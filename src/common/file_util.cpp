@@ -526,11 +526,11 @@ void CopyDir(const std::string& source_path, const std::string& dest_path) {
 std::optional<std::string> GetCurrentDir() {
     // Get the current working directory (getcwd uses malloc)
 #ifdef _WIN32
-    wchar_t* dir;
-    if (!(dir = _wgetcwd(nullptr, 0))) {
+    wchar_t* dir = _wgetcwd(nullptr, 0);
+    if (!dir) {
 #else
-    char* dir;
-    if (!(dir = getcwd(nullptr, 0))) {
+    char* dir = getcwd(nullptr, 0);
+    if (!dir) {
 #endif
         LOG_ERROR(Common_Filesystem, "GetCurrentDirectory failed: {}", GetLastErrorMsg());
         return {};
