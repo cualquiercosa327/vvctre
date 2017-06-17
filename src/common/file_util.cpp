@@ -844,15 +844,16 @@ bool IOFile::Open(const std::string& filename, const char openmode[], int flags)
     if (flags != 0) {
         m_file = _wfsopen(Common::UTF8ToUTF16W(filename).c_str(),
                           Common::UTF8ToUTF16W(openmode).c_str(), flags);
+        m_good = m_file != nullptr;
     } else {
-        _wfopen_s(&m_file, Common::UTF8ToUTF16W(filename).c_str(),
-                  Common::UTF8ToUTF16W(openmode).c_str());
+        m_good = _wfopen_s(&m_file, Common::UTF8ToUTF16W(filename).c_str(),
+                           Common::UTF8ToUTF16W(openmode).c_str()) == 0;
     }
 #else
-    m_file = fopen(filename.c_str(), openmode);
+    m_file = std::fopen(filename.c_str(), openmode);
+    m_good = m_file != nullptr;
 #endif
 
-    m_good = IsOpen();
     return m_good;
 }
 
