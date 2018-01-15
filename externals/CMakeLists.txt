@@ -50,6 +50,9 @@ if (ARCHITECTURE_x86_64)
     target_compile_definitions(xbyak INTERFACE XBYAK_NO_OP_NAMES)
 endif()
 
+# xBRZ
+add_subdirectory(xbrz)
+
 # Zstandard
 add_subdirectory(zstd/build/cmake EXCLUDE_FROM_ALL)
 
