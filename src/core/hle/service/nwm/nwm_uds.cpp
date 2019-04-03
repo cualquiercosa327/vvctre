@@ -317,10 +317,6 @@ void NWM_UDS::HandleSecureDataPacket(const WifiPacket& packet) {
         // The packet wasn't addressed to us, we can only act as a router if we're the host.
         // However, we might have received this packet due to a broadcast from the host, in that
         // case just ignore it.
-        ASSERT_MSG(packet.destination_address == BroadcastMac ||
-                       connection_status.status == static_cast<u32>(NetworkStatus::ConnectedAsHost),
-                   "Can't be a router if we're not a host");
-
         if (connection_status.status == static_cast<u32>(NetworkStatus::ConnectedAsHost) &&
             secure_data.dest_node_id != BroadcastNetworkNodeId) {
             // Broadcast the packet so the right receiver can get it.
@@ -340,12 +336,14 @@ void NWM_UDS::HandleSecureDataPacket(const WifiPacket& packet) {
     // TODO(B3N30): Allow more than one bind node per channel.
     auto channel_info = channel_data.find(secure_data.data_channel);
     // Ignore packets from channels we're not interested in.
-    if (channel_info == channel_data.end())
+    if (channel_info == channel_data.end()) {
         return;
+    }
 
     if (channel_info->second.network_node_id != BroadcastNetworkNodeId &&
-        channel_info->second.network_node_id != secure_data.src_node_id)
+        channel_info->second.network_node_id != secure_data.src_node_id) {
         return;
+    }
 
     // Add the received packet to the data queue.
     channel_info->second.received_packets.emplace_back(packet.data);
@@ -458,7 +456,6 @@ void NWM_UDS::HandleDeauthenticationFrame(const WifiPacket& packet) {
     auto node_it = std::find_if(node_info.begin(), node_info.end(), [&node](const NodeInfo& info) {
         return info.network_node_id == node.node_id;
     });
-    ASSERT(node_it != node_info.end());
 
     connection_status.node_bitmask &= ~(1 << (node.node_id - 1));
     connection_status.changed_nodes |= 1 << (node.node_id - 1);
@@ -1092,7 +1089,6 @@ void NWM_UDS::SendTo(Kernel::HLERequestContext& ctx) {
     u8 flags = rp.Pop<u8>();
 
     // There should never be a dest_node_id of 0
-    ASSERT(dest_node_id != 0);
 
     std::vector<u8> input_buffer = rp.PopStaticBuffer();
     ASSERT(input_buffer.size() >= data_size);
