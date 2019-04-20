@@ -77,7 +77,6 @@ MemorySystem::~MemorySystem() = default;
 void MemorySystem::ResetPageTable(PageTable& page_table) {
     page_table.pointers.fill(nullptr);
     page_table.attributes.fill(Memory::PageType::Unmapped);
-    page_table.fastmem_base = impl->fastmem_mapper.AllocateFastmemRegion();
 }
 
 void MemorySystem::SetCurrentPageTable(PageTable* page_table) {

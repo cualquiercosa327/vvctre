@@ -19,15 +19,17 @@ namespace AudioCore {
 class DspInterface;
 } // namespace AudioCore
 
+namespace Common {
+class FastmemMapper;
+} // namespace Common
+
 namespace Kernel {
 class Process;
 } // namespace Kernel
 
-namespace AudioCore {
-class DspInterface;
-} // namespace AudioCore
-
 namespace Memory {
+
+class MemorySystem;
 
 // Are defined in a system header
 #undef PAGE_SIZE
@@ -57,7 +59,12 @@ enum class PageType {
  * fetching requirements when accessing. In the usual case of an access to regular memory, it only
  * requires an indexed fetch and a check for NULL.
  */
-struct PageTable {
+class PageTable final {
+private:
+    friend class ::ARM_Dynarmic;
+    friend class ::Common::FastmemMapper;
+    friend class ::Memory::MemorySystem;
+
     /**
      * Array of memory pointers backing each page. An entry can only be non-null if the
      * corresponding entry in the `attributes` array is of type `Memory`.
@@ -200,6 +207,14 @@ class MemorySystem {
 public:
     MemorySystem();
     ~MemorySystem();
+
+    /**
+     * Resets page table by clearning all mappings.
+     * Also enables fastmem support for specified page table.
+     *
+     * @param page_table The page table to reset.
+     */
+    void ResetPageTable(PageTable& page_table);
 
     /**
      * Maps an allocated buffer onto a region of the emulated process address space.
