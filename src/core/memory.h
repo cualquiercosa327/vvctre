@@ -10,16 +10,22 @@
 #include <string>
 #include <vector>
 #include "common/common_types.h"
+#include "common/fastmem_mapper.h"
 
 class ARM_Interface;
-
-namespace Kernel {
-class Process;
-}
+class ARM_Dynarmic;
 
 namespace AudioCore {
 class DspInterface;
-}
+} // namespace AudioCore
+
+namespace Kernel {
+class Process;
+} // namespace Kernel
+
+namespace AudioCore {
+class DspInterface;
+} // namespace AudioCore
 
 namespace Memory {
 
@@ -63,6 +69,8 @@ struct PageTable {
      * the corresponding entry in `pointers` MUST be set to null.
      */
     std::array<PageType, PAGE_TABLE_NUM_ENTRIES> attributes;
+
+    Common::FastmemRegion fastmem_base;
 };
 
 /// Physical memory regions as seen from the ARM11
