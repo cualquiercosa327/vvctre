@@ -46,3 +46,6 @@
 [submodule "semver"]
     path = externals/semver
     url = https://github.com/Neargye/semver.git
+[submodule "zstd"]
+    path = externals/zstd
+    url = https://github.com/facebook/zstd.git
