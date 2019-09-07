@@ -2,10 +2,6 @@
 [Bb]uild/
 doc-build/
 
-# Generated source files
-src/common/scm_rev.cpp
-.travis.descriptor.json
-
 # Project/editor files
 *.swp
 .idea/
