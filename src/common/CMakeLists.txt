@@ -1,7 +1,3 @@
-# Generate cpp with Git revision from template
-# Also if this is a CI build, add the build name (ie: Nightly, Canary) to the scm_rev file as well
-configure_file("${CMAKE_CURRENT_SOURCE_DIR}/scm_rev.cpp.in" "${CMAKE_CURRENT_SOURCE_DIR}/scm_rev.cpp" @ONLY)
-
 add_library(common STATIC
     alignment.h
     announce_multiplayer_room.h
@@ -47,9 +43,10 @@ add_library(common STATIC
     timer.cpp
     timer.h
     vector_math.h
+    zstd_compression.cpp
+    zstd_compression.h
 )
 
-if(ARCHITECTURE_x86_64)
     target_sources(common
         PRIVATE
             x64/cpu_detect.cpp
@@ -62,7 +59,8 @@ endif()
 
 create_target_directory_groups(common)
 
-target_link_libraries(common PUBLIC fmt)
+target_link_libraries(common PUBLIC fmt PRIVATE libzstd_static)
+
 if (ARCHITECTURE_x86_64)
     target_link_libraries(common PRIVATE xbyak)
 endif()
