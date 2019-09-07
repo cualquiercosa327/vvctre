@@ -37,6 +37,7 @@
 #include "core/movie.h"
 #include "core/settings.h"
 #include "network/network.h"
+#include "video_core/renderer_base.h"
 #include "video_core/video_core.h"
 #include "vvctre/config.h"
 #include "vvctre/emu_window/emu_window_sdl2.h"
@@ -44,6 +45,7 @@
 
 #undef _UNICODE
 #include <getopt.h>
+
 #ifndef _MSC_VER
 #include <unistd.h>
 #endif
@@ -405,6 +407,14 @@ int main(int argc, char** argv) {
     }
 
     std::thread render_thread([&emu_window] { emu_window->Present(); });
+
+    std::atomic_bool stop_run;
+    Core::System::GetInstance().Renderer().Rasterizer()->LoadDiskResources(
+        stop_run, [](VideoCore::LoadCallbackStage stage, std::size_t value, std::size_t total) {
+            LOG_DEBUG(Frontend, "Loading stage {} progress {} {}", static_cast<u32>(stage), value,
+                      total);
+        });
+
     while (emu_window->IsOpen()) {
         system.RunLoop();
     }

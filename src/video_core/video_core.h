@@ -10,13 +10,13 @@
 
 namespace Frontend {
 class EmuWindow;
-}
+} // namespace Frontend
 
 class RendererBase;
 
 namespace Memory {
 class MemorySystem;
-}
+} // namespace Memory
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // Video Core namespace
