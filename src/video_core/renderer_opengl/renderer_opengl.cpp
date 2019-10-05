@@ -29,7 +29,6 @@
 #include "core/tracer/recorder.h"
 #include "video_core/debug_utils/debug_utils.h"
 #include "video_core/rasterizer_interface.h"
-#include "video_core/renderer_opengl/gl_vars.h"
 #include "video_core/renderer_opengl/post_processing_opengl.h"
 #include "video_core/renderer_opengl/renderer_opengl.h"
 #include "video_core/video_core.h"
@@ -172,7 +171,8 @@ public:
     }
 };
 
-static const char vertex_shader[] = R"(
+static const char vertex_shader[] = R"(#version 330 core
+
 in vec2 vert_position;
 in vec2 vert_tex_coord;
 out vec2 frag_tex_coord;
@@ -190,10 +190,10 @@ void main() {
     // to `vec3(vert_position.xy, 1.0)`
     gl_Position = vec4(mat2(modelview_matrix) * vert_position + modelview_matrix[2], 0.0, 1.0);
     frag_tex_coord = vert_tex_coord;
-}
-)";
+})";
 
-static const char fragment_shader[] = R"(
+static const char fragment_shader[] = R"(#version 330 core
+
 in vec2 frag_tex_coord;
 layout(location = 0) out vec4 color;
 
@@ -205,10 +205,9 @@ uniform sampler2D color_texture;
 
 void main() {
     color = texture(color_texture, frag_tex_coord);
-}
-)";
+})";
 
-static const char fragment_shader_anaglyph[] = R"(
+static const char fragment_shader_anaglyph[] = R"(#version 330 core
 
 // Anaglyph Red-Cyan shader based on Dubois algorithm
 // Constants taken from the paper:
@@ -235,8 +234,7 @@ void main() {
     vec4 color_tex_l = texture(color_texture, frag_tex_coord);
     vec4 color_tex_r = texture(color_texture_r, frag_tex_coord);
     color = vec4(color_tex_l.rgb*l+color_tex_r.rgb*r, color_tex_l.a);
-}
-)";
+})";
 
 /**
  * Vertex structure that the drawn screen rectangles are composed of.
@@ -606,9 +604,7 @@ void RendererOpenGL::ReloadSampler() {
 void RendererOpenGL::ReloadShader() {
     // Link shaders and get variable locations
     std::string shader_data;
-    if (GLES) {
-        shader_data += fragment_shader_precision_OES;
-    }
+
     if (Settings::values.render_3d == Settings::StereoRenderOption::Anaglyph) {
         if (Settings::values.pp_shader_name == "dubois (builtin)") {
             shader_data += fragment_shader_anaglyph;
@@ -664,7 +660,7 @@ void RendererOpenGL::ConfigureFramebufferTexture(TextureInfo& texture,
     case GPU::Regs::PixelFormat::RGBA8:
         internal_format = GL_RGBA;
         texture.gl_format = GL_RGBA;
-        texture.gl_type = GLES ? GL_UNSIGNED_BYTE : GL_UNSIGNED_INT_8_8_8_8;
+        texture.gl_type = GL_UNSIGNED_INT_8_8_8_8;
         break;
 
     case GPU::Regs::PixelFormat::RGB8:
@@ -673,9 +669,7 @@ void RendererOpenGL::ConfigureFramebufferTexture(TextureInfo& texture,
         // mostly everywhere) for words or half-words.
         // TODO: check how those behave on big-endian processors.
         internal_format = GL_RGB;
-
-        // GLES Dosen't support BGR , Use RGB instead
-        texture.gl_format = GLES ? GL_RGB : GL_BGR;
+        texture.gl_format = GL_BGR;
         texture.gl_type = GL_UNSIGNED_BYTE;
         break;
 

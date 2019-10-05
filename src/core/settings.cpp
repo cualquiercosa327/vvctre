@@ -71,7 +71,6 @@ void LogSetting(const std::string& name, const T& value) {
 
 void LogSettings() {
     LOG_INFO(Config, "Configuration:");
-    // TODO
 }
 
 void LoadProfile(int index) {
