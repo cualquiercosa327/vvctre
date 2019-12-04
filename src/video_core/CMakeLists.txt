@@ -53,6 +53,8 @@ add_library(video_core STATIC
     renderer_opengl/texture_filters/texture_filter_manager.h
     renderer_opengl/texture_filters/xbrz_cpu.cpp
     renderer_opengl/texture_filters/xbrz_cpu.h
+    renderer_opengl/texture_filters/xbrz_freescale.cpp
+    renderer_opengl/texture_filters/xbrz_freescale.h
     shader/debug_data.h
     shader/shader.cpp
     shader/shader.h
