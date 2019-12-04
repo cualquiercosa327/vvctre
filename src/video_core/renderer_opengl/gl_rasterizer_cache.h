@@ -520,4 +520,20 @@ private:
 
     std::unordered_map<TextureCubeConfig, CachedTextureCube> texture_cube_cache;
 };
+
+struct FormatTuple {
+    GLint internal_format;
+    GLenum format;
+    GLenum type;
+};
+
+constexpr FormatTuple tex_tuple = {GL_RGBA8, GL_RGBA, GL_UNSIGNED_BYTE};
+
+const FormatTuple& GetFormatTuple(SurfaceParams::PixelFormat pixel_format);
+
+void AllocateSurfaceTexture(GLuint texture, const FormatTuple& format_tuple, u32 width, u32 height);
+
+bool BlitTextures(GLuint src_tex, const Common::Rectangle<u32>& src_rect, GLuint dst_tex,
+                  const Common::Rectangle<u32>& dst_rect, SurfaceParams::SurfaceType type,
+                  GLuint read_fb_handle, GLuint draw_fb_handle);
 } // namespace OpenGL
