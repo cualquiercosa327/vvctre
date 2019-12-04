@@ -11,30 +11,24 @@
 #include <string>
 #include <tuple>
 
-#include "common/logging/log.h"
-#include "video_core/renderer_opengl/texture_filters/anime4k_ultrafast.h"
 #include "video_core/renderer_opengl/texture_filters/texture_filter_interface.h"
-#include "video_core/renderer_opengl/texture_filters/xbrz_cpu.h"
-#include "video_core/renderer_opengl/texture_filters/xbrz_freescale.h"
 
 namespace OpenGL {
 
 class TextureFilterManager {
-    using TextureFilterConstructor = std::unique_ptr<TextureFilterInterface> (*)();
-
-    static TextureFilterManager singleton;
-
     std::atomic<bool> updated{false};
     std::mutex mutex;
     std::string name{"none"};
-    u16 scale_factor{0};
+    u16 scale_factor{1};
 
     std::unique_ptr<TextureFilterInterface> filter;
 
 public:
-    static const std::map<std::string_view, TextureFilterConstructor> texture_filter_map;
+    // function ensures map is initialized before use
+    static const std::map<std::string, TextureFilterInfo>& TextureFilterMap();
 
     static TextureFilterManager& GetInstance() {
+        static TextureFilterManager singleton;
         return singleton;
     }
 

@@ -312,8 +312,14 @@ void main() {
     GLint output_size;
 
 public:
-    XbrzFreescale();
+    static TextureFilterInfo GetInfo() {
+        TextureFilterInfo info;
+        info.name = "xBRZ (GPU)";
+        info.constructor = std::make_unique<XbrzFreescale>;
+        return info;
+    }
 
+    XbrzFreescale();
     void scale(const Surface& src_surface, const Surface& dst_surface) override;
 };
 } // namespace OpenGL

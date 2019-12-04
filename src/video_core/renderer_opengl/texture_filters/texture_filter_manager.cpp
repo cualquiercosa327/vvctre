@@ -2,41 +2,55 @@
 // Licensed under GPLv2 or any later version
 // Refer to the license.txt file included.
 
+#include "common/logging/log.h"
+#include "video_core/renderer_opengl/texture_filters/anime4k_ultrafast.h"
 #include "video_core/renderer_opengl/texture_filters/texture_filter_manager.h"
+#include "video_core/renderer_opengl/texture_filters/xbrz_cpu.h"
+#include "video_core/renderer_opengl/texture_filters/xbrz_freescale.h"
 
 namespace OpenGL {
 
 template <typename T>
-static constexpr std::pair<std::string, TextureFilterManager::TextureFilterConstructor>
-FilterMapPair(std::string name) {
-    return {name,
-            []() -> std::unique_ptr<TextureFilterInterface> { return std::make_unique<T>(); }};
-}
+static std::pair<std::string, TextureFilterInfo> FilterMapPair = {T::GetInfo().name, T::GetInfo()};
 
-const std::map<std::string_view, TextureFilterManager::TextureFilterConstructor>
-    TextureFilterManager::texture_filter_map{
-        {"none", []() -> std::unique_ptr<TextureFilterInterface> { return nullptr; }},
-        FilterMapPair<Anime4kUltrafast>("Anime4K Ultrafast"),
-        FilterMapPair<XbrzCpu>("xBRZ (CPU)"),
-        FilterMapPair<XbrzFreescale>("xBRZ (GPU)"),
+struct NoFilter {
+    static TextureFilterInfo GetInfo() {
+        TextureFilterInfo info;
+        info.name = "none";
+        info.clamp_scale = {1, 1};
+        info.constructor = [] { return nullptr; };
+        return info;
+    }
+};
+
+const std::map<std::string, TextureFilterInfo>& TextureFilterManager::TextureFilterMap() {
+    static const std::map<std::string, TextureFilterInfo> filter_map{
+        FilterMapPair<NoFilter>,
+        FilterMapPair<Anime4kUltrafast>,
+        FilterMapPair<XbrzFreescale>,
+        FilterMapPair<XbrzCpu>,
     };
+    return filter_map;
+}
 
 void TextureFilterManager::SetTextureFilter(const std::string& filter_name, u16 new_scale_factor) {
     if (name == filter_name && scale_factor == new_scale_factor)
         return;
-    std::lock_guard<std::mutex>{mutex};
+    std::lock_guard<std::mutex> lock{mutex};
     name = filter_name;
     scale_factor = new_scale_factor;
     updated = true;
 }
 
+// <filter, scale_factor, delete cache>
 std::tuple<TextureFilterInterface*, u16, bool> TextureFilterManager::GetTextureFilter() {
     if (!updated)
         return {filter.get(), scale_factor, false};
+    updated = false;
 
-    std::lock_guard<std::mutex>{mutex};
-    auto iter = texture_filter_map.find(name);
-    if (iter == texture_filter_map.end()) {
+    std::lock_guard<std::mutex> lock{mutex};
+    auto iter = TextureFilterMap().find(name);
+    if (iter == TextureFilterMap().end()) {
         LOG_ERROR(Render_OpenGL, "Invalid texture filter: {}", name);
         return {nullptr, 0, true};
     }
@@ -51,7 +65,6 @@ std::tuple<TextureFilterInterface*, u16, bool> TextureFilterManager::GetTextureF
                   scale_unclamped, name, scale_factor);
     }
 
-    filter = iter->second();
     return {filter.get(), scale_factor, true};
 }
 

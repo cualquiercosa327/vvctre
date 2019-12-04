@@ -15,8 +15,15 @@ class XbrzCpu : public TextureFilterInterface {
     std::vector<u32> tmp_buf, upscaled_buf;
 
 public:
-    XbrzCpu();
+    static TextureFilterInfo GetInfo() {
+        TextureFilterInfo info;
+        info.name = "xBRZ (CPU)";
+        info.clamp_scale = {1, 6};
+        info.constructor = std::make_unique<XbrzCpu>;
+        return info;
+    }
 
+    XbrzCpu();
     void scale(const Surface& src_surface, const Surface& dst_surface) override;
 };
 } // namespace OpenGL

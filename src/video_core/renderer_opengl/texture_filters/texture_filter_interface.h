@@ -4,6 +4,11 @@
 
 #pragma once
 
+#include <functional>
+#include <string>
+
+#include "common/common_types.h"
+
 namespace OpenGL {
 
 struct CachedSurface;
@@ -14,4 +19,14 @@ public:
     virtual void scale(const Surface& src_surface, const Surface& dst_surface) = 0;
     virtual ~TextureFilterInterface() = default;
 };
+
+// every texture filter should have a static GetInfo function
+struct TextureFilterInfo {
+    std::string name;
+    struct {
+        u16 min, max;
+    } clamp_scale{1, 10};
+    std::function<std::unique_ptr<TextureFilterInterface>()> constructor;
+};
+
 } // namespace OpenGL

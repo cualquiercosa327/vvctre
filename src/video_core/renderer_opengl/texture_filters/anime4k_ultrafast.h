@@ -285,8 +285,14 @@ void main(){
     } gradient_program, gaussian_program, refine_program;
 
 public:
-    Anime4kUltrafast();
+    static TextureFilterInfo GetInfo() {
+        TextureFilterInfo info;
+        info.name = "Anime4K Ultrafast";
+        info.constructor = std::make_unique<Anime4kUltrafast>;
+        return info;
+    }
 
+    Anime4kUltrafast();
     void scale(const Surface& src_surface, const Surface& dst_surface) override;
 };
 
