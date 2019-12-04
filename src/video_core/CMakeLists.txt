@@ -48,6 +48,8 @@ add_library(video_core STATIC
     renderer_opengl/post_processing_opengl.h
     renderer_opengl/renderer_opengl.cpp
     renderer_opengl/renderer_opengl.h
+    renderer_opengl/texture_filters/anime4k_ultrafast.cpp
+    renderer_opengl/texture_filters/anime4k_ultrafast.h
     renderer_opengl/texture_filters/texture_filter_interface.h
     renderer_opengl/texture_filters/texture_filter_manager.cpp
     renderer_opengl/texture_filters/texture_filter_manager.h
