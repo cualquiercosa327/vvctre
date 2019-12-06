@@ -168,10 +168,14 @@ void Config::ReadValues() {
     Settings::values.factor_3d =
         static_cast<u8>(sdl2_config->GetInteger("Renderer", "factor_3d", 0));
     Settings::values.filter_mode = sdl2_config->GetBoolean("Renderer", "filter_mode", true);
-    Settings::values.pp_shader_name = sdl2_config->GetString(
-        "Renderer", "pp_shader_name",
-        (Settings::values.render_3d == Settings::StereoRenderOption::Anaglyph) ? "dubois (builtin)"
-                                                                               : "none (builtin)");
+    std::string default_shader = "none (builtin)";
+    if (Settings::values.render_3d == Settings::StereoRenderOption::Anaglyph) {
+        default_shader = "dubois (builtin)";
+    } else if (Settings::values.render_3d == Settings::StereoRenderOption::Interlaced) {
+        default_shader = "horizontal (builtin)";
+    }
+    Settings::values.pp_shader_name =
+        sdl2_config->GetString("Renderer", "pp_shader_name", default_shader);
     Settings::values.use_vsync_new = sdl2_config->GetBoolean("Renderer", "use_vsync_new", true);
     Settings::values.sharper_distant_objects =
         sdl2_config->GetBoolean("Renderer", "sharper_distant_objects", false);

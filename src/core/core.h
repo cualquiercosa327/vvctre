@@ -10,35 +10,37 @@
 #include "core/custom_tex_cache.h"
 #include "core/frontend/applets/mii_selector.h"
 #include "core/frontend/applets/swkbd.h"
+#include "core/frontend/image_interface.h"
 #include "core/loader/loader.h"
 #include "core/memory.h"
 #include "core/perf_stats.h"
+#include "core/telemetry_session.h"
 
 class ARM_Interface;
 
 namespace Frontend {
 class EmuWindow;
-} // namespace Frontend
+}
 
 namespace Memory {
 class MemorySystem;
-} // namespace Memory
+}
 
 namespace AudioCore {
 class DspInterface;
-} // namespace AudioCore
+}
 
 namespace RPC {
 class RPCServer;
-} // namespace RPC
+}
 
 namespace Service {
 namespace SM {
 class ServiceManager;
-} // namespace SM
+}
 namespace FS {
 class ArchiveManager;
-} // namespace FS
+}
 } // namespace Service
 
 namespace Kernel {
@@ -52,8 +54,6 @@ class CheatEngine;
 namespace VideoDumper {
 class Backend;
 }
-
-class RendererBase;
 
 namespace Core {
 
@@ -123,10 +123,6 @@ public:
         shutdown_requested = true;
     }
 
-    void SetResetFilePath(const std::string filepath) {
-        m_filepath = filepath;
-    }
-
     /**
      * Load an executable application.
      * @param emu_window Reference to the host-system window used for video output and keyboard
@@ -143,6 +139,14 @@ public:
      */
     bool IsPoweredOn() const {
         return cpu_core != nullptr;
+    }
+
+    /**
+     * Returns a reference to the telemetry session for this emulation session.
+     * @returns Reference to the telemetry session.
+     */
+    Core::TelemetrySession& TelemetrySession() const {
+        return *telemetry_session;
     }
 
     /// Prepare the core emulation for a reschedule
@@ -165,8 +169,6 @@ public:
     AudioCore::DspInterface& DSP() {
         return *dsp_core;
     }
-
-    RendererBase& Renderer();
 
     /**
      * Gets a reference to the service manager.
@@ -216,6 +218,9 @@ public:
     /// Gets a const reference to the custom texture cache system
     const Core::CustomTexCache& CustomTexCache() const;
 
+    /// Handles loading all custom textures from disk into cache.
+    void PreloadCustomTextures();
+
     /// Gets a reference to the video dumper backend
     VideoDumper::Backend& VideoDumper();
 
@@ -241,13 +246,25 @@ public:
     }
 
     /// Frontend Applets
+
     void RegisterMiiSelector(std::shared_ptr<Frontend::MiiSelector> mii_selector);
+
     void RegisterSoftwareKeyboard(std::shared_ptr<Frontend::SoftwareKeyboard> swkbd);
+
     std::shared_ptr<Frontend::MiiSelector> GetMiiSelector() const {
         return registered_mii_selector;
     }
+
     std::shared_ptr<Frontend::SoftwareKeyboard> GetSoftwareKeyboard() const {
         return registered_swkbd;
+    }
+
+    /// Image interface
+
+    void RegisterImageInterface(std::shared_ptr<Frontend::ImageInterface> image_interface);
+
+    std::shared_ptr<Frontend::ImageInterface> GetImageInterface() const {
+        return registered_image_interface;
     }
 
 private:
@@ -275,6 +292,9 @@ private:
     /// When true, signals that a reschedule should happen
     bool reschedule_pending{};
 
+    /// Telemetry session for this emulation session
+    std::unique_ptr<Core::TelemetrySession> telemetry_session;
+
     /// Service manager
     std::shared_ptr<Service::SM::ServiceManager> service_manager;
 
@@ -291,6 +311,9 @@ private:
     /// Custom texture cache system
     std::unique_ptr<Core::CustomTexCache> custom_tex_cache;
 
+    /// Image interface
+    std::shared_ptr<Frontend::ImageInterface> registered_image_interface;
+
     /// RPC Server for scripting support
     std::unique_ptr<RPC::RPCServer> rpc_server;
 
@@ -305,11 +328,8 @@ private:
 
     ResultStatus status = ResultStatus::Success;
     std::string status_details = "";
-
-    /// Saved variable for reset
+    /// Saved variables for reset
     Frontend::EmuWindow* m_emu_window;
-
-    /// Saved variable for reset and application jump
     std::string m_filepath;
 
     std::atomic<bool> reset_requested;
