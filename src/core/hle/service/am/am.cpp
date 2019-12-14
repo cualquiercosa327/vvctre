@@ -147,27 +147,30 @@ ResultCode CIAFile::WriteTitleMetadata() {
 }
 
 ResultVal<std::size_t> CIAFile::WriteContentData(u64 offset, std::size_t length, const u8* buffer) {
-    // Data is not being buffered, so we have to keep track of how much of each <ID>.app
-    // has been written since we might get a written buffer which contains multiple .app
-    // contents or only part of a larger .app's contents.
+    // Data is not being buffered, so we have to keep track of how much of each
+    // <ID>.app has been written since we might get a written buffer which
+    // contains multiple .app contents or only part of a larger .app's contents.
     u64 offset_max = offset + length;
     for (int i = 0; i < container.GetTitleMetadata().GetContentCount(); i++) {
         if (content_written[i] < container.GetContentSize(i)) {
-            // The size, minimum unwritten offset, and maximum unwritten offset of this content
+            // The size, minimum unwritten offset, and maximum unwritten offset of
+            // this content
             u64 size = container.GetContentSize(i);
             u64 range_min = container.GetContentOffset(i) + content_written[i];
             u64 range_max = container.GetContentOffset(i) + size;
 
-            // The unwritten range for this content is beyond the buffered data we have
-            // or comes before the buffered data we have, so skip this content ID.
+            // The unwritten range for this content is beyond the buffered data we
+            // have or comes before the buffered data we have, so skip this content
+            // ID.
             if (range_min > offset_max || range_max < offset)
                 continue;
 
-            // Figure out how much of this content ID we have just recieved/can write out
+            // Figure out how much of this content ID we have just recieved/can write
+            // out
             u64 available_to_write = std::min(offset_max, range_max) - range_min;
 
-            // Since the incoming TMD has already been written, we can use GetTitleContentPath
-            // to get the content paths to write to.
+            // Since the incoming TMD has already been written, we can use
+            // GetTitleContentPath to get the content paths to write to.
             FileSys::TitleMetadata tmd = container.GetTitleMetadata();
             FileUtil::IOFile file(GetTitleContentPath(media_type, tmd.GetTitleID(), i, is_update),
                                   content_written[i] ? "ab" : "wb");
@@ -185,8 +188,8 @@ ResultVal<std::size_t> CIAFile::WriteContentData(u64 offset, std::size_t length,
 
             file.WriteBytes(temp.data(), temp.size());
 
-            // Keep tabs on how much of this content ID has been written so new range_min
-            // values can be calculated.
+            // Keep tabs on how much of this content ID has been written so new
+            // range_min values can be calculated.
             content_written[i] += available_to_write;
             LOG_DEBUG(Service_AM, "Wrote {:x} to content {}, total {:x}", available_to_write, i,
                       content_written[i]);
@@ -200,14 +203,15 @@ ResultVal<std::size_t> CIAFile::Write(u64 offset, std::size_t length, bool flush
                                       const u8* buffer) {
     written += length;
 
-    // TODO(shinyquagsire23): Can we assume that things will only be written in sequence?
-    // Does AM send an error if we write to things out of order?
-    // Or does it just ignore offsets and assume a set sequence of incoming data?
+    // TODO(shinyquagsire23): Can we assume that things will only be written in
+    // sequence? Does AM send an error if we write to things out of order? Or does
+    // it just ignore offsets and assume a set sequence of incoming data?
 
-    // The data in CIAs is always stored CIA Header > Cert > Ticket > TMD > Content > Meta.
-    // The CIA Header describes Cert, Ticket, TMD, total content sizes, and TMD is needed for
-    // content sizes so it ends up becoming a problem of keeping track of how much has been
-    // written and what we have been able to pick up.
+    // The data in CIAs is always stored CIA Header > Cert > Ticket > TMD >
+    // Content > Meta. The CIA Header describes Cert, Ticket, TMD, total content
+    // sizes, and TMD is needed for content sizes so it ends up becoming a problem
+    // of keeping track of how much has been written and what we have been able to
+    // pick up.
     if (install_state == CIAInstallState::InstallStarted) {
         std::size_t buf_copy_size = std::min(length, FileSys::CIA_HEADER_SIZE);
         std::size_t buf_max_size =
@@ -243,26 +247,30 @@ ResultVal<std::size_t> CIAFile::Write(u64 offset, std::size_t length, bool flush
 
     // TODO(shinyquagsire23): Write out .tik files to nand?
 
-    // The end of our TMD is at the beginning of Content data, so ensure we have that much
-    // buffered before trying to parse.
+    // The end of our TMD is at the beginning of Content data, so ensure we have
+    // that much buffered before trying to parse.
     if (written >= container.GetContentOffset() && install_state != CIAInstallState::TMDLoaded) {
         auto result = WriteTicket();
-        if (result.IsError())
+        if (result.IsError()) {
             return result;
+        }
 
         result = WriteTitleMetadata();
-        if (result.IsError())
+        if (result.IsError()) {
             return result;
+        }
     }
 
     // Content data sizes can only be retrieved from TMD data
-    if (install_state != CIAInstallState::TMDLoaded)
+    if (install_state != CIAInstallState::TMDLoaded) {
         return MakeResult<std::size_t>(length);
+    }
 
     // From this point forward, data will no longer be buffered in data
     auto result = WriteContentData(offset, length, buffer);
-    if (result.Failed())
+    if (result.Failed()) {
         return result;
+    }
 
     return MakeResult<std::size_t>(length);
 }
@@ -278,8 +286,9 @@ bool CIAFile::SetSize(u64 size) const {
 bool CIAFile::Close() const {
     bool complete = true;
     for (std::size_t i = 0; i < container.GetTitleMetadata().GetContentCount(); i++) {
-        if (content_written[i] < container.GetContentSize(static_cast<u16>(i)))
+        if (content_written[i] < container.GetContentSize(static_cast<u16>(i))) {
             complete = false;
+        }
     }
 
     // Install aborted
@@ -301,9 +310,9 @@ bool CIAFile::Close() const {
         old_tmd.Load(old_tmd_path);
         new_tmd.Load(new_tmd_path);
 
-        // For each content ID in the old TMD, check if there is a matching ID in the new
-        // TMD. If a CIA contains (and wrote to) an identical ID, it should be kept while
-        // IDs which only existed for the old TMD should be deleted.
+        // For each content ID in the old TMD, check if there is a matching ID in
+        // the new TMD. If a CIA contains (and wrote to) an identical ID, it should
+        // be kept while IDs which only existed for the old TMD should be deleted.
         for (u16 old_index = 0; old_index < old_tmd.GetContentCount(); old_index++) {
             bool abort = false;
             for (u16 new_index = 0; new_index < new_tmd.GetContentCount(); new_index++) {
@@ -312,8 +321,9 @@ bool CIAFile::Close() const {
                     abort = true;
                 }
             }
-            if (abort)
+            if (abort) {
                 break;
+            }
 
             FileUtil::Delete(GetTitleContentPath(media_type, old_tmd.GetTitleID(), old_index));
         }
@@ -387,11 +397,13 @@ Service::FS::MediaType GetTitleMediaType(u64 titleId) {
     u16 category = static_cast<u16>((titleId >> 32) & 0xFFFF);
     u8 variation = static_cast<u8>(titleId & 0xFF);
 
-    if (platform != PLATFORM_CTR)
+    if (platform != PLATFORM_CTR) {
         return Service::FS::MediaType::NAND;
+    }
 
-    if (category & CATEGORY_SYSTEM || category & CATEGORY_DLP || variation & VARIATION_SYSTEM)
+    if (category & CATEGORY_SYSTEM || category & CATEGORY_DLP || variation & VARIATION_SYSTEM) {
         return Service::FS::MediaType::NAND;
+    }
 
     return Service::FS::MediaType::SDMC;
 }
@@ -404,9 +416,10 @@ std::string GetTitleMetadataPath(Service::FS::MediaType media_type, u64 tid, boo
         return "";
     }
 
-    // The TMD ID is usually held in the title databases, which we don't implement.
-    // For now, just scan for any .tmd files which exist, the smallest will be the
-    // base ID and the largest will be the (currently installing) update ID.
+    // The TMD ID is usually held in the title databases, which we don't
+    // implement. For now, just scan for any .tmd files which exist, the smallest
+    // will be the base ID and the largest will be the (currently installing)
+    // update ID.
     constexpr u32 MAX_TMD_ID = 0xFFFFFFFF;
     u32 base_id = MAX_TMD_ID;
     u32 update_id = 0;
@@ -424,12 +437,14 @@ std::string GetTitleMetadataPath(Service::FS::MediaType media_type, u64 tid, boo
     }
 
     // If we didn't find anything, default to 00000000.tmd for it to be created.
-    if (base_id == MAX_TMD_ID)
+    if (base_id == MAX_TMD_ID) {
         base_id = 0;
+    }
 
     // Update ID should be one more than the last, if it hasn't been created yet.
-    if (base_id == update_id)
+    if (base_id == update_id) {
         update_id++;
+    }
 
     return content_path + fmt::format("{:08x}.tmd", (update ? update_id : base_id));
 }
@@ -459,9 +474,10 @@ std::string GetTitleContentPath(Service::FS::MediaType media_type, u64 tid, u16 
         }
 
         // TODO(shinyquagsire23): how does DLC actually get this folder on hardware?
-        // For now, check if the second (index 1) content has the optional flag set, for most
-        // apps this is usually the manual and not set optional, DLC has it set optional.
-        // All .apps (including index 0) will be in the 00000000/ folder for DLC.
+        // For now, check if the second (index 1) content has the optional flag set,
+        // for most apps this is usually the manual and not set optional, DLC has it
+        // set optional. All .apps (including index 0) will be in the 00000000/
+        // folder for DLC.
         if (tmd.GetContentCount() > 1 &&
             tmd.GetContentTypeByIndex(1) & FileSys::TMDContentTypeFlag::Optional) {
             content_path += "00000000/";
@@ -475,8 +491,9 @@ std::string GetTitlePath(Service::FS::MediaType media_type, u64 tid) {
     u32 high = static_cast<u32>(tid >> 32);
     u32 low = static_cast<u32>(tid & 0xFFFFFFFF);
 
-    if (media_type == Service::FS::MediaType::NAND || media_type == Service::FS::MediaType::SDMC)
+    if (media_type == Service::FS::MediaType::NAND || media_type == Service::FS::MediaType::SDMC) {
         return fmt::format("{}{:08x}/{:08x}/", GetMediaTitlePath(media_type), high, low);
+    }
 
     if (media_type == Service::FS::MediaType::GameCard) {
         // TODO(shinyquagsire23): get current app path if TID matches?
@@ -488,14 +505,16 @@ std::string GetTitlePath(Service::FS::MediaType media_type, u64 tid) {
 }
 
 std::string GetMediaTitlePath(Service::FS::MediaType media_type) {
-    if (media_type == Service::FS::MediaType::NAND)
+    if (media_type == Service::FS::MediaType::NAND) {
         return fmt::format("{}{}/title/", FileUtil::GetUserPath(FileUtil::UserPath::NANDDir),
                            SYSTEM_ID);
+    }
 
-    if (media_type == Service::FS::MediaType::SDMC)
+    if (media_type == Service::FS::MediaType::SDMC) {
         return fmt::format("{}Nintendo 3DS/{}/{}/title/",
                            FileUtil::GetUserPath(FileUtil::UserPath::SDMCDir), SYSTEM_ID,
                            SDCARD_ID);
+    }
 
     if (media_type == Service::FS::MediaType::GameCard) {
         // TODO(shinyquagsire23): get current app parent folder if TID matches?
@@ -521,8 +540,9 @@ void Module::ScanForTitles(Service::FS::MediaType media_type) {
                 u64 tid = std::stoull(tid_string.c_str(), nullptr, 16);
 
                 FileSys::NCCHContainer container(GetTitleContentPath(media_type, tid));
-                if (container.Load() == Loader::ResultStatus::Success)
+                if (container.Load() == Loader::ResultStatus::Success) {
                     am_title_list[static_cast<u32>(media_type)].push_back(tid);
+                }
             }
         }
     }
@@ -719,8 +739,9 @@ ResultCode GetTitleInfoFromList(const std::vector<u64>& title_id_list,
 
         FileSys::TitleMetadata tmd;
         if (tmd.Load(tmd_path) == Loader::ResultStatus::Success) {
-            // TODO(shinyquagsire23): This is the total size of all files this process owns,
-            // including savefiles and other content. This comes close but is off.
+            // TODO(shinyquagsire23): This is the total size of all files this process
+            // owns, including savefiles and other content. This comes close but is
+            // off.
             title_info.size = tmd.GetContentSizeByIndex(FileSys::TMDContentIndex::Main);
             title_info.version = tmd.GetTitleVersion();
             title_info.type = tmd.GetTitleType();
@@ -756,8 +777,8 @@ void Module::Interface::GetProgramInfos(Kernel::HLERequestContext& ctx) {
 
 void Module::Interface::DeleteUserProgram(Kernel::HLERequestContext& ctx) {
     IPC::RequestParser rp(ctx, 0x0004, 3, 0);
-    auto media_type = rp.PopEnum<FS::MediaType>();
-    u64 title_id = rp.Pop<u64>();
+    const Service::FS::MediaType media_type = rp.PopEnum<FS::MediaType>();
+    const u64 title_id = rp.Pop<u64>();
     IPC::RequestBuilder rb = rp.MakeBuilder(1, 0);
     u16 category = static_cast<u16>((title_id >> 32) & 0xFFFF);
     u8 variation = static_cast<u8>(title_id & 0xFF);
@@ -767,19 +788,29 @@ void Module::Interface::DeleteUserProgram(Kernel::HLERequestContext& ctx) {
                            ErrorSummary::InvalidArgument, ErrorLevel::Usage));
         return;
     }
+    u64 current_program_id = title_id;
+    am->system.GetAppLoader().ReadProgramId(current_program_id);
+    if (current_program_id == title_id) {
+        LOG_ERROR(Service_AM, "Can't delete running program or reading the running program's "
+                              "ID failed");
+        rb.Push(ResultCode(ErrorDescription::NotAuthorized, ErrorModule::FS,
+                           ErrorSummary::InvalidState, ErrorLevel::Permanent));
+        return;
+    }
     LOG_INFO(Service_AM, "Deleting title 0x{:016x}", title_id);
-    std::string path = GetTitlePath(media_type, title_id);
+    const std::string path = GetTitlePath(media_type, title_id);
     if (!FileUtil::Exists(path)) {
         rb.Push(ResultCode(ErrorDescription::NotFound, ErrorModule::AM, ErrorSummary::InvalidState,
                            ErrorLevel::Permanent));
         LOG_ERROR(Service_AM, "Title not found");
         return;
     }
-    bool success = FileUtil::DeleteDirRecursively(path);
+    const bool success = FileUtil::DeleteDirRecursively(path);
     am->ScanForAllTitles();
     rb.Push(RESULT_SUCCESS);
-    if (!success)
+    if (!success) {
         LOG_ERROR(Service_AM, "FileUtil::DeleteDirRecursively unexpectedly failed");
+    }
 }
 
 void Module::Interface::GetProductCode(Kernel::HLERequestContext& ctx) {
@@ -898,7 +929,8 @@ void Module::Interface::ListDataTitleTicketInfos(Kernel::HLERequestContext& ctx)
     rb.PushMappedBuffer(ticket_info_out);
 
     LOG_WARNING(Service_AM,
-                "(STUBBED) ticket_count=0x{:08X}, title_id=0x{:016x}, start_index=0x{:08X}",
+                "(STUBBED) ticket_count=0x{:08X}, title_id=0x{:016x}, "
+                "start_index=0x{:08X}",
                 ticket_count, title_id, start_index);
 }
 
@@ -1044,10 +1076,10 @@ void Module::Interface::BeginImportProgramTemporarily(Kernel::HLERequestContext&
         return;
     }
 
-    // Note: This function should register the title in the temp_i.db database, but we can get away
-    // with not doing that because we traverse the file system to detect installed titles.
-    // Create our CIAFile handle for the app to write to, and while the app writes vvctre will store
-    // contents out to sdmc/nand
+    // Note: This function should register the title in the temp_i.db database,
+    // but we can get away with not doing that because we traverse the file system
+    // to detect installed titles. Create our CIAFile handle for the app to write
+    // to, and while the app writes vvctre will store contents out to sdmc/nand
     const FileSys::Path cia_path = {};
     auto file = std::make_shared<Service::FS::File>(
         am->system, std::make_unique<CIAFile>(FS::MediaType::NAND), cia_path);
@@ -1076,8 +1108,8 @@ void Module::Interface::EndImportProgramWithoutCommit(Kernel::HLERequestContext&
     IPC::RequestParser rp(ctx, 0x0406, 0, 2); // 0x04060002
     auto cia = rp.PopObject<Kernel::ClientSession>();
 
-    // Note: This function is basically a no-op for us since we don't use title.db or ticket.db
-    // files to keep track of installed titles.
+    // Note: This function is basically a no-op for us since we don't use title.db
+    // or ticket.db files to keep track of installed titles.
     am->ScanForAllTitles();
 
     am->cia_installing = false;
@@ -1092,8 +1124,8 @@ void Module::Interface::CommitImportPrograms(Kernel::HLERequestContext& ctx) {
     u8 database = rp.Pop<u8>();
     auto buffer = rp.PopMappedBuffer();
 
-    // Note: This function is basically a no-op for us since we don't use title.db or ticket.db
-    // files to keep track of installed titles.
+    // Note: This function is basically a no-op for us since we don't use title.db
+    // or ticket.db files to keep track of installed titles.
     am->ScanForAllTitles();
 
     IPC::RequestBuilder rb = rp.MakeBuilder(1, 2);
@@ -1153,10 +1185,11 @@ ResultVal<std::unique_ptr<AMFileWrapper>> GetFileFromSession(
     if (server->hle_handler != nullptr) {
         auto file = std::dynamic_pointer_cast<Service::FS::File>(server->hle_handler);
 
-        // TODO(shinyquagsire23): This requires RTTI, use service calls directly instead?
+        // TODO(shinyquagsire23): This requires RTTI, use service calls directly
+        // instead?
         if (file != nullptr) {
-            // Grab the session file offset in case we were given a subfile opened with
-            // File::OpenSubFile
+            // Grab the session file offset in case we were given a subfile opened
+            // with File::OpenSubFile
             std::size_t offset = file->GetSessionFileOffset(server);
             std::size_t size = file->GetSessionFileSize(server);
             return MakeResult(std::make_unique<AMFileWrapper>(file, offset, size));
@@ -1166,8 +1199,8 @@ ResultVal<std::unique_ptr<AMFileWrapper>> GetFileFromSession(
         return Kernel::ERR_INVALID_HANDLE;
     }
 
-    // Probably the best bet if someone is LLEing the fs service is to just have them LLE AM
-    // while they're at it, so not implemented.
+    // Probably the best bet if someone is LLEing the fs service is to just have
+    // them LLE AM while they're at it, so not implemented.
     LOG_ERROR(Service_AM, "Given file handle does not have an HLE handler!");
     return Kernel::ERR_NOT_IMPLEMENTED;
 }
@@ -1196,9 +1229,10 @@ void Module::Interface::GetProgramInfoFromCia(Kernel::HLERequestContext& ctx) {
     TitleInfo title_info = {};
     container.Print();
 
-    // TODO(shinyquagsire23): Sizes allegedly depend on the mediatype, and will double
-    // on some mediatypes. Since this is more of a required install size we'll report
-    // what vvctre needs, but it would be good to be more accurate here.
+    // TODO(shinyquagsire23): Sizes allegedly depend on the mediatype, and will
+    // double on some mediatypes. Since this is more of a required install size
+    // we'll report what vvctre needs, but it would be good to be more accurate
+    // here.
     title_info.tid = tmd.GetTitleID();
     title_info.size = tmd.GetContentSizeByIndex(FileSys::TMDContentIndex::Main);
     title_info.version = tmd.GetTitleVersion();
@@ -1348,9 +1382,10 @@ void Module::Interface::GetRequiredSizeFromCia(Kernel::HLERequestContext& ctx) {
         return;
     }
 
-    // TODO(shinyquagsire23): Sizes allegedly depend on the mediatype, and will double
-    // on some mediatypes. Since this is more of a required install size we'll report
-    // what vvctre needs, but it would be good to be more accurate here.
+    // TODO(shinyquagsire23): Sizes allegedly depend on the mediatype, and will
+    // double on some mediatypes. Since this is more of a required install size
+    // we'll report what vvctre needs, but it would be good to be more accurate
+    // here.
     IPC::RequestBuilder rb = rp.MakeBuilder(3, 0);
     rb.Push(RESULT_SUCCESS);
     rb.Push(container.GetTitleMetadata().GetContentSizeByIndex(FileSys::TMDContentIndex::Main));
@@ -1358,22 +1393,32 @@ void Module::Interface::GetRequiredSizeFromCia(Kernel::HLERequestContext& ctx) {
 
 void Module::Interface::DeleteProgram(Kernel::HLERequestContext& ctx) {
     IPC::RequestParser rp(ctx, 0x0410, 3, 0);
-    auto media_type = rp.PopEnum<FS::MediaType>();
-    u64 title_id = rp.Pop<u64>();
-    LOG_INFO(Service_AM, "Deleting title 0x{:016x}", title_id);
-    std::string path = GetTitlePath(media_type, title_id);
+    const Service::FS::MediaType media_type = rp.PopEnum<FS::MediaType>();
+    const u64 title_id = rp.Pop<u64>();
     IPC::RequestBuilder rb = rp.MakeBuilder(1, 0);
+    u64 current_program_id = title_id;
+    am->system.GetAppLoader().ReadProgramId(current_program_id);
+    if (current_program_id == title_id) {
+        LOG_ERROR(Service_AM, "Can't delete running program or reading the running program's "
+                              "ID failed");
+        rb.Push(ResultCode(ErrorDescription::NotAuthorized, ErrorModule::FS,
+                           ErrorSummary::InvalidState, ErrorLevel::Permanent));
+        return;
+    }
+    LOG_INFO(Service_AM, "Deleting title 0x{:016x}", title_id);
+    const std::string path = GetTitlePath(media_type, title_id);
     if (!FileUtil::Exists(path)) {
         rb.Push(ResultCode(ErrorDescription::NotFound, ErrorModule::AM, ErrorSummary::InvalidState,
                            ErrorLevel::Permanent));
         LOG_ERROR(Service_AM, "Title not found");
         return;
     }
-    bool success = FileUtil::DeleteDirRecursively(path);
+    const bool success = FileUtil::DeleteDirRecursively(path);
     am->ScanForAllTitles();
     rb.Push(RESULT_SUCCESS);
-    if (!success)
+    if (!success) {
         LOG_ERROR(Service_AM, "FileUtil::DeleteDirRecursively unexpectedly failed");
+    }
 }
 
 void Module::Interface::GetSystemUpdaterMutex(Kernel::HLERequestContext& ctx) {
@@ -1397,7 +1442,6 @@ void Module::Interface::GetMetaSizeFromCia(Kernel::HLERequestContext& ctx) {
 
     FileSys::CIAContainer container;
     if (container.Load(*file_res.Unwrap()) != Loader::ResultStatus::Success) {
-
         IPC::RequestBuilder rb = rp.MakeBuilder(1, 0);
         rb.Push(ResultCode(ErrCodes::InvalidCIAHeader, ErrorModule::AM,
                            ErrorSummary::InvalidArgument, ErrorLevel::Permanent));
