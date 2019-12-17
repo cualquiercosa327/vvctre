@@ -134,7 +134,13 @@ struct TimingEventType {
 
 class Timing {
 public:
+    explicit Timing(u32 cpu_clock_percentage);
     ~Timing();
+
+    /**
+     * Updates the value of the cpu clock scaling to the new percentage.
+     */
+    void UpdateClockSpeed(u32 cpu_clock_percentage);
 
     /**
      * This should only be called from the emu thread, if you are calling it any other thread, you
@@ -208,17 +214,17 @@ private:
 
     // unordered_map stores each element separately as a linked list node so pointers to
     // elements remain stable regardless of rehashes/resizing.
-    std::unordered_map<std::string, TimingEventType> event_types;
+    std::unordered_map<std::string, TimingEventType> event_types = {};
 
     // The queue is a min-heap using std::make_heap/push_heap/pop_heap.
     // We don't use std::priority_queue because we need to be able to serialize, unserialize and
     // erase arbitrary events (RemoveEvent()) regardless of the queue order. These aren't
     // accomodated by the standard adaptor class.
-    std::vector<Event> event_queue;
+    std::vector<Event> event_queue = {};
     u64 event_fifo_id = 0;
     // the queue for storing the events from other threads threadsafe until they will be added
     // to the event_queue by the emu thread
-    Common::MPSCQueue<Event> ts_queue;
+    Common::MPSCQueue<Event> ts_queue = {};
     s64 idled_cycles = 0;
 
     // Are we in a function that has been called from Advance()
@@ -229,6 +235,10 @@ private:
     // executing the first cycle of each slice to prepare the slice length and downcount for
     // that slice.
     bool is_global_timer_sane = true;
+
+    // Stores a scaling for the internal clockspeed. Changing this number results in
+    // under/overclocking the guest cpu
+    double cpu_clock_scale = 1.0;
 };
 
 } // namespace Core

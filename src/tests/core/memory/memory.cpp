@@ -11,7 +11,7 @@
 #include "core/memory.h"
 
 TEST_CASE("Memory::IsValidVirtualAddress", "[core][memory]") {
-    Core::Timing timing;
+    Core::Timing timing(100);
     Memory::MemorySystem memory;
     Kernel::KernelSystem kernel(memory, timing, [] {}, 0);
     SECTION("these regions should not be mapped on an empty process") {

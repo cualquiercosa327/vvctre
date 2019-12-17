@@ -8,7 +8,6 @@
 #include "common/assert.h"
 #include "common/logging/log.h"
 #include "core/core_timing.h"
-#include "core/settings.h"
 
 namespace Core {
 
@@ -19,6 +18,12 @@ bool Timing::Event::operator>(const Event& right) const {
 
 bool Timing::Event::operator<(const Event& right) const {
     return std::tie(time, fifo_order) < std::tie(right.time, right.fifo_order);
+}
+
+Timing::Timing(u32 cpu_clock_percentage) : cpu_clock_scale(100.0 / cpu_clock_percentage) {}
+
+void Timing::UpdateClockSpeed(u32 cpu_clock_percentage) {
+    this->cpu_clock_scale = 100.0 / cpu_clock_percentage;
 }
 
 TimingEventType* Timing::RegisterEvent(const std::string& name, TimedCallback callback) {
@@ -48,7 +53,7 @@ u64 Timing::GetTicks() const {
 }
 
 void Timing::AddTicks(u64 ticks) {
-    downcount -= static_cast<u64>(ticks * 100.0 / Settings ::values.cpu_clock_percentage);
+    downcount -= static_cast<u64>(ticks * cpu_clock_scale);
 }
 
 u64 Timing::GetIdleTicks() const {
