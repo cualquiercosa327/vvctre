@@ -21,13 +21,14 @@
 #include "common/logging/log.h"
 #include "core/core.h"
 #include "core/core_timing.h"
+#include "core/settings.h"
 
 using InterruptType = Service::DSP::DSP_DSP::InterruptType;
 using Service::DSP::DSP_DSP;
 
 namespace AudioCore {
 
-static constexpr u64 audio_frame_ticks = 1310252ull; ///< Units: ARM11 cycles
+static constexpr u64 audio_frame_ticks_full_speed = 1310252ull; ///< Units: ARM11 cycles
 
 struct DspHle::Impl final {
 public:
@@ -110,10 +111,9 @@ DspHle::Impl::Impl(DspHle& parent_, Memory::MemorySystem& memory) : parent(paren
 
     Core::Timing& timing = Core::System::GetInstance().CoreTiming();
     tick_event =
-        timing.RegisterEvent("AudioCore::DspHle::tick_event", [this](u64, s64 cycles_late) {
-            this->AudioTickCallback(cycles_late);
-        });
-    timing.ScheduleEvent(audio_frame_ticks, tick_event);
+        timing.RegisterEvent("AudioCore::DspHle::tick_event",
+                             [this](u64, s64 cycles_late) { AudioTickCallback(cycles_late); });
+    timing.ScheduleEvent(audio_frame_ticks_full_speed * Settings::values.audio_speed, tick_event);
 }
 
 DspHle::Impl::~Impl() {
@@ -413,7 +413,8 @@ void DspHle::Impl::AudioTickCallback(s64 cycles_late) {
 
     // Reschedule recurrent event
     Core::Timing& timing = Core::System::GetInstance().CoreTiming();
-    timing.ScheduleEvent(audio_frame_ticks - cycles_late, tick_event);
+    timing.ScheduleEvent(
+        (audio_frame_ticks_full_speed * Settings::values.audio_speed) - cycles_late, tick_event);
 }
 
 DspHle::DspHle(Memory::MemorySystem& memory) : impl(std::make_unique<Impl>(*this, memory)) {}
