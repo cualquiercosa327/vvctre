@@ -124,6 +124,7 @@ void LogSettings() {
     LogSetting("volume", values.volume);
     LogSetting("mic_input_type", static_cast<int>(values.mic_input_type));
     LogSetting("mic_input_device", values.mic_input_device);
+    LogSetting("audio_speed", values.audio_speed);
     for (std::size_t i = 0; i < static_cast<std::size_t>(Service::CAM::NumCameras); i++) {
         LogSetting(fmt::format("camera_name[{}]", i), values.camera_name[i]);
         LogSetting(fmt::format("camera_config[{}]", i), values.camera_config[i]);

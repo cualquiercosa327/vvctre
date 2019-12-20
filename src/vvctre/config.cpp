@@ -228,6 +228,9 @@ void Config::ReadValues() {
         static_cast<Settings::MicInputType>(sdl2_config->GetInteger("Audio", "mic_input_type", 0));
     Settings::values.mic_input_device =
         sdl2_config->GetString("Audio", "mic_input_device", Frontend::Mic::default_device_name);
+    Settings::values.audio_speed =
+        static_cast<float>(sdl2_config->GetReal("Audio", "audio_speed", 1));
+    ASSERT_MSG(Settings::values.audio_speed != 0.00f, "audio_speed: 0.00 is not allowed!");
 
     // Camera
     using namespace Service::CAM;
