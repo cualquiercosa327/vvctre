@@ -113,7 +113,7 @@ DspHle::Impl::Impl(DspHle& parent_, Memory::MemorySystem& memory) : parent(paren
     tick_event =
         timing.RegisterEvent("AudioCore::DspHle::tick_event",
                              [this](u64, s64 cycles_late) { AudioTickCallback(cycles_late); });
-    timing.ScheduleEvent(audio_frame_ticks_full_speed * Settings::values.audio_speed, tick_event);
+    timing.ScheduleEvent(audio_frame_ticks_full_speed / Settings::values.audio_speed, tick_event);
 }
 
 DspHle::Impl::~Impl() {
@@ -414,7 +414,7 @@ void DspHle::Impl::AudioTickCallback(s64 cycles_late) {
     // Reschedule recurrent event
     Core::Timing& timing = Core::System::GetInstance().CoreTiming();
     timing.ScheduleEvent(
-        (audio_frame_ticks_full_speed * Settings::values.audio_speed) - cycles_late, tick_event);
+        (audio_frame_ticks_full_speed / Settings::values.audio_speed) - cycles_late, tick_event);
 }
 
 DspHle::DspHle(Memory::MemorySystem& memory) : impl(std::make_unique<Impl>(*this, memory)) {}
