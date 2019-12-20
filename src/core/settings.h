@@ -191,6 +191,7 @@ struct Values {
     float volume;
     MicInputType mic_input_type;
     std::string mic_input_device;
+    float audio_speed;
 
     // Camera
     std::array<std::string, Service::CAM::NumCameras> camera_name;
