@@ -218,6 +218,10 @@ mic_input_type =
 
 mic_input_device =
 
+# DSP HLE only and requires audio-stretching to be enabled for this to work properly
+# Range: 0.01-4.0. Default: 1.0
+audio_speed =
+
 [Camera]
 # Which camera engine to use for the right outer camera
 # blank (default): a dummy camera that always returns black image
