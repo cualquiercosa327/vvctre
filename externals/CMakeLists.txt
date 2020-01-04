@@ -57,10 +57,6 @@ endif()
 add_subdirectory(zstd/build/cmake EXCLUDE_FROM_ALL)
 target_include_directories(libzstd_static INTERFACE ./zstd/lib)
 
-# ENet
-add_subdirectory(enet)
-target_include_directories(enet INTERFACE ./enet/include)
-
 # Cubeb
 if (ENABLE_CUBEB)
     set(BUILD_TESTS OFF CACHE BOOL "")

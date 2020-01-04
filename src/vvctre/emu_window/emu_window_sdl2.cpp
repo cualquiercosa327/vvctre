@@ -18,7 +18,6 @@
 #include "input_common/main.h"
 #include "input_common/motion_emu.h"
 #include "input_common/sdl/sdl.h"
-#include "network/network.h"
 #include "video_core/renderer_base.h"
 #include "video_core/video_core.h"
 #include "vvctre/emu_window/emu_window_sdl2.h"
@@ -140,7 +139,6 @@ EmuWindow_SDL2::EmuWindow_SDL2(bool fullscreen) {
     }
 
     InputCommon::Init();
-    Network::Init();
 
     SDL_SetMainReady();
 
@@ -208,7 +206,6 @@ EmuWindow_SDL2::EmuWindow_SDL2(bool fullscreen) {
 
 EmuWindow_SDL2::~EmuWindow_SDL2() {
     core_context.reset();
-    Network::Shutdown();
     InputCommon::Shutdown();
     SDL_GL_DeleteContext(window_context);
     SDL_Quit();

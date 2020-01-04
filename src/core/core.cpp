@@ -35,7 +35,6 @@
 #include "core/movie.h"
 #include "core/rpc/rpc_server.h"
 #include "core/settings.h"
-#include "network/network.h"
 #include "video_core/video_core.h"
 
 namespace Core {
@@ -354,11 +353,6 @@ void System::Shutdown() {
 
     if (video_dumper->IsDumping()) {
         video_dumper->StopDumping();
-    }
-
-    if (auto room_member = Network::GetRoomMember().lock()) {
-        Network::GameInfo game_info{};
-        room_member->SendGameInfo(game_info);
     }
 
     LOG_DEBUG(Core, "Shutdown OK");

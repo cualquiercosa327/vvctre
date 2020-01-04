@@ -22,7 +22,7 @@
 
 namespace Core {
 class System;
-}
+} // namespace Core
 
 namespace Kernel {
 class Event;
@@ -40,6 +40,7 @@ const u8 DefaultNetworkChannel = 11;
 
 // Number of milliseconds in a TU.
 const double MillisecondsPerTU = 1.024;
+
 // Interval measured in TU, the default value is 100TU = 102.4ms
 const u16 DefaultBeaconInterval = 100;
 

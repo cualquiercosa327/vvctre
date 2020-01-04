@@ -106,7 +106,6 @@ enum class Class : ClassType {
     Audio_Sink,        ///< Emulator audio output backend
     Loader,            ///< ROM loader
     Input,             ///< Input emulation
-    Network,           ///< Network emulation
     Movie,             ///< Movie (Input Recording) Playback
     WebService,        ///< Interface to Citra Web Services
     RPC_Server,        ///< RPC server
