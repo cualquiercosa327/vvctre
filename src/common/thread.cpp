@@ -58,7 +58,6 @@ void SetCurrentThreadName(const char* name) {
 
 #else // !MSVC_VER, so must be POSIX threads
 
-// MinGW with the POSIX threading model does not support pthread_setname_np
 #if !defined(_WIN32) || defined(_MSC_VER)
 void SetCurrentThreadName(const char* name) {
 #ifdef __APPLE__

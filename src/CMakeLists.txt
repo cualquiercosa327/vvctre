@@ -60,27 +60,14 @@ else()
         add_compile_options("-stdlib=libc++")
     endif()
 
-    # Set file offset size to 64 bits.
-    #
-    # On modern Unixes, this is typically already the case. The lone exception is
-    # glibc, which may default to 32 bits. glibc allows this to be configured
-    # by setting _FILE_OFFSET_BITS.
-    if(CMAKE_SYSTEM_NAME STREQUAL "Linux" OR MINGW)
+    if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+        # Set file offset size to 64 bits.
+        #
+        # On modern Unixes, this is typically already the case. The lone exception is
+        # glibc, which may default to 32 bits. glibc allows this to be configured
+        # by setting _FILE_OFFSET_BITS.
         add_definitions(-D_FILE_OFFSET_BITS=64)
-    endif()
 
-    if (MINGW)
-        add_definitions(-DMINGW_HAS_SECURE_API)
-        if (COMPILE_WITH_DWARF)
-            add_compile_options("-gdwarf")
-        endif()
-
-        if (MINGW_STATIC_BUILD)
-            add_compile_options("-static")
-        endif()
-    endif()
-
-    if(CMAKE_SYSTEM_NAME STREQUAL "Linux" OR MINGW)
         # GNU ar: Create thin archive files.
         # Requires binutils-2.19 or later.
         set(CMAKE_C_ARCHIVE_CREATE   "<CMAKE_AR> qcTP <TARGET> <LINK_FLAGS> <OBJECTS>")

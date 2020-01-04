@@ -28,7 +28,7 @@
 #define fileno _fileno
 #endif
 
-// 64 bit offsets for MSVC and MinGW. MinGW also needs this for using _wstat64
+// 64 bit offsets for MSVC
 #define stat _stat64
 #define fstat _fstat64
 

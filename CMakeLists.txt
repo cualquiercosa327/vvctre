@@ -27,8 +27,6 @@ option(USE_DISCORD_PRESENCE "Enables Discord Rich Presence" OFF)
 
 CMAKE_DEPENDENT_OPTION(ENABLE_MF "Use Media Foundation decoder (preferred over FFmpeg)" ON "WIN32" OFF)
 
-CMAKE_DEPENDENT_OPTION(COMPILE_WITH_DWARF "Add DWARF debugging information" ON "MINGW" OFF)
-
 if(NOT EXISTS ${PROJECT_SOURCE_DIR}/.git/hooks/pre-commit)
     message(STATUS "Copying pre-commit hook")
     file(COPY hooks/pre-commit
@@ -185,10 +183,6 @@ elseif (WIN32)
     # WSAPoll and SHGetKnownFolderPath (AppData/Roaming) didn't exist before WinNT 6.x (Vista)
     add_definitions(-D_WIN32_WINNT=0x0600 -DWINVER=0x0600)
     set(PLATFORM_LIBRARIES winmm ws2_32)
-    if (MINGW)
-        # PSAPI is the Process Status API
-        set(PLATFORM_LIBRARIES ${PLATFORM_LIBRARIES} psapi imm32 version)
-    endif()
 elseif (CMAKE_SYSTEM_NAME MATCHES "^(Linux|kFreeBSD|GNU|SunOS)$")
     set(PLATFORM_LIBRARIES rt)
 endif()
@@ -227,10 +221,6 @@ if (CLANG_FORMAT)
     if (WIN32)
         add_custom_target(clang-format
             COMMAND powershell.exe -Command "Get-ChildItem '${SRCS}/*' -Include *.cpp,*.h -Recurse | Foreach {&'${CLANG_FORMAT}' -i $_.fullname}"
-            COMMENT ${CCOMMENT})
-    elseif(MINGW)
-        add_custom_target(clang-format
-            COMMAND find `cygpath -u ${SRCS}` -iname *.h -o -iname *.cpp | xargs `cygpath -u ${CLANG_FORMAT}` -i
             COMMENT ${CCOMMENT})
     else()
         add_custom_target(clang-format
