@@ -97,7 +97,7 @@ use_cpu_jit =
 # Range is any positive integer (but we suspect 25 - 400 is a good idea) Default is 100
 cpu_clock_percentage =
 
-# 0 (default): off, 1: on
+# 0 (default): Off, 1: On
 use_custom_cpu_ticks =
 
 # Default: 77
@@ -188,6 +188,14 @@ pp_shader_name =
 # so only turn this off if you notice a speed difference.
 # 0: Off, 1 (default): On
 use_vsync_new =
+
+# 0: Off (default), 1: On
+sharper_distant_objects =
+ignore_format_reinterpretation =
+use_custom_screen_refresh_rate =
+
+# Default: 60.0
+custom_screen_refresh_rate =
 
 [Layout]
 # Layout for the screen inside the render window.

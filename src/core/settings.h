@@ -159,6 +159,10 @@ struct Values {
     bool filter_mode;
     std::string pp_shader_name;
     bool use_vsync_new;
+    bool sharper_distant_objects;
+    bool ignore_format_reinterpretation;
+    bool use_custom_screen_refresh_rate;
+    double custom_screen_refresh_rate;
 
     // Layout
     LayoutOption layout_option;

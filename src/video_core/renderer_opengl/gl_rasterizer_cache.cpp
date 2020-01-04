@@ -894,11 +894,13 @@ void CachedSurface::UploadGLTexture(const Common::Rectangle<u32>& rect, GLuint r
     // Required for rect to function properly with custom textures
     Common::Rectangle custom_rect = rect;
 
-    if (Settings::values.dump_textures || Settings::values.custom_textures)
+    if (Settings::values.dump_textures || Settings::values.custom_textures) {
         tex_hash = Common::ComputeHash64(gl_buffer.get(), gl_buffer_size);
+    }
 
-    if (Settings::values.custom_textures)
+    if (Settings::values.custom_textures) {
         is_custom = LoadCustomTexture(tex_hash, custom_tex_info, custom_rect);
+    }
 
     // Load data from memory to the surface
     GLint x0 = static_cast<GLint>(custom_rect.left);
@@ -1463,7 +1465,7 @@ Surface RasterizerCacheOpenGL::GetTextureSurface(const Pica::Texture::TextureInf
         auto format_tuple = GetFormatTuple(params.pixel_format);
 
         // Allocate more mipmap level if necessary
-        if (surface->max_level < max_level) {
+        if (!Settings::values.sharper_distant_objects && (surface->max_level < max_level)) {
             state.texture_units[0].texture_2d = surface->texture.handle;
             state.Apply();
             glActiveTexture(GL_TEXTURE0);
@@ -1823,6 +1825,19 @@ void RasterizerCacheOpenGL::ValidateSurface(const Surface& surface, PAddr addr, 
             CopySurface(copy_surface, surface, copy_interval);
             surface->invalid_regions.erase(copy_interval);
             continue;
+        }
+
+        if (Settings::values.ignore_format_reinterpretation) {
+            bool retry = false;
+
+            for (const auto& pair : RangeFromInterval(dirty_regions, interval)) {
+                surface->invalid_regions.erase(pair.first & interval);
+                retry = true;
+            }
+
+            if (retry) {
+                continue;
+            }
         }
 
         // D24S8 to RGBA8

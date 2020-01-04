@@ -177,8 +177,15 @@ void Config::ReadValues() {
         "Renderer", "pp_shader_name",
         (Settings::values.render_3d == Settings::StereoRenderOption::Anaglyph) ? "dubois (builtin)"
                                                                                : "none (builtin)");
-    Settings::values.use_vsync_new =
-        static_cast<u16>(sdl2_config->GetInteger("Renderer", "use_vsync_new", 1));
+    Settings::values.use_vsync_new = sdl2_config->GetBoolean("Renderer", "use_vsync_new", true);
+    Settings::values.sharper_distant_objects =
+        sdl2_config->GetBoolean("Renderer", "sharper_distant_objects", false);
+    Settings::values.ignore_format_reinterpretation =
+        sdl2_config->GetBoolean("Renderer", "ignore_format_reinterpretation", false);
+    Settings::values.use_custom_screen_refresh_rate =
+        sdl2_config->GetBoolean("Renderer", "use_custom_screen_refresh_rate", false);
+    Settings::values.custom_screen_refresh_rate =
+        sdl2_config->GetReal("Renderer", "custom_screen_refresh_rate", 60.0);
 
     // Layout
     Settings::values.layout_option =
