@@ -44,6 +44,7 @@ add_library(common STATIC
     zstd_compression.h
 )
 
+if(ARCHITECTURE_x86_64)
     target_sources(common
         PRIVATE
             x64/cpu_detect.cpp
