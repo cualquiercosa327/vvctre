@@ -4,7 +4,6 @@
 
 #include <cstring>
 #include <fmt/format.h>
-
 #include "common/assert.h"
 #include "common/common_paths.h"
 #include "common/common_types.h"
