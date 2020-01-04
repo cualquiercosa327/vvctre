@@ -42,6 +42,8 @@ add_library(common STATIC
     vector_math.h
     zstd_compression.cpp
     zstd_compression.h
+    version.cpp
+    version.h
 )
 
 if(ARCHITECTURE_x86_64)
