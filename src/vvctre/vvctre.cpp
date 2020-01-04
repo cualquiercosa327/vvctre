@@ -199,6 +199,10 @@ int main(int argc, char** argv) {
                 break; // Expected case
             }
 
+            std::string game;
+            system.GetAppLoader().ReadTitle(game);
+            emu_window->SetGameName(game);
+
             if (!movie_play.empty()) {
                 Core::Movie::GetInstance().StartPlayback(movie_play);
             }
