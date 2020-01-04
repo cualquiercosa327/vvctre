@@ -124,13 +124,10 @@ int main(int argc, char** argv) {
                 LOG_INFO(Frontend, "{:02d}%", (written * 100 / total));
             };
 
-            if (Service::AM::InstallCIA(path, cia_progress) ==
-                Service::AM::InstallStatus::Success) {
-                std::cout << "CIA installed successfully" << std::endl;
-            } else {
-                std::cout << "CIA installation failed" << std::endl;
-                return -1;
-            }
+            return Service::AM::InstallCIA(path, cia_progress) ==
+                           Service::AM::InstallStatus::Success
+                       ? 0
+                       : -1;
         } else {
             if (!movie_record.empty() && !movie_play.empty()) {
                 LOG_CRITICAL(Frontend, "Cannot both play and record a movie");
