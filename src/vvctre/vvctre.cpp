@@ -101,7 +101,7 @@ int main(int argc, char** argv) {
               clipp::value("path").set(movie_play),
           clipp::option("-d", "--dump-video").doc("dump audio and video to a file") &
               clipp::value("path").set(dump_video),
-          clipp::option("-f", "--fullscreen").set(fullscreen)) |
+          clipp::option("-f", "--fullscreen").set(fullscreen).doc("start in fullscreen mode")) |
          clipp::command("version").set(command, Command::Version).doc("prints vvctre's version"));
 
     if (!clipp::parse(argc, argv, cli)) {
