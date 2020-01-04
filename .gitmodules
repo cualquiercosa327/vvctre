@@ -49,6 +49,6 @@
 [submodule "zstd"]
     path = externals/zstd
     url = https://github.com/facebook/zstd.git
-[submodule "externals/clipp"]
-	path = externals/clipp
-	url = https://github.com/muellan/clipp.git
+[submodule "clipp"]
+    path = externals/clipp
+    url = https://github.com/muellan/clipp.git

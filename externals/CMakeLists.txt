@@ -24,11 +24,6 @@ endif()
 add_subdirectory(fmt)
 add_library(fmt::fmt ALIAS fmt)
 
-# getopt
-if (MSVC)
-    add_subdirectory(getopt)
-endif()
-
 # Glad
 add_subdirectory(glad)
 
@@ -93,4 +88,4 @@ target_include_directories(httplib INTERFACE ./httplib)
 
 add_subdirectory(lodepng)
 add_subdirectory(semver)
-# add_subdirectory(clipp)
+add_subdirectory(clipp)
