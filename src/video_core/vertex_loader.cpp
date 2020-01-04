@@ -19,7 +19,6 @@ namespace Pica {
 
 void VertexLoader::Setup(const PipelineRegs& regs) {
     ASSERT_MSG(!is_setup, "VertexLoader is not intended to be setup more than once.");
-
     const auto& attribute_config = regs.vertex_attributes;
     num_total_attributes = attribute_config.GetNumTotalAttributes();
 

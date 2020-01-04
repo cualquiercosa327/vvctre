@@ -132,7 +132,6 @@ std::vector<std::string> GetPostProcessingShaderList(bool anaglyph) {
                                           const std::string& virtual_name) -> bool {
         const std::string physical_name = directory + DIR_SEP + virtual_name;
         if (!FileUtil::IsDirectory(physical_name)) {
-            // The following is done to avoid coupling this to Qt
             std::size_t dot_pos = virtual_name.rfind(".");
             if (dot_pos != std::string::npos) {
                 if (Common::ToLower(virtual_name.substr(dot_pos + 1)) == "glsl") {
@@ -165,7 +164,6 @@ std::string GetPostProcessingShaderCode(bool anaglyph, std::string shader) {
                                                   const std::string& virtual_name) -> bool {
         const std::string physical_name = directory + DIR_SEP + virtual_name;
         if (!FileUtil::IsDirectory(physical_name)) {
-            // The following is done to avoid coupling this to Qt
             std::size_t dot_pos = virtual_name.rfind(".");
             if (dot_pos != std::string::npos) {
                 if (Common::ToLower(virtual_name.substr(dot_pos + 1)) == "glsl" &&

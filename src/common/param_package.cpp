@@ -20,7 +20,6 @@ constexpr char PARAM_SEPARATOR_ESCAPE[] = "$1";
 constexpr char ESCAPE_CHARACTER_ESCAPE[] = "$2";
 
 /// A placeholder for empty param packages to avoid empty strings
-/// (they may be recognized as "not set" by some frontend libraries like qt)
 constexpr char EMPTY_PLACEHOLDER[] = "[empty]";
 
 ParamPackage::ParamPackage(const std::string& serialized) {
