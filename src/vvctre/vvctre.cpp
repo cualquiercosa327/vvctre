@@ -2,13 +2,11 @@
 // Licensed under GPLv2 or any later version
 // Refer to the license.txt file included.
 
-#define SDL_MAIN_HANDLED
 #include <iostream>
 #include <memory>
 #include <regex>
 #include <string>
 #include <thread>
-#include <SDL.h>
 
 #ifdef _WIN32
 // windows.h needs to be included before shellapi.h
@@ -253,58 +251,31 @@ int main(int argc, char** argv) {
         break;
     }
     case Command::Poll: {
-        if (SDL_Init(SDL_INIT_JOYSTICK) < 0) {
-            LOG_CRITICAL(Frontend, "Failed to initialize SDL2! Exiting...");
-            std::exit(1);
-        }
-
         InputCommon::Init();
-        using namespace std::chrono_literals;
-        std::thread([] {
-            std::vector<std::unique_ptr<InputCommon::Polling::DevicePoller>> pollers =
-                InputCommon::Polling::GetPollers(InputCommon::Polling::DeviceType::Button);
-
-            for (std::unique_ptr<InputCommon::Polling::DevicePoller>& poller : pollers) {
-                poller->Start();
-            }
-
-            for (;;) {
-                for (std::unique_ptr<InputCommon::Polling::DevicePoller>& poller : pollers) {
-                    const Common::ParamPackage params = poller->GetNextInput();
-                    if (params.Has("engine")) {
-                        std::cout << "Button: " << params.Serialize() << std::endl;
-                    }
+        std::vector<std::unique_ptr<InputCommon::Polling::DevicePoller>> button_pollers =
+            InputCommon::Polling::GetPollers(InputCommon::Polling::DeviceType::Button);
+        std::vector<std::unique_ptr<InputCommon::Polling::DevicePoller>> analog_pollers =
+            InputCommon::Polling::GetPollers(InputCommon::Polling::DeviceType::Analog);
+        for (std::unique_ptr<InputCommon::Polling::DevicePoller>& poller : button_pollers) {
+            poller->Start();
+        }
+        for (std::unique_ptr<InputCommon::Polling::DevicePoller>& poller : analog_pollers) {
+            poller->Start();
+        }
+        for (;;) {
+            for (std::unique_ptr<InputCommon::Polling::DevicePoller>& poller : button_pollers) {
+                const Common::ParamPackage params = poller->GetNextInput();
+                if (params.Has("engine")) {
+                    std::cout << "Button: " << params.Serialize() << std::endl;
                 }
-
-                std::this_thread::sleep_for(250ms);
             }
-        })
-            .detach();
-
-        std::thread([] {
-            std::vector<std::unique_ptr<InputCommon::Polling::DevicePoller>> pollers =
-                InputCommon::Polling::GetPollers(InputCommon::Polling::DeviceType::Analog);
-
-            for (std::unique_ptr<InputCommon::Polling::DevicePoller>& poller : pollers) {
-                poller->Start();
-            }
-
-            for (;;) {
-                for (std::unique_ptr<InputCommon::Polling::DevicePoller>& poller : pollers) {
-                    const Common::ParamPackage params = poller->GetNextInput();
-                    if (params.Has("engine")) {
-                        std::cout << "Analog: " << params.Serialize() << std::endl;
-                    }
+            for (std::unique_ptr<InputCommon::Polling::DevicePoller>& poller : analog_pollers) {
+                const Common::ParamPackage params = poller->GetNextInput();
+                if (params.Has("engine")) {
+                    std::cout << "Analog: " << params.Serialize() << std::endl;
                 }
-
-                std::this_thread::sleep_for(250ms);
             }
-        })
-            .detach();
-
-        std::cout << "Press enter to exit." << std::endl;
-        std::cin.get();
-
+        }
         break;
     }
     case Command::Version: {
