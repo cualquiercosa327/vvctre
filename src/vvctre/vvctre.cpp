@@ -22,6 +22,7 @@
 #include "common/logging/backend.h"
 #include "common/logging/filter.h"
 #include "common/logging/log.h"
+#include "common/param_package.h"
 #include "common/scope_exit.h"
 #include "common/string_util.h"
 #include "common/version.h"
@@ -37,6 +38,7 @@
 #include "core/loader/loader.h"
 #include "core/movie.h"
 #include "core/settings.h"
+#include "input_common/main.h"
 #include "video_core/renderer_base.h"
 #include "video_core/video_core.h"
 #include "vvctre/config.h"
@@ -84,6 +86,7 @@ int main(int argc, char** argv) {
 
     enum class Command {
         Boot,
+        Poll,
         Version,
     } command;
 
@@ -108,6 +111,9 @@ int main(int argc, char** argv) {
           clipp::option("-u", "--unlimited")
               .set(Settings::values.use_frame_limit, false)
               .doc("disable the speed limiter")) |
+         clipp::command("poll")
+             .set(command, Command::Poll)
+             .doc("polls controllers and prints the values to use in the ini") |
          clipp::command("version").set(command, Command::Version).doc("prints vvctre's version"));
 
     if (!clipp::parse(argc, argv, cli)) {
@@ -242,6 +248,28 @@ int main(int argc, char** argv) {
             system.Shutdown();
         }
 
+        break;
+    }
+    case Command::Poll: {
+        InputCommon::Init();
+        std::vector<std::unique_ptr<InputCommon::Polling::DevicePoller>> button_pollers =
+            InputCommon::Polling::GetPollers(InputCommon::Polling::DeviceType::Button);
+        std::vector<std::unique_ptr<InputCommon::Polling::DevicePoller>> analog_pollers =
+            InputCommon::Polling::GetPollers(InputCommon::Polling::DeviceType::Analog);
+        for (;;) {
+            for (std::unique_ptr<InputCommon::Polling::DevicePoller>& poller : button_pollers) {
+                const Common::ParamPackage params = poller->GetNextInput();
+                if (params.Has("engine")) {
+                    std::cout << "Button: " << params.Serialize() << std::endl;
+                }
+            }
+            for (std::unique_ptr<InputCommon::Polling::DevicePoller>& poller : analog_pollers) {
+                const Common::ParamPackage params = poller->GetNextInput();
+                if (params.Has("engine")) {
+                    std::cout << "Analog: " << params.Serialize() << std::endl;
+                }
+            }
+        }
         break;
     }
     case Command::Version: {
