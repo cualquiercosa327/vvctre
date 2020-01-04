@@ -622,7 +622,7 @@ void RendererOpenGL::ReloadShader() {
         if (Settings::values.pp_shader_name == "none (builtin)") {
             shader_data += fragment_shader;
         } else {
-            std::string shader_text =
+            const std::string shader_text =
                 OpenGL::GetPostProcessingShaderCode(false, Settings::values.pp_shader_name);
             if (shader_text.empty()) {
                 // Should probably provide some information that the shader couldn't load

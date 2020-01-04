@@ -19,7 +19,7 @@ namespace OpenGL {
 // GetTime (not used in any shader provided by Dolphin)
 // GetOption* (used in only one shader provided by Dolphin; would require more
 // configuration/frontend work)
-constexpr char dolphin_shader_header[] = R"(
+constexpr char dolphin_shader_header[] = R"(#version 330 core
 
 // hlsl to glsl types
 #define float2 vec2

@@ -1172,7 +1172,7 @@ RasterizerCacheOpenGL::RasterizerCacheOpenGL() {
     d24s8_abgr_buffer.Create();
     d24s8_abgr_buffer_size = 0;
 
-    std::string vs_source = R"(#version 330 core
+    const std::string vs_source = R"(#version 330 core
 
 const vec2 vertices[4] = vec2[4](vec2(-1.0, -1.0), vec2(1.0, -1.0), vec2(-1.0, 1.0), vec2(1.0, 1.0));
 
@@ -1181,7 +1181,7 @@ void main() {
 }
 )";
 
-    std::string fs_source = R"(#version 330 core
+    const std::string fs_source = R"(#version 330 core
 
 uniform samplerBuffer tbo;
 uniform vec2 tbo_size;
