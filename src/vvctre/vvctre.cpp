@@ -73,7 +73,7 @@ static void PrintHelp(const char* argv0) {
 }
 
 static void PrintVersion() {
-    std::cout << version::vvctre << std::endl;
+    std::cout << version::vvctre.to_string() << std::endl;
 }
 
 static void OnStateChanged(const Network::RoomMember::State& state) {

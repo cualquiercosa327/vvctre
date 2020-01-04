@@ -200,7 +200,7 @@ EmuWindow_SDL2::EmuWindow_SDL2(bool fullscreen) {
     OnResize();
     OnMinimalClientAreaChangeRequest(GetActiveConfig().min_client_area_size);
     SDL_PumpEvents();
-    LOG_INFO(Frontend, "Version: {}", version::vvctre);
+    LOG_INFO(Frontend, "Version: {}", version::vvctre.to_string());
     LOG_INFO(Frontend, "Movie version: {}", version::movie);
     LOG_INFO(Frontend, "Shader cache version: {}", version::shader_cache);
     Settings::LogSettings();
