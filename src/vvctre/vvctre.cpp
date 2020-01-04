@@ -82,13 +82,6 @@ int main(int argc, char** argv) {
     std::string dump_video;
     bool fullscreen = false;
 
-    static struct option long_options[] = {
-        {"movie-record", required_argument, 0, 'r'},
-        {"movie-play", required_argument, 0, 'p'},
-        {"dump-video", required_argument, 0, 'd'},
-        {"fullscreen", no_argument, 0, 'f'},
-    };
-
     enum class Command {
         Boot,
         Version,
@@ -107,7 +100,8 @@ int main(int argc, char** argv) {
                   .doc("play inputs from a file") &
               clipp::value("path").set(movie_play),
           clipp::option("-d", "--dump-video").doc("dump audio and video to a file") &
-              clipp::value("path").set(dump_video)) |
+              clipp::value("path").set(dump_video),
+          clipp::option("-f", "--fullscreen").set(fullscreen)) |
          clipp::command("version").set(command, Command::Version).doc("prints vvctre's version"));
 
     if (!clipp::parse(argc, argv, cli)) {
