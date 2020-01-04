@@ -2,11 +2,13 @@
 // Licensed under GPLv2 or any later version
 // Refer to the license.txt file included.
 
+#define SDL_MAIN_HANDLED
 #include <iostream>
 #include <memory>
 #include <regex>
 #include <string>
 #include <thread>
+#include <SDL.h>
 
 #ifdef _WIN32
 // windows.h needs to be included before shellapi.h
@@ -251,6 +253,11 @@ int main(int argc, char** argv) {
         break;
     }
     case Command::Poll: {
+        if (SDL_Init(SDL_INIT_JOYSTICK) < 0) {
+            LOG_CRITICAL(Frontend, "Failed to initialize SDL2! Exiting...");
+            std::exit(1);
+        }
+
         InputCommon::Init();
         using namespace std::chrono_literals;
         std::thread([] {
