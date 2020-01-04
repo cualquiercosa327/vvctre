@@ -15,7 +15,7 @@ add_executable(${PROJECT_NAME}
 
 create_target_directory_groups(${PROJECT_NAME})
 
-target_link_libraries(${PROJECT_NAME} PRIVATE common core input_common network)
+target_link_libraries(${PROJECT_NAME} PRIVATE common core input_common)
 target_link_libraries(${PROJECT_NAME} PRIVATE inih glad lodepng clipp ${PLATFORM_LIBRARIES} SDL2 Threads::Threads)
 
 if(UNIX AND NOT APPLE)

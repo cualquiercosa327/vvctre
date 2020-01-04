@@ -49,6 +49,3 @@
 [submodule "clipp"]
     path = externals/clipp
     url = https://github.com/muellan/clipp.git
-[submodule "easywsclient"]
-    path = externals/easywsclient
-    url = https://github.com/dhbaird/easywsclient.git

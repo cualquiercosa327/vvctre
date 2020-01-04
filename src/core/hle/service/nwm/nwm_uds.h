@@ -12,13 +12,13 @@
 #include <map>
 #include <memory>
 #include <mutex>
+#include <thread>
 #include <unordered_map>
 #include <vector>
 #include <boost/optional.hpp>
 #include "common/common_types.h"
 #include "common/swap.h"
 #include "core/hle/service/service.h"
-#include "network/network.h"
 
 namespace Core {
 class System;
@@ -29,11 +29,35 @@ class Event;
 class SharedMemory;
 } // namespace Kernel
 
+namespace easywsclient {
+class WebSocket;
+} // namespace easywsclient
+
 // Local-WLAN service
 
 namespace Service::NWM {
 
 using MacAddress = std::array<u8, 6>;
+
+/// Information about the received WiFi packets.
+/// Acts as our own 802.11 header.
+struct WifiPacket {
+    enum class PacketType : u8 {
+        Beacon,
+        Data,
+        Authentication,
+        AssociationResponse,
+        Deauthentication,
+        NodeMap,
+        MacAddress = 255,
+    };
+    PacketType type;      ///< The type of 802.11 frame.
+    std::vector<u8> data; ///< Raw 802.11 frame data, starting at the management frame header
+                          /// for management frames.
+    MacAddress transmitter_address; ///< Mac address of the transmitter.
+    MacAddress destination_address; ///< Mac address of the receiver.
+    u8 channel;                     ///< WiFi channel where this frame was transmitted.
+};
 
 const std::size_t ApplicationDataSize = 0xC8;
 const u8 DefaultNetworkChannel = 11;
@@ -434,7 +458,7 @@ private:
      * Returns a list of received 802.11 beacon frames from the specified sender since the last
      * call.
      */
-    std::list<Network::WifiPacket> GetReceivedBeacons(const MacAddress& sender);
+    std::list<WifiPacket> GetReceivedBeacons(const MacAddress& sender);
 
     /*
      * Returns an available index in the nodes array for the
@@ -443,11 +467,11 @@ private:
     u16 GetNextAvailableNodeId();
 
     void BroadcastNodeMap();
-    void HandleNodeMapPacket(const Network::WifiPacket& packet);
-    void HandleBeaconFrame(const Network::WifiPacket& packet);
-    void HandleAssociationResponseFrame(const Network::WifiPacket& packet);
-    void HandleEAPoLPacket(const Network::WifiPacket& packet);
-    void HandleSecureDataPacket(const Network::WifiPacket& packet);
+    void HandleNodeMapPacket(const WifiPacket& packet);
+    void HandleBeaconFrame(const WifiPacket& packet);
+    void HandleAssociationResponseFrame(const WifiPacket& packet);
+    void HandleEAPoLPacket(const WifiPacket& packet);
+    void HandleSecureDataPacket(const WifiPacket& packet);
 
     /*
      * Start a connection sequence with an UDS server. The sequence starts by sending an 802.11
@@ -465,17 +489,19 @@ private:
      * Association response frame containing the details of the access point and the assigned
      * association id for the new client.
      */
-    void HandleAuthenticationFrame(const Network::WifiPacket& packet);
+    void HandleAuthenticationFrame(const WifiPacket& packet);
 
     /// Handles the deauthentication frames sent from clients to hosts, when they leave a session
-    void HandleDeauthenticationFrame(const Network::WifiPacket& packet);
+    void HandleDeauthenticationFrame(const WifiPacket& packet);
 
-    void HandleDataFrame(const Network::WifiPacket& packet);
+    void HandleDataFrame(const WifiPacket& packet);
 
     /// Callback to parse and handle a received wifi packet.
-    void OnWifiPacketReceived(const Network::WifiPacket& packet);
+    void OnWifiPacketReceived(const WifiPacket& packet);
 
-    boost::optional<Network::MacAddress> GetNodeMacAddress(u16 dest_node_id, u8 flags);
+    void SendPacket(WifiPacket& packet);
+
+    boost::optional<MacAddress> GetNodeMacAddress(u16 dest_node_id, u8 flags);
 
     // Event that is signaled every time the connection status changes.
     std::shared_ptr<Kernel::Event> connection_status_event;
@@ -529,9 +555,6 @@ private:
     // Event that will generate and send the 802.11 beacon frames.
     Core::TimingEventType* beacon_broadcast_event;
 
-    // Callback identifier for the OnWifiPacketReceived event.
-    Network::RoomMember::CallbackHandle<Network::WifiPacket> wifi_packet_received;
-
     // Mutex to synchronize access to the connection status between the emulation thread and the
     // network thread.
     std::mutex connection_status_mutex;
@@ -543,7 +566,13 @@ private:
     std::mutex beacon_mutex;
 
     // List of the last <MaxBeaconFrames> beacons received from the network.
-    std::list<Network::WifiPacket> received_beacons;
+    std::list<WifiPacket> received_beacons;
+
+    std::mutex send_list_mutex;      ///< Mutex that controls access to the `send_list` variable.
+    std::list<WifiPacket> send_list; ///< A list that stores all packets to send async
+
+    std::unique_ptr<std::thread> loop_thread;
+    std::unique_ptr<easywsclient::WebSocket> client;
 };
 
 } // namespace Service::NWM

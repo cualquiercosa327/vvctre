@@ -80,6 +80,7 @@ int main(int argc, char** argv) {
     std::string movie_play;
     std::string dump_video;
     bool fullscreen = false;
+    bool regenerate_console_id = false;
 
     enum class Command {
         Boot,
@@ -100,7 +101,13 @@ int main(int argc, char** argv) {
               clipp::value("path").set(movie_play),
           clipp::option("-d", "--dump-video").doc("dump audio and video to a file") &
               clipp::value("path").set(dump_video),
-          clipp::option("-f", "--fullscreen").set(fullscreen).doc("start in fullscreen mode")) |
+          clipp::option("-f", "--fullscreen").set(fullscreen).doc("start in fullscreen mode"),
+          clipp::option("-c", "--regenerate-console-id")
+              .set(regenerate_console_id)
+              .doc("Regenerate the console ID before booting"),
+          clipp::option("-u", "--unlimited")
+              .set(Settings::values.use_frame_limit, false)
+              .doc("disable the speed limiter")) |
          clipp::command("version").set(command, Command::Version).doc("prints vvctre's version"));
 
     if (!clipp::parse(argc, argv, cli)) {
@@ -128,6 +135,16 @@ int main(int argc, char** argv) {
             if (!movie_record.empty() && !movie_play.empty()) {
                 LOG_CRITICAL(Frontend, "Cannot both play and record a movie");
                 return -1;
+            }
+
+            if (regenerate_console_id) {
+                u32 random_number;
+                u64 console_id;
+                std::shared_ptr<Service::CFG::Module> cfg =
+                    std::make_shared<Service::CFG::Module>();
+                cfg->GenerateConsoleUniqueId(random_number, console_id);
+                cfg->SetConsoleUniqueId(random_number, console_id);
+                cfg->UpdateConfigNANDSavegame();
             }
 
             if (!movie_record.empty()) {

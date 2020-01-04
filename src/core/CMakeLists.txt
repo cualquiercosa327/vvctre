@@ -459,7 +459,7 @@ endif()
 create_target_directory_groups(core)
 
 target_link_libraries(core PUBLIC common PRIVATE audio_core video_core)
-target_link_libraries(core PUBLIC Boost::boost PRIVATE cryptopp fmt open_source_archives)
+target_link_libraries(core PUBLIC Boost::boost PRIVATE cryptopp fmt open_source_archives easywsclient)
 
 if (ARCHITECTURE_x86_64)
     target_sources(core PRIVATE
