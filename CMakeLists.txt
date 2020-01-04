@@ -25,12 +25,6 @@ option(USE_DISCORD_PRESENCE "Enables Discord Rich Presence" OFF)
 
 CMAKE_DEPENDENT_OPTION(ENABLE_MF "Use Media Foundation decoder (preferred over FFmpeg)" ON "WIN32" OFF)
 
-if(NOT EXISTS ${PROJECT_SOURCE_DIR}/.git/hooks/pre-commit)
-    message(STATUS "Copying pre-commit hook")
-    file(COPY hooks/pre-commit
-        DESTINATION ${PROJECT_SOURCE_DIR}/.git/hooks)
-endif()
-
 # Sanity check : Check that all submodules are present
 # =======================================================================
 
