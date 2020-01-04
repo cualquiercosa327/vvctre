@@ -159,7 +159,7 @@ EmuWindow_SDL2::EmuWindow_SDL2(bool fullscreen) {
     // Enable vsync
     SDL_GL_SetSwapInterval(1);
 
-    const std::string window_title = fmt::format("vvctre {}", version::vvctre);
+    const std::string window_title = fmt::format("vvctre {}", version::vvctre.to_string());
 
     render_window =
         SDL_CreateWindow(window_title.c_str(),
