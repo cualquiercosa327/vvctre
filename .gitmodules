@@ -22,9 +22,6 @@
 [submodule "fmt"]
     path = externals/fmt
     url = https://github.com/fmtlib/fmt.git
-[submodule "enet"]
-    path = externals/enet
-    url = https://github.com/lsalzman/enet.git
 [submodule "inih"]
     path = externals/inih/inih
     url = https://github.com/benhoyt/inih.git
@@ -52,3 +49,6 @@
 [submodule "clipp"]
     path = externals/clipp
     url = https://github.com/muellan/clipp.git
+[submodule "externals/easywsclient"]
+	path = externals/easywsclient
+	url = https://github.com/dhbaird/easywsclient.git

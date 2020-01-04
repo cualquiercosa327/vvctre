@@ -24,7 +24,6 @@
 #include "core/loader/ncch.h"
 #include "core/loader/smdh.h"
 #include "core/memory.h"
-#include "network/network.h"
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // Loader namespace
@@ -160,8 +159,9 @@ ResultStatus AppLoader_NCCH::Load(std::shared_ptr<Kernel::Process>& process) {
         return ResultStatus::ErrorAlreadyLoaded;
 
     ResultStatus result = base_ncch.Load();
-    if (result != ResultStatus::Success)
+    if (result != ResultStatus::Success) {
         return result;
+    }
 
     ReadProgramId(ncch_program_id);
     std::string program_id{fmt::format("{:016X}", ncch_program_id)};
@@ -175,18 +175,12 @@ ResultStatus AppLoader_NCCH::Load(std::shared_ptr<Kernel::Process>& process) {
         overlay_ncch = &update_ncch;
     }
 
-    if (auto room_member = Network::GetRoomMember().lock()) {
-        Network::GameInfo game_info;
-        ReadTitle(game_info.name);
-        game_info.id = ncch_program_id;
-        room_member->SendGameInfo(game_info);
-    }
-
     is_loaded = true; // Set state to loaded
 
     result = LoadExec(process); // Load the executable into memory for booting
-    if (ResultStatus::Success != result)
+    if (ResultStatus::Success != result) {
         return result;
+    }
 
     Core::System::GetInstance().ArchiveManager().RegisterSelfNCCH(*this);
 
