@@ -104,7 +104,7 @@ int main(int argc, char** argv) {
           clipp::option("-f", "--fullscreen").set(fullscreen).doc("start in fullscreen mode"),
           clipp::option("-c", "--regenerate-console-id")
               .set(regenerate_console_id)
-              .doc("Regenerate the console ID before booting"),
+              .doc("regenerate the console ID before booting"),
           clipp::option("-u", "--unlimited")
               .set(Settings::values.use_frame_limit, false)
               .doc("disable the speed limiter")) |
