@@ -1,6 +1,3 @@
 - Core: Log settings
-- Add:  Ignore format reinterpretation
-- Add:  Custom screen refresh rate
-- Add:  Sharper distant objects
-- Add:  BPS support
+- Add: BPS support
 - Rewrite multiplayer
