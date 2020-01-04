@@ -11,7 +11,6 @@
 #include "common/color.h"
 #include "common/common_types.h"
 #include "common/logging/log.h"
-#include "common/microprofile.h"
 #include "common/quaternion.h"
 #include "common/vector_math.h"
 #include "core/hw/gpu.h"
@@ -117,8 +116,6 @@ static std::tuple<float24, float24, float24, PAddr> ConvertCubeCoord(float24 u, 
     return std::make_tuple(x / z * half + half, y / z * half + half, z_abs, addr);
 }
 
-MICROPROFILE_DEFINE(GPU_Rasterization, "GPU", "Rasterization", MP_RGB(50, 50, 240));
-
 /**
  * Helper function for ProcessTriangle with the "reversed" flag to allow for implementing
  * culling via recursion.
@@ -126,7 +123,6 @@ MICROPROFILE_DEFINE(GPU_Rasterization, "GPU", "Rasterization", MP_RGB(50, 50, 24
 static void ProcessTriangleInternal(const Vertex& v0, const Vertex& v1, const Vertex& v2,
                                     bool reversed = false) {
     const auto& regs = g_state.regs;
-    MICROPROFILE_SCOPE(GPU_Rasterization);
 
     // vertex positions in rasterizer coordinates
     static auto FloatToFix = [](float24 flt) {

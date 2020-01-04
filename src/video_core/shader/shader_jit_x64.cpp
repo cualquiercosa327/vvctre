@@ -2,7 +2,6 @@
 // Licensed under GPLv2 or any later version
 // Refer to the license.txt file included.
 
-#include "common/microprofile.h"
 #include "video_core/shader/shader.h"
 #include "video_core/shader/shader_jit_x64.h"
 #include "video_core/shader/shader_jit_x64_compiler.h"
@@ -31,12 +30,8 @@ void JitX64Engine::SetupBatch(ShaderSetup& setup, unsigned int entry_point) {
     }
 }
 
-MICROPROFILE_DECLARE(GPU_Shader);
-
 void JitX64Engine::Run(const ShaderSetup& setup, UnitState& state) const {
     ASSERT(setup.engine_data.cached_shader != nullptr);
-
-    MICROPROFILE_SCOPE(GPU_Shader);
 
     const JitShader* shader = static_cast<const JitShader*>(setup.engine_data.cached_shader);
     shader->Run(setup, state, setup.engine_data.entry_point);

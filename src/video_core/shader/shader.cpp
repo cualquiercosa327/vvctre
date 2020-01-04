@@ -6,7 +6,6 @@
 #include <cstring>
 #include "common/bit_set.h"
 #include "common/logging/log.h"
-#include "common/microprofile.h"
 #include "video_core/pica_state.h"
 #include "video_core/regs_rasterizer.h"
 #include "video_core/regs_shader.h"
@@ -131,8 +130,6 @@ void GSUnitState::SetVertexHandler(VertexHandler vertex_handler, WindingSetter w
 void GSUnitState::ConfigOutput(const ShaderRegs& config) {
     emitter.output_mask = config.output_mask;
 }
-
-MICROPROFILE_DEFINE(GPU_Shader, "GPU", "Shader", MP_RGB(50, 50, 240));
 
 #ifdef ARCHITECTURE_x86_64
 static std::unique_ptr<JitX64Engine> jit_engine;

@@ -62,7 +62,7 @@ endif()
 
 create_target_directory_groups(common)
 
-target_link_libraries(common PUBLIC fmt microprofile)
+target_link_libraries(common PUBLIC fmt)
 if (ARCHITECTURE_x86_64)
     target_link_libraries(common PRIVATE xbyak)
 endif()

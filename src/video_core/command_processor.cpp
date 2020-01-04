@@ -8,7 +8,6 @@
 #include <utility>
 #include "common/assert.h"
 #include "common/logging/log.h"
-#include "common/microprofile.h"
 #include "common/vector_math.h"
 #include "core/hle/service/gsp/gsp.h"
 #include "core/hw/gpu.h"
@@ -35,8 +34,6 @@ static const u32 expand_bits_to_bytes[] = {
     0x00000000, 0x000000ff, 0x0000ff00, 0x0000ffff, 0x00ff0000, 0x00ff00ff, 0x00ffff00, 0x00ffffff,
     0xff000000, 0xff0000ff, 0xff00ff00, 0xff00ffff, 0xffff0000, 0xffff00ff, 0xffffff00, 0xffffffff,
 };
-
-MICROPROFILE_DEFINE(GPU_Drawing, "GPU", "Drawing", MP_RGB(50, 50, 240));
 
 static const char* GetShaderSetupTypeName(Shader::ShaderSetup& setup) {
     if (&setup == &g_state.vs) {
@@ -208,7 +205,6 @@ static void WritePicaReg(u32 id, u32 value, u32 mask) {
                 if (immediate_attribute_id < regs.pipeline.max_input_attrib_index) {
                     immediate_attribute_id += 1;
                 } else {
-                    MICROPROFILE_SCOPE(GPU_Drawing);
                     immediate_attribute_id = 0;
 
                     Shader::OutputVertex::ValidateSemantics(regs.rasterizer);
@@ -268,8 +264,6 @@ static void WritePicaReg(u32 id, u32 value, u32 mask) {
     // It seems like these trigger vertex rendering
     case PICA_REG_INDEX(pipeline.trigger_draw):
     case PICA_REG_INDEX(pipeline.trigger_draw_indexed): {
-        MICROPROFILE_SCOPE(GPU_Drawing);
-
 #if PICA_LOG_TEV
         DebugUtils::DumpTevStageConfig(regs.GetTevStages());
 #endif

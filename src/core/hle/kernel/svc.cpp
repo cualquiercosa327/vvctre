@@ -7,7 +7,6 @@
 #include <map>
 #include <fmt/format.h>
 #include "common/logging/log.h"
-#include "common/microprofile.h"
 #include "common/scope_exit.h"
 #include "core/arm/arm_interface.h"
 #include "core/core.h"
@@ -1572,11 +1571,7 @@ const SVC::FunctionDef* SVC::GetSVCInfo(u32 func_num) {
     return &SVC_Table[func_num];
 }
 
-MICROPROFILE_DEFINE(Kernel_SVC, "Kernel", "SVC", MP_RGB(70, 200, 70));
-
 void SVC::CallSVC(u32 immediate) {
-    MICROPROFILE_SCOPE(Kernel_SVC);
-
     // Lock the global kernel mutex when we enter the kernel HLE.
     std::lock_guard lock{HLE::g_hle_lock};
 

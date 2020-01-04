@@ -9,7 +9,6 @@
 #include <cstdio>
 #include "common/common_types.h"
 #include "common/logging/log.h"
-#include "common/microprofile.h"
 #include "core/arm/dyncom/arm_dyncom_dec.h"
 #include "core/arm/dyncom/arm_dyncom_interpreter.h"
 #include "core/arm/dyncom/arm_dyncom_run.h"
@@ -806,8 +805,6 @@ static ThumbDecodeStatus DecodeThumbInstruction(u32 inst, u32 addr, u32* arm_ins
 
 enum { KEEP_GOING, FETCH_EXCEPTION };
 
-MICROPROFILE_DEFINE(DynCom_Decode, "DynCom", "Decode", MP_RGB(255, 64, 64));
-
 static unsigned int InterpreterTranslateInstruction(const ARMul_State* cpu, const u32 phys_addr,
                                                     ARM_INST_PTR& inst_base) {
     u32 inst_size = 4;
@@ -841,8 +838,6 @@ static unsigned int InterpreterTranslateInstruction(const ARMul_State* cpu, cons
 }
 
 static int InterpreterTranslateBlock(ARMul_State* cpu, std::size_t& bb_start, u32 addr) {
-    MICROPROFILE_SCOPE(DynCom_Decode);
-
     // Decode instruction, get index
     // Allocate memory and init InsCream
     // Go on next, until terminal instruction
@@ -874,8 +869,6 @@ static int InterpreterTranslateBlock(ARMul_State* cpu, std::size_t& bb_start, u3
 }
 
 static int InterpreterTranslateSingle(ARMul_State* cpu, std::size_t& bb_start, u32 addr) {
-    MICROPROFILE_SCOPE(DynCom_Decode);
-
     ARM_INST_PTR inst_base = nullptr;
     bb_start = trans_cache_buf_top;
 
@@ -918,11 +911,7 @@ static int clz(unsigned int x) {
     return n;
 }
 
-MICROPROFILE_DEFINE(DynCom_Execute, "DynCom", "Execute", MP_RGB(255, 0, 0));
-
 unsigned InterpreterMainLoop(ARMul_State* cpu) {
-    MICROPROFILE_SCOPE(DynCom_Execute);
-
     /// Nearest upcoming GDB code execution breakpoint, relative to the last dispatch's address.
     GDBStub::BreakpointAddress breakpoint_data;
     breakpoint_data.type = GDBStub::BreakpointType::None;
