@@ -19,11 +19,11 @@
 
 namespace OpenGL {
 
-enum class TransferableEntryKind : u32 {
+enum class TransferableEntryKind : u8 {
     Raw,
 };
 
-enum class PrecompiledEntryKind : u32 {
+enum class PrecompiledEntryKind : u8 {
     Decompiled,
     Dump,
 };
@@ -129,8 +129,8 @@ std::optional<std::vector<ShaderDiskCacheRaw>> ShaderDiskCache::LoadTransferable
     // Version is valid, load the shaders
     std::vector<ShaderDiskCacheRaw> raws;
     while (file.Tell() < file.GetSize()) {
-        TransferableEntryKind kind{};
-        if (file.ReadBytes(&kind, sizeof(u32)) != sizeof(u32)) {
+        TransferableEntryKind kind;
+        if (file.ReadBytes(&kind, sizeof(kind)) != sizeof(kind)) {
             LOG_ERROR(Render_OpenGL, "Failed to read transferable file - skipping");
             return {};
         }
@@ -203,7 +203,7 @@ ShaderDiskCache::LoadPrecompiledFile(FileUtil::IOFile& file) {
     std::unordered_map<u64, ShaderDiskCacheDecompiled> decompiled;
     ShaderDumpsMap dumps;
     while (decompressed_precompiled_cache_offset < decompressed_precompiled_cache.size()) {
-        PrecompiledEntryKind kind{};
+        PrecompiledEntryKind kind;
         if (!LoadObjectFromPrecompiled(kind)) {
             return {};
         }
