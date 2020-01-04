@@ -97,6 +97,35 @@ use_cpu_jit =
 # Range is any positive integer (but we suspect 25 - 400 is a good idea) Default is 100
 cpu_clock_percentage =
 
+# 0 (default): off, 1: on
+use_custom_cpu_ticks =
+
+# Default: 77
+custom_cpu_ticks =
+
+[Data Storage]
+# Whether to create a virtual SD card.
+# 1 (default): Yes, 0: No
+use_virtual_sd =
+
+[System]
+# The system model that Citra will try to emulate
+# 0: Old 3DS (default), 1: New 3DS
+is_new_3ds =
+
+# The system region that Citra will use during emulation
+# -1: Auto-select (default), 0: Japan, 1: USA, 2: Europe, 3: Australia, 4: China, 5: Korea, 6: Taiwan
+region_value =
+
+# The clock to use when vvctre starts
+# 0: System clock (default), 1: fixed time
+init_clock =
+
+# Time used when init_clock is set to fixed_time in the format %Y-%m-%d %H:%M:%S
+# set to fixed time. Default 2000-01-01 00:00:01
+# Note: 3DS can only handle times later then Jan 1 2000
+init_time =
+
 [Renderer]
 # Whether to use software or hardware rendering.
 # 0: Software, 1 (default): Hardware
@@ -106,6 +135,10 @@ use_hw_renderer =
 # 0: Software, 1 (default): Hardware
 use_hw_shader =
 
+# Reduce stuttering by storing and loading generated shaders to disk
+# 0: Off, 1 (default. On)
+use_disk_shader_cache =
+
 # Whether to use accurate multiplication in hardware shaders
 # 0: Off (Default. Faster, but causes issues in some games) 1: On (Slower, but correct)
 shaders_accurate_mul =
@@ -113,15 +146,6 @@ shaders_accurate_mul =
 # Whether to use the Just-In-Time (JIT) compiler for shader emulation
 # 0: Interpreter (slow), 1 (default): JIT (fast)
 use_shader_jit =
-
-# Forces VSync on the display thread. Usually doesn't impact performance, but on some drivers it can
-# so only turn this off if you notice a speed difference.
-# 0: Off, 1 (default): On
-use_vsync_new =
-
-# Reduce stuttering by storing and loading generated shaders to disk
-# 0: Off, 1 (default. On)
-use_disk_shader_cache =
 
 # Resolution scale factor
 # 0: Auto (scales resolution to window size), 1: Native 3DS screen resolution, Otherwise a scale
@@ -142,23 +166,28 @@ bg_red =
 bg_blue =
 bg_green =
 
-# Whether and how Stereoscopic 3D should be rendered
+# Whether and how stereoscopic 3D should be rendered
 # 0 (default): Off, 1: Side by Side, 2: Anaglyph
 render_3d =
 
-# Change 3D Intensity
-# 0 - 100: Intensity. 0 (default)
+# Change 3D intensity
+# 0 - 100: intensity. default: 0
 factor_3d =
+
+# Whether to enable linear filtering or not
+# This is required for some shaders to work correctly
+# 0: Nearest, 1 (default): Linear
+filter_mode =
 
 # The name of the post processing shader to apply.
 # Loaded from shaders if render_3d is off or side by side.
 # Loaded from shaders/anaglyph if render_3d is anaglyph
 pp_shader_name =
 
-# Whether to enable linear filtering or not
-# This is required for some shaders to work correctly
-# 0: Nearest, 1 (default): Linear
-filter_mode =
+# Forces VSync on the display thread. Usually doesn't impact performance, but on some drivers it can
+# so only turn this off if you notice a speed difference.
+# 0: Off, 1 (default): On
+use_vsync_new =
 
 [Layout]
 # Layout for the screen inside the render window.
@@ -206,7 +235,6 @@ enable_dsp_lle =
 # 0 (default): No, 1: Yes
 enable_dsp_lle_thread =
 
-
 # Which audio output engine to use.
 # auto (default): Auto-select, null: No audio output, sdl2: SDL2 (if available)
 output_engine =
@@ -225,28 +253,10 @@ output_device =
 # 1.0 (default): 100%, 0.0; mute
 volume =
 
-[Data Storage]
-# Whether to create a virtual SD card.
-# 1 (default): Yes, 0: No
-use_virtual_sd =
+# 0 (default): none, 1: real, 2: static
+mic_input_type =
 
-[System]
-# The system model that Citra will try to emulate
-# 0: Old 3DS (default), 1: New 3DS
-is_new_3ds =
-
-# The system region that Citra will use during emulation
-# -1: Auto-select (default), 0: Japan, 1: USA, 2: Europe, 3: Australia, 4: China, 5: Korea, 6: Taiwan
-region_value =
-
-# The clock to use when vvctre starts
-# 0: System clock (default), 1: fixed time
-init_clock =
-
-# Time used when init_clock is set to fixed_time in the format %Y-%m-%d %H:%M:%S
-# set to fixed time. Default 2000-01-01 00:00:01
-# Note: 3DS can only handle times later then Jan 1 2000
-init_time =
+mic_input_device =
 
 [Camera]
 # Which camera engine to use for the right outer camera

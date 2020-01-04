@@ -32,7 +32,11 @@ enum class MicInputType {
     Static,
 };
 
-enum class StereoRenderOption { Off, SideBySide, Anaglyph };
+enum class StereoRenderOption {
+    Off,
+    SideBySide,
+    Anaglyph,
+};
 
 namespace NativeButton {
 enum Values {
@@ -118,9 +122,6 @@ struct InputProfile {
 };
 
 struct Values {
-    // CheckNew3DS
-    bool is_new_3ds;
-
     // Controls
     InputProfile current_input_profile;       ///< The current input profile
     int current_input_profile_index;          ///< The current input profile index
@@ -129,11 +130,14 @@ struct Values {
     // Core
     bool use_cpu_jit;
     int cpu_clock_percentage;
+    bool use_custom_cpu_ticks;
+    u64 custom_cpu_ticks;
 
     // Data Storage
     bool use_virtual_sd;
 
     // System
+    bool is_new_3ds;
     int region_value;
     InitClock init_clock;
     u64 init_time;
@@ -147,7 +151,16 @@ struct Values {
     u16 resolution_factor;
     bool use_frame_limit;
     u16 frame_limit;
+    float bg_red;
+    float bg_green;
+    float bg_blue;
+    StereoRenderOption render_3d;
+    std::atomic<u8> factor_3d;
+    bool filter_mode;
+    std::string pp_shader_name;
+    bool use_vsync_new;
 
+    // Layout
     LayoutOption layout_option;
     bool swap_screen;
     bool custom_layout;
@@ -160,21 +173,10 @@ struct Values {
     u16 custom_bottom_right;
     u16 custom_bottom_bottom;
 
-    float bg_red;
-    float bg_green;
-    float bg_blue;
-
-    StereoRenderOption render_3d;
-    std::atomic<u8> factor_3d;
-
-    bool filter_mode;
-    std::string pp_shader_name;
-
+    // Utility
     bool dump_textures;
     bool custom_textures;
     bool preload_textures;
-
-    bool use_vsync_new;
 
     // Audio
     bool enable_dsp_lle;
@@ -191,11 +193,13 @@ struct Values {
     std::array<std::string, Service::CAM::NumCameras> camera_config;
     std::array<int, Service::CAM::NumCameras> camera_flip;
 
+    // Miscellaneous
+    std::string log_filter;
+
     // Debugging
     bool record_frame_times;
     bool use_gdbstub;
     u16 gdbstub_port;
-    std::string log_filter;
     std::unordered_map<std::string, bool> lle_modules;
 } extern values;
 

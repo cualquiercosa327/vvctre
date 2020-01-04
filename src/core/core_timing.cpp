@@ -8,6 +8,7 @@
 #include "common/assert.h"
 #include "common/logging/log.h"
 #include "core/core_timing.h"
+#include "core/settings.h"
 
 namespace Core {
 
@@ -53,7 +54,7 @@ u64 Timing::GetTicks() const {
 }
 
 void Timing::AddTicks(u64 ticks) {
-    downcount -= static_cast<u64>(ticks * cpu_clock_scale);
+    downcount -= static_cast<u64>((Settings::values.cpu_clock_percentage) * cpu_clock_scale);
 }
 
 u64 Timing::GetIdleTicks() const {

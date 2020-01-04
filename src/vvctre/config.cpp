@@ -74,7 +74,7 @@ void Config::ReadValues() {
     // Controls
     // TODO: add multiple input profile support
     for (int i = 0; i < Settings::NativeButton::NumButtons; ++i) {
-        std::string default_param = InputCommon::GenerateKeyboardParam(default_buttons[i]);
+        const std::string default_param = InputCommon::GenerateKeyboardParam(default_buttons[i]);
         Settings::values.current_input_profile.buttons[i] =
             sdl2_config->GetString("Controls", Settings::NativeButton::mapping[i], default_param);
         if (Settings::values.current_input_profile.buttons[i].empty())
@@ -82,7 +82,7 @@ void Config::ReadValues() {
     }
 
     for (int i = 0; i < Settings::NativeAnalog::NumAnalogs; ++i) {
-        std::string default_param = InputCommon::GenerateAnalogParamFromKeys(
+        const std::string default_param = InputCommon::GenerateAnalogParamFromKeys(
             default_analogs[i][0], default_analogs[i][1], default_analogs[i][2],
             default_analogs[i][3], default_analogs[i][4], 0.5f);
         Settings::values.current_input_profile.analogs[i] =
@@ -101,11 +101,48 @@ void Config::ReadValues() {
     Settings::values.current_input_profile.udp_input_port =
         static_cast<u16>(sdl2_config->GetInteger("Controls", "udp_input_port",
                                                  InputCommon::CemuhookUDP::DEFAULT_PORT));
+    Settings::values.current_input_profile.udp_pad_index =
+        static_cast<u8>(sdl2_config->GetInteger("Controls", "udp_pad_index", 0));
 
     // Core
     Settings::values.use_cpu_jit = sdl2_config->GetBoolean("Core", "use_cpu_jit", true);
     Settings::values.cpu_clock_percentage =
         sdl2_config->GetInteger("Core", "cpu_clock_percentage", 100);
+    Settings::values.use_custom_cpu_ticks =
+        sdl2_config->GetBoolean("Core", "use_custom_cpu_ticks", false);
+    Settings::values.custom_cpu_ticks =
+        static_cast<u64>(sdl2_config->GetInteger("Core", "custom_cpu_ticks", 77));
+
+    // Data Storage
+    Settings::values.use_virtual_sd =
+        sdl2_config->GetBoolean("Data Storage", "use_virtual_sd", true);
+
+    // System
+    Settings::values.is_new_3ds = sdl2_config->GetBoolean("System", "is_new_3ds", false);
+    Settings::values.region_value =
+        sdl2_config->GetInteger("System", "region_value", Settings::REGION_VALUE_AUTO_SELECT);
+    Settings::values.init_clock =
+        static_cast<Settings::InitClock>(sdl2_config->GetInteger("System", "init_clock", 1));
+    {
+        std::tm t;
+        t.tm_sec = 1;
+        t.tm_min = 0;
+        t.tm_hour = 0;
+        t.tm_mday = 1;
+        t.tm_mon = 0;
+        t.tm_year = 100;
+        t.tm_isdst = 0;
+        std::istringstream string_stream(
+            sdl2_config->GetString("System", "init_time", "2000-01-01 00:00:01"));
+        string_stream >> std::get_time(&t, "%Y-%m-%d %H:%M:%S");
+        if (string_stream.fail()) {
+            LOG_ERROR(Config, "Failed To parse init_time. Using 2000-01-01 00:00:01");
+        }
+        Settings::values.init_time =
+            std::chrono::duration_cast<std::chrono::seconds>(
+                std::chrono::system_clock::from_time_t(std::mktime(&t)).time_since_epoch())
+                .count();
+    }
 
     // Renderer
     Settings::values.use_hw_renderer = sdl2_config->GetBoolean("Renderer", "use_hw_renderer", true);
@@ -117,33 +154,31 @@ void Config::ReadValues() {
 #else
     Settings::values.use_hw_shader = sdl2_config->GetBoolean("Renderer", "use_hw_shader", true);
 #endif
+    Settings::values.use_disk_shader_cache =
+        sdl2_config->GetBoolean("Renderer", "use_disk_shader_cache", true);
     Settings::values.shaders_accurate_mul =
         sdl2_config->GetBoolean("Renderer", "shaders_accurate_mul", false);
     Settings::values.use_shader_jit = sdl2_config->GetBoolean("Renderer", "use_shader_jit", true);
     Settings::values.resolution_factor =
         static_cast<u16>(sdl2_config->GetInteger("Renderer", "resolution_factor", 1));
     Settings::values.use_frame_limit = sdl2_config->GetBoolean("Renderer", "use_frame_limit", true);
-    Settings::values.use_disk_shader_cache =
-        sdl2_config->GetBoolean("Renderer", "use_disk_shader_cache", true);
     Settings::values.frame_limit =
         static_cast<u16>(sdl2_config->GetInteger("Renderer", "frame_limit", 100));
-    Settings::values.use_vsync_new =
-        static_cast<u16>(sdl2_config->GetInteger("Renderer", "use_vsync_new", 1));
-
-    Settings::values.render_3d = static_cast<Settings::StereoRenderOption>(
-        sdl2_config->GetInteger("Renderer", "render_3d", 0));
-    Settings::values.factor_3d =
-        static_cast<u8>(sdl2_config->GetInteger("Renderer", "factor_3d", 0));
-    Settings::values.pp_shader_name = sdl2_config->GetString(
-        "Renderer", "pp_shader_name",
-        (Settings::values.render_3d == Settings::StereoRenderOption::Anaglyph) ? "dubois (builtin)"
-                                                                               : "none (builtin)");
-    Settings::values.filter_mode = sdl2_config->GetBoolean("Renderer", "filter_mode", true);
-
     Settings::values.bg_red = static_cast<float>(sdl2_config->GetReal("Renderer", "bg_red", 0.0));
     Settings::values.bg_green =
         static_cast<float>(sdl2_config->GetReal("Renderer", "bg_green", 0.0));
     Settings::values.bg_blue = static_cast<float>(sdl2_config->GetReal("Renderer", "bg_blue", 0.0));
+    Settings::values.render_3d = static_cast<Settings::StereoRenderOption>(
+        sdl2_config->GetInteger("Renderer", "render_3d", 0));
+    Settings::values.factor_3d =
+        static_cast<u8>(sdl2_config->GetInteger("Renderer", "factor_3d", 0));
+    Settings::values.filter_mode = sdl2_config->GetBoolean("Renderer", "filter_mode", true);
+    Settings::values.pp_shader_name = sdl2_config->GetString(
+        "Renderer", "pp_shader_name",
+        (Settings::values.render_3d == Settings::StereoRenderOption::Anaglyph) ? "dubois (builtin)"
+                                                                               : "none (builtin)");
+    Settings::values.use_vsync_new =
+        static_cast<u16>(sdl2_config->GetInteger("Renderer", "use_vsync_new", 1));
 
     // Layout
     Settings::values.layout_option =
@@ -182,41 +217,10 @@ void Config::ReadValues() {
         sdl2_config->GetBoolean("Audio", "enable_audio_stretching", true);
     Settings::values.audio_device_id = sdl2_config->GetString("Audio", "output_device", "auto");
     Settings::values.volume = static_cast<float>(sdl2_config->GetReal("Audio", "volume", 1));
-    Settings::values.mic_input_device =
-        sdl2_config->GetString("Audio", "mic_input_device", Frontend::Mic::default_device_name);
     Settings::values.mic_input_type =
         static_cast<Settings::MicInputType>(sdl2_config->GetInteger("Audio", "mic_input_type", 0));
-
-    // Data Storage
-    Settings::values.use_virtual_sd =
-        sdl2_config->GetBoolean("Data Storage", "use_virtual_sd", true);
-
-    // System
-    Settings::values.is_new_3ds = sdl2_config->GetBoolean("System", "is_new_3ds", false);
-    Settings::values.region_value =
-        sdl2_config->GetInteger("System", "region_value", Settings::REGION_VALUE_AUTO_SELECT);
-    Settings::values.init_clock =
-        static_cast<Settings::InitClock>(sdl2_config->GetInteger("System", "init_clock", 1));
-    {
-        std::tm t;
-        t.tm_sec = 1;
-        t.tm_min = 0;
-        t.tm_hour = 0;
-        t.tm_mday = 1;
-        t.tm_mon = 0;
-        t.tm_year = 100;
-        t.tm_isdst = 0;
-        std::istringstream string_stream(
-            sdl2_config->GetString("System", "init_time", "2000-01-01 00:00:01"));
-        string_stream >> std::get_time(&t, "%Y-%m-%d %H:%M:%S");
-        if (string_stream.fail()) {
-            LOG_ERROR(Config, "Failed To parse init_time. Using 2000-01-01 00:00:01");
-        }
-        Settings::values.init_time =
-            std::chrono::duration_cast<std::chrono::seconds>(
-                std::chrono::system_clock::from_time_t(std::mktime(&t)).time_since_epoch())
-                .count();
-    }
+    Settings::values.mic_input_device =
+        sdl2_config->GetString("Audio", "mic_input_device", Frontend::Mic::default_device_name);
 
     // Camera
     using namespace Service::CAM;
