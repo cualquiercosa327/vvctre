@@ -57,7 +57,7 @@ endif()
 
 create_target_directory_groups(common)
 
-target_link_libraries(common PUBLIC fmt PRIVATE libzstd_static)
+target_link_libraries(common PUBLIC fmt semver PRIVATE libzstd_static)
 
 if (ARCHITECTURE_x86_64)
     target_link_libraries(common PRIVATE xbyak)
