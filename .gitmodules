@@ -43,3 +43,6 @@
 [submodule "lodepng"]
     path = externals/lodepng/lodepng
     url = https://github.com/lvandeve/lodepng.git
+[submodule "externals/semver"]
+	path = externals/semver
+	url = https://github.com/Neargye/semver.git
