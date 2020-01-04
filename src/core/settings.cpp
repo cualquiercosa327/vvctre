@@ -70,46 +70,8 @@ void LogSetting(const std::string& name, const T& value) {
 }
 
 void LogSettings() {
-    LOG_INFO(Config, "Citra Configuration:");
-    LogSetting("Core_UseCpuJit", Settings::values.use_cpu_jit);
-    LogSetting("Renderer_UseGLES", Settings::values.use_gles);
-    LogSetting("Renderer_UseHwRenderer", Settings::values.use_hw_renderer);
-    LogSetting("Renderer_UseHwShader", Settings::values.use_hw_shader);
-    LogSetting("Renderer_ShadersAccurateMul", Settings::values.shaders_accurate_mul);
-    LogSetting("Renderer_UseShaderJit", Settings::values.use_shader_jit);
-    LogSetting("Renderer_UseResolutionFactor", Settings::values.resolution_factor);
-    LogSetting("Renderer_UseFrameLimit", Settings::values.use_frame_limit);
-    LogSetting("Renderer_FrameLimit", Settings::values.frame_limit);
-    LogSetting("Renderer_PostProcessingShader", Settings::values.pp_shader_name);
-    LogSetting("Renderer_FilterMode", Settings::values.filter_mode);
-    LogSetting("Stereoscopy_Render3d", static_cast<int>(Settings::values.render_3d));
-    LogSetting("Stereoscopy_Factor3d", Settings::values.factor_3d);
-    LogSetting("Layout_LayoutOption", static_cast<int>(Settings::values.layout_option));
-    LogSetting("Layout_SwapScreen", Settings::values.swap_screen);
-    LogSetting("Utility_DumpTextures", Settings::values.dump_textures);
-    LogSetting("Utility_CustomTextures", Settings::values.custom_textures);
-    LogSetting("Audio_EnableDspLle", Settings::values.enable_dsp_lle);
-    LogSetting("Audio_EnableDspLleMultithread", Settings::values.enable_dsp_lle_multithread);
-    LogSetting("Audio_OutputEngine", Settings::values.sink_id);
-    LogSetting("Audio_EnableAudioStretching", Settings::values.enable_audio_stretching);
-    LogSetting("Audio_OutputDevice", Settings::values.audio_device_id);
-    LogSetting("Audio_InputDeviceType", static_cast<int>(Settings::values.mic_input_type));
-    LogSetting("Audio_InputDevice", Settings::values.mic_input_device);
-    using namespace Service::CAM;
-    LogSetting("Camera_OuterRightName", Settings::values.camera_name[OuterRightCamera]);
-    LogSetting("Camera_OuterRightConfig", Settings::values.camera_config[OuterRightCamera]);
-    LogSetting("Camera_OuterRightFlip", Settings::values.camera_flip[OuterRightCamera]);
-    LogSetting("Camera_InnerName", Settings::values.camera_name[InnerCamera]);
-    LogSetting("Camera_InnerConfig", Settings::values.camera_config[InnerCamera]);
-    LogSetting("Camera_InnerFlip", Settings::values.camera_flip[InnerCamera]);
-    LogSetting("Camera_OuterLeftName", Settings::values.camera_name[OuterLeftCamera]);
-    LogSetting("Camera_OuterLeftConfig", Settings::values.camera_config[OuterLeftCamera]);
-    LogSetting("Camera_OuterLeftFlip", Settings::values.camera_flip[OuterLeftCamera]);
-    LogSetting("DataStorage_UseVirtualSd", Settings::values.use_virtual_sd);
-    LogSetting("System_IsNew3ds", Settings::values.is_new_3ds);
-    LogSetting("System_RegionValue", Settings::values.region_value);
-    LogSetting("Debugging_UseGdbstub", Settings::values.use_gdbstub);
-    LogSetting("Debugging_GdbstubPort", Settings::values.gdbstub_port);
+    LOG_INFO(Config, "Configuration:");
+    // TODO
 }
 
 void LoadProfile(int index) {
