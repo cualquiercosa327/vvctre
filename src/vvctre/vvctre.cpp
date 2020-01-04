@@ -256,6 +256,12 @@ int main(int argc, char** argv) {
             InputCommon::Polling::GetPollers(InputCommon::Polling::DeviceType::Button);
         std::vector<std::unique_ptr<InputCommon::Polling::DevicePoller>> analog_pollers =
             InputCommon::Polling::GetPollers(InputCommon::Polling::DeviceType::Analog);
+        for (std::unique_ptr<InputCommon::Polling::DevicePoller>& poller : button_pollers) {
+            poller->Start();
+        }
+        for (std::unique_ptr<InputCommon::Polling::DevicePoller>& poller : analog_pollers) {
+            poller->Start();
+        }
         for (;;) {
             for (std::unique_ptr<InputCommon::Polling::DevicePoller>& poller : button_pollers) {
                 const Common::ParamPackage params = poller->GetNextInput();
