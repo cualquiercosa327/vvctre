@@ -21,9 +21,9 @@
 #include "common/logging/backend.h"
 #include "common/logging/filter.h"
 #include "common/logging/log.h"
-#include "common/scm_rev.h"
 #include "common/scope_exit.h"
 #include "common/string_util.h"
+#include "common/version.h"
 #include "core/core.h"
 #include "core/dumping/backend.h"
 #include "core/file_sys/cia_container.h"
@@ -73,7 +73,7 @@ static void PrintHelp(const char* argv0) {
 }
 
 static void PrintVersion() {
-    std::cout << "Citra " << Common::g_scm_branch << " " << Common::g_scm_desc << std::endl;
+    std::cout << version::vvctre << std::endl;
 }
 
 static void OnStateChanged(const Network::RoomMember::State& state) {
@@ -343,11 +343,11 @@ int main(int argc, char** argv) {
     // Register generic image interface
     Core::System::GetInstance().RegisterImageInterface(std::make_shared<LodePNGImageInterface>());
 
-    std::unique_ptr<EmuWindow_SDL2> emu_window{std::make_unique<EmuWindow_SDL2>(fullscreen)};
+    std::unique_ptr<EmuWindow_SDL2> emu_window = std::make_unique<EmuWindow_SDL2>(fullscreen);
     Frontend::ScopeAcquireContext scope(*emu_window);
-    Core::System& system{Core::System::GetInstance()};
+    Core::System& system = Core::System::GetInstance();
 
-    const Core::System::ResultStatus load_result{system.Load(*emu_window, filepath)};
+    const Core::System::ResultStatus load_result = system.Load(*emu_window, filepath);
 
     switch (load_result) {
     case Core::System::ResultStatus::ErrorGetLoader:
@@ -358,7 +358,7 @@ int main(int argc, char** argv) {
         return -1;
     case Core::System::ResultStatus::ErrorLoader_ErrorEncrypted:
         LOG_CRITICAL(Frontend, "The game that you are trying to load must be decrypted before "
-                               "being used with Citra. \n\n For more information on dumping and "
+                               "being used with vvctre. \n\n For more information on dumping and "
                                "decrypting games, please refer to: "
                                "https://citra-emu.org/wiki/dumping-game-cartridges/");
         return -1;
@@ -366,7 +366,7 @@ int main(int argc, char** argv) {
         LOG_CRITICAL(Frontend, "Error while loading ROM: The ROM format is not supported.");
         return -1;
     case Core::System::ResultStatus::ErrorNotInitialized:
-        LOG_CRITICAL(Frontend, "CPUCore not initialized");
+        LOG_CRITICAL(Frontend, "CPU not initialized");
         return -1;
     case Core::System::ResultStatus::ErrorSystemMode:
         LOG_CRITICAL(Frontend, "Failed to determine system mode!");
@@ -397,12 +397,14 @@ int main(int argc, char** argv) {
     if (!movie_play.empty()) {
         Core::Movie::GetInstance().StartPlayback(movie_play);
     }
+
     if (!movie_record.empty()) {
         Core::Movie::GetInstance().StartRecording(movie_record);
     }
+
     if (!dump_video.empty()) {
-        Layout::FramebufferLayout layout{
-            Layout::FrameLayoutFromResolutionScale(VideoCore::GetResolutionScaleFactor())};
+        const Layout::FramebufferLayout layout =
+            Layout::FrameLayoutFromResolutionScale(VideoCore::GetResolutionScaleFactor());
         system.VideoDumper().StartDumping(dump_video, "webm", layout);
     }
 

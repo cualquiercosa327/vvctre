@@ -10,7 +10,7 @@
 #include <fmt/format.h>
 #include <glad/glad.h>
 #include "common/logging/log.h"
-#include "common/scm_rev.h"
+#include "common/version.h"
 #include "core/3ds.h"
 #include "core/core.h"
 #include "core/settings.h"
@@ -152,13 +152,15 @@ EmuWindow_SDL2::EmuWindow_SDL2(bool fullscreen) {
     SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 8);
     SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 8);
     SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, 0);
+
     // Enable context sharing for the shared context
     SDL_GL_SetAttribute(SDL_GL_SHARE_WITH_CURRENT_CONTEXT, 1);
+
     // Enable vsync
     SDL_GL_SetSwapInterval(1);
 
-    std::string window_title = fmt::format("Citra {} | {}-{}", Common::g_build_fullname,
-                                           Common::g_scm_branch, Common::g_scm_desc);
+    const std::string window_title = fmt::format("vvctre {}", version::vvctre);
+
     render_window =
         SDL_CreateWindow(window_title.c_str(),
                          SDL_WINDOWPOS_UNDEFINED, // x position
@@ -168,7 +170,7 @@ EmuWindow_SDL2::EmuWindow_SDL2(bool fullscreen) {
 
     if (render_window == nullptr) {
         LOG_CRITICAL(Frontend, "Failed to create SDL2 window: {}", SDL_GetError());
-        exit(1);
+        std::exit(1);
     }
 
     dummy_window = SDL_CreateWindow(NULL, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 0, 0,
@@ -198,8 +200,9 @@ EmuWindow_SDL2::EmuWindow_SDL2(bool fullscreen) {
     OnResize();
     OnMinimalClientAreaChangeRequest(GetActiveConfig().min_client_area_size);
     SDL_PumpEvents();
-    LOG_INFO(Frontend, "Citra Version: {} | {}-{}", Common::g_build_fullname, Common::g_scm_branch,
-             Common::g_scm_desc);
+    LOG_INFO(Frontend, "Version: {}", version::vvctre);
+    LOG_INFO(Frontend, "Movie version: {}", version::movie);
+    LOG_INFO(Frontend, "Shader cache version: {}", version::shader_cache);
     Settings::LogSettings();
 }
 
@@ -281,10 +284,13 @@ void EmuWindow_SDL2::PollEvents() {
 
     const u32 current_time = SDL_GetTicks();
     if (current_time > last_time + 2000) {
-        const auto results = Core::System::GetInstance().GetAndResetPerfStats();
-        const auto title = fmt::format(
-            "Citra {} | {}-{} | FPS: {:.0f} ({:.0%})", Common::g_build_fullname,
-            Common::g_scm_branch, Common::g_scm_desc, results.game_fps, results.emulation_speed);
+        Core::PerfStats::Results results = Core::System::GetInstance().GetAndResetPerfStats();
+        const std::string title =
+            game.empty()
+                ? fmt::format("vvctre {} | FPS: {:.0f} ({:.0f}%)", version::vvctre.to_string(),
+                              results.game_fps, results.emulation_speed * 100.0)
+                : fmt::format("vvctre {} | {} | FPS: {:.0f} ({:.0f}%)", version::vvctre.to_string(),
+                              game, results.game_fps, results.emulation_speed * 100.0);
         SDL_SetWindowTitle(render_window, title.c_str());
         last_time = current_time;
     }
@@ -300,4 +306,8 @@ void EmuWindow_SDL2::DoneCurrent() {
 
 void EmuWindow_SDL2::OnMinimalClientAreaChangeRequest(std::pair<u32, u32> minimal_size) {
     SDL_SetWindowMinimumSize(render_window, minimal_size.first, minimal_size.second);
+}
+
+void EmuWindow_SDL2::SetGameName(const std::string& game) {
+    this->game = game;
 }

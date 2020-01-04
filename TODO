@@ -3,5 +3,5 @@
 - Add:  Custom screen refresh rate
 - Add:  Sharper distant objects
 - Add:  Custom ticks
-- Add:  Disk shader cache
 - Add:  BPS support
+- Rewrite multiplayer

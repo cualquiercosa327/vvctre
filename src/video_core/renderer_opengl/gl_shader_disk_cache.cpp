@@ -10,7 +10,7 @@
 #include "common/common_types.h"
 #include "common/file_util.h"
 #include "common/logging/log.h"
-#include "common/scm_rev.h"
+#include "common/version.h"
 #include "common/zstd_compression.h"
 #include "core/core.h"
 #include "core/hle/kernel/process.h"
@@ -18,8 +18,6 @@
 #include "video_core/renderer_opengl/gl_shader_disk_cache.h"
 
 namespace OpenGL {
-
-using ShaderCacheVersionHash = std::array<u8, 64>;
 
 enum class TransferableEntryKind : u32 {
     Raw,
@@ -29,15 +27,6 @@ enum class PrecompiledEntryKind : u32 {
     Decompiled,
     Dump,
 };
-
-constexpr u32 NativeVersion = 1;
-
-ShaderCacheVersionHash GetShaderCacheVersionHash() {
-    ShaderCacheVersionHash hash{};
-    const std::size_t length = std::min(std::strlen(Common::g_shader_cache_version), hash.size());
-    std::memcpy(hash.data(), Common::g_shader_cache_version, length);
-    return hash;
-}
 
 ShaderDiskCacheRaw::ShaderDiskCacheRaw(u64 unique_identifier, ProgramType program_type,
                                        RawShaderConfig config, ProgramCode program_code)
@@ -111,8 +100,9 @@ ShaderDiskCache::~ShaderDiskCache() = default;
 
 std::optional<std::vector<ShaderDiskCacheRaw>> ShaderDiskCache::LoadTransferable() {
     const bool has_title_id = GetProgramID() != 0;
-    if (!Settings::values.use_disk_shader_cache || !has_title_id)
+    if (!Settings::values.use_disk_shader_cache || !has_title_id) {
         return {};
+    }
     tried_to_load = true;
 
     FileUtil::IOFile file(GetTransferablePath(), "rb");
@@ -122,24 +112,18 @@ std::optional<std::vector<ShaderDiskCacheRaw>> ShaderDiskCache::LoadTransferable
         return {};
     }
 
-    u32 version{};
+    u8 version;
     if (file.ReadBytes(&version, sizeof(version)) != sizeof(version)) {
         LOG_ERROR(Render_OpenGL,
                   "Failed to get transferable cache version for title id={} - skipping",
                   GetTitleID());
-        return {};
+        return std::nullopt;
     }
-
-    if (version < NativeVersion) {
-        LOG_INFO(Render_OpenGL, "Transferable shader cache is old - removing");
+    if (version != Version::shader_cache) {
+        LOG_INFO(Render_OpenGL, "Different transferable cache version - removing");
         file.Close();
         InvalidateAll();
-        return {};
-    }
-    if (version > NativeVersion) {
-        LOG_WARNING(Render_OpenGL, "Transferable shader cache was generated with a newer version "
-                                   "of the emulator - skipping");
-        return {};
+        return std::nullopt;
     }
 
     // Version is valid, load the shaders
@@ -199,23 +183,22 @@ ShaderDiskCache::LoadPrecompiled() {
 
 std::optional<std::pair<std::unordered_map<u64, ShaderDiskCacheDecompiled>, ShaderDumpsMap>>
 ShaderDiskCache::LoadPrecompiledFile(FileUtil::IOFile& file) {
+    u8 version;
+    if (file.ReadBytes(&version, sizeof(version)) != sizeof(version)) {
+        LOG_ERROR(Render_OpenGL, "Could not read version from precompiled shader cache");
+        return std::nullopt;
+    }
+    if (version != version::shader_cache) {
+        LOG_ERROR(Render_OpenGL, "Different shader cache version");
+        return std::nullopt;
+    }
+
     // Read compressed file from disk and decompress to virtual precompiled cache file
     std::vector<u8> compressed(file.GetSize());
     file.ReadBytes(compressed.data(), compressed.size());
     const std::vector<u8> decompressed = Common::Compression::DecompressDataZSTD(compressed);
     SaveArrayToPrecompiled(decompressed.data(), decompressed.size());
     decompressed_precompiled_cache_offset = 0;
-
-    ShaderCacheVersionHash file_hash{};
-    if (!LoadArrayFromPrecompiled(file_hash.data(), file_hash.size())) {
-        decompressed_precompiled_cache_offset = 0;
-        return {};
-    }
-    if (GetShaderCacheVersionHash() != file_hash) {
-        LOG_INFO(Render_OpenGL, "Precompiled cache is from another version of the emulator");
-        decompressed_precompiled_cache_offset = 0;
-        return {};
-    }
 
     std::unordered_map<u64, ShaderDiskCacheDecompiled> decompiled;
     ShaderDumpsMap dumps;
@@ -344,11 +327,8 @@ void ShaderDiskCache::SaveRaw(const ShaderDiskCacheRaw& entry) {
 
 void ShaderDiskCache::SaveDecompiled(u64 unique_identifier,
                                      const ShaderDecompiler::ProgramResult& code) {
-    if (!IsUsable())
+    if (!IsUsable()) {
         return;
-
-    if (decompressed_precompiled_cache.size() == 0) {
-        SavePrecompiledHeaderToVirtualPrecompiledCache();
     }
 
     if (!SaveDecompiledFile(unique_identifier, code)) {
@@ -399,22 +379,13 @@ FileUtil::IOFile ShaderDiskCache::AppendTransferableFile() {
     }
     if (!existed || file.GetSize() == 0) {
         // If the file didn't exist, write its version
-        if (file.WriteObject(NativeVersion) != 1) {
+        if (file.WriteObject(version::shader_cache) != 1) {
             LOG_ERROR(Render_OpenGL, "Failed to write transferable cache version in path={}",
                       transferable_path);
             return {};
         }
     }
     return file;
-}
-
-void ShaderDiskCache::SavePrecompiledHeaderToVirtualPrecompiledCache() {
-    const auto hash{GetShaderCacheVersionHash()};
-    if (!SaveArrayToPrecompiled(hash.data(), hash.size())) {
-        LOG_ERROR(
-            Render_OpenGL,
-            "Failed to write precompiled cache version hash to virtual precompiled cache file");
-    }
 }
 
 void ShaderDiskCache::SaveVirtualPrecompiledFile() {

@@ -88,5 +88,5 @@ add_library(httplib INTERFACE)
 target_include_directories(httplib INTERFACE ./httplib)
 
 add_subdirectory(lodepng)
-# add_subdirectory(semver)
+add_subdirectory(semver)
 # add_subdirectory(clipp)

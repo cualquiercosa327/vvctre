@@ -134,9 +134,6 @@ private:
     /// Opens current game's transferable file and write it's header if it doesn't exist
     FileUtil::IOFile AppendTransferableFile();
 
-    /// Save precompiled header to precompiled_cache_in_memory
-    void SavePrecompiledHeaderToVirtualPrecompiledCache();
-
     /// Create shader disk cache directories. Returns true on success.
     bool EnsureDirectories() const;
 

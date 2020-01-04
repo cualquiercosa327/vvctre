@@ -49,6 +49,9 @@ public:
     /// Creates a new context that is shared with the current context
     std::unique_ptr<GraphicsContext> CreateSharedContext() const override;
 
+    /// Sets the game name
+    void SetGameName(const std::string& game);
+
 private:
     /// Called by PollEvents when a key is pressed or released.
     void OnKeyEvent(int key, u8 state);
@@ -99,4 +102,6 @@ private:
 
     /// Keeps track of how often to update the title bar during gameplay
     u32 last_time = 0;
+
+    std::string game;
 };
