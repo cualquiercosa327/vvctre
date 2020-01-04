@@ -16,7 +16,7 @@ namespace OpenGL {
 GLuint LoadShader(const char* source, GLenum type) {
     const std::string version = GLES ? R"(#version 310 es
 
-#define CITRA_GLES
+#define VVCTRE_GLES
 
 #if defined(GL_ANDROID_extension_pack_es31a)
 #extension GL_ANDROID_extension_pack_es31a : enable

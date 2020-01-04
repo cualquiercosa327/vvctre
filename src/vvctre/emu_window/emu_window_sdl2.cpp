@@ -9,7 +9,6 @@
 #include <SDL.h>
 #include <fmt/format.h>
 #include <glad/glad.h>
-#include "citra/emu_window/emu_window_sdl2.h"
 #include "common/logging/log.h"
 #include "common/scm_rev.h"
 #include "core/3ds.h"
@@ -22,6 +21,7 @@
 #include "network/network.h"
 #include "video_core/renderer_base.h"
 #include "video_core/video_core.h"
+#include "vvctre/emu_window/emu_window_sdl2.h"
 
 SharedContext_SDL2::SharedContext_SDL2() {
     window = SDL_CreateWindow(NULL, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 0, 0,

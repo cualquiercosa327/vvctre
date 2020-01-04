@@ -46,13 +46,6 @@ PROJECT_NUMBER         =
 
 PROJECT_BRIEF          = "Nintendo 3DS emulator/debugger"
 
-# With the PROJECT_LOGO tag one can specify an logo or icon that is included in
-# the documentation. The maximum height of the logo should not exceed 55 pixels
-# and the maximum width should not exceed 200 pixels. Doxygen will copy the logo
-# to the output directory.
-
-PROJECT_LOGO           = dist/doc-icon.png
-
 # The OUTPUT_DIRECTORY tag is used to specify the (relative or absolute) path
 # into which the generated documentation will be written. If a relative path is
 # entered, it will be relative to the location where doxygen was started. If

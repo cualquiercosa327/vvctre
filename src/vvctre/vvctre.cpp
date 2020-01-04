@@ -18,9 +18,6 @@
 #include <shellapi.h>
 #endif
 
-#include "citra/config.h"
-#include "citra/emu_window/emu_window_sdl2.h"
-#include "citra/lodepng_image_interface.h"
 #include "common/common_paths.h"
 #include "common/detached_tasks.h"
 #include "common/file_util.h"
@@ -44,6 +41,9 @@
 #include "core/settings.h"
 #include "network/network.h"
 #include "video_core/video_core.h"
+#include "vvctre/config.h"
+#include "vvctre/emu_window/emu_window_sdl2.h"
+#include "vvctre/lodepng_image_interface.h"
 
 #undef _UNICODE
 #include <getopt.h>

@@ -204,8 +204,8 @@ struct Values {
     std::string citra_token;
 } extern values;
 
-// a special value for Values::region_value indicating that citra will automatically select a region
-// value to fit the region lockout info of the game
+// A special value for Values::region_value indicating that vvctre will automatically select a
+// region value to fit the region lockout info of the game
 static constexpr int REGION_VALUE_AUTO_SELECT = -1;
 
 void Apply();

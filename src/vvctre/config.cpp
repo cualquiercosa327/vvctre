@@ -8,8 +8,6 @@
 #include <unordered_map>
 #include <SDL.h>
 #include <inih/cpp/INIReader.h>
-#include "citra/config.h"
-#include "citra/default_ini.h"
 #include "common/file_util.h"
 #include "common/logging/log.h"
 #include "common/param_package.h"
@@ -18,6 +16,8 @@
 #include "core/settings.h"
 #include "input_common/main.h"
 #include "input_common/udp/client.h"
+#include "vvctre/config.h"
+#include "vvctre/default_ini.h"
 
 Config::Config() {
     // TODO: Don't hardcode the path; let the frontend decide where to put the config files.
@@ -250,14 +250,6 @@ void Config::ReadValues() {
         bool use_lle = sdl2_config->GetBoolean("Debugging", "LLE\\" + service_module.name, false);
         Settings::values.lle_modules.emplace(service_module.name, use_lle);
     }
-
-    // Web Service
-    Settings::values.enable_telemetry =
-        sdl2_config->GetBoolean("WebService", "enable_telemetry", true);
-    Settings::values.web_api_url =
-        sdl2_config->GetString("WebService", "web_api_url", "https://api.citra-emu.org");
-    Settings::values.citra_username = sdl2_config->GetString("WebService", "citra_username", "");
-    Settings::values.citra_token = sdl2_config->GetString("WebService", "citra_token", "");
 }
 
 void Config::Reload() {

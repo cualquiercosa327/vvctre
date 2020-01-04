@@ -18,21 +18,8 @@
 #ifdef USER_DIR
 #define EMU_DATA_DIR USER_DIR
 #else
-#ifdef _WIN32
-#define EMU_DATA_DIR "Citra"
-#elif ANDROID
-// On Android internal storage is mounted as "/sdcard"
-#define SDCARD_DIR "sdcard"
-#define EMU_DATA_DIR "citra-emu"
-#else
-#define EMU_DATA_DIR "citra-emu"
+#define EMU_DATA_DIR "vvctre"
 #endif
-#endif
-
-// Dirs in both User and Sys
-#define EUR_DIR "EUR"
-#define USA_DIR "USA"
-#define JAP_DIR "JAP"
 
 // Subdirs in the User dir returned by GetUserPath(UserPath::UserDir)
 #define CONFIG_DIR "config"

@@ -233,7 +233,7 @@ is_new_3ds =
 # -1: Auto-select (default), 0: Japan, 1: USA, 2: Europe, 3: Australia, 4: China, 5: Korea, 6: Taiwan
 region_value =
 
-# The clock to use when citra starts
+# The clock to use when vvctre starts
 # 0: System clock (default), 1: fixed time
 init_clock =
 
@@ -276,16 +276,5 @@ record_frame_times =
 use_gdbstub=false
 gdbstub_port=24689
 # To LLE a service module add "LLE\<module name>=true"
-
-[WebService]
-# Whether or not to enable telemetry
-# 0: No, 1 (default): Yes
-enable_telemetry =
-# URL for Web API
-web_api_url = https://api.citra-emu.org
-# Username and token for Citra Web Service
-# See https://profile.citra-emu.org/ for more info
-citra_username =
-citra_token =
 )";
 }

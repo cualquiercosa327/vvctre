@@ -40,7 +40,7 @@ struct Symbol {
     T* ptr_symbol = nullptr;
 };
 
-// Runtime load the MF symbols to prevent mf.dll not found errors on citra load
+// Runtime load the MF symbols to prevent mf.dll not found errors on vvctre load
 extern Symbol<HRESULT(ULONG, DWORD)> MFStartup;
 extern Symbol<HRESULT(void)> MFShutdown;
 extern Symbol<HRESULT(IUnknown*)> MFShutdownObject;

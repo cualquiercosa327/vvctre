@@ -1251,9 +1251,9 @@ std::string GenerateFragmentShader(const PicaFSConfig& config, bool separable_sh
     out += GetVertexInterfaceDeclaration(false, separable_shader);
 
     out += R"(
-#ifndef CITRA_GLES
+#ifndef VVCTRE_GLES
 in vec4 gl_FragCoord;
-#endif // CITRA_GLES
+#endif // VVCTRE_GLES
 
 out vec4 color;
 
@@ -1623,10 +1623,10 @@ void main() {
     normquat = vert_normquat;
     view = vert_view;
     gl_Position = vert_position;
-#if !defined(CITRA_GLES) || defined(GL_EXT_clip_cull_distance)
+#if !defined(VVCTRE_GLES) || defined(GL_EXT_clip_cull_distance)
     gl_ClipDistance[0] = -vert_position.z; // fixed PICA clipping plane z <= 0
     gl_ClipDistance[1] = dot(clip_coef, vert_position);
-#endif // !defined(CITRA_GLES) || defined(GL_EXT_clip_cull_distance)
+#endif // !defined(VVCTRE_GLES) || defined(GL_EXT_clip_cull_distance)
 }
 )";
 
@@ -1739,10 +1739,10 @@ struct Vertex {
            semantic(VSOutputAttributes::POSITION_Z) + ", " +
            semantic(VSOutputAttributes::POSITION_W) + ");\n";
     out += "    gl_Position = vtx_pos;\n";
-    out += "#if !defined(CITRA_GLES) || defined(GL_EXT_clip_cull_distance)\n";
+    out += "#if !defined(VVCTRE_GLES) || defined(GL_EXT_clip_cull_distance)\n";
     out += "    gl_ClipDistance[0] = -vtx_pos.z;\n"; // fixed PICA clipping plane z <= 0
     out += "    gl_ClipDistance[1] = dot(clip_coef, vtx_pos);\n";
-    out += "#endif // !defined(CITRA_GLES) || defined(GL_EXT_clip_cull_distance)\n\n";
+    out += "#endif // !defined(VVCTRE_GLES) || defined(GL_EXT_clip_cull_distance)\n\n";
 
     out += "    vec4 vtx_quat = GetVertexQuaternion(vtx);\n";
     out += "    normquat = mix(vtx_quat, -vtx_quat, bvec4(quats_opposite));\n\n";
