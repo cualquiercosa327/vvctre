@@ -35,10 +35,6 @@ add_subdirectory(glad)
 # inih
 add_subdirectory(inih)
 
-# MicroProfile
-add_library(microprofile INTERFACE)
-target_include_directories(microprofile INTERFACE ./microprofile)
-
 # Nihstro
 add_library(nihstro-headers INTERFACE)
 target_include_directories(nihstro-headers INTERFACE ./nihstro/include)
@@ -72,34 +68,25 @@ if (ENABLE_CUBEB)
     add_subdirectory(cubeb EXCLUDE_FROM_ALL)
 endif()
 
-# DiscordRPC
+# Discord RPC
 if (USE_DISCORD_PRESENCE)
     add_subdirectory(discord-rpc EXCLUDE_FROM_ALL)
     target_include_directories(discord-rpc INTERFACE ./discord-rpc/include)
 endif()
 
-if (ENABLE_WEB_SERVICE)
-    # LibreSSL
-    set(LIBRESSL_SKIP_INSTALL ON CACHE BOOL "")
-    add_subdirectory(libressl EXCLUDE_FROM_ALL)
-    target_include_directories(ssl INTERFACE ./libressl/include)
-    target_compile_definitions(ssl PRIVATE -DHAVE_INET_NTOP)
+# LibreSSL
+set(LIBRESSL_SKIP_INSTALL ON CACHE BOOL "")
+add_subdirectory(libressl EXCLUDE_FROM_ALL)
+target_include_directories(ssl INTERFACE ./libressl/include)
+target_compile_definitions(ssl PRIVATE -DHAVE_INET_NTOP)
 
-    # JSON
-    add_library(json-headers INTERFACE)
-    target_include_directories(json-headers INTERFACE ./json)
+# lurlparser
+add_subdirectory(lurlparser EXCLUDE_FROM_ALL)
 
-    # lurlparser
-    add_subdirectory(lurlparser EXCLUDE_FROM_ALL)
+# httplib
+add_library(httplib INTERFACE)
+target_include_directories(httplib INTERFACE ./httplib)
 
-    # httplib
-    add_library(httplib INTERFACE)
-    target_include_directories(httplib INTERFACE ./httplib)
-
-    # cpp-jwt
-    add_library(cpp-jwt INTERFACE)
-    target_include_directories(cpp-jwt INTERFACE ./cpp-jwt/include)
-endif()
-
-# lodepng
 add_subdirectory(lodepng)
+# add_subdirectory(semver)
+# add_subdirectory(clipp)

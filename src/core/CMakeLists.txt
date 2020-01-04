@@ -446,8 +446,6 @@ add_library(core STATIC
     rpc/udp_server.h
     settings.cpp
     settings.h
-    telemetry_session.cpp
-    telemetry_session.h
     tracer/citrace.h
     tracer/recorder.cpp
     tracer/recorder.h
@@ -464,10 +462,6 @@ create_target_directory_groups(core)
 
 target_link_libraries(core PUBLIC common PRIVATE audio_core network video_core)
 target_link_libraries(core PUBLIC Boost::boost PRIVATE cryptopp fmt open_source_archives)
-if (ENABLE_WEB_SERVICE)
-    target_compile_definitions(core PRIVATE -DENABLE_WEB_SERVICE)
-    target_link_libraries(core PRIVATE web_service)
-endif()
 
 if (ARCHITECTURE_x86_64)
     target_sources(core PRIVATE

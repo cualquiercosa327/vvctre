@@ -1532,8 +1532,6 @@ vec4 shadowTextureCube(vec2 uv, float w) {
         // Blend the fog
         out += "last_tex_env_out.rgb = mix(fog_color.rgb, last_tex_env_out.rgb, fog_factor);\n";
     } else if (state.fog_mode == TexturingRegs::FogMode::Gas) {
-        Core::System::GetInstance().TelemetrySession().AddField(Telemetry::FieldType::Session,
-                                                                "VideoCore_Pica_UseGasMode", true);
         LOG_CRITICAL(Render_OpenGL, "Unimplemented gas mode");
         out += "discard; }";
         return out;

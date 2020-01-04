@@ -14,33 +14,32 @@
 #include "core/loader/loader.h"
 #include "core/memory.h"
 #include "core/perf_stats.h"
-#include "core/telemetry_session.h"
 
 class ARM_Interface;
 
 namespace Frontend {
 class EmuWindow;
-}
+} // namespace Frontend
 
 namespace Memory {
 class MemorySystem;
-}
+} // namespace Memory
 
 namespace AudioCore {
 class DspInterface;
-}
+} // namespace AudioCore
 
 namespace RPC {
 class RPCServer;
-}
+} // namespace RPC
 
 namespace Service {
 namespace SM {
 class ServiceManager;
-}
+} // namespace SM
 namespace FS {
 class ArchiveManager;
-}
+} // namespace FS
 } // namespace Service
 
 namespace Kernel {
@@ -139,14 +138,6 @@ public:
      */
     bool IsPoweredOn() const {
         return cpu_core != nullptr;
-    }
-
-    /**
-     * Returns a reference to the telemetry session for this emulation session.
-     * @returns Reference to the telemetry session.
-     */
-    Core::TelemetrySession& TelemetrySession() const {
-        return *telemetry_session;
     }
 
     /// Prepare the core emulation for a reschedule
@@ -291,9 +282,6 @@ private:
 
     /// When true, signals that a reschedule should happen
     bool reschedule_pending{};
-
-    /// Telemetry session for this emulation session
-    std::unique_ptr<Core::TelemetrySession> telemetry_session;
 
     /// Service manager
     std::shared_ptr<Service::SM::ServiceManager> service_manager;

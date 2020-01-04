@@ -1014,16 +1014,11 @@ Core::System::ResultStatus RendererOpenGL::Init() {
     LOG_INFO(Render_OpenGL, "GL_VENDOR: {}", gpu_vendor);
     LOG_INFO(Render_OpenGL, "GL_RENDERER: {}", gpu_model);
 
-    auto& telemetry_session = Core::System::GetInstance().TelemetrySession();
-    telemetry_session.AddField(Telemetry::FieldType::UserSystem, "GPU_Vendor", gpu_vendor);
-    telemetry_session.AddField(Telemetry::FieldType::UserSystem, "GPU_Model", gpu_model);
-    telemetry_session.AddField(Telemetry::FieldType::UserSystem, "GPU_OpenGL_Version", gl_version);
-
     if (!strcmp(gpu_vendor, "GDI Generic")) {
         return Core::System::ResultStatus::ErrorVideoCore_ErrorGenericDrivers;
     }
 
-    if (!(GLAD_GL_VERSION_3_3 || GLAD_GL_ES_VERSION_3_1)) {
+    if (!GLAD_GL_VERSION_3_3) {
         return Core::System::ResultStatus::ErrorVideoCore_ErrorBelowGL33;
     }
 

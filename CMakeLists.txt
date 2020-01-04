@@ -10,8 +10,6 @@ project(vvctre)
 # MSVC only: bundled SDL2
 CMAKE_DEPENDENT_OPTION(VVCTRE_USE_BUNDLED_SDL2 "Download bundled SDL2 binaries" ON "MSVC" OFF)
 
-option(ENABLE_WEB_SERVICE "Enable web services (telemetry, etc.)" ON)
-
 option(ENABLE_CUBEB "Enables the cubeb audio backend" ON)
 
 option(ENABLE_FFMPEG_AUDIO_DECODER "Enable FFmpeg audio (AAC) decoder" OFF)

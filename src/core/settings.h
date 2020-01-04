@@ -196,12 +196,6 @@ struct Values {
     u16 gdbstub_port;
     std::string log_filter;
     std::unordered_map<std::string, bool> lle_modules;
-
-    // WebService
-    bool enable_telemetry;
-    std::string web_api_url;
-    std::string citra_username;
-    std::string citra_token;
 } extern values;
 
 // A special value for Values::region_value indicating that vvctre will automatically select a

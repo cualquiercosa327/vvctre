@@ -175,9 +175,6 @@ ResultStatus AppLoader_NCCH::Load(std::shared_ptr<Kernel::Process>& process) {
         overlay_ncch = &update_ncch;
     }
 
-    auto& system = Core::System::GetInstance();
-    system.TelemetrySession().AddField(Telemetry::FieldType::Session, "ProgramId", program_id);
-
     if (auto room_member = Network::GetRoomMember().lock()) {
         Network::GameInfo game_info;
         ReadTitle(game_info.name);
@@ -191,7 +188,7 @@ ResultStatus AppLoader_NCCH::Load(std::shared_ptr<Kernel::Process>& process) {
     if (ResultStatus::Success != result)
         return result;
 
-    system.ArchiveManager().RegisterSelfNCCH(*this);
+    Core::System::GetInstance().ArchiveManager().RegisterSelfNCCH(*this);
 
     ParseRegionLockoutInfo();
 
