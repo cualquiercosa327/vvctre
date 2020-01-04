@@ -119,7 +119,7 @@ std::optional<std::vector<ShaderDiskCacheRaw>> ShaderDiskCache::LoadTransferable
                   GetTitleID());
         return std::nullopt;
     }
-    if (version != Version::shader_cache) {
+    if (version != version::shader_cache) {
         LOG_INFO(Render_OpenGL, "Different transferable cache version - removing");
         file.Close();
         InvalidateAll();
