@@ -112,6 +112,8 @@ void Config::ReadValues() {
         sdl2_config->GetBoolean("Core", "use_custom_cpu_ticks", false);
     Settings::values.custom_cpu_ticks =
         static_cast<u64>(sdl2_config->GetInteger("Core", "custom_cpu_ticks", 77));
+    Settings::values.multiplayer_url =
+        sdl2_config->GetString("Core", "multiplayer_url", "ws://vvctre-multiplayer.glitch.me");
 
     // Data Storage
     Settings::values.use_virtual_sd =

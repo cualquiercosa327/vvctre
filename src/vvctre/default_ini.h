@@ -55,6 +55,9 @@ use_custom_cpu_ticks =
 # Default: 77
 custom_cpu_ticks =
 
+# Default: ws://vvctre-multiplayer.glitch.me
+multiplayer_url =
+
 [Data Storage]
 # Whether to create a virtual SD card.
 # 1 (default): Yes, 0: No

@@ -132,6 +132,7 @@ struct Values {
     int cpu_clock_percentage;
     bool use_custom_cpu_ticks;
     u64 custom_cpu_ticks;
+    std::string multiplayer_url;
 
     // Data Storage
     bool use_virtual_sd;

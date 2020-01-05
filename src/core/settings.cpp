@@ -77,6 +77,7 @@ void LogSettings() {
     LogSetting("cpu_clock_percentage", values.cpu_clock_percentage);
     LogSetting("use_custom_cpu_ticks", values.use_custom_cpu_ticks);
     LogSetting("custom_cpu_ticks", values.custom_cpu_ticks);
+    LogSetting("multiplayer_url", values.multiplayer_url);
     LogSetting("use_virtual_sd", values.use_virtual_sd);
     LogSetting("is_new_3ds", values.is_new_3ds);
     LogSetting("region_value", values.region_value);

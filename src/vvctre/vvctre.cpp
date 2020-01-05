@@ -120,6 +120,8 @@ int main(int argc, char** argv) {
                   .set(Settings::values.custom_cpu_ticks),
           clipp::option("-l", "--cpu-clock-percentage").doc("set CPU clock percentage") &
               clipp::value("percentage").set(Settings::values.cpu_clock_percentage),
+          clipp::option("-m", "--multiplayer-server-url").doc("set the multiplayer server URL") &
+              clipp::value("url").set(Settings::values.multiplayer_url),
           clipp::option("-f", "--fullscreen").set(fullscreen).doc("start in fullscreen mode"),
           clipp::option("-c", "--regenerate-console-id")
               .set(regenerate_console_id)
