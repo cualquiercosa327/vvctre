@@ -518,20 +518,24 @@ Loader::ResultStatus NCCHContainer::ApplyCodePatch(std::vector<u8>& code) const 
     }};
 
     for (const PatchLocation& info : patch_paths) {
-        FileUtil::IOFile file{info.path, "rb"};
-        if (!file)
+        FileUtil::IOFile file(info.path, "rb");
+        if (!file) {
             continue;
+        }
 
         std::vector<u8> patch(file.GetSize());
-        if (file.ReadBytes(patch.data(), patch.size()) != patch.size())
+        if (file.ReadBytes(patch.data(), patch.size()) != patch.size()) {
             return Loader::ResultStatus::Error;
+        }
 
         LOG_INFO(Service_FS, "File {} patching code.bin", info.path);
-        if (!info.patch_fn(patch, code))
+        if (!info.patch_fn(patch, code)) {
             return Loader::ResultStatus::Error;
+        }
 
         return Loader::ResultStatus::Success;
     }
+
     return Loader::ResultStatus::ErrorNotUsed;
 }
 
