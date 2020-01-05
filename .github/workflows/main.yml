@@ -39,11 +39,11 @@ jobs:
       run: |
         if [ "$RUNNER_OS" == "Linux" ]; then
           rm $GITHUB_WORKSPACE/build/bin/tests
-          cp license.txt $GITHUB_WORKSPACE/build/bin
+          cp $GITHUB_WORKSPACE/license.txt $GITHUB_WORKSPACE/build/bin
         elif [ "$RUNNER_OS" == "Windows" ]; then
           rm $GITHUB_WORKSPACE/build/bin/Release/tests.exe
           rm $GITHUB_WORKSPACE/build/bin/Release/*.pdb
-          cp license.txt $GITHUB_WORKSPACE/build/bin/Release
+          cp $GITHUB_WORKSPACE/license.txt $GITHUB_WORKSPACE/build/bin/Release
         fi
     - name: Upload artifact
       uses: actions/upload-artifact@v1.0.0
