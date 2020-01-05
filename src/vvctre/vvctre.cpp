@@ -97,37 +97,51 @@ int main(int argc, char** argv) {
 
     auto cli =
         ((clipp::value("path").set(command, Command::Boot).set(path).doc("executable or CIA path"),
-          clipp::option("-g", "--gdbstub").doc("enable the GDB stub") &
+          clipp::option("--gdbstub").doc("enable the GDB stub") &
               clipp::value("port")
                   .set(Settings::values.use_gdbstub, true)
                   .set(Settings::values.gdbstub_port),
-          clipp::option("-r", "--movie-record").doc("record inputs to a file") &
+          clipp::option("--movie-record").doc("record inputs to a file") &
               clipp::value("path").set(movie_record),
-          clipp::option("-p", "--movie-play").doc("play inputs from a file") &
+          clipp::option("--movie-play").doc("play inputs from a file") &
               clipp::value("path").set(movie_play),
-          clipp::option("-d", "--dump-video").doc("dump audio and video to a file") &
+          clipp::option("--dump-video").doc("dump audio and video to a file") &
               clipp::value("path").set(dump_video),
-          clipp::option("-s", "--speed-limit").doc("set the speed limit") &
+          clipp::option("--speed-limit").doc("set the speed limit") &
               clipp::value("limit")
                   .set(Settings::values.use_frame_limit, true)
                   .set(Settings::values.frame_limit),
-          clipp::option("-e", "--screen-refresh-rate").doc("set a custom 3DS screen refresh rate") &
+          clipp::option("--screen-refresh-rate").doc("set a custom 3DS screen refresh rate") &
               clipp::value("rate")
                   .set(Settings::values.use_custom_screen_refresh_rate, true)
                   .set(Settings::values.custom_screen_refresh_rate),
-          clipp::option("-t", "--custom-cpu-ticks").doc("set custom CPU ticks") &
+          clipp::option("--custom-cpu-ticks").doc("set custom CPU ticks") &
               clipp::value("ticks")
                   .set(Settings::values.use_custom_cpu_ticks, true)
                   .set(Settings::values.custom_cpu_ticks),
-          clipp::option("-l", "--cpu-clock-percentage").doc("set CPU clock percentage") &
+          clipp::option("--cpu-clock-percentage").doc("set CPU clock percentage") &
               clipp::value("percentage").set(Settings::values.cpu_clock_percentage),
-          clipp::option("-m", "--multiplayer-server-url").doc("set the multiplayer server URL") &
+          clipp::option("--multiplayer-server-url").doc("set the multiplayer server URL") &
               clipp::value("url").set(Settings::values.multiplayer_url),
-          clipp::option("-f", "--fullscreen").set(fullscreen).doc("start in fullscreen mode"),
-          clipp::option("-c", "--regenerate-console-id")
+          clipp::option("--log-filter").doc("set the log filter") &
+              clipp::value("filter").set(Settings::values.log_filter),
+          clipp::option("--hardware-renderer")
+              .set(Settings::values.use_hw_renderer)
+              .doc("enable hardware renderer"),
+          clipp::option("--hardware-shader")
+              .set(Settings::values.use_hw_shader)
+              .doc("enable hardware shader"),
+          clipp::option("--accurate-multiplication")
+              .set(Settings::values.shaders_accurate_mul)
+              .doc("enable accurate multiplication"),
+          clipp::option("--disk-shader-cache")
+              .set(Settings::values.use_disk_shader_cache)
+              .doc("enable disk shader cache"),
+          clipp::option("--fullscreen").set(fullscreen).doc("start in fullscreen mode"),
+          clipp::option("--regenerate-console-id")
               .set(regenerate_console_id)
               .doc("regenerate the console ID before booting"),
-          clipp::option("-u", "--unlimited")
+          clipp::option("--unlimited")
               .set(Settings::values.use_frame_limit, false)
               .doc("disable the speed limiter")) |
          clipp::command("controls").set(command, Command::Controls).doc("configure a controller") |
