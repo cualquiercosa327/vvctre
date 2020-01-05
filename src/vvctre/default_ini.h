@@ -8,55 +8,7 @@ namespace DefaultINI {
 
 const char* sdl2_config_file = R"(
 [Controls]
-# The input devices and parameters for each 3DS native input
-# It should be in the format of "engine:[engine_name],[param1]:[value1],[param2]:[value2]..."
-# Escape characters $0 (for ':'), $1 (for ',') and $2 (for '$') can be used in values
-
-# for button input, the following devices are available:
-#  - "keyboard" (default) for keyboard input. Required parameters:
-#      - "code": the code of the key to bind
-#  - "sdl" for joystick input using SDL. Required parameters:
-#      - "joystick": the index of the joystick to bind
-#      - "button"(optional): the index of the button to bind
-#      - "hat"(optional): the index of the hat to bind as direction buttons
-#      - "axis"(optional): the index of the axis to bind
-#      - "direction"(only used for hat): the direction name of the hat to bind. Can be "up", "down", "left" or "right"
-#      - "threshold"(only used for axis): a float value in (-1.0, 1.0) which the button is
-#          triggered if the axis value crosses
-#      - "direction"(only used for axis): "+" means the button is triggered when the axis value
-#          is greater than the threshold; "-" means the button is triggered when the axis value
-#          is smaller than the threshold
-button_a=
-button_b=
-button_x=
-button_y=
-button_up=
-button_down=
-button_left=
-button_right=
-button_l=
-button_r=
-button_start=
-button_select=
-button_debug=
-button_gpio14=
-button_zl=
-button_zr=
-button_home=
-
-# for analog input, the following devices are available:
-#  - "analog_from_button" (default) for emulating analog input from direction buttons. Required parameters:
-#      - "up", "down", "left", "right": sub-devices for each direction.
-#          Should be in the format as a button input devices using escape characters, for example, "engine$0keyboard$1code$00"
-#      - "modifier": sub-devices as a modifier.
-#      - "modifier_scale": a float number representing the applied modifier scale to the analog input.
-#          Must be in range of 0.0-1.0. Defaults to 0.5
-#  - "sdl" for joystick input using SDL. Required parameters:
-#      - "joystick": the index of the joystick to bind
-#      - "axis_x": the index of the axis to bind as x-axis (default to 0)
-#      - "axis_y": the index of the axis to bind as y-axis (default to 1)
-circle_pad=
-c_stick=
+# for button/analog, you can use vvctre's controls command.
 
 # for motion input, the following devices are available:
 #  - "motion_emu" (default) for emulating motion input from mouse input. Required parameters:
