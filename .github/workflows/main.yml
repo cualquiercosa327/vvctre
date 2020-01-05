@@ -38,12 +38,12 @@ jobs:
       shell: bash
       run: |
         if [ "$RUNNER_OS" == "Linux" ]; then
-          VVCTRE_DIR="vvctre-linux-$(./build/bin/vvctre version | head -c -1)"
+          VVCTRE_DIR=vvctre-linux-$(./build/bin/vvctre version | head -c -1)
           mkdir $VVCTRE_DIR
           cp license.txt $VVCTRE_DIR
           cp -r ./build/bin/* $VVCTRE_DIR
         elif [ "$RUNNER_OS" == "Windows ]; then
-          VVCTRE_DIR="vvctre-windows-$(./build/bin/Release/vvctre version | head -c -2)"
+          VVCTRE_DIR=vvctre-windows-$(./build/bin/Release/vvctre version | head -c -2)
           mkdir $VVCTRE_DIR
           cp license.txt $VVCTRE_DIR
           rm ./build/bin/*.pdb
