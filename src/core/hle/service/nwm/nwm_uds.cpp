@@ -632,7 +632,7 @@ ResultVal<std::shared_ptr<Kernel::Event>> NWM_UDS::Initialize(
     u32 sharedmem_size, const NodeInfo& node, u16 version,
     std::shared_ptr<Kernel::SharedMemory> sharedmem) {
 
-    client.reset(easywsclient::WebSocket::from_url("ws://vvctre-multiplayer.glitch.me"));
+    client.reset(easywsclient::WebSocket::from_url("ws://vvctre.glitch.me/multiplayer"));
 
     loop_thread = std::make_unique<std::thread>([&] {
         while (client != nullptr && client->getReadyState() == easywsclient::WebSocket::OPEN) {
