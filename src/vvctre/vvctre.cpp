@@ -284,7 +284,7 @@ int main(int argc, char** argv) {
 
         for (const auto& mapping : Settings::NativeAnalog::mapping) {
             fmt::print("Current joystick: {}. After pressing the enter key, first move your "
-                       "joystick horizontally, and then vertically\n",
+                       "joystick to the right, and then to the bottom\n",
                        mapping);
             std::cin.get();
 
