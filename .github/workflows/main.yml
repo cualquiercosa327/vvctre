@@ -43,7 +43,7 @@ jobs:
           cp license.txt $VVCTRE_DIR
           rm ./build/bin/tests
           cp -r ./build/bin/* $VVCTRE_DIR
-        elif [ "$RUNNER_OS" == "Windows ]; then
+        elif [ "$RUNNER_OS" == "Windows" ]; then
           VVCTRE_DIR=vvctre-windows-$(./build/bin/Release/vvctre version | head -c -2)
           mkdir $VVCTRE_DIR
           cp license.txt $VVCTRE_DIR
@@ -52,7 +52,7 @@ jobs:
           cp -r ./build/bin/Release/* $VVCTRE_DIR
         fi
 
-        7z a "$VVCTRE_DIR.7z" $VVCTRE_DIR
+        7z a $VVCTRE_DIR.7z $VVCTRE_DIR
     - name: Release
       uses: softprops/action-gh-release@v1
       with:
