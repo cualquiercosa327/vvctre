@@ -25,9 +25,11 @@ jobs:
       run: cmake -E make_directory ${{runner.workspace}}/build
     - name: Configure CMake
       working-directory: ${{runner.workspace}}/build
-      run: ls .. && cmake .. -DCMAKE_BUILD_TYPE=Release ${{matrix.options}}
+      shell: bash
+      run: cmake .. $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=Release ${{matrix.options}}
     - name: Build
       working-directory: ${{runner.workspace}}/build
+      shell: bash
       run: cmake --build . --config Release
     - name: Test
       working-directory: ${{runner.workspace}}/build
