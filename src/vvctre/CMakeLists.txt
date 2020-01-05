@@ -11,12 +11,18 @@ add_executable(${PROJECT_NAME}
     lodepng_image_interface.cpp
     lodepng_image_interface.h
     resource.h
+    $<$<BOOL:${USE_DISCORD_PRESENCE}>:discord_rp.cpp discord_rp.h>
 )
 
 create_target_directory_groups(${PROJECT_NAME})
 
 target_link_libraries(${PROJECT_NAME} PRIVATE common core input_common)
 target_link_libraries(${PROJECT_NAME} PRIVATE inih glad lodepng clipp ${PLATFORM_LIBRARIES} SDL2 Threads::Threads)
+
+if(USE_DISCORD_PRESENCE)
+    target_compile_definitions(${PROJECT_NAME} PRIVATE -DUSE_DISCORD_PRESENCE)
+    target_link_libraries(${PROJECT_NAME} PRIVATE discord-rpc)
+endif()
 
 if(UNIX AND NOT APPLE)
     install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION "${CMAKE_INSTALL_PREFIX}/bin")
