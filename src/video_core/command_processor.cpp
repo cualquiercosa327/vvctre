@@ -293,7 +293,7 @@ static void WritePicaReg(u32 id, u32 value, u32 mask) {
             accelerate_draw = false;
         }
 
-        bool is_indexed = (id == PICA_REG_INDEX(pipeline.trigger_draw_indexed));
+        const bool is_indexed = (id == PICA_REG_INDEX(pipeline.trigger_draw_indexed));
 
         if (accelerate_draw &&
             VideoCore::g_renderer->Rasterizer()->AccelerateDrawBatch(is_indexed)) {
@@ -312,14 +312,14 @@ static void WritePicaReg(u32 id, u32 value, u32 mask) {
         // Multithreaded vertex cache. Each thread will lock the vertex that its processing and add
         // the data to that batch
         struct CachedVertex {
-            explicit CachedVertex() : batch(0), lock ATOMIC_FLAG_INIT {}
-            CachedVertex(const CachedVertex& other) : CachedVertex() {}
+            CachedVertex() {}
+            explicit CachedVertex(const CachedVertex&) {}
             union {
                 Shader::AttributeBuffer output_attr; // GS used
                 Shader::OutputVertex output_vertex;  // No GS
             };
-            std::atomic<u32> batch;
-            std::atomic_flag lock;
+            std::atomic<u32> batch{0};
+            std::atomic_flag lock ATOMIC_FLAG_INIT;
         };
         static std::vector<CachedVertex> vs_output(0x10000);
 
@@ -327,7 +327,7 @@ static void WritePicaReg(u32 id, u32 value, u32 mask) {
             vs_output.resize(regs.pipeline.num_vertices);
         }
 
-        // used to invalidate data from the previous batch without clearing it
+        // Used to invalidate data from the previous batch without clearing it
         static u32 batch_id = std::numeric_limits<u32>::max();
         ++batch_id;
         // reset cache when id overflows for safety
@@ -344,7 +344,7 @@ static void WritePicaReg(u32 id, u32 value, u32 mask) {
         const u16* index_address_16 = reinterpret_cast<const u16*>(index_address_8);
         bool index_u16 = index_info.format != 0;
 
-        auto VertexIndex = [&](unsigned int index) {
+        const auto VertexIndex = [&](unsigned int index) {
             // Indexed rendering doesn't use the start offset
             return is_indexed ? (index_u16 ? index_address_16[index] : index_address_8[index])
                               : (index + regs.pipeline.vertex_offset);
@@ -353,8 +353,9 @@ static void WritePicaReg(u32 id, u32 value, u32 mask) {
         if (g_debug_context && g_debug_context->recorder) {
             for (int i = 0; i < 3; ++i) {
                 const auto texture = regs.texturing.GetTextures()[i];
-                if (!texture.enabled)
+                if (!texture.enabled) {
                     continue;
+                }
 
                 u8* texture_data =
                     VideoCore::g_memory->GetPhysicalPointer(texture.config.GetPhysicalAddress());
@@ -368,30 +369,30 @@ static void WritePicaReg(u32 id, u32 value, u32 mask) {
 
         DebugUtils::MemoryAccessTracker memory_accesses;
 
-        auto* shader_engine = Shader::GetEngine();
+        Pica::Shader::ShaderEngine* shader_engine = Shader::GetEngine();
         Shader::UnitState shader_unit;
 
         shader_engine->SetupBatch(g_state.vs, regs.vs.main_offset);
 
         const bool use_gs = regs.pipeline.use_gs == PipelineRegs::UseGS::Yes;
 
-        auto VSUnitLoop = [&](u32 thread_id, auto num_threads) {
+        const auto VSUnitLoop = [&](u32 thread_id, auto num_threads) {
             constexpr bool single_thread =
                 std::is_same<std::integral_constant<u32, 1>, decltype(num_threads)>();
             Shader::UnitState shader_unit;
 
             for (unsigned int index = thread_id; index < regs.pipeline.num_vertices;
                  index += num_threads) {
-                unsigned int vertex = VertexIndex(index);
-                auto& cached_vertex = vs_output[is_indexed ? vertex : index];
+                const unsigned int vertex = VertexIndex(index);
+                CachedVertex& cached_vertex = vs_output[is_indexed ? vertex : index];
 
                 if (is_indexed) {
-
                     if (g_debug_context && Pica::g_debug_context->recorder) {
-                        int size = index_u16 ? 2 : 1;
+                        const int size = index_u16 ? 2 : 1;
                         memory_accesses.AddAccess(base_address + index_info.offset + size * index,
                                                   size);
                     }
+
                     if (!single_thread) {
                         // Try locking this vertex
                         if (cached_vertex.lock.test_and_set(std::memory_order_acquire)) {
@@ -407,6 +408,7 @@ static void WritePicaReg(u32 id, u32 value, u32 mask) {
                         continue;
                     }
                 }
+
                 Shader::AttributeBuffer attribute_buffer;
                 Shader::AttributeBuffer& output_attr =
                     use_gs ? cached_vertex.output_attr : attribute_buffer;
@@ -415,9 +417,10 @@ static void WritePicaReg(u32 id, u32 value, u32 mask) {
                 loader.LoadVertex(base_address, index, vertex, attribute_buffer, memory_accesses);
 
                 // Send to vertex shader
-                if (g_debug_context)
+                if (g_debug_context) {
                     g_debug_context->OnEvent(DebugContext::Event::VertexShaderInvocation,
                                              &attribute_buffer);
+                }
                 shader_unit.LoadInput(regs.vs, attribute_buffer);
                 shader_engine->Run(g_state.vs, shader_unit);
                 shader_unit.WriteOutput(regs.vs, output_attr);
@@ -437,7 +440,7 @@ static void WritePicaReg(u32 id, u32 value, u32 mask) {
             }
         };
 
-        auto& thread_pool = Common::ThreadPool::GetPool();
+        Common::ThreadPool& thread_pool = Common::ThreadPool::GetPool();
         std::vector<std::future<void>> futures;
 
         const u32 vs_threads =
@@ -454,17 +457,18 @@ static void WritePicaReg(u32 id, u32 value, u32 mask) {
 
         g_state.geometry_pipeline.Reconfigure();
         g_state.geometry_pipeline.Setup(shader_engine);
-        if (g_state.geometry_pipeline.NeedIndexInput())
+        if (g_state.geometry_pipeline.NeedIndexInput()) {
             ASSERT(is_indexed);
+        }
 
         const auto AddTriangle =
-            [rasterizer = VideoCore::g_renderer->Rasterizer()](auto& v0, auto& v1, auto& v2) {
-                rasterizer->AddTriangle(v0, v1, v2);
-            };
+            [rasterizer = VideoCore::g_renderer->Rasterizer()](
+                const Pica::Shader::OutputVertex& v0, const Pica::Shader::OutputVertex& v1,
+                const Pica::Shader::OutputVertex& v2) { rasterizer->AddTriangle(v0, v1, v2); };
 
         for (u32 index = 0; index < regs.pipeline.num_vertices; ++index) {
-            u32 vertex = VertexIndex(index);
-            auto& cached_vertex = vs_output[is_indexed ? vertex : index];
+            const u32 vertex = VertexIndex(index);
+            CachedVertex& cached_vertex = vs_output[is_indexed ? vertex : index];
 
             if (use_gs && is_indexed && g_state.geometry_pipeline.NeedIndexInput()) {
                 g_state.geometry_pipeline.SubmitIndex(vertex);
@@ -486,8 +490,9 @@ static void WritePicaReg(u32 id, u32 value, u32 mask) {
             }
         }
 
-        for (auto& future : futures)
+        for (std::future<void>& future : futures) {
             future.get();
+        }
 
         for (auto& range : memory_accesses.ranges) {
             g_debug_context->recorder->MemoryAccessed(
@@ -510,8 +515,8 @@ static void WritePicaReg(u32 id, u32 value, u32 mask) {
     case PICA_REG_INDEX(gs.int_uniforms[1]):
     case PICA_REG_INDEX(gs.int_uniforms[2]):
     case PICA_REG_INDEX(gs.int_uniforms[3]): {
-        unsigned index = (id - PICA_REG_INDEX(gs.int_uniforms[0]));
-        auto values = regs.gs.int_uniforms[index];
+        const unsigned index = (id - PICA_REG_INDEX(gs.int_uniforms[0]));
+        const auto values = regs.gs.int_uniforms[index];
         WriteUniformIntReg(g_state.gs, index,
                            Common::Vec4<u8>(values.x, values.y, values.z, values.w));
         break;
