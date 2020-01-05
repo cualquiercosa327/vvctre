@@ -86,7 +86,7 @@ int main(int argc, char** argv) {
 
     enum class Command {
         Boot,
-        Poll,
+        Controls,
         Version,
     } command;
 
@@ -111,9 +111,7 @@ int main(int argc, char** argv) {
           clipp::option("-u", "--unlimited")
               .set(Settings::values.use_frame_limit, false)
               .doc("disable the speed limiter")) |
-         clipp::command("poll")
-             .set(command, Command::Poll)
-             .doc("polls controllers and prints the values to use in the ini") |
+         clipp::command("controls").set(command, Command::Controls).doc("configure a controller") |
          clipp::command("version").set(command, Command::Version).doc("prints vvctre's version"));
 
     if (!clipp::parse(argc, argv, cli)) {
@@ -250,38 +248,60 @@ int main(int argc, char** argv) {
 
         break;
     }
-    case Command::Poll: {
+    case Command::Controls: {
         InputCommon::Init();
-        std::vector<std::unique_ptr<InputCommon::Polling::DevicePoller>> button_pollers =
-            InputCommon::Polling::GetPollers(InputCommon::Polling::DeviceType::Button);
-        std::vector<std::unique_ptr<InputCommon::Polling::DevicePoller>> analog_pollers =
-            InputCommon::Polling::GetPollers(InputCommon::Polling::DeviceType::Analog);
-        for (std::unique_ptr<InputCommon::Polling::DevicePoller>& poller : button_pollers) {
-            poller->Start();
-        }
-        for (std::unique_ptr<InputCommon::Polling::DevicePoller>& poller : analog_pollers) {
-            poller->Start();
-        }
-        for (;;) {
-            for (std::unique_ptr<InputCommon::Polling::DevicePoller>& poller : button_pollers) {
-                const Common::ParamPackage params = poller->GetNextInput();
-                if (params.Has("engine")) {
-                    std::cout << "Button: " << params.Serialize() << std::endl;
-                }
+        const auto GetInput = [](InputCommon::Polling::DeviceType type) {
+            auto pollers = InputCommon::Polling::GetPollers(type);
+            for (auto& poller : pollers) {
+                poller->Start();
             }
-            for (std::unique_ptr<InputCommon::Polling::DevicePoller>& poller : analog_pollers) {
-                const Common::ParamPackage params = poller->GetNextInput();
-                if (params.Has("engine")) {
-                    std::cout << "Analog: " << params.Serialize() << std::endl;
+            for (;;) {
+                for (auto& poller : pollers) {
+                    const Common::ParamPackage params = poller->GetNextInput();
+                    if (params.Has("engine")) {
+                        for (auto& poller : pollers) {
+                            poller->Stop();
+                        }
+                        return params;
+                    }
                 }
+
+                using namespace std::chrono_literals;
+                std::this_thread::sleep_for(250ms);
             }
-            using namespace std::chrono_literals;
-            std::this_thread::sleep_for(250ms);
+        };
+
+        std::vector<std::string> lines;
+
+        for (const auto& mapping : Settings::NativeButton::mapping) {
+            fmt::print("Current button: {}. After pressing the enter key, press the button\n",
+                       mapping);
+            std::cin.get();
+
+            const Common::ParamPackage params = GetInput(InputCommon::Polling::DeviceType::Button);
+            lines.push_back(fmt::format("{}={}", mapping, params.Serialize()));
         }
+
+        for (const auto& mapping : Settings::NativeAnalog::mapping) {
+            fmt::print("Current joystick: {}. After pressing the enter key, first move your "
+                       "joystick horizontally, and then vertically\n",
+                       mapping);
+            std::cin.get();
+
+            const Common::ParamPackage params = GetInput(InputCommon::Polling::DeviceType::Analog);
+            lines.push_back(fmt::format("{}={}", mapping, params.Serialize()));
+        }
+
+        fmt::print("Change the [Controls] section in the ini file to this:\n\n[Controls]\n");
+
+        for (const std::string& line : lines) {
+            fmt::print("{}\n", line);
+        }
+
         break;
     }
     case Command::Version: {
-        std::cout << version::vvctre.to_string() << std::endl;
+        fmt::print("{}\n", version::vvctre.to_string());
         break;
     }
     }
