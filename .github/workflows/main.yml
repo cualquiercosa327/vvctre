@@ -4,7 +4,7 @@ on: [push]
 
 jobs:
   build:
-    runs-on: ${{ matrix.os }}
+    runs-on: ${{matrix.os}}
     strategy:
       matrix:
         os: [windows-latest, ubuntu-latest]
@@ -21,43 +21,33 @@ jobs:
           sudo apt-get install -y libsdl2-dev libavcodec-dev libavformat-dev libswscale-dev
     - uses: actions/checkout@v1
     - run: git submodule update --init --recursive
-    - name: Create Build Environment
-      run: cmake -E make_directory ${{runner.workspace}}/build
     - name: Configure CMake
-      working-directory: ${{runner.workspace}}/build
       shell: bash
-      run: cmake .. $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=Release ${{matrix.options}}
+      run: |
+        cd $GITHUB_WORKSPACE
+        mkdir build && cd build
+        cmake .. $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=Release ${{matrix.options}}
     - name: Build
-      working-directory: ${{runner.workspace}}/build
+      working-directory: ./build
       shell: bash
       run: cmake --build . --config Release
     - name: Test
-      working-directory: ${{runner.workspace}}/build
+      working-directory: ./build
       run: ctest -C Release
-    - name: Package
+    - name: Prepare to upload
       shell: bash
       run: |
+        cd $GITHUB_WORKSPACE
         if [ "$RUNNER_OS" == "Linux" ]; then
-          #VVCTRE_DIR=vvctre-linux-$(./build/bin/vvctre version | head -c -1)
-          VVCTRE_DIR=vvctre-linux
-          mkdir $VVCTRE_DIR
           rm ./build/bin/tests
-          cp license.txt $VVCTRE_DIR
-          cp -r ./build/bin/* $VVCTRE_DIR
+          cp license.txt ./build/bin
         elif [ "$RUNNER_OS" == "Windows" ]; then
-          #VVCTRE_DIR=vvctre-windows-$(./build/bin/Release/vvctre.exe version | head -c -2)
-          VVCTRE_DIR=vvctre-windows
-          mkdir $VVCTRE_DIR
           rm ./build/bin/Release/tests.exe
           rm ./build/bin/Release/*.pdb
-          cp license.txt $VVCTRE_DIR
-          cp -r ./build/bin/Release/* $VVCTRE_DIR
+          cp license.txt ./build/bin/Release
         fi
-
-        7z a $VVCTRE_DIR.7z $VVCTRE_DIR
-    - name: Release
-      uses: softprops/action-gh-release@v1
+    - name: Upload artifact
+      uses: actions/upload-artifact@v1.0.0
       with:
-        files: "*.7z"
-      env:
-        GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+        name: vvctre-${{matrix.os}}
+        path: build/bin
