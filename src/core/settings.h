@@ -164,6 +164,7 @@ struct Values {
     bool ignore_format_reinterpretation;
     bool use_custom_screen_refresh_rate;
     double custom_screen_refresh_rate;
+    int min_vertices_per_thread;
 
     // Layout
     LayoutOption layout_option;

@@ -181,6 +181,8 @@ void Config::ReadValues() {
         sdl2_config->GetBoolean("Renderer", "use_custom_screen_refresh_rate", false);
     Settings::values.custom_screen_refresh_rate =
         sdl2_config->GetReal("Renderer", "custom_screen_refresh_rate", 60.0);
+    Settings::values.min_vertices_per_thread =
+        static_cast<int>(sdl2_config->GetInteger("Renderer", "min_vertices_per_thread", 10));
 
     // Layout
     Settings::values.layout_option =

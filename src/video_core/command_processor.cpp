@@ -14,6 +14,7 @@
 #include "core/hle/service/gsp/gsp.h"
 #include "core/hw/gpu.h"
 #include "core/memory.h"
+#include "core/settings.h"
 #include "core/tracer/recorder.h"
 #include "video_core/command_processor.h"
 #include "video_core/debug_utils/debug_utils.h"
@@ -439,9 +440,9 @@ static void WritePicaReg(u32 id, u32 value, u32 mask) {
         auto& thread_pool = Common::ThreadPool::GetPool();
         std::vector<std::future<void>> futures;
 
-        constexpr unsigned int MIN_VERTICES_PER_THREAD = 10;
-        u32 vs_threads = regs.pipeline.num_vertices / MIN_VERTICES_PER_THREAD;
-        vs_threads = std::min(vs_threads, std::thread::hardware_concurrency() - 1);
+        const u32 vs_threads =
+            std::min(regs.pipeline.num_vertices / Settings::values.min_vertices_per_thread,
+                     std::thread::hardware_concurrency() - 1);
 
         if (!vs_threads) {
             VSUnitLoop(0, std::integral_constant<u32, 1>{});

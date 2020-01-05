@@ -103,6 +103,7 @@ void LogSettings() {
     LogSetting("ignore_format_reinterpretation", values.ignore_format_reinterpretation);
     LogSetting("use_custom_screen_refresh_rate", values.use_custom_screen_refresh_rate);
     LogSetting("custom_screen_refresh_rate", values.custom_screen_refresh_rate);
+    LogSetting("min_vertices_per_thread", values.min_vertices_per_thread);
     LogSetting("layout_option", static_cast<int>(values.layout_option));
     LogSetting("swap_screen", values.swap_screen);
     LogSetting("custom_layout", values.custom_layout);

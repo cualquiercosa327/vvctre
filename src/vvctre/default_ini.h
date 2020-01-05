@@ -152,6 +152,9 @@ use_custom_screen_refresh_rate =
 # Default: 60.0
 custom_screen_refresh_rate =
 
+# Default: 10
+min_vertices_per_thread =
+
 [Layout]
 # Layout for the screen inside the render window.
 # 0 (default): Default Top Bottom Screen, 1: Single Screen Only, 2: Large Screen Small Screen, 3: Side by Side
