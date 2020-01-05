@@ -41,6 +41,7 @@
 #include "input_common/main.h"
 #include "video_core/renderer_base.h"
 #include "video_core/video_core.h"
+#include "vvctre/applets/keyboard.h"
 #include "vvctre/config.h"
 #include "vvctre/emu_window/emu_window_sdl2.h"
 #include "vvctre/lodepng_image_interface.h"
@@ -178,7 +179,9 @@ int main(int argc, char** argv) {
             Settings::Apply();
 
             // Register frontend applets
+            Core::System& system = Core::System::GetInstance();
             Frontend::RegisterDefaultApplets();
+            system.RegisterSoftwareKeyboard(std::make_shared<Frontend::SDL2_SoftwareKeyboard>());
 
             // Register image interface
             Core::System::GetInstance().RegisterImageInterface(
@@ -187,7 +190,6 @@ int main(int argc, char** argv) {
             std::unique_ptr<EmuWindow_SDL2> emu_window =
                 std::make_unique<EmuWindow_SDL2>(fullscreen);
             Frontend::ScopeAcquireContext scope(*emu_window);
-            Core::System& system = Core::System::GetInstance();
 
             const Core::System::ResultStatus load_result = system.Load(*emu_window, path);
 

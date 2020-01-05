@@ -11,6 +11,8 @@ add_executable(${PROJECT_NAME}
     lodepng_image_interface.cpp
     lodepng_image_interface.h
     resource.h
+    applets/keyboard.cpp
+    applets/keyboard.h
     $<$<BOOL:${USE_DISCORD_PRESENCE}>:discord_rp.cpp discord_rp.h>
 )
 
