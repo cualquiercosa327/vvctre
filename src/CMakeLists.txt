@@ -56,10 +56,6 @@ else()
         -Wno-attributes
     )
 
-    if (APPLE AND CMAKE_CXX_COMPILER_ID STREQUAL Clang)
-        add_compile_options("-stdlib=libc++")
-    endif()
-
     if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
         # Set file offset size to 64 bits.
         #

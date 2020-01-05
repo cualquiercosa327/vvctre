@@ -16,14 +16,6 @@ CMakeLists.txt.user*
 # Visual Studio CMake settings
 CMakeSettings.json
 
-# OSX global filetypes
-# Created by Finder or Spotlight in directories for various OS functionality (indexing, etc)
-.DS_Store
-.AppleDouble
-.LSOverride
-.Spotlight-V100
-.Trashes
-
 # Windows global filetypes
 Thumbs.db
 

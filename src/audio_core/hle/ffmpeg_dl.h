@@ -55,7 +55,7 @@ bool InitFFmpegDL();
 
 #else // _Win32
 
-// No dynamic loading for Unix and Apple
+// No dynamic loading for Unix
 
 const auto av_get_bytes_per_sample_dl = &av_get_bytes_per_sample;
 const auto av_frame_alloc_dl = &av_frame_alloc;

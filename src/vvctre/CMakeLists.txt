@@ -24,7 +24,7 @@ if(USE_DISCORD_PRESENCE)
     target_link_libraries(${PROJECT_NAME} PRIVATE discord-rpc)
 endif()
 
-if(UNIX AND NOT APPLE)
+if(UNIX)
     install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION "${CMAKE_INSTALL_PREFIX}/bin")
 endif()
 

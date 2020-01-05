@@ -167,11 +167,7 @@ endif()
 # Platform-specific library requirements
 # ======================================
 
-if (APPLE)
-    # Umbrella framework for everything GUI-related
-    find_library(COCOA_LIBRARY Cocoa)
-    set(PLATFORM_LIBRARIES ${COCOA_LIBRARY} ${IOKIT_LIBRARY} ${COREVIDEO_LIBRARY})
-elseif (WIN32)
+if (WIN32)
     # WSAPoll and SHGetKnownFolderPath (AppData/Roaming) didn't exist before WinNT 6.x (Vista)
     add_definitions(-D_WIN32_WINNT=0x0600 -DWINVER=0x0600)
     set(PLATFORM_LIBRARIES winmm ws2_32)
