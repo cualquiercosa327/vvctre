@@ -277,7 +277,7 @@ std::optional<ShaderDiskCacheDecompiled> ShaderDiskCache::LoadDecompiledEntry() 
 
 bool ShaderDiskCache::SaveDecompiledFile(u64 unique_identifier,
                                          const ShaderDecompiler::ProgramResult& code) {
-    if (!SaveObjectToPrecompiled(static_cast<u32>(PrecompiledEntryKind::Decompiled)) ||
+    if (!SaveObjectToPrecompiled(static_cast<u8>(PrecompiledEntryKind::Decompiled)) ||
         !SaveObjectToPrecompiled(unique_identifier) ||
         !SaveObjectToPrecompiled(static_cast<u32>(code.size())) ||
         !SaveArrayToPrecompiled(code.data(), code.size())) {
@@ -353,7 +353,7 @@ void ShaderDiskCache::SaveDump(u64 unique_identifier, GLuint program) {
     std::vector<u8> binary(binary_length);
     glGetProgramBinary(program, binary_length, nullptr, &binary_format, binary.data());
 
-    if (!SaveObjectToPrecompiled(static_cast<u32>(PrecompiledEntryKind::Dump)) ||
+    if (!SaveObjectToPrecompiled(static_cast<u8>(PrecompiledEntryKind::Dump)) ||
         !SaveObjectToPrecompiled(unique_identifier) ||
         !SaveObjectToPrecompiled(static_cast<u32>(binary_format)) ||
         !SaveObjectToPrecompiled(static_cast<u32>(binary_length)) ||
@@ -374,7 +374,7 @@ FileUtil::IOFile ShaderDiskCache::AppendTransferableFile() {
         return {};
     }
 
-    const auto transferable_path{GetTransferablePath()};
+    const std::string transferable_path = GetTransferablePath();
     const bool existed = FileUtil::Exists(transferable_path);
 
     FileUtil::IOFile file(transferable_path, "ab");
@@ -405,8 +405,7 @@ void ShaderDiskCache::SaveVirtualPrecompiledFile() {
         LOG_ERROR(Render_OpenGL, "Failed to open precompiled cache in path={}", precompiled_path);
         return;
     }
-    if (file.WriteBytes(&version::shader_cache, sizeof(version::shader_cache)) !=
-        sizeof(version::shader_cache)) {
+    if (file.WriteObject(version::shader_cache) != 1) {
         LOG_ERROR(Render_OpenGL, "Failed to write precompiled cache version in path={}",
                   precompiled_path);
         return;
