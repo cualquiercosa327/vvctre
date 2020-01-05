@@ -21,6 +21,7 @@
 #include "core/hle/service/nwm/uds_connection.h"
 #include "core/hle/service/nwm/uds_data.h"
 #include "core/memory.h"
+#include "core/settings.h"
 
 namespace Service::NWM {
 
