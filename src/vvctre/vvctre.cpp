@@ -275,6 +275,8 @@ int main(int argc, char** argv) {
                     std::cout << "Analog: " << params.Serialize() << std::endl;
                 }
             }
+            using namespace std::chrono_literals;
+            std::this_thread::sleep_for(250ms);
         }
         break;
     }
