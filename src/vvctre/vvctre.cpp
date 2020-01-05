@@ -129,17 +129,29 @@ int main(int argc, char** argv) {
           clipp::option("--log-filter").doc("set the log filter") &
               clipp::value("filter").set(Settings::values.log_filter),
           clipp::option("--hardware-renderer")
-              .set(Settings::values.use_hw_renderer)
-              .doc("enable hardware renderer"),
+              .doc("force hardware renderer")
+              .set(Settings::values.use_hw_renderer, true),
+          clipp::option("--software-renderer")
+              .doc("force software renderer")
+              .set(Settings::values.use_hw_renderer, false),
           clipp::option("--hardware-shader")
-              .set(Settings::values.use_hw_shader)
-              .doc("enable hardware shader"),
+              .doc("force hardware shader")
+              .set(Settings::values.use_hw_shader, true),
+          clipp::option("--software-shader")
+              .doc("force software shader")
+              .set(Settings::values.use_hw_shader, false),
           clipp::option("--accurate-multiplication")
-              .set(Settings::values.shaders_accurate_mul)
-              .doc("enable accurate multiplication"),
-          clipp::option("--disk-shader-cache")
-              .set(Settings::values.use_disk_shader_cache)
-              .doc("enable disk shader cache"),
+              .doc("force accurate multiplication if hardware shader is enabled")
+              .set(Settings::values.shaders_accurate_mul, true),
+          clipp::option("--inaccurate-multiplication")
+              .doc("force inaccurate multiplication if hardware shader is enabled")
+              .set(Settings::values.shaders_accurate_mul, false),
+          clipp::option("--use-disk-shader-cache")
+              .doc("use disk shader cache")
+              .set(Settings::values.use_disk_shader_cache, true),
+          clipp::option("--no-disk-shader-cache")
+              .doc("don't use disk shader cache")
+              .set(Settings::values.use_disk_shader_cache, false),
           clipp::option("--fullscreen").set(fullscreen).doc("start in fullscreen mode"),
           clipp::option("--regenerate-console-id")
               .set(regenerate_console_id)
