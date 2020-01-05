@@ -195,7 +195,7 @@ ShaderDiskCache::LoadPrecompiledFile(FileUtil::IOFile& file) {
     }
 
     // Read compressed file from disk and decompress to virtual precompiled cache file
-    std::vector<u8> compressed(file.GetSize());
+    std::vector<u8> compressed(file.GetSize() - sizeof(version));
     file.ReadBytes(compressed.data(), compressed.size());
     const std::vector<u8> decompressed = Common::Compression::DecompressDataZSTD(compressed);
     SaveArrayToPrecompiled(decompressed.data(), decompressed.size());
@@ -211,12 +211,12 @@ ShaderDiskCache::LoadPrecompiledFile(FileUtil::IOFile& file) {
 
         switch (kind) {
         case PrecompiledEntryKind::Decompiled: {
-            u64 unique_identifier{};
+            u64 unique_identifier;
             if (!LoadObjectFromPrecompiled(unique_identifier)) {
                 return {};
             }
 
-            auto entry = LoadDecompiledEntry();
+            std::optional<OpenGL::ShaderDiskCacheDecompiled> entry = LoadDecompiledEntry();
             if (!entry) {
                 return {};
             }
@@ -234,7 +234,7 @@ ShaderDiskCache::LoadPrecompiledFile(FileUtil::IOFile& file) {
                 return {};
             }
 
-            u32 binary_length{};
+            u32 binary_length;
             if (!LoadObjectFromPrecompiled(binary_length)) {
                 return {};
             }
