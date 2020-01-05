@@ -26,7 +26,7 @@ jobs:
       run: |
         cd $GITHUB_WORKSPACE
         mkdir build && cd build
-        cmake .. $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=Release ${{matrix.options}}
+        cmake .. -DCMAKE_BUILD_TYPE=Release ${{matrix.options}}
     - name: Build
       working-directory: ./build
       shell: bash
