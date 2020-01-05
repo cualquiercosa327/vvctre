@@ -21,7 +21,7 @@
 #define EMU_DATA_DIR "vvctre"
 #endif
 
-// Subdirs in the User dir returned by GetUserPath(UserPath::UserDir)
+// Subdirectories in the user directory returned by GetUserPath(UserPath::UserDir)
 #define CONFIG_DIR "config"
 #define CACHE_DIR "cache"
 #define SDMC_DIR "sdmc"
@@ -35,16 +35,12 @@
 #define LOAD_DIR "load"
 #define SHADER_DIR "shaders"
 
-// Filenames
-// Files in the directory returned by GetUserPath(UserPath::LogDir)
-#define LOG_FILE "citra_log.txt"
-
 // Files in the directory returned by GetUserPath(UserPath::ConfigDir)
 #define EMU_CONFIG "emu.ini"
 #define DEBUGGER_CONFIG "debugger.ini"
 #define LOGGER_CONFIG "logger.ini"
 
-// Sys files
+// System files
 #define SHARED_FONT "shared_font.bin"
 #define AES_KEYS "aes_keys.txt"
 #define BOOTROM9 "boot9.bin"
