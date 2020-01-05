@@ -535,6 +535,20 @@ boost::optional<MacAddress> NWM_UDS::GetNodeMacAddress(u16 dest_node_id, u8 flag
 void NWM_UDS::Shutdown(Kernel::HLERequestContext& ctx) {
     IPC::RequestParser rp(ctx, 0x03, 0, 0);
 
+    if (client != nullptr) {
+        client->close();
+        client->poll();
+        client.reset();
+    }
+
+    if (loop_thread != nullptr) {
+        if (loop_thread->joinable()) {
+            loop_thread->join();
+        }
+
+        loop_thread.reset();
+    }
+
     for (auto bind_node : channel_data) {
         bind_node.second.event->Signal();
     }
@@ -1442,6 +1456,20 @@ NWM_UDS::NWM_UDS(Core::System& system) : ServiceFramework("nwm::UDS"), system(sy
 }
 
 NWM_UDS::~NWM_UDS() {
+    if (client != nullptr) {
+        client->close();
+        client->poll();
+        client.reset();
+    }
+
+    if (loop_thread != nullptr) {
+        if (loop_thread->joinable()) {
+            loop_thread->join();
+        }
+
+        loop_thread.reset();
+    }
+
     system.CoreTiming().UnscheduleEvent(beacon_broadcast_event, 0);
 }
 
