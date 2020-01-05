@@ -219,7 +219,7 @@ mic_input_type =
 mic_input_device =
 
 # Only used in DSP HLE and requires audio stretching to be enabled to work properly.
-# Minimum: 0.01. Default: 1.0. If the value is 0.00, vvctre will crash.
+# Minimum: 0.01. Default: 1.0. If the value is less than 0.01, vvctre will crash.
 audio_speed =
 
 [Camera]
