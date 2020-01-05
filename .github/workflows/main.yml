@@ -44,7 +44,7 @@ jobs:
           rm ./build/bin/tests
           cp -r ./build/bin/* $VVCTRE_DIR
         elif [ "$RUNNER_OS" == "Windows" ]; then
-          VVCTRE_DIR=vvctre-windows-$(./build/bin/Release/vvctre version | head -c -2)
+          VVCTRE_DIR=vvctre-windows-$(./build/bin/Release/vvctre.exe version | head -c -2)
           mkdir $VVCTRE_DIR
           cp license.txt $VVCTRE_DIR
           rm ./build/bin/Release/tests.exe
