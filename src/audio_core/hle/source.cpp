@@ -1,4 +1,4 @@
-// Copyright 2016 Citra Emulator Project
+﻿// Copyright 2016 Citra Emulator Project
 // Licensed under GPLv2 or any later version
 // Refer to the license.txt file included.
 
@@ -289,7 +289,7 @@ void Source::GenerateFrame() {
             break;
         }
     }
-    state.next_sample_number += static_cast<u32>(frame_position);
+    state.next_sample_number += static_cast<u32>(frame_position * state.rate_multiplier);
 
     state.filters.ProcessFrame(current_frame);
 }
