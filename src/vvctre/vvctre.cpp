@@ -90,13 +90,16 @@ int main(int argc, char** argv) {
     bool regenerate_console_id = false;
 
     enum class Command {
-        Boot,
+        BootOrInstall,
         Controls,
         Version,
     } command;
 
     auto cli =
-        ((clipp::value("path").set(command, Command::Boot).set(path).doc("executable or CIA path"),
+        ((clipp::value("path")
+              .set(command, Command::BootOrInstall)
+              .set(path)
+              .doc("executable or CIA path"),
           clipp::option("--gdbstub").doc("enable the GDB stub") &
               clipp::value("port")
                   .set(Settings::values.use_gdbstub, true)
@@ -153,7 +156,7 @@ int main(int argc, char** argv) {
     }
 
     switch (command) {
-    case Command::Boot: {
+    case Command::BootOrInstall: {
         InitializeLogging();
 
         if (EndsWithIgnoreCase(path, ".cia")) {
