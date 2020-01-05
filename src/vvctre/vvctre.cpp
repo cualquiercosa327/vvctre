@@ -45,6 +45,10 @@
 #include "vvctre/emu_window/emu_window_sdl2.h"
 #include "vvctre/lodepng_image_interface.h"
 
+#ifdef USE_DISCORD_PRESENCE
+#include "vvctre/discord_rp.h"
+#endif
+
 #ifndef _MSC_VER
 #include <unistd.h>
 #endif
@@ -206,6 +210,10 @@ int main(int argc, char** argv) {
             std::string game;
             system.GetAppLoader().ReadTitle(game);
             emu_window->SetGameName(game);
+
+#ifdef USE_DISCORD_PRESENCE
+            [[maybe_unused]] DiscordRP discord_rp(game);
+#endif
 
             if (!movie_play.empty()) {
                 Core::Movie::GetInstance().StartPlayback(movie_play);

@@ -11,7 +11,7 @@
 DiscordRP::DiscordRP(const std::string& game) {
     Discord_Initialize("657225747915866157", nullptr, 1, nullptr);
 
-    DiscordRichPresence presence;
+    DiscordRichPresence presence{};
     presence.state = fmt::format("Version {} (movie version {}, shader cache version {})",
                                  version::vvctre.to_string(), version::movie, version::shader_cache)
                          .c_str();
