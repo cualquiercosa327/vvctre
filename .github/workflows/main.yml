@@ -1,0 +1,63 @@
+name: CI
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [windows-latest, ubuntu-latest]
+        include:
+          - os: windows-latest
+            options: "-DVVCTRE_USE_BUNDLED_SDL2=ON -DUSE_DISCORD_PRESENCE=ON -DENABLE_MF=ON -DENABLE_FFMPEG_VIDEO_DUMPER=ON"
+          - os: ubuntu-latest
+            options: "-DUSE_DISCORD_PRESENCE=ON -DENABLE_FFMPEG_VIDEO_DUMPER=ON"
+    steps:
+    - name: Install Dependencies
+      if: matrix.os == 'ubuntu-latest'
+      run: |
+          sudo apt-get update
+          sudo apt-get install -y libsdl2-dev libavcodec-dev libavformat-dev libswscale-dev
+    - uses: actions/checkout@v1
+    - run: git submodule update --init --recursive
+    - name: Create Build Environment
+      run: cmake -E make_directory ${{runner.workspace}}/build
+    - name: Configure CMake
+      working-directory: ${{runner.workspace}}/build
+      shell: bash
+      run: cmake .. $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=Release ${{matrix.options}}
+    - name: Build
+      working-directory: ${{runner.workspace}}/build
+      shell: bash
+      run: cmake --build . --config Release
+    - name: Test
+      working-directory: ${{runner.workspace}}/build
+      run: ctest -C Release
+    - name: Package
+      shell: bash
+      run: |
+        if [ "$RUNNER_OS" == "Linux" ]; then
+          #VVCTRE_DIR=vvctre-linux-$(./build/bin/vvctre version | head -c -1)
+          VVCTRE_DIR=vvctre-linux
+          mkdir $VVCTRE_DIR
+          rm ./build/bin/tests
+          cp license.txt $VVCTRE_DIR
+          cp -r ./build/bin/* $VVCTRE_DIR
+        elif [ "$RUNNER_OS" == "Windows" ]; then
+          #VVCTRE_DIR=vvctre-windows-$(./build/bin/Release/vvctre.exe version | head -c -2)
+          VVCTRE_DIR=vvctre-windows
+          mkdir $VVCTRE_DIR
+          rm ./build/bin/Release/tests.exe
+          rm ./build/bin/Release/*.pdb
+          cp license.txt $VVCTRE_DIR
+          cp -r ./build/bin/Release/* $VVCTRE_DIR
+        fi
+
+        7z a $VVCTRE_DIR.7z $VVCTRE_DIR
+    - name: Release
+      uses: softprops/action-gh-release@v1
+      with:
+        files: "*.7z"
+      env:
+        GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
