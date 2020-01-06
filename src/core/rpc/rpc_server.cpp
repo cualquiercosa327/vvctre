@@ -30,42 +30,51 @@ RPCServer::RPCServer() {
             "application/json");
     });
 
+    server->Post("/memory/read", [&](const httplib::Request& req, httplib::Response& res) {
+        try {
+            const nlohmann::json json = nlohmann::json::parse(req.body);
+            const VAddr address = json["address"].get<VAddr>();
+            const std::size_t size = json["size"].get<std::size_t>();
+
+            std::vector<u8> data(size);
+
+            // Note: Memory read occurs asynchronously from the state of the emulator
+            Core::System::GetInstance().Memory().ReadBlock(
+                *Core::System::GetInstance().Kernel().GetCurrentProcess(), address, &data[0], size);
+
+            res.set_content(nlohmann::json(data).dump(), "application/json");
+        } catch (nlohmann::json::exception& exception) {
+            res.status = 500;
+            res.set_content(exception.what(), "text/plain");
+        }
+    });
+
+    server->Post("/memory/write", [&](const httplib::Request& req, httplib::Response& res) {
+        try {
+            const nlohmann::json json = nlohmann::json::parse(req.body);
+            const VAddr address = json["address"].get<VAddr>();
+            const std::vector<u8> data = json["data"].get<std::vector<u8>>();
+
+            // Note: Memory write occurs asynchronously from the state of the emulator
+            Core::System::GetInstance().Memory().WriteBlock(
+                *Core::System::GetInstance().Kernel().GetCurrentProcess(), address, &data[0],
+                data.size());
+
+            res.status = 204;
+        } catch (nlohmann::json::exception& exception) {
+            res.status = 500;
+            res.set_content(exception.what(), "text/plain");
+        }
+    });
+
     request_handler_thread = std::thread([&] { server->listen("0.0.0.0", RPC_PORT); });
     LOG_INFO(RPC_Server, "RPC server running on port {}", RPC_PORT);
 }
 
 RPCServer::~RPCServer() {
     server->stop();
+    request_handler_thread.join();
     LOG_INFO(RPC_Server, "RPC server stopped");
 }
-
-// void RPCServer::HandleReadMemory(Packet& packet, u32 address, u32 data_size) {
-//     if (data_size > MAX_READ_SIZE) {
-//         return;
-//     }
-
-//     // Note: Memory read occurs asynchronously from the state of the emulator
-//     Core::System::GetInstance().Memory().ReadBlock(
-//         *Core::System::GetInstance().Kernel().GetCurrentProcess(), address,
-//         packet.GetPacketData().data(), data_size);
-//     packet.SetPacketDataSize(data_size);
-//     packet.SendReply();
-// }
-
-// void RPCServer::HandleWriteMemory(Packet& packet, u32 address, const u8* data, u32 data_size) {
-//     // Only allow writing to certain memory regions
-//     if ((address >= Memory::PROCESS_IMAGE_VADDR && address <= Memory::PROCESS_IMAGE_VADDR_END) ||
-//         (address >= Memory::HEAP_VADDR && address <= Memory::HEAP_VADDR_END) ||
-//         (address >= Memory::N3DS_EXTRA_RAM_VADDR && address <= Memory::N3DS_EXTRA_RAM_VADDR_END))
-//         {
-//         // Note: Memory write occurs asynchronously from the state of the emulator
-//         Core::System::GetInstance().Memory().WriteBlock(
-//             *Core::System::GetInstance().Kernel().GetCurrentProcess(), address, data, data_size);
-//         // If the memory happens to be executable code, make sure the changes become visible
-//         Core::CPU().InvalidateCacheRange(address, data_size);
-//     }
-//     packet.SetPacketDataSize(0);
-//     packet.SendReply();
-// }
 
 } // namespace RPC

@@ -178,6 +178,12 @@ int main(int argc, char** argv) {
           clipp::option("--disable-disk-shader-caching")
               .doc("force disable disk shader caching")
               .set(Settings::values.use_disk_shader_cache, false),
+          clipp::option("--enable-ignore-format-reinterpretation")
+              .doc("force enable ignore format reinterpretation")
+              .set(Settings::values.ignore_format_reinterpretation, true),
+          clipp::option("--disable-ignore-format-reinterpretation")
+              .doc("force disable ignore format reinterpretation")
+              .set(Settings::values.ignore_format_reinterpretation, false),
           clipp::option("--fullscreen").set(fullscreen).doc("start in fullscreen mode"),
           clipp::option("--regenerate-console-id")
               .set(regenerate_console_id)
