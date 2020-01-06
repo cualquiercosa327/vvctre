@@ -316,10 +316,8 @@ static void ProcessTriangleInternal(const Vertex& v0, const Vertex& v1, const Ve
             Common::Vec4<u8> texture_color[4]{};
             for (int i = 0; i < 3; ++i) {
                 const auto& texture = textures[i];
-                if (!texture.enabled)
+                if (!texture.enabled || texture.config.address == 0)
                     continue;
-
-                DEBUG_ASSERT(0 != texture.config.address);
 
                 int coordinate_i =
                     (i == 2 && regs.texturing.main_config.texture2_use_coord1) ? 1 : i;
@@ -402,6 +400,7 @@ static void ProcessTriangleInternal(const Vertex& v0, const Vertex& v1, const Ve
 
                     const u8* texture_data =
                         VideoCore::g_memory->GetPhysicalPointer(texture_address);
+
                     auto info =
                         Texture::TextureInfo::FromPicaRegister(texture.config, texture.format);
 
