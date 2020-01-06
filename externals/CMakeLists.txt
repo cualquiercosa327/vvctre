@@ -82,6 +82,10 @@ add_subdirectory(lurlparser EXCLUDE_FROM_ALL)
 add_library(httplib INTERFACE)
 target_include_directories(httplib INTERFACE ./httplib)
 
+# JSON
+add_library(json INTERFACE)
+target_include_directories(json INTERFACE ./json)
+
 add_subdirectory(lodepng)
 add_subdirectory(semver)
 add_subdirectory(clipp)
