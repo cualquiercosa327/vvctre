@@ -133,6 +133,8 @@ int main(int argc, char** argv) {
               clipp::value("value").set(Settings::values.min_vertices_per_thread),
           clipp::option("--resolution").doc("set resolution") &
               clipp::value("value").set(Settings::values.resolution_factor),
+          clipp::option("--audio-speed").doc("set audio speed") &
+              clipp::value("value").set(Settings::values.audio_speed),
           clipp::option("--cpu-jit")
               .doc("force use CPU JIT")
               .set(Settings::values.use_cpu_jit, true),
