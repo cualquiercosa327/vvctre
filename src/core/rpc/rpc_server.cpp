@@ -293,7 +293,8 @@ RPCServer::RPCServer() {
                      {"right", layout.bottom_screen.right},
                      {"bottom", layout.bottom_screen.bottom},
                  }},
-            },
+            }
+                .dump(),
             "application/json");
     });
 
