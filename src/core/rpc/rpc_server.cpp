@@ -98,6 +98,49 @@ RPCServer::RPCServer() {
             "application/json");
     });
 
+    server->Post("/padstate", [&](const httplib::Request& req, httplib::Response& res) {
+        try {
+            auto hid = Service::HID::GetModule(Core::System::GetInstance());
+            const nlohmann::json json = nlohmann::json::parse(req.body);
+
+            if (json.count("hex")) {
+                Service::HID::PadState state;
+                state.hex = json["hex"].get<u32>();
+                hid->SetCustomPadState(state);
+
+                res.set_content(
+                    nlohmann::json{
+                        {"a", static_cast<bool>(state.a)},
+                        {"b", static_cast<bool>(state.b)},
+                        {"select", static_cast<bool>(state.select)},
+                        {"start", static_cast<bool>(state.start)},
+                        {"right", static_cast<bool>(state.right)},
+                        {"left", static_cast<bool>(state.left)},
+                        {"up", static_cast<bool>(state.up)},
+                        {"down", static_cast<bool>(state.down)},
+                        {"r", static_cast<bool>(state.r)},
+                        {"l", static_cast<bool>(state.l)},
+                        {"x", static_cast<bool>(state.x)},
+                        {"y", static_cast<bool>(state.y)},
+                        {"debug", static_cast<bool>(state.debug)},
+                        {"gpio14", static_cast<bool>(state.gpio14)},
+                        {"circle_right", static_cast<bool>(state.circle_right)},
+                        {"circle_left", static_cast<bool>(state.circle_left)},
+                        {"circle_up", static_cast<bool>(state.circle_up)},
+                        {"circle_down", static_cast<bool>(state.circle_down)},
+                    }
+                        .dump(),
+                    "application/json");
+            } else {
+                hid->SetCustomPadState(std::nullopt);
+                res.status = 204;
+            }
+        } catch (nlohmann::json::exception& exception) {
+            res.status = 500;
+            res.set_content(exception.what(), "text/plain");
+        }
+    });
+
     request_handler_thread = std::thread([&] { server->listen("0.0.0.0", RPC_PORT); });
     LOG_INFO(RPC_Server, "RPC server running on port {}", RPC_PORT);
 }
