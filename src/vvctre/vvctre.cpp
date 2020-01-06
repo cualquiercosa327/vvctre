@@ -133,7 +133,7 @@ int main(int argc, char** argv) {
               clipp::value("value").set(Settings::values.min_vertices_per_thread),
           clipp::option("--resolution").doc("set resolution") &
               clipp::value("value").set(Settings::values.resolution_factor),
-          clipp::option("--audio-speed").doc("set audio speed") &
+          clipp::option("--audio-speed").doc("set audio speed to a float, minimum: 0.01") &
               clipp::value("value").set(Settings::values.audio_speed),
           clipp::option("--cpu-jit")
               .doc("force use CPU JIT")
@@ -194,6 +194,8 @@ int main(int argc, char** argv) {
                        ? 0
                        : -1;
         } else {
+            ASSERT_MSG(Settings::values.audio_speed > 0.00f, "audio_speed: invalid value!");
+
             if (!movie_record.empty() && !movie_play.empty()) {
                 LOG_CRITICAL(Frontend, "Cannot both play and record a movie");
                 return -1;
