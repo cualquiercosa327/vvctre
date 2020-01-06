@@ -134,7 +134,8 @@ int main(int argc, char** argv) {
           clipp::option("--resolution").doc("set resolution") &
               clipp::value("value").set(Settings::values.resolution_factor),
           clipp::option("--audio-speed")
-                  .doc("set audio speed to a float, must be greater than zero") &
+                  .doc("set audio speed for DSP HLE to a float, must be greater than zero and "
+                       "requires audio stretching to be enabled to work properly") &
               clipp::value("value").set(Settings::values.audio_speed),
           clipp::option("--cpu-jit")
               .doc("force use CPU JIT")
@@ -142,6 +143,17 @@ int main(int argc, char** argv) {
           clipp::option("--cpu-interpreter")
               .doc("force use CPU interpreter")
               .set(Settings::values.use_cpu_jit, false),
+          clipp::option("--dsp-hle")
+              .doc("force use DSP HLE")
+              .set(Settings::values.enable_dsp_lle, false),
+          clipp::option("--dsp-lle")
+              .doc("force use DSP LLE single-threaded")
+              .set(Settings::values.enable_dsp_lle, true)
+              .set(Settings::values.enable_dsp_lle_multithread, false),
+          clipp::option("--dsp-lle-multi-threaded")
+              .doc("force use DSP LLE multi-threaded")
+              .set(Settings::values.enable_dsp_lle, true)
+              .set(Settings::values.enable_dsp_lle_multithread, true),
           clipp::option("--hardware-renderer")
               .doc("force use hardware renderer")
               .set(Settings::values.use_hw_renderer, true),
