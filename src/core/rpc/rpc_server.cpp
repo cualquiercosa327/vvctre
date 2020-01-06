@@ -4,7 +4,9 @@
 
 #include <httplib.h>
 #include <json.hpp>
+#include <lodepng.h>
 #include "common/logging/log.h"
+#include "common/thread.h"
 #include "common/version.h"
 #include "core/arm/arm_interface.h"
 #include "core/core.h"
@@ -12,6 +14,8 @@
 #include "core/hle/service/hid/hid.h"
 #include "core/memory.h"
 #include "core/rpc/rpc_server.h"
+#include "video_core/renderer_base.h"
+#include "video_core/video_core.h"
 
 namespace RPC {
 
@@ -203,6 +207,64 @@ RPCServer::RPCServer() {
         } catch (nlohmann::json::exception& exception) {
             res.status = 500;
             res.set_content(exception.what(), "text/plain");
+        }
+    });
+
+    server->Get("/screenshot", [&](const httplib::Request& req, httplib::Response& res) {
+        const Layout::FramebufferLayout& layout =
+            VideoCore::g_renderer->GetRenderWindow().GetFramebufferLayout();
+
+        Common::Event done;
+        std::vector<u8> data(layout.width * layout.height * 4);
+        VideoCore::RequestScreenshot(data.data(), [&] { done.Set(); }, layout);
+        done.Wait();
+
+        // Rotate the image to put the pixels in correct order
+        // (As OpenGL returns pixel data starting from the lowest position)
+        const auto rotate = [](const std::vector<u8>& input,
+                               const Layout::FramebufferLayout& layout) {
+            std::vector<u8> output(input.size());
+
+            for (std::size_t i = 0; i < layout.height; i++) {
+                for (std::size_t j = 0; j < layout.width; j++) {
+                    for (std::size_t k = 0; k < 4; k++) {
+                        output[i * (layout.width * 4) + j * 4 + k] =
+                            input[(layout.height - i - 1) * (layout.width * 4) + j * 4 + k];
+                    }
+                }
+            }
+
+            return output;
+        };
+
+        const auto convert_rgba_to_bgra = [](const std::vector<u8>& input,
+                                             const Layout::FramebufferLayout& layout) {
+            int offset = 0;
+            std::vector<u8> output(input.size());
+
+            for (int y = 0; y < layout.height; y++) {
+                for (int x = 0; x < layout.width; x++) {
+                    output[offset] = input[offset + 2];
+                    output[offset + 1] = input[offset + 1];
+                    output[offset + 2] = input[offset];
+                    output[offset + 3] = input[offset + 3];
+
+                    offset += 4;
+                }
+            }
+
+            return output;
+        };
+
+        data = convert_rgba_to_bgra(rotate(data, layout), layout);
+
+        std::vector<u8> out;
+        const u32 result = lodepng::encode(out, data, layout.width, layout.height);
+        if (result) {
+            res.status = 500;
+            res.set_content(lodepng_error_text(result), "text/plain");
+        } else {
+            res.set_content(reinterpret_cast<const char*>(out.data()), out.size(), "image/png");
         }
     });
 
