@@ -268,6 +268,64 @@ RPCServer::RPCServer() {
         }
     });
 
+    server->Get("/layout", [&](const httplib::Request& req, httplib::Response& res) {
+        const Layout::FramebufferLayout& layout =
+            VideoCore::g_renderer->GetRenderWindow().GetFramebufferLayout();
+        res.set_content(
+            nlohmann::json{
+                {"width", layout.width},
+                {"height", layout.height},
+                {"top_screen",
+                 {
+                     {"enabled", layout.top_screen_enabled},
+                     {"width", layout.top_screen.GetWidth()},
+                     {"height", layout.top_screen.GetHeight()},
+                     {"left", layout.top_screen.left},
+                     {"top", layout.top_screen.top},
+                     {"right", layout.top_screen.right},
+                     {"bottom", layout.top_screen.bottom},
+                 }},
+                {"bottom_screen",
+                 {
+                     {"enabled", layout.bottom_screen_enabled},
+                     {"width", layout.bottom_screen.GetWidth()},
+                     {"height", layout.bottom_screen.GetHeight()},
+                     {"left", layout.bottom_screen.left},
+                     {"top", layout.bottom_screen.top},
+                     {"right", layout.bottom_screen.right},
+                     {"bottom", layout.bottom_screen.bottom},
+                 }},
+            },
+            "application/json");
+    });
+
+    server->Post("/layout", [&](const httplib::Request& req, httplib::Response& res) {
+        try {
+            Layout::FramebufferLayout layout =
+                VideoCore::g_renderer->GetRenderWindow().GetFramebufferLayout();
+
+            const nlohmann::json json = nlohmann::json::parse(req.body);
+            layout.width = json["width"];
+            layout.height = json["height"];
+            layout.top_screen_enabled = json["top_screen"]["enabled"];
+            layout.bottom_screen_enabled = json["bottom_screen"]["enabled"];
+            layout.top_screen.left = json["top_screen"]["left"];
+            layout.top_screen.top = json["top_screen"]["top"];
+            layout.top_screen.right = json["top_screen"]["right"];
+            layout.top_screen.bottom = json["top_screen"]["bottom"];
+            layout.bottom_screen.left = json["bottom_screen"]["left"];
+            layout.bottom_screen.top = json["bottom_screen"]["top"];
+            layout.bottom_screen.right = json["bottom_screen"]["right"];
+            layout.bottom_screen.bottom = json["bottom_screen"]["bottom"];
+            layout.height = json["height"];
+
+            res.status = 204;
+        } catch (nlohmann::json::exception& exception) {
+            res.status = 500;
+            res.set_content(exception.what(), "text/plain");
+        }
+    });
+
     request_handler_thread = std::thread([&] { server->listen("0.0.0.0", RPC_PORT); });
     LOG_INFO(RPC_Server, "RPC server running on port {}", RPC_PORT);
 }
