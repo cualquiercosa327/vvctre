@@ -3,8 +3,38 @@ name: CI
 on: [push]
 
 jobs:
+  check-formatting:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - run: |
+          sudo apt-get update
+          sudo apt-get install --yes clang-format-6.0
+      - run: |
+          #!/bin/bash -ex
+
+          files_to_lint="$(find src/ -name '*.cpp' -or -name '*.h')"
+
+          # Turn off tracing for this because it's too verbose
+          set +x
+
+          for f in $files_to_lint; do
+              d=$(diff -u "$f" <(clang-format-6.0 "$f") || true)
+              if ! [ -z "$d" ]; then
+                  echo "!!! $f not compliant to coding style, here is the fix:"
+                  echo "$d"
+                  fail=1
+              fi
+          done
+
+          set -x
+
+          if [ "$fail" = 1 ]; then
+              exit 1
+          fi
   build:
     runs-on: ${{matrix.os}}
+    if: "!contains(github.event.head_commit.message, '[skip ci]')"
     strategy:
       matrix:
         os: [windows-latest, ubuntu-latest]
@@ -14,40 +44,40 @@ jobs:
           - os: ubuntu-latest
             options: "-DUSE_DISCORD_PRESENCE=ON -DENABLE_FFMPEG_VIDEO_DUMPER=ON"
     steps:
-    - name: Install Dependencies
-      if: matrix.os == 'ubuntu-latest'
-      run: |
+      - name: Install Dependencies
+        if: matrix.os == 'ubuntu-latest'
+        run: |
           sudo apt-get update
-          sudo apt-get install -y libsdl2-dev libavcodec-dev libavformat-dev libswscale-dev
-    - uses: actions/checkout@v1
-    - run: git submodule update --init --recursive
-    - name: Configure CMake
-      shell: bash
-      run: |
-        cd $GITHUB_WORKSPACE
-        mkdir build && cd build
-        cmake .. -DCMAKE_BUILD_TYPE=Release ${{matrix.options}}
-    - name: Build
-      working-directory: ./build
-      shell: bash
-      run: cmake --build . --config Release
-    - name: Test
-      working-directory: ./build
-      run: ctest -C Release
-    - name: Prepare to upload
-      shell: bash
-      run: |
-        cd $GITHUB_WORKSPACE
-        if [ "$RUNNER_OS" == "Linux" ]; then
-          rm ./build/bin/tests
-          cp license.txt ./build/bin
-        elif [ "$RUNNER_OS" == "Windows" ]; then
-          rm ./build/bin/Release/tests.exe
-          rm ./build/bin/Release/*.pdb
-          cp license.txt ./build/bin/Release
-        fi
-    - name: Upload artifact
-      uses: actions/upload-artifact@v1.0.0
-      with:
-        name: vvctre-${{matrix.os}}
-        path: build/bin
+          sudo apt-get install --yes libsdl2-dev libavcodec-dev libavformat-dev libswscale-dev
+      - uses: actions/checkout@v1
+      - run: git submodule update --init --recursive
+      - name: Configure CMake
+        shell: bash
+        run: |
+          cd $GITHUB_WORKSPACE
+          mkdir build && cd build
+          cmake .. -DCMAKE_BUILD_TYPE=Release ${{matrix.options}}
+      - name: Build
+        working-directory: ./build
+        shell: bash
+        run: cmake --build . --config Release
+      - name: Test
+        working-directory: ./build
+        run: ctest -C Release
+      - name: Prepare to upload
+        shell: bash
+        run: |
+          cd $GITHUB_WORKSPACE
+          if [ "$RUNNER_OS" == "Linux" ]; then
+            rm ./build/bin/tests
+            cp license.txt ./build/bin
+          elif [ "$RUNNER_OS" == "Windows" ]; then
+            rm ./build/bin/Release/tests.exe
+            rm ./build/bin/Release/*.pdb
+            cp license.txt ./build/bin/Release
+          fi
+      - name: Upload artifact
+        uses: actions/upload-artifact@v1.0.0
+        with:
+          name: vvctre-${{matrix.os}}
+          path: build/bin
