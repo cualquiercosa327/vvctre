@@ -201,6 +201,18 @@ int main(int argc, char** argv) {
           clipp::option("--no-preload-custom-textures")
               .doc("force disable custom texture preloading")
               .set(Settings::values.preload_textures, false),
+          clipp::option("--custom-layout")
+              .doc("force use custom layout")
+              .set(Settings::values.custom_layout, true),
+          clipp::option("--no-custom-layout")
+              .doc("force disable custom layout")
+              .set(Settings::values.custom_layout, false),
+          clipp::option("--swap-screens")
+              .doc("force swap screens")
+              .set(Settings::values.swap_screen, true),
+          clipp::option("--no-swap-screens")
+              .doc("force disable swap screens")
+              .set(Settings::values.swap_screen, false),
           clipp::option("--fullscreen").set(fullscreen).doc("start in fullscreen mode"),
           clipp::option("--regenerate-console-id")
               .set(regenerate_console_id)
