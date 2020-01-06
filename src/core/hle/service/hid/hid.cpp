@@ -85,19 +85,20 @@ void Module::UpdatePadCallback(u64 userdata, s64 cycles_late) {
     PadState state = GetPadState();
 
     // Get current circle pad position and update circle pad direction
-    float circle_pad_x_f, circle_pad_y_f;
-    std::tie(circle_pad_x_f, circle_pad_y_f) = circle_pad->GetStatus();
+    const auto [circle_pad_x_f, circle_pad_y_f] = GetCirclePadState();
     constexpr int MAX_CIRCLEPAD_POS = 0x9C; // Max value for a circle pad position
     s16 circle_pad_x = static_cast<s16>(circle_pad_x_f * MAX_CIRCLEPAD_POS);
     s16 circle_pad_y = static_cast<s16>(circle_pad_y_f * MAX_CIRCLEPAD_POS);
 
     Core::Movie::GetInstance().HandlePadAndCircleStatus(state, circle_pad_x, circle_pad_y);
 
-    const DirectionState direction = GetStickDirectionState(circle_pad_x, circle_pad_y);
-    state.circle_up.Assign(direction.up);
-    state.circle_down.Assign(direction.down);
-    state.circle_left.Assign(direction.left);
-    state.circle_right.Assign(direction.right);
+    if (!custom_pad_state) {
+        const DirectionState direction = GetStickDirectionState(circle_pad_x, circle_pad_y);
+        state.circle_up.Assign(direction.up);
+        state.circle_down.Assign(direction.down);
+        state.circle_left.Assign(direction.left);
+        state.circle_right.Assign(direction.right);
+    }
 
     mem->pad.current_state.hex = state.hex;
     mem->pad.index = next_pad_index;
@@ -110,7 +111,7 @@ void Module::UpdatePadCallback(u64 userdata, s64 cycles_late) {
     // Compute bitmask with 1s for bits different from the old state
     PadState changed = {{(state.hex ^ old_state.hex)}};
 
-    // Get the current Pad entry
+    // Get the current pad entry
     PadDataEntry& pad_entry = mem->pad.entries[mem->pad.index];
 
     // Update entry properties
@@ -421,6 +422,14 @@ const PadState Module::GetPadState() const {
     state.debug.Assign(buttons[Debug - BUTTON_HID_BEGIN]->GetStatus());
     state.gpio14.Assign(buttons[Gpio14 - BUTTON_HID_BEGIN]->GetStatus());
     return state;
+}
+
+void Module::SetCustomCirclePadState(std::optional<std::tuple<float, float>> state) {
+    custom_circle_pad_state = std::move(state);
+}
+
+const std::tuple<float, float> Module::GetCirclePadState() const {
+    return custom_circle_pad_state.has_value() ? *custom_circle_pad_state : circle_pad->GetStatus();
 }
 
 std::shared_ptr<Module> GetModule(Core::System& system) {

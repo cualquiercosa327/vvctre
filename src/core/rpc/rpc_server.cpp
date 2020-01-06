@@ -103,7 +103,7 @@ RPCServer::RPCServer() {
             auto hid = Service::HID::GetModule(Core::System::GetInstance());
             const nlohmann::json json = nlohmann::json::parse(req.body);
 
-            if (json.count("hex")) {
+            if (json.contains("hex")) {
                 Service::HID::PadState state;
                 state.hex = json["hex"].get<u32>();
                 hid->SetCustomPadState(state);
@@ -135,6 +135,38 @@ RPCServer::RPCServer() {
                 hid->SetCustomPadState(std::nullopt);
                 res.status = 204;
             }
+        } catch (nlohmann::json::exception& exception) {
+            res.status = 500;
+            res.set_content(exception.what(), "text/plain");
+        }
+    });
+
+    server->Get("/circlepadstate", [&](const httplib::Request& req, httplib::Response& res) {
+        auto hid = Service::HID::GetModule(Core::System::GetInstance());
+        const auto [x, y] = hid->GetCirclePadState();
+
+        res.set_content(
+            nlohmann::json{
+                {"x", x},
+                {"y", y},
+            }
+                .dump(),
+            "application/json");
+    });
+
+    server->Post("/circlepadstate", [&](const httplib::Request& req, httplib::Response& res) {
+        try {
+            auto hid = Service::HID::GetModule(Core::System::GetInstance());
+            const nlohmann::json json = nlohmann::json::parse(req.body);
+
+            if (json.contains("x") && json.contains("y")) {
+                hid->SetCustomCirclePadState(
+                    std::make_tuple(json["x"].get<float>(), json["y"].get<float>()));
+            } else {
+                hid->SetCustomCirclePadState(std::nullopt);
+            }
+
+            res.status = 204;
         } catch (nlohmann::json::exception& exception) {
             res.status = 500;
             res.set_content(exception.what(), "text/plain");
