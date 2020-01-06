@@ -132,9 +132,7 @@ void Module::UpdatePadCallback(u64 userdata, s64 cycles_late) {
 
     // Get the current touch entry
     TouchDataEntry& touch_entry = mem->touch.entries[mem->touch.index];
-    bool pressed = false;
-    float x, y;
-    std::tie(x, y, pressed) = touch_device->GetStatus();
+    const auto [x, y, pressed] = GetTouchState();
     touch_entry.x = static_cast<u16>(x * Core::kScreenBottomWidth);
     touch_entry.y = static_cast<u16>(y * Core::kScreenBottomHeight);
     touch_entry.valid.Assign(pressed ? 1 : 0);
@@ -430,6 +428,14 @@ void Module::SetCustomCirclePadState(std::optional<std::tuple<float, float>> sta
 
 const std::tuple<float, float> Module::GetCirclePadState() const {
     return custom_circle_pad_state.has_value() ? *custom_circle_pad_state : circle_pad->GetStatus();
+}
+
+void Module::SetCustomTouchState(std::optional<std::tuple<float, float, bool>> state) {
+    custom_touch_state = std::move(state);
+}
+
+const std::tuple<float, float, bool> Module::GetTouchState() const {
+    return custom_touch_state.has_value() ? *custom_touch_state : touch_device->GetStatus();
 }
 
 std::shared_ptr<Module> GetModule(Core::System& system) {

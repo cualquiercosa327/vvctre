@@ -307,6 +307,9 @@ public:
     void SetCustomCirclePadState(std::optional<std::tuple<float, float>> state);
     const std::tuple<float, float> GetCirclePadState() const;
 
+    void SetCustomTouchState(std::optional<std::tuple<float, float, bool>> state);
+    const std::tuple<float, float, bool> GetTouchState() const;
+
 private:
     void LoadInputDevices();
     void UpdatePadCallback(u64 userdata, s64 cycles_late);
@@ -329,6 +332,7 @@ private:
     std::optional<PadState> custom_pad_state;
 
     std::optional<std::tuple<float, float>> custom_circle_pad_state;
+    std::optional<std::tuple<float, float, bool>> custom_touch_state;
 
     u32 next_pad_index = 0;
     u32 next_touch_index = 0;

@@ -173,6 +173,39 @@ RPCServer::RPCServer() {
         }
     });
 
+    server->Get("/touchstate", [&](const httplib::Request& req, httplib::Response& res) {
+        auto hid = Service::HID::GetModule(Core::System::GetInstance());
+        const auto [x, y, pressed] = hid->GetTouchState();
+
+        res.set_content(
+            nlohmann::json{
+                {"x", x},
+                {"y", y},
+                {"pressed", pressed},
+            }
+                .dump(),
+            "application/json");
+    });
+
+    server->Post("/touchstate", [&](const httplib::Request& req, httplib::Response& res) {
+        try {
+            auto hid = Service::HID::GetModule(Core::System::GetInstance());
+            const nlohmann::json json = nlohmann::json::parse(req.body);
+
+            if (json.contains("x") && json.contains("y") && json.contains("pressed")) {
+                hid->SetCustomTouchState(std::make_tuple(
+                    json["x"].get<float>(), json["y"].get<float>(), json["pressed"].get<bool>()));
+            } else {
+                hid->SetCustomTouchState(std::nullopt);
+            }
+
+            res.status = 204;
+        } catch (nlohmann::json::exception& exception) {
+            res.status = 500;
+            res.set_content(exception.what(), "text/plain");
+        }
+    });
+
     request_handler_thread = std::thread([&] { server->listen("0.0.0.0", RPC_PORT); });
     LOG_INFO(RPC_Server, "RPC server running on port {}", RPC_PORT);
 }
