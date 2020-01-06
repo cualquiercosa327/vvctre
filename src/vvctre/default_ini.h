@@ -26,7 +26,7 @@ touch_device=
 
 # Most desktop operating systems do not expose a way to poll the motion state of the controllers
 # so as a way around it, cemuhook created a udp client/server protocol to broadcast the data directly
-# from a controller device to the client program. Citra has a client that can connect and read
+# from a controller device to the client program. vvctre has a client that can connect and read
 # from any cemuhook compatible motion program.
 
 # IPv4 address of the udp input server (Default "127.0.0.1")
@@ -64,11 +64,11 @@ multiplayer_url =
 use_virtual_sd =
 
 [System]
-# The system model that Citra will try to emulate
+# The system model that vvctre will try to emulate
 # 0: Old 3DS (default), 1: New 3DS
 is_new_3ds =
 
-# The system region that Citra will use during emulation
+# The system region that vvctre will use during emulation
 # -1: Auto-select (default), 0: Japan, 1: USA, 2: Europe, 3: Australia, 4: China, 5: Korea, 6: Taiwan
 region_value =
 

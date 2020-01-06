@@ -95,7 +95,7 @@ static_assert(std::is_standard_layout<GSEmitter>::value, "GSEmitter is not stand
 
 /**
  * This structure contains the state information that needs to be unique for a shader unit. The 3DS
- * has four shader units that process shaders in parallel. At the present, Citra only implements a
+ * has four shader units that process shaders in parallel. At the present, vvctre only implements a
  * single shader unit that processes all shaders serially. Putting the state information in a struct
  * here will make it easier for us to parallelize the shader processing later.
  */

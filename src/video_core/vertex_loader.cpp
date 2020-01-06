@@ -154,7 +154,7 @@ void VertexLoader::LoadVertex(u32 base_address, int index, int vertex,
         } else {
             // TODO(yuriks): In this case, no data gets loaded and the vertex
             // remains with the last value it had. This isn't currently maintained
-            // as global state, however, and so won't work in Citra yet.
+            // as global state, however, and so won't work in vvctre yet.
         }
     }
 }

@@ -119,7 +119,7 @@ void CheckNew3DS(IPC::RequestBuilder& rb) {
 
     if (is_new_3ds) {
         LOG_CRITICAL(Service_PTM, "The option 'is_new_3ds' is enabled as part of the 'System' "
-                                  "settings. Citra does not fully support New 3DS emulation yet!");
+                                  "settings. vvctre does not fully support New 3DS emulation yet!");
     }
 
     rb.Push(RESULT_SUCCESS);

@@ -97,7 +97,7 @@ void Module::Interface::GetMyScreenName(Kernel::HLERequestContext& ctx) {
     };
 
     // TODO: (mailwl) get the name from config
-    ScreenName screen_name{u"Citra"};
+    ScreenName screen_name{u"vvctre"};
 
     rb.Push(RESULT_SUCCESS);
     rb.PushRaw(screen_name);

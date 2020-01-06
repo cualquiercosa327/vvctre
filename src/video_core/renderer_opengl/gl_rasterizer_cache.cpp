@@ -865,7 +865,7 @@ void CachedSurface::DumpTexture(GLuint target_tex, u64 tex_hash) {
            higher quality 256x256 texture. If the 256x256 texture is displayed first and the 32x32
            texture gets uploaded to the same underlying OpenGL texture, the 32x32 texture will
            appear in the corner of the 256x256 texture.
-           If texture dumping is enabled and the 32x32 is undumped, Citra will attempt to dump it.
+           If texture dumping is enabled and the 32x32 is undumped, vvctre will attempt to dump it.
            Since the underlying OpenGL texture is still 256x256, vvctre crashes because it thinks
            the texture is only 32x32. GetTexImage conveniently only dumps the specified region.
         */

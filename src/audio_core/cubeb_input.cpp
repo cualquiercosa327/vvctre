@@ -26,7 +26,7 @@ struct CubebInput::Impl {
 
 CubebInput::CubebInput(std::string device_id)
     : impl(std::make_unique<Impl>()), device_id(std::move(device_id)) {
-    if (cubeb_init(&impl->ctx, "Citra Input", nullptr) != CUBEB_OK) {
+    if (cubeb_init(&impl->ctx, "vvctre input", nullptr) != CUBEB_OK) {
         LOG_ERROR(Audio, "cubeb_init failed! Mic will not work properly");
         return;
     }
@@ -87,9 +87,9 @@ void CubebInput::StartSampling(const Frontend::Mic::Parameters& params) {
         LOG_ERROR(Audio, "Could not get minimum latency");
     }
 
-    if (cubeb_stream_init(impl->ctx, &impl->stream, "Citra Microphone", input_device, &input_params,
-                          nullptr, nullptr, latency_frames, Impl::DataCallback, Impl::StateCallback,
-                          impl.get()) != CUBEB_OK) {
+    if (cubeb_stream_init(impl->ctx, &impl->stream, "vvctre microphone", input_device,
+                          &input_params, nullptr, nullptr, latency_frames, Impl::DataCallback,
+                          Impl::StateCallback, impl.get()) != CUBEB_OK) {
         LOG_CRITICAL(Audio, "Error creating cubeb input stream");
         is_sampling = false;
         return;
@@ -160,7 +160,7 @@ std::vector<std::string> ListCubebInputDevices() {
     std::vector<std::string> device_list;
     cubeb* ctx;
 
-    if (cubeb_init(&ctx, "Citra Input Device Enumerator", nullptr) != CUBEB_OK) {
+    if (cubeb_init(&ctx, "vvctre input device enumerator", nullptr) != CUBEB_OK) {
         LOG_CRITICAL(Audio, "cubeb_init failed");
         return {};
     }
