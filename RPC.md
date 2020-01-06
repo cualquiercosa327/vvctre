@@ -247,6 +247,8 @@ Get the background color.
 
 ## Reply
 
+`red`, `green` and `blue` are floats in range 0.0-1.0.
+
 ```json
 {
   "red": Number,
@@ -260,6 +262,8 @@ Get the background color.
 Sets the background color.
 
 ## Request
+
+`red`, `green` and `blue` are floats in range 0.0-1.0.
 
 ```json
 {
