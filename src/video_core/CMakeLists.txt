@@ -83,7 +83,6 @@ if(ARCHITECTURE_x86_64)
         PRIVATE
             shader/shader_jit_x64.cpp
             shader/shader_jit_x64_compiler.cpp
-
             shader/shader_jit_x64.h
             shader/shader_jit_x64_compiler.h
     )
@@ -92,7 +91,7 @@ endif()
 create_target_directory_groups(video_core)
 
 target_link_libraries(video_core PUBLIC common core)
-target_link_libraries(video_core PRIVATE glad nihstro-headers)
+target_link_libraries(video_core PRIVATE glad nihstro-headers lodepng)
 
 if (ARCHITECTURE_x86_64)
     target_link_libraries(video_core PUBLIC xbyak)

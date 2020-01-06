@@ -44,7 +44,6 @@
 #include "vvctre/applets/keyboard.h"
 #include "vvctre/config.h"
 #include "vvctre/emu_window/emu_window_sdl2.h"
-#include "vvctre/lodepng_image_interface.h"
 
 #ifdef USE_DISCORD_PRESENCE
 #include "vvctre/discord_rp.h"
@@ -246,10 +245,6 @@ int main(int argc, char** argv) {
             Core::System& system = Core::System::GetInstance();
             Frontend::RegisterDefaultApplets();
             system.RegisterSoftwareKeyboard(std::make_shared<Frontend::SDL2_SoftwareKeyboard>());
-
-            // Register image interface
-            Core::System::GetInstance().RegisterImageInterface(
-                std::make_shared<LodePNGImageInterface>());
 
             std::unique_ptr<EmuWindow_SDL2> emu_window =
                 std::make_unique<EmuWindow_SDL2>(fullscreen);

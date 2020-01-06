@@ -332,10 +332,6 @@ void System::RegisterSoftwareKeyboard(std::shared_ptr<Frontend::SoftwareKeyboard
     registered_swkbd = std::move(swkbd);
 }
 
-void System::RegisterImageInterface(std::shared_ptr<Frontend::ImageInterface> image_interface) {
-    registered_image_interface = std::move(image_interface);
-}
-
 void System::Shutdown() {
     // Shutdown emulation session
     GDBStub::Shutdown();

@@ -8,8 +8,6 @@ add_executable(${PROJECT_NAME}
     default_ini.h
     emu_window/emu_window_sdl2.cpp
     emu_window/emu_window_sdl2.h
-    lodepng_image_interface.cpp
-    lodepng_image_interface.h
     resource.h
     applets/keyboard.cpp
     applets/keyboard.h

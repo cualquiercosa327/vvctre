@@ -102,7 +102,6 @@ add_library(core STATIC
     frontend/emu_window.h
     frontend/framebuffer_layout.cpp
     frontend/framebuffer_layout.h
-    frontend/image_interface.h
     frontend/input.h
     frontend/mic.h
     frontend/mic.cpp

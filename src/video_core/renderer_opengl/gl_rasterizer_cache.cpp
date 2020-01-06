@@ -14,6 +14,7 @@
 #include <vector>
 #include <boost/range/iterator_range.hpp>
 #include <glad/glad.h>
+#include <lodepng.h>
 #include "common/alignment.h"
 #include "common/bit_field.h"
 #include "common/color.h"
@@ -799,17 +800,17 @@ void CachedSurface::FlushGLBuffer(PAddr flush_start, PAddr flush_end) {
 bool CachedSurface::LoadCustomTexture(u64 tex_hash, Core::CustomTexInfo& tex_info,
                                       Common::Rectangle<u32>& custom_rect) {
     bool result = false;
-    auto& custom_tex_cache = Core::System::GetInstance().CustomTexCache();
-    const auto& image_interface = Core::System::GetInstance().GetImageInterface();
+    Core::CustomTexCache& custom_tex_cache = Core::System::GetInstance().CustomTexCache();
 
     if (custom_tex_cache.IsTextureCached(tex_hash)) {
         tex_info = custom_tex_cache.LookupTexture(tex_hash);
         result = true;
     } else {
         if (custom_tex_cache.CustomTextureExists(tex_hash)) {
-            const auto& path_info = custom_tex_cache.LookupTexturePathInfo(tex_hash);
-            if (image_interface->DecodePNG(tex_info.tex, tex_info.width, tex_info.height,
-                                           path_info.path)) {
+            const Core::CustomTexPathInfo& path_info =
+                custom_tex_cache.LookupTexturePathInfo(tex_hash);
+            if (lodepng::decode(tex_info.tex, tex_info.width, tex_info.height, path_info.path) ==
+                0) {
                 std::bitset<32> width_bits(tex_info.width);
                 std::bitset<32> height_bits(tex_info.height);
                 if (width_bits.count() == 1 && height_bits.count() == 1) {
@@ -839,7 +840,6 @@ bool CachedSurface::LoadCustomTexture(u64 tex_hash, Core::CustomTexInfo& tex_inf
 
 void CachedSurface::DumpTexture(GLuint target_tex, u64 tex_hash) {
     // Dump texture to RGBA8 and encode as PNG
-    const auto& image_interface = Core::System::GetInstance().GetImageInterface();
     auto& custom_tex_cache = Core::System::GetInstance().CustomTexCache();
     std::string dump_path =
         fmt::format("{}textures/{:016X}/", FileUtil::GetUserPath(FileUtil::UserPath::DumpDir),
@@ -873,7 +873,7 @@ void CachedSurface::DumpTexture(GLuint target_tex, u64 tex_hash) {
                     &decoded_texture[0], decoded_texture.size());
         glBindTexture(GL_TEXTURE_2D, 0);
         Common::FlipRGBA8Texture(decoded_texture, width, height);
-        if (!image_interface->EncodePNG(dump_path, decoded_texture, width, height)) {
+        if (lodepng::encode(dump_path, decoded_texture, width, height)) {
             LOG_ERROR(Render_OpenGL, "Failed to save decoded texture");
         }
     }

@@ -10,7 +10,6 @@
 #include "core/custom_tex_cache.h"
 #include "core/frontend/applets/mii_selector.h"
 #include "core/frontend/applets/swkbd.h"
-#include "core/frontend/image_interface.h"
 #include "core/loader/loader.h"
 #include "core/memory.h"
 #include "core/perf_stats.h"
@@ -241,25 +240,13 @@ public:
     }
 
     /// Frontend Applets
-
     void RegisterMiiSelector(std::shared_ptr<Frontend::MiiSelector> mii_selector);
-
     void RegisterSoftwareKeyboard(std::shared_ptr<Frontend::SoftwareKeyboard> swkbd);
-
     std::shared_ptr<Frontend::MiiSelector> GetMiiSelector() const {
         return registered_mii_selector;
     }
-
     std::shared_ptr<Frontend::SoftwareKeyboard> GetSoftwareKeyboard() const {
         return registered_swkbd;
-    }
-
-    /// Image interface
-
-    void RegisterImageInterface(std::shared_ptr<Frontend::ImageInterface> image_interface);
-
-    std::shared_ptr<Frontend::ImageInterface> GetImageInterface() const {
-        return registered_image_interface;
     }
 
 private:
@@ -302,9 +289,6 @@ private:
 
     /// Custom texture cache system
     std::unique_ptr<Core::CustomTexCache> custom_tex_cache;
-
-    /// Image interface
-    std::shared_ptr<Frontend::ImageInterface> registered_image_interface;
 
     /// RPC Server for scripting support
     std::unique_ptr<RPC::RPCServer> rpc_server;
