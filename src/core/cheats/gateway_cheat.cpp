@@ -445,7 +445,7 @@ std::string GatewayCheat::GetCode() const {
 }
 
 /// A special marker used to keep track of enabled cheats
-static constexpr char EnabledText[] = "*citra_enabled";
+static constexpr char EnabledText[] = "*vvctre_enabled";
 
 std::string GatewayCheat::ToString() const {
     std::string result;
