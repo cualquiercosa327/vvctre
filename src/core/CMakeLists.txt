@@ -440,14 +440,8 @@ add_library(core STATIC
     movie.h
     perf_stats.cpp
     perf_stats.h
-    rpc/packet.cpp
-    rpc/packet.h
     rpc/rpc_server.cpp
     rpc/rpc_server.h
-    rpc/server.cpp
-    rpc/server.h
-    rpc/udp_server.cpp
-    rpc/udp_server.h
     settings.cpp
     settings.h
     tracer/citrace.h
@@ -465,7 +459,7 @@ endif()
 create_target_directory_groups(core)
 
 target_link_libraries(core PUBLIC common PRIVATE audio_core video_core)
-target_link_libraries(core PUBLIC Boost::boost PRIVATE cryptopp fmt open_source_archives easywsclient)
+target_link_libraries(core PUBLIC Boost::boost PRIVATE cryptopp fmt open_source_archives easywsclient json httplib)
 
 if (ARCHITECTURE_x86_64)
     target_sources(core PRIVATE
@@ -474,6 +468,7 @@ if (ARCHITECTURE_x86_64)
         arm/dynarmic/arm_dynarmic_cp15.cpp
         arm/dynarmic/arm_dynarmic_cp15.h
     )
+
     target_link_libraries(core PRIVATE dynarmic)
 endif()
 
