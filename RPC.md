@@ -166,3 +166,11 @@ Set the touch screen state.
   "pressed": Boolean
 }
 ```
+
+# GET /screenshot
+
+Replies with a screenshot in PNG format.
+
+# GET /layout
+
+Replies with a screenshot in PNG format.

@@ -277,7 +277,6 @@ RPCServer::RPCServer() {
                 {"height", layout.height},
                 {"top_screen",
                  {
-                     {"enabled", layout.top_screen_enabled},
                      {"width", layout.top_screen.GetWidth()},
                      {"height", layout.top_screen.GetHeight()},
                      {"left", layout.top_screen.left},
@@ -287,7 +286,6 @@ RPCServer::RPCServer() {
                  }},
                 {"bottom_screen",
                  {
-                     {"enabled", layout.bottom_screen_enabled},
                      {"width", layout.bottom_screen.GetWidth()},
                      {"height", layout.bottom_screen.GetHeight()},
                      {"left", layout.bottom_screen.left},
