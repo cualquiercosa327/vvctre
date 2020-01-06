@@ -195,7 +195,7 @@ int main(int argc, char** argv) {
                        ? 0
                        : -1;
         } else {
-            ASSERT_MSG(Settings::values.audio_speed > 0.00f,
+            ASSERT_MSG(Settings::values.audio_speed > 0.0f,
                        "audio speed must be greater than zero");
 
             if (!movie_record.empty() && !movie_play.empty()) {
