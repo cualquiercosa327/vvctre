@@ -123,11 +123,11 @@ static inline void AddOffsetOp(const GatewayCheat::CheatLine& line, State& state
 
 static inline void JokerOp(const GatewayCheat::CheatLine& line, State& state,
                            const Core::System& system) {
-    u32 pad_state = system.ServiceManager()
-                        .GetService<Service::HID::Module::Interface>("hid:USER")
-                        ->GetModule()
-                        ->GetState()
-                        .hex;
+    const u32 pad_state = system.ServiceManager()
+                              .GetService<Service::HID::Module::Interface>("hid:USER")
+                              ->GetModule()
+                              ->GetPadState()
+                              .hex;
     bool pressed = (pad_state & line.value) == line.value;
     if (!pressed) {
         state.if_flag++;

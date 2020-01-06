@@ -10,6 +10,7 @@
 #include <cstddef>
 #endif
 #include <memory>
+#include <optional>
 #include "common/bit_field.h"
 #include "common/common_funcs.h"
 #include "common/common_types.h"
@@ -19,7 +20,7 @@
 
 namespace Core {
 class System;
-}
+} // namespace Core
 
 namespace Kernel {
 class Event;
@@ -28,12 +29,12 @@ class SharedMemory;
 
 namespace Core {
 struct TimingEventType;
-};
+} // namespace Core
 
 namespace Service::HID {
 
 /**
- * Structure of a Pad controller state.
+ * Structure of a pad controller state.
  */
 struct PadState {
     union {
@@ -300,7 +301,8 @@ public:
 
     void ReloadInputDevices();
 
-    const PadState& GetState() const;
+    void SetCustomPadState(std::optional<PadState> state);
+    const PadState GetPadState() const;
 
 private:
     void LoadInputDevices();
@@ -320,9 +322,8 @@ private:
     std::shared_ptr<Kernel::Event> event_gyroscope;
     std::shared_ptr<Kernel::Event> event_debug_pad;
 
-    // The HID module of a 3DS does not store the PadState.
-    // Storing this here was necessary for emulation specific tasks like cheats or scripting.
-    PadState state;
+    // Used in GetPadState which is used for cheats and RPC
+    std::optional<PadState> custom_pad_state;
 
     u32 next_pad_index = 0;
     u32 next_touch_index = 0;

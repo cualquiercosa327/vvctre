@@ -34,25 +34,27 @@ DirectionState GetStickDirectionState(s16 circle_pad_x, s16 circle_pad_y) {
     // 30 degree and 60 degree are angular thresholds for directions
     constexpr float TAN30 = 0.577350269f;
     constexpr float TAN60 = 1 / TAN30;
-    // a circle pad radius greater than 40 will trigger circle pad direction
+    // A circle pad radius greater than 40 will trigger circle pad direction
     constexpr int CIRCLE_PAD_THRESHOLD_SQUARE = 40 * 40;
     DirectionState state{false, false, false, false};
 
     if (circle_pad_x * circle_pad_x + circle_pad_y * circle_pad_y > CIRCLE_PAD_THRESHOLD_SQUARE) {
-        float t = std::abs(static_cast<float>(circle_pad_y) / circle_pad_x);
+        const float t = std::abs(static_cast<float>(circle_pad_y) / circle_pad_x);
 
         if (circle_pad_x != 0 && t < TAN60) {
-            if (circle_pad_x > 0)
+            if (circle_pad_x > 0) {
                 state.right = true;
-            else
+            } else {
                 state.left = true;
+            }
         }
 
         if (circle_pad_x == 0 || t > TAN30) {
-            if (circle_pad_y > 0)
+            if (circle_pad_y > 0) {
                 state.up = true;
-            else
+            } else {
                 state.down = true;
+            }
         }
     }
 
@@ -76,24 +78,11 @@ void Module::LoadInputDevices() {
 void Module::UpdatePadCallback(u64 userdata, s64 cycles_late) {
     SharedMem* mem = reinterpret_cast<SharedMem*>(shared_mem->GetPointer());
 
-    if (is_device_reload_pending.exchange(false))
+    if (is_device_reload_pending.exchange(false)) {
         LoadInputDevices();
+    }
 
-    using namespace Settings::NativeButton;
-    state.a.Assign(buttons[A - BUTTON_HID_BEGIN]->GetStatus());
-    state.b.Assign(buttons[B - BUTTON_HID_BEGIN]->GetStatus());
-    state.x.Assign(buttons[X - BUTTON_HID_BEGIN]->GetStatus());
-    state.y.Assign(buttons[Y - BUTTON_HID_BEGIN]->GetStatus());
-    state.right.Assign(buttons[Right - BUTTON_HID_BEGIN]->GetStatus());
-    state.left.Assign(buttons[Left - BUTTON_HID_BEGIN]->GetStatus());
-    state.up.Assign(buttons[Up - BUTTON_HID_BEGIN]->GetStatus());
-    state.down.Assign(buttons[Down - BUTTON_HID_BEGIN]->GetStatus());
-    state.l.Assign(buttons[L - BUTTON_HID_BEGIN]->GetStatus());
-    state.r.Assign(buttons[R - BUTTON_HID_BEGIN]->GetStatus());
-    state.start.Assign(buttons[Start - BUTTON_HID_BEGIN]->GetStatus());
-    state.select.Assign(buttons[Select - BUTTON_HID_BEGIN]->GetStatus());
-    state.debug.Assign(buttons[Debug - BUTTON_HID_BEGIN]->GetStatus());
-    state.gpio14.Assign(buttons[Gpio14 - BUTTON_HID_BEGIN]->GetStatus());
+    PadState state = GetPadState();
 
     // Get current circle pad position and update circle pad direction
     float circle_pad_x_f, circle_pad_y_f;
@@ -114,7 +103,7 @@ void Module::UpdatePadCallback(u64 userdata, s64 cycles_late) {
     mem->pad.index = next_pad_index;
     next_pad_index = (next_pad_index + 1) % mem->pad.entries.size();
 
-    // Get the previous Pad state
+    // Get the previous pad state
     u32 last_entry_index = (mem->pad.index - 1) % mem->pad.entries.size();
     PadState old_state = mem->pad.entries[last_entry_index].current_state;
 
@@ -406,14 +395,39 @@ void Module::ReloadInputDevices() {
     is_device_reload_pending.store(true);
 }
 
-const PadState& Module::GetState() const {
+void Module::SetCustomPadState(std::optional<PadState> state) {
+    custom_pad_state = std::move(state);
+}
+
+const PadState Module::GetPadState() const {
+    if (custom_pad_state) {
+        return *custom_pad_state;
+    }
+
+    using namespace Settings::NativeButton;
+    PadState state;
+    state.a.Assign(buttons[A - BUTTON_HID_BEGIN]->GetStatus());
+    state.b.Assign(buttons[B - BUTTON_HID_BEGIN]->GetStatus());
+    state.x.Assign(buttons[X - BUTTON_HID_BEGIN]->GetStatus());
+    state.y.Assign(buttons[Y - BUTTON_HID_BEGIN]->GetStatus());
+    state.right.Assign(buttons[Right - BUTTON_HID_BEGIN]->GetStatus());
+    state.left.Assign(buttons[Left - BUTTON_HID_BEGIN]->GetStatus());
+    state.up.Assign(buttons[Up - BUTTON_HID_BEGIN]->GetStatus());
+    state.down.Assign(buttons[Down - BUTTON_HID_BEGIN]->GetStatus());
+    state.l.Assign(buttons[L - BUTTON_HID_BEGIN]->GetStatus());
+    state.r.Assign(buttons[R - BUTTON_HID_BEGIN]->GetStatus());
+    state.start.Assign(buttons[Start - BUTTON_HID_BEGIN]->GetStatus());
+    state.select.Assign(buttons[Select - BUTTON_HID_BEGIN]->GetStatus());
+    state.debug.Assign(buttons[Debug - BUTTON_HID_BEGIN]->GetStatus());
+    state.gpio14.Assign(buttons[Gpio14 - BUTTON_HID_BEGIN]->GetStatus());
     return state;
 }
 
 std::shared_ptr<Module> GetModule(Core::System& system) {
     auto hid = system.ServiceManager().GetService<Service::HID::Module::Interface>("hid:USER");
-    if (!hid)
+    if (!hid) {
         return nullptr;
+    }
     return hid->GetModule();
 }
 
