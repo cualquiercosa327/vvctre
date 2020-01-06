@@ -183,6 +183,24 @@ int main(int argc, char** argv) {
           clipp::option("--disable-ignore-format-reinterpretation")
               .doc("force disable ignore format reinterpretation")
               .set(Settings::values.ignore_format_reinterpretation, false),
+          clipp::option("--dump-textures")
+              .doc("force enable texture dumping")
+              .set(Settings::values.dump_textures, true),
+          clipp::option("--no-dump-textures")
+              .doc("force disable texture dumping")
+              .set(Settings::values.dump_textures, false),
+          clipp::option("--custom-textures")
+              .doc("force enable custom textures")
+              .set(Settings::values.custom_textures, true),
+          clipp::option("--no-custom-textures")
+              .doc("force disable custom textures")
+              .set(Settings::values.custom_textures, false),
+          clipp::option("--preload-custom-textures")
+              .doc("force enable custom texture preloading")
+              .set(Settings::values.preload_textures, true),
+          clipp::option("--no-preload-custom-textures")
+              .doc("force disable custom texture preloading")
+              .set(Settings::values.preload_textures, false),
           clipp::option("--fullscreen").set(fullscreen).doc("start in fullscreen mode"),
           clipp::option("--regenerate-console-id")
               .set(regenerate_console_id)
