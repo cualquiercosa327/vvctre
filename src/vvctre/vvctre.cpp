@@ -128,6 +128,17 @@ int main(int argc, char** argv) {
               clipp::value("url").set(Settings::values.multiplayer_url),
           clipp::option("--log-filter").doc("set the log filter") &
               clipp::value("filter").set(Settings::values.log_filter),
+          clipp::option("--minimum-vertices-per-thread")
+                  .doc("set minimum vertices per thread (only used for software shader)") &
+              clipp::value("value").set(Settings::values.min_vertices_per_thread),
+          clipp::option("--resolution").doc("set resolution") &
+              clipp::value("value").set(Settings::values.resolution_factor),
+          clipp::option("--cpu-jit")
+              .doc("force use CPU JIT")
+              .set(Settings::values.use_cpu_jit, true),
+          clipp::option("--cpu-interpreter")
+              .doc("force use CPU interpreter")
+              .set(Settings::values.use_cpu_jit, false),
           clipp::option("--hardware-renderer")
               .doc("force hardware renderer")
               .set(Settings::values.use_hw_renderer, true),
@@ -141,10 +152,10 @@ int main(int argc, char** argv) {
               .doc("force software shader")
               .set(Settings::values.use_hw_shader, false),
           clipp::option("--accurate-multiplication")
-              .doc("force accurate multiplication if hardware shader is enabled")
+              .doc("force accurate multiplication if using hardware shader")
               .set(Settings::values.shaders_accurate_mul, true),
           clipp::option("--inaccurate-multiplication")
-              .doc("force inaccurate multiplication if hardware shader is enabled")
+              .doc("force inaccurate multiplication if using hardware shader")
               .set(Settings::values.shaders_accurate_mul, false),
           clipp::option("--use-disk-shader-cache")
               .doc("use disk shader cache")
