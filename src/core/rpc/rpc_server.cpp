@@ -327,7 +327,7 @@ RPCServer::RPCServer() {
         res.status = 204;
     });
 
-    server->Get("/layout/single", [&](const httplib::Request& req, httplib::Response& res) {
+    server->Get("/layout/singlescreen", [&](const httplib::Request& req, httplib::Response& res) {
         Settings::values.custom_layout = false;
         Settings::values.layout_option = Settings::LayoutOption::SingleScreen;
         Settings::Apply();
@@ -335,7 +335,7 @@ RPCServer::RPCServer() {
         res.status = 204;
     });
 
-    server->Get("/layout/large", [&](const httplib::Request& req, httplib::Response& res) {
+    server->Get("/layout/largescreen", [&](const httplib::Request& req, httplib::Response& res) {
         Settings::values.custom_layout = false;
         Settings::values.layout_option = Settings::LayoutOption::LargeScreen;
         Settings::Apply();
@@ -351,12 +351,38 @@ RPCServer::RPCServer() {
         res.status = 204;
     });
 
-    server->Get("/layout/medium", [&](const httplib::Request& req, httplib::Response& res) {
+    server->Get("/layout/mediumscreen", [&](const httplib::Request& req, httplib::Response& res) {
         Settings::values.custom_layout = false;
         Settings::values.layout_option = Settings::LayoutOption::MediumScreen;
         Settings::Apply();
 
         res.status = 204;
+    });
+
+    server->Get("/backgroundcolor", [&](const httplib::Request& req, httplib::Response& res) {
+        res.set_content(
+            nlohmann::json{
+                {"red", Settings::values.bg_red},
+                {"green", Settings::values.bg_green},
+                {"blue", Settings::values.bg_blue},
+            }
+                .dump(),
+            "application/json");
+    });
+
+    server->Post("/backgroundcolor", [&](const httplib::Request& req, httplib::Response& res) {
+        try {
+            const nlohmann::json json = nlohmann::json::parse(req.body);
+            Settings::values.bg_red = json["red"];
+            Settings::values.bg_green = json["green"];
+            Settings::values.bg_blue = json["blue"];
+            Settings::Apply();
+
+            res.status = 204;
+        } catch (nlohmann::json::exception& exception) {
+            res.status = 500;
+            res.set_content(exception.what(), "text/plain");
+        }
     });
 
     request_handler_thread = std::thread([&] { server->listen("0.0.0.0", RPC_PORT); });

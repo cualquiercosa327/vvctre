@@ -173,4 +173,98 @@ Replies with a screenshot in PNG format.
 
 # GET /layout
 
-Replies with a screenshot in PNG format.
+## Reply
+
+```json
+{
+  "width": Number,
+  "height": Number,
+  "top_screen": {
+    "width": Number,
+    "height": Number,
+    "left": Number,
+    "top": Number,
+    "right": Number,
+    "bottom": Number
+  },
+  "bottom_screen": {
+    "width": Number,
+    "height": Number,
+    "left": Number,
+    "top": Number,
+    "right": Number,
+    "bottom": Number
+  }
+}
+```
+
+# POST /layout/custom
+
+Sets the layout to a custom layout.
+
+## Request
+
+```json
+{
+  "top_screen": {
+    "left": Number,
+    "top": Number,
+    "right": Number,
+    "bottom": Number
+  },
+  "bottom_screen": {
+    "left": Number,
+    "top": Number,
+    "right": Number,
+    "bottom": Number
+  }
+}
+```
+
+# GET /layout/default
+
+Sets the layout to Default Top Bottom Screen.
+
+# GET /layout/singlescreen
+
+Sets the layout to Single Screen Only.
+
+# GET /layout/largescreen
+
+Sets the layout to Large Screen Small Screen.
+
+# GET /layout/sidebyside
+
+Sets the layout to Side by Side.
+
+# GET /layout/mediumscreen
+
+Sets the layout to Large Screen Medium Screen.
+
+# GET /backgroundcolor
+
+Get the background color.
+
+## Reply
+
+```json
+{
+  "red": Number,
+  "green": Number,
+  "blue": Number
+}
+```
+
+# POST /backgroundcolor
+
+Sets the background color.
+
+## Request
+
+```json
+{
+  "red": Number,
+  "green": Number,
+  "blue": Number
+}
+```

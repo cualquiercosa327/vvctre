@@ -136,6 +136,15 @@ int main(int argc, char** argv) {
                   .doc("set audio speed for DSP HLE to a float, must be greater than zero and "
                        "requires audio stretching to be enabled to work properly") &
               clipp::value("value").set(Settings::values.audio_speed),
+          clipp::option("--background-color-red")
+                  .doc("set background color red component to a float in range 0.0-1.0") &
+              clipp::value("value").set(Settings::values.bg_red),
+          clipp::option("--background-color-green")
+                  .doc("set background color green component to a float in range 0.0-1.0") &
+              clipp::value("value").set(Settings::values.bg_green),
+          clipp::option("--background-color-blue")
+                  .doc("set background color blue component to a float in range 0.0-1.0") &
+              clipp::value("value").set(Settings::values.bg_blue),
           clipp::option("--cpu-jit")
               .doc("force use CPU JIT")
               .set(Settings::values.use_cpu_jit, true),
