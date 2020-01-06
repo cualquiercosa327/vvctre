@@ -9,6 +9,7 @@ jobs:
       - uses: actions/checkout@v1
       - uses: DoozyX/clang-format-lint-action@v0.5
         with:
+          source: src
           clangFormatVersion: 6
   build:
     runs-on: ${{matrix.os}}
