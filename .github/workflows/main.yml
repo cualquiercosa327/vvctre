@@ -7,31 +7,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
-      - run: |
-          sudo apt-get update
-          sudo apt-get install --yes clang-format-6.0
-      - run: |
-          #!/bin/bash -ex
-
-          files_to_lint="$(find src/ -name '*.cpp' -or -name '*.h')"
-
-          # Turn off tracing for this because it's too verbose
-          set +x
-
-          for f in $files_to_lint; do
-              d=$(diff -u "$f" <(clang-format-6.0 "$f") || true)
-              if ! [ -z "$d" ]; then
-                  echo "!!! $f not compliant to coding style, here is the fix:"
-                  echo "$d"
-                  fail=1
-              fi
-          done
-
-          set -x
-
-          if [ "$fail" = 1 ]; then
-              exit 1
-          fi
+      - uses: DoozyX/clang-format-lint-action@v0.5
+        with:
+          clangFormatVersion: 6
   build:
     runs-on: ${{matrix.os}}
     if: "!contains(github.event.head_commit.message, '[skip ci]')"
