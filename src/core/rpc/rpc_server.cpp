@@ -299,31 +299,65 @@ RPCServer::RPCServer() {
             "application/json");
     });
 
-    server->Post("/layout", [&](const httplib::Request& req, httplib::Response& res) {
+    server->Post("/layout/custom", [&](const httplib::Request& req, httplib::Response& res) {
         try {
-            Layout::FramebufferLayout layout =
-                VideoCore::g_renderer->GetRenderWindow().GetFramebufferLayout();
-
             const nlohmann::json json = nlohmann::json::parse(req.body);
-            layout.width = json["width"];
-            layout.height = json["height"];
-            layout.top_screen_enabled = json["top_screen"]["enabled"];
-            layout.bottom_screen_enabled = json["bottom_screen"]["enabled"];
-            layout.top_screen.left = json["top_screen"]["left"];
-            layout.top_screen.top = json["top_screen"]["top"];
-            layout.top_screen.right = json["top_screen"]["right"];
-            layout.top_screen.bottom = json["top_screen"]["bottom"];
-            layout.bottom_screen.left = json["bottom_screen"]["left"];
-            layout.bottom_screen.top = json["bottom_screen"]["top"];
-            layout.bottom_screen.right = json["bottom_screen"]["right"];
-            layout.bottom_screen.bottom = json["bottom_screen"]["bottom"];
-            layout.height = json["height"];
+            Settings::values.custom_layout = true;
+            Settings::values.custom_top_left = json["top_screen"]["left"];
+            Settings::values.custom_top_top = json["top_screen"]["top"];
+            Settings::values.custom_top_right = json["top_screen"]["right"];
+            Settings::values.custom_top_bottom = json["top_screen"]["bottom"];
+            Settings::values.custom_bottom_left = json["bottom_screen"]["left"];
+            Settings::values.custom_bottom_top = json["bottom_screen"]["top"];
+            Settings::values.custom_bottom_right = json["bottom_screen"]["right"];
+            Settings::values.custom_bottom_bottom = json["bottom_screen"]["bottom"];
+            Settings::Apply();
 
             res.status = 204;
         } catch (nlohmann::json::exception& exception) {
             res.status = 500;
             res.set_content(exception.what(), "text/plain");
         }
+    });
+
+    server->Get("/layout/default", [&](const httplib::Request& req, httplib::Response& res) {
+        Settings::values.custom_layout = false;
+        Settings::values.layout_option = Settings::LayoutOption::Default;
+        Settings::Apply();
+
+        res.status = 204;
+    });
+
+    server->Get("/layout/single", [&](const httplib::Request& req, httplib::Response& res) {
+        Settings::values.custom_layout = false;
+        Settings::values.layout_option = Settings::LayoutOption::SingleScreen;
+        Settings::Apply();
+
+        res.status = 204;
+    });
+
+    server->Get("/layout/large", [&](const httplib::Request& req, httplib::Response& res) {
+        Settings::values.custom_layout = false;
+        Settings::values.layout_option = Settings::LayoutOption::LargeScreen;
+        Settings::Apply();
+
+        res.status = 204;
+    });
+
+    server->Get("/layout/sidebyside", [&](const httplib::Request& req, httplib::Response& res) {
+        Settings::values.custom_layout = false;
+        Settings::values.layout_option = Settings::LayoutOption::SideScreen;
+        Settings::Apply();
+
+        res.status = 204;
+    });
+
+    server->Get("/layout/medium", [&](const httplib::Request& req, httplib::Response& res) {
+        Settings::values.custom_layout = false;
+        Settings::values.layout_option = Settings::LayoutOption::MediumScreen;
+        Settings::Apply();
+
+        res.status = 204;
     });
 
     request_handler_thread = std::thread([&] { server->listen("0.0.0.0", RPC_PORT); });

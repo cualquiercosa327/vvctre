@@ -43,9 +43,9 @@ FramebufferLayout DefaultFrameLayout(u32 width, u32 height, bool is_swapped);
 FramebufferLayout SingleFrameLayout(u32 width, u32 height, bool is_swapped);
 
 /**
- * Factory method for constructing a Frame with the a 4x size Top screen with a 1x size bottom
- * screen on the right
- * This is useful in particular because it matches well with a 1920x1080 resolution monitor
+ * Factory method for constructing a FramebufferLayout with the a 4x size Top screen with a 1x size
+ * bottom screen on the right This is useful in particular because it matches well with a 1920x1080
+ * resolution monitor
  * @param width Window framebuffer width in pixels
  * @param height Window framebuffer height in pixels
  * @param is_swapped if true, the bottom screen will be the large display
@@ -54,7 +54,7 @@ FramebufferLayout SingleFrameLayout(u32 width, u32 height, bool is_swapped);
 FramebufferLayout LargeFrameLayout(u32 width, u32 height, bool is_swapped);
 
 /**
- * Factory method for constructing a Frame with the Top screen and bottom
+ * Factory method for constructing a FramebufferLayout with the Top screen and bottom
  * screen side by side
  * This is useful for devices with small screens, like the GPDWin
  * @param width Window framebuffer width in pixels
@@ -63,6 +63,14 @@ FramebufferLayout LargeFrameLayout(u32 width, u32 height, bool is_swapped);
  * @return Newly created FramebufferLayout object with default screen regions initialized
  */
 FramebufferLayout SideFrameLayout(u32 width, u32 height, bool is_swapped);
+
+/**
+ * @param width Window framebuffer width in pixels
+ * @param height Window framebuffer height in pixels
+ * @param is_swapped if true, the bottom screen will be the left display
+ * @return Newly created FramebufferLayout object with default screen regions initialized
+ */
+FramebufferLayout MediumFrameLayout(u32 width, u32 height, bool is_swapped);
 
 /**
  * Factory method for constructing a custom FramebufferLayout

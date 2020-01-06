@@ -207,6 +207,26 @@ int main(int argc, char** argv) {
           clipp::option("--no-custom-layout")
               .doc("force disable custom layout")
               .set(Settings::values.custom_layout, false),
+          clipp::option("--default-layout")
+              .doc("force use default layout")
+              .set(Settings::values.custom_layout, false)
+              .set(Settings::values.layout_option, Settings::LayoutOption::Default),
+          clipp::option("--single-screen-layout")
+              .doc("force use single screen layout")
+              .set(Settings::values.custom_layout, false)
+              .set(Settings::values.layout_option, Settings::LayoutOption::SingleScreen),
+          clipp::option("--large-screen-layout")
+              .doc("force use Large Screen Small Screen layout")
+              .set(Settings::values.custom_layout, false)
+              .set(Settings::values.layout_option, Settings::LayoutOption::LargeScreen),
+          clipp::option("--side-by-side-layout")
+              .doc("force use side by side layout")
+              .set(Settings::values.custom_layout, false)
+              .set(Settings::values.layout_option, Settings::LayoutOption::SideScreen),
+          clipp::option("--medium-screen-layout")
+              .doc("force use Large Screen Medium Screen layout")
+              .set(Settings::values.custom_layout, false)
+              .set(Settings::values.layout_option, Settings::LayoutOption::MediumScreen),
           clipp::option("--swap-screens")
               .doc("force swap screens")
               .set(Settings::values.swap_screen, true),

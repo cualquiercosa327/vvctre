@@ -24,6 +24,7 @@ enum class LayoutOption {
     SingleScreen,
     LargeScreen,
     SideScreen,
+    MediumScreen,
 };
 
 enum class MicInputType {
