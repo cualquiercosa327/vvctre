@@ -20,12 +20,14 @@ RPCServer::RPCServer() {
     server = std::make_unique<httplib::Server>();
 
     server->Get("/version", [&](const httplib::Request& req, httplib::Response& res) {
-        res.set_content(nlohmann::json{
-            {"vvctre", version::vvctre.to_string()},
-            {"movie", version::movie},
-            {"shader_cache", version::shader_cache},
-        }
-                            .dump());
+        res.set_content(
+            nlohmann::json{
+                {"vvctre", version::vvctre.to_string()},
+                {"movie", version::movie},
+                {"shader_cache", version::shader_cache},
+            }
+                .dump(),
+            "application/json");
     });
 
     request_handler_thread = std::thread([&] { server->listen("0.0.0.0", RPC_PORT); });
