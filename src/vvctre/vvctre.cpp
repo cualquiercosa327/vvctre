@@ -25,6 +25,7 @@
 #include "common/param_package.h"
 #include "common/scope_exit.h"
 #include "common/string_util.h"
+#include "common/string_util.h"
 #include "common/version.h"
 #include "core/core.h"
 #include "core/dumping/backend.h"
@@ -417,7 +418,7 @@ int main(int argc, char** argv) {
 
         for (const auto& mapping : Settings::NativeButton::mapping) {
             fmt::print("Current button: {}. After pressing the enter key, press the button\n",
-                       mapping);
+                       Common::ToUpper(mapping));
             std::cin.get();
 
             const Common::ParamPackage params = GetInput(InputCommon::Polling::DeviceType::Button);
@@ -427,7 +428,7 @@ int main(int argc, char** argv) {
         for (const auto& mapping : Settings::NativeAnalog::mapping) {
             fmt::print("Current joystick: {}. After pressing the enter key, first move your "
                        "joystick to the right, and then to the bottom\n",
-                       mapping);
+                       Common::ToUpper(mapping));
             std::cin.get();
 
             const Common::ParamPackage params = GetInput(InputCommon::Polling::DeviceType::Analog);
