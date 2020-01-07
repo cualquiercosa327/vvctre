@@ -83,7 +83,7 @@ void CustomTexCache::PreloadTextures() {
     for (const auto& path : custom_texture_paths) {
         const auto& path_info = path.second;
         Core::CustomTexInfo tex_info;
-        if (lodepng::encode(path_info.path, tex_info.tex, tex_info.width, tex_info.height) == 0) {
+        if (lodepng::decode(tex_info.tex, tex_info.width, tex_info.height, path_info.path) == 0) {
             // Make sure the texture size is a power of 2
             std::bitset<32> width_bits(tex_info.width);
             std::bitset<32> height_bits(tex_info.height);
