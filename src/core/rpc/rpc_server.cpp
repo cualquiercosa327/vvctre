@@ -237,7 +237,7 @@ RPCServer::RPCServer() {
             return output;
         };
 
-        const auto convert_rgba_to_bgra = [](const std::vector<u8>& input,
+        const auto convert_bgra_to_rgba = [](const std::vector<u8>& input,
                                              const Layout::FramebufferLayout& layout) {
             int offset = 0;
             std::vector<u8> output(input.size());
@@ -256,7 +256,7 @@ RPCServer::RPCServer() {
             return output;
         };
 
-        data = convert_rgba_to_bgra(rotate(data, layout), layout);
+        data = convert_bgra_to_rgba(rotate(data, layout), layout);
 
         std::vector<u8> out;
         const u32 result = lodepng::encode(out, data, layout.width, layout.height);
