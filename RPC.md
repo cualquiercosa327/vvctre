@@ -298,3 +298,29 @@ Set custom tick settings.
   "ticks": Number
 }
 ```
+
+# GET /speedlimit
+
+Get speed limit settings.
+
+## Reply
+
+```json
+{
+  "enabled": Boolean,
+  "percentage": Number
+}
+```
+
+# POST /speedlimit
+
+Set speed limit settings.
+
+## Request
+
+```json
+{
+  "enabled": Boolean,
+  "percentage": Number
+}
+```

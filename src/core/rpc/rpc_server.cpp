@@ -409,6 +409,30 @@ RPCServer::RPCServer() {
         }
     });
 
+    server->Get("/speedlimit", [&](const httplib::Request& req, httplib::Response& res) {
+        res.set_content(
+            nlohmann::json{
+                {"enabled", Settings::values.use_frame_limit},
+                {"percentage", Settings::values.frame_limit},
+            }
+                .dump(),
+            "application/json");
+    });
+
+    server->Post("/speedlimit", [&](const httplib::Request& req, httplib::Response& res) {
+        try {
+            const nlohmann::json json = nlohmann::json::parse(req.body);
+            Settings::values.use_frame_limit = json["enabled"];
+            Settings::values.frame_limit = json["percentage"];
+            Settings::Apply();
+
+            res.status = 204;
+        } catch (nlohmann::json::exception& exception) {
+            res.status = 500;
+            res.set_content(exception.what(), "text/plain");
+        }
+    });
+
     request_handler_thread = std::thread([&] { server->listen("0.0.0.0", RPC_PORT); });
     LOG_INFO(RPC_Server, "RPC server running on port {}", RPC_PORT);
 }
