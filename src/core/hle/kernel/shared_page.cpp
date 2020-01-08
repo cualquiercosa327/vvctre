@@ -58,8 +58,8 @@ Handler::Handler(Core::Timing& timing) : timing(timing) {
                                              std::bind(&Handler::UpdateTimeCallback, this, _1, _2));
     timing.ScheduleEvent(0, update_time_event);
 
-    float slidestate = Settings::values.factor_3d / 100.0f;
-    shared_page.sliderstate_3d = static_cast<float_le>(slidestate);
+    float sliderstate = Settings::values.factor_3d / 100.0f;
+    shared_page.sliderstate_3d = static_cast<float_le>(sliderstate);
 }
 
 /// Gets system time in 3DS format. The epoch is Jan 1900, and the unit is millisecond.
@@ -118,8 +118,8 @@ void Handler::Set3DLed(u8 state) {
     shared_page.ledstate_3d = state;
 }
 
-void Handler::Set3DSlider(float slidestate) {
-    shared_page.sliderstate_3d = static_cast<float_le>(slidestate);
+void Handler::Set3DSlider(float sliderstate) {
+    shared_page.sliderstate_3d = static_cast<float_le>(sliderstate);
 }
 
 SharedPageDef& Handler::GetSharedPage() {
