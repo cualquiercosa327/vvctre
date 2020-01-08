@@ -11,14 +11,13 @@ add_executable(${PROJECT_NAME}
     resource.h
     applets/keyboard.cpp
     applets/keyboard.h
-    portable-file-dialogs.h
     $<$<BOOL:${USE_DISCORD_PRESENCE}>:discord_rp.cpp discord_rp.h>
 )
 
 create_target_directory_groups(${PROJECT_NAME})
 
 target_link_libraries(${PROJECT_NAME} PRIVATE common core input_common)
-target_link_libraries(${PROJECT_NAME} PRIVATE inih glad lodepng clipp ${PLATFORM_LIBRARIES} SDL2 Threads::Threads)
+target_link_libraries(${PROJECT_NAME} PRIVATE inih glad lodepng clipp portable-file-dialogs ${PLATFORM_LIBRARIES} SDL2 Threads::Threads)
 
 if(USE_DISCORD_PRESENCE)
     target_compile_definitions(${PROJECT_NAME} PRIVATE -DUSE_DISCORD_PRESENCE)

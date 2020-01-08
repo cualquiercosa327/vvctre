@@ -86,6 +86,10 @@ target_include_directories(httplib INTERFACE ./httplib)
 add_library(json INTERFACE)
 target_include_directories(json INTERFACE ./json)
 
+# portable-file-dialogs
+add_library(portable-file-dialogs INTERFACE)
+target_include_directories(portable-file-dialogs INTERFACE ./portable-file-dialogs/include)
+
 add_subdirectory(lodepng)
 add_subdirectory(semver)
 add_subdirectory(clipp)
