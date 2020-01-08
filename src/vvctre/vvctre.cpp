@@ -277,7 +277,7 @@ int main(int argc, char** argv) {
 
         if (EndsWithIgnoreCase(path, ".cia")) {
             const auto cia_progress = [](std::size_t written, std::size_t total) {
-                LOG_INFO(Frontend, "{:02d}%", (written * 100 / total));
+                LOG_INFO(Frontend, "{:d}%", (written * 100 / total));
             };
 
             return Service::AM::InstallCIA(path, cia_progress) ==
