@@ -533,19 +533,10 @@ boost::optional<MacAddress> NWM_UDS::GetNodeMacAddress(u16 dest_node_id, u8 flag
 void NWM_UDS::Shutdown(Kernel::HLERequestContext& ctx) {
     IPC::RequestParser rp(ctx, 0x03, 0, 0);
 
-    if (client != nullptr) {
-        client->close();
-        client->poll();
-        client.reset();
-    }
-
-    if (loop_thread != nullptr) {
-        if (loop_thread->joinable()) {
-            loop_thread->join();
-        }
-
-        loop_thread.reset();
-    }
+    initialized = false;
+    loop_thread->join();
+    loop_thread.reset();
+    client.reset();
 
     for (auto bind_node : channel_data) {
         bind_node.second.event->Signal();
@@ -632,8 +623,10 @@ ResultVal<std::shared_ptr<Kernel::Event>> NWM_UDS::Initialize(
 
     client.reset(easywsclient::WebSocket::from_url(Settings::values.multiplayer_url));
 
+    initialized = true;
+
     loop_thread = std::make_unique<std::thread>([&] {
-        while (client != nullptr && client->getReadyState() == easywsclient::WebSocket::OPEN) {
+        while (initialized) {
             client->poll();
 
             client->dispatchBinary([&](const std::vector<u8>& data) {
@@ -698,10 +691,12 @@ ResultVal<std::shared_ptr<Kernel::Event>> NWM_UDS::Initialize(
                 send_list.clear();
             }
         }
+
+        client->close();
+        client->poll();
     });
 
     current_node = node;
-    initialized = true;
 
     recv_buffer_memory = std::move(sharedmem);
     ASSERT_MSG(recv_buffer_memory->GetSize() == sharedmem_size, "Invalid shared memory size.");
@@ -1453,18 +1448,9 @@ NWM_UDS::NWM_UDS(Core::System& system) : ServiceFramework("nwm::UDS"), system(sy
 }
 
 NWM_UDS::~NWM_UDS() {
-    if (client != nullptr) {
-        client->close();
-        client->poll();
-        client.reset();
-    }
-
-    if (loop_thread != nullptr) {
-        if (loop_thread->joinable()) {
-            loop_thread->join();
-        }
-
-        loop_thread.reset();
+    if (initialized) {
+        initialized = false;
+        loop_thread->join();
     }
 
     system.CoreTiming().UnscheduleEvent(beacon_broadcast_event, 0);
