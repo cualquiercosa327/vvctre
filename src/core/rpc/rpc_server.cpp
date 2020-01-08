@@ -12,6 +12,7 @@
 #include "core/core.h"
 #include "core/hle/kernel/process.h"
 #include "core/hle/service/hid/hid.h"
+#include "core/hle/service/nfc/nfc_u.h"
 #include "core/memory.h"
 #include "core/rpc/rpc_server.h"
 #include "video_core/renderer_base.h"
@@ -302,14 +303,14 @@ RPCServer::RPCServer() {
         try {
             const nlohmann::json json = nlohmann::json::parse(req.body);
             Settings::values.custom_layout = true;
-            Settings::values.custom_top_left = json["top_screen"]["left"];
-            Settings::values.custom_top_top = json["top_screen"]["top"];
-            Settings::values.custom_top_right = json["top_screen"]["right"];
-            Settings::values.custom_top_bottom = json["top_screen"]["bottom"];
-            Settings::values.custom_bottom_left = json["bottom_screen"]["left"];
-            Settings::values.custom_bottom_top = json["bottom_screen"]["top"];
-            Settings::values.custom_bottom_right = json["bottom_screen"]["right"];
-            Settings::values.custom_bottom_bottom = json["bottom_screen"]["bottom"];
+            Settings::values.custom_top_left = json["top_screen"]["left"].get<u16>();
+            Settings::values.custom_top_top = json["top_screen"]["top"].get<u16>();
+            Settings::values.custom_top_right = json["top_screen"]["right"].get<u16>();
+            Settings::values.custom_top_bottom = json["top_screen"]["bottom"].get<u16>();
+            Settings::values.custom_bottom_left = json["bottom_screen"]["left"].get<u16>();
+            Settings::values.custom_bottom_top = json["bottom_screen"]["top"].get<u16>();
+            Settings::values.custom_bottom_right = json["bottom_screen"]["right"].get<u16>();
+            Settings::values.custom_bottom_bottom = json["bottom_screen"]["bottom"].get<u16>();
             Settings::Apply();
 
             res.status = 204;
@@ -373,9 +374,9 @@ RPCServer::RPCServer() {
     server->Post("/backgroundcolor", [&](const httplib::Request& req, httplib::Response& res) {
         try {
             const nlohmann::json json = nlohmann::json::parse(req.body);
-            Settings::values.bg_red = json["red"];
-            Settings::values.bg_green = json["green"];
-            Settings::values.bg_blue = json["blue"];
+            Settings::values.bg_red = json["red"].get<float>();
+            Settings::values.bg_green = json["green"].get<float>();
+            Settings::values.bg_blue = json["blue"].get<float>();
             Settings::Apply();
 
             res.status = 204;
@@ -398,8 +399,8 @@ RPCServer::RPCServer() {
     server->Post("/customticks", [&](const httplib::Request& req, httplib::Response& res) {
         try {
             const nlohmann::json json = nlohmann::json::parse(req.body);
-            Settings::values.use_custom_cpu_ticks = json["enabled"];
-            Settings::values.custom_cpu_ticks = json["ticks"];
+            Settings::values.use_custom_cpu_ticks = json["enabled"].get<bool>();
+            Settings::values.custom_cpu_ticks = json["ticks"].get<u64>();
             Settings::Apply();
 
             res.status = 204;
@@ -422,14 +423,40 @@ RPCServer::RPCServer() {
     server->Post("/speedlimit", [&](const httplib::Request& req, httplib::Response& res) {
         try {
             const nlohmann::json json = nlohmann::json::parse(req.body);
-            Settings::values.use_frame_limit = json["enabled"];
-            Settings::values.frame_limit = json["percentage"];
+            Settings::values.use_frame_limit = json["enabled"].get<bool>();
+            Settings::values.frame_limit = json["percentage"].get<u16>();
             Settings::Apply();
 
             res.status = 204;
         } catch (nlohmann::json::exception& exception) {
             res.status = 500;
             res.set_content(exception.what(), "text/plain");
+        }
+    });
+
+    server->Post("/amiibo", [&](const httplib::Request& req, httplib::Response& res) {
+        std::shared_ptr<Service::NFC::Module::Interface> nfc =
+            Core::System::GetInstance()
+                .ServiceManager()
+                .GetService<Service::NFC::Module::Interface>("nfc:u");
+        if (nfc == nullptr) {
+            res.status = 500;
+            res.set_content("nfc:u is null", "text/plain");
+        } else {
+            if (req.body.empty()) {
+                nfc->RemoveAmiibo();
+                res.status = 204;
+            } else if (req.body.size() == sizeof(Service::NFC::AmiiboData)) {
+                Service::NFC::AmiiboData data;
+                std::memcpy(&data, &req.body[0], sizeof(data));
+                nfc->LoadAmiibo(data);
+                res.status = 204;
+            } else {
+                res.status = 400;
+                res.set_content("invalid body size. the current amiibo is removed if the body is "
+                                "empty, or a amiibo is loaded if the body size is 540.",
+                                "text/plain");
+            }
         }
     });
 

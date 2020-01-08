@@ -324,3 +324,11 @@ Set speed limit settings.
   "percentage": Number
 }
 ```
+
+# POST /amiibo
+
+Load a amiibo or remove the current amiibo.
+
+## Request
+
+Empty body to remove the current amiibo, or amiibo file contents.
