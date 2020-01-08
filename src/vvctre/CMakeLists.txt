@@ -11,6 +11,7 @@ add_executable(${PROJECT_NAME}
     resource.h
     applets/keyboard.cpp
     applets/keyboard.h
+    portable-file-dialogs.h
     $<$<BOOL:${USE_DISCORD_PRESENCE}>:discord_rp.cpp discord_rp.h>
 )
 

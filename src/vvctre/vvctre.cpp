@@ -44,6 +44,7 @@
 #include "vvctre/applets/keyboard.h"
 #include "vvctre/config.h"
 #include "vvctre/emu_window/emu_window_sdl2.h"
+#include "vvctre/portable-file-dialogs.h"
 
 #ifdef USE_DISCORD_PRESENCE
 #include "vvctre/discord_rp.h"
@@ -92,13 +93,11 @@ int main(int argc, char** argv) {
         BootOrInstall,
         Controls,
         Version,
-    } command;
+        Usage,
+    } command = Command::BootOrInstall;
 
     auto cli =
-        ((clipp::value("path")
-              .set(command, Command::BootOrInstall)
-              .set(path)
-              .doc("executable or CIA path"),
+        ((clipp::value("path").set(path).doc("executable or CIA path"),
           clipp::option("--gdbstub").doc("enable the GDB stub") &
               clipp::value("port")
                   .set(Settings::values.use_gdbstub, true)
@@ -250,9 +249,10 @@ int main(int argc, char** argv) {
               .set(Settings::values.use_frame_limit, false)
               .doc("disable the speed limiter")) |
          clipp::command("controls").set(command, Command::Controls).doc("configure a controller") |
-         clipp::command("version").set(command, Command::Version).doc("prints vvctre's version"));
+         clipp::command("version").set(command, Command::Version).doc("prints vvctre's version") |
+         clipp::command("usage").set(command, Command::Usage).doc("prints this"));
 
-    if (!clipp::parse(argc, argv, cli)) {
+    if (!clipp::parse(argc, argv, cli) && argc > 1) {
         std::cout << clipp::make_man_page(cli, argv[0]);
         return -1;
     }
@@ -260,6 +260,20 @@ int main(int argc, char** argv) {
     switch (command) {
     case Command::BootOrInstall: {
         InitializeLogging();
+
+        if (path.empty()) {
+            const std::vector<std::string> result =
+                pfd::open_file(
+                    "Open File", ".",
+                    {"3DS Executables", "*.cci *.3ds *.cxi *.3dsx *.app *.elf *.axf *.cia"})
+                    .result();
+
+            if (result.empty()) {
+                return -1;
+            } else {
+                path = result[0];
+            }
+        }
 
         if (EndsWithIgnoreCase(path, ".cia")) {
             const auto cia_progress = [](std::size_t written, std::size_t total) {
@@ -444,6 +458,10 @@ int main(int argc, char** argv) {
     }
     case Command::Version: {
         fmt::print("{}\n", version::vvctre.to_string());
+        break;
+    }
+    case Command::Usage: {
+        std::cout << clipp::make_man_page(cli, argv[0]);
         break;
     }
     }
