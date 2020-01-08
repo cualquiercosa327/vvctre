@@ -272,3 +272,29 @@ Sets the background color.
   "blue": Number
 }
 ```
+
+# GET /customticks
+
+Get custom tick settings.
+
+## Reply
+
+```json
+{
+  "enabled": Boolean,
+  "ticks": Number
+}
+```
+
+# POST /customticks
+
+Set custom tick settings.
+
+## Request
+
+```json
+{
+  "enabled": Boolean,
+  "ticks": Number
+}
+```

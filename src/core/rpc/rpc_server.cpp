@@ -385,6 +385,30 @@ RPCServer::RPCServer() {
         }
     });
 
+    server->Get("/customticks", [&](const httplib::Request& req, httplib::Response& res) {
+        res.set_content(
+            nlohmann::json{
+                {"enabled", Settings::values.use_custom_cpu_ticks},
+                {"ticks", Settings::values.custom_cpu_ticks},
+            }
+                .dump(),
+            "application/json");
+    });
+
+    server->Post("/customticks", [&](const httplib::Request& req, httplib::Response& res) {
+        try {
+            const nlohmann::json json = nlohmann::json::parse(req.body);
+            Settings::values.use_custom_cpu_ticks = json["enabled"];
+            Settings::values.custom_cpu_ticks = json["ticks"];
+            Settings::Apply();
+
+            res.status = 204;
+        } catch (nlohmann::json::exception& exception) {
+            res.status = 500;
+            res.set_content(exception.what(), "text/plain");
+        }
+    });
+
     request_handler_thread = std::thread([&] { server->listen("0.0.0.0", RPC_PORT); });
     LOG_INFO(RPC_Server, "RPC server running on port {}", RPC_PORT);
 }
