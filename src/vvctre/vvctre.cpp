@@ -241,6 +241,12 @@ int main(int argc, char** argv) {
           clipp::option("--no-swap-screens")
               .doc("force disable swap screens")
               .set(Settings::values.swap_screen, false),
+          clipp::option("--upright-orientation")
+              .doc("force upright orientation, for book style games")
+              .set(Settings::values.upright_screen, true),
+          clipp::option("--no-upright-orientation")
+              .doc("force disable upright orientation")
+              .set(Settings::values.upright_screen, false),
           clipp::option("--fullscreen").set(fullscreen).doc("start in fullscreen mode"),
           clipp::option("--regenerate-console-id")
               .set(regenerate_console_id)
