@@ -270,15 +270,40 @@ FramebufferLayout MediumFrameLayout(unsigned width, unsigned height, bool swappe
     ASSERT(width > 0);
     ASSERT(height > 0);
 
-    FramebufferLayout res{width, height, true, true, {}, {}, true};
+    FramebufferLayout res{width, height, true, true, {}, {}, !upright};
     float window_aspect_ratio = static_cast<float>(height) / width;
-    float emulation_aspect_ratio =
-        swapped ? Core::kScreenBottomHeight * 4 /
-                      (Core::kScreenBottomWidth * 6.0f + Core::kScreenTopWidth * 0.61f)
-                : Core::kScreenTopHeight * 4 /
-                      (Core::kScreenTopWidth * 5.5f + Core::kScreenBottomWidth * 0.33f);
-    float large_screen_aspect_ratio = swapped ? BOT_SCREEN_ASPECT_RATIO : TOP_SCREEN_ASPECT_RATIO;
-    float small_screen_aspect_ratio = swapped ? TOP_SCREEN_ASPECT_RATIO : BOT_SCREEN_ASPECT_RATIO;
+    float emulation_aspect_ratio;
+    float large_screen_aspect_ratio;
+    float small_screen_aspect_ratio;
+    if (upright) {
+        if (swapped) {
+            emulation_aspect_ratio =
+                (Core::kScreenBottomWidth * 6.0f + Core::kScreenTopWidth * 0.61f) /
+                (Core::kScreenBottomHeight * 4);
+            large_screen_aspect_ratio = BOT_SCREEN_UPRIGHT_ASPECT_RATIO;
+            small_screen_aspect_ratio = TOP_SCREEN_UPRIGHT_ASPECT_RATIO;
+        } else {
+            emulation_aspect_ratio =
+                (Core::kScreenTopWidth * 5.5f + Core::kScreenBottomWidth * 0.33f) /
+                (Core::kScreenTopHeight * 4);
+            large_screen_aspect_ratio = TOP_SCREEN_UPRIGHT_ASPECT_RATIO;
+            small_screen_aspect_ratio = BOT_SCREEN_UPRIGHT_ASPECT_RATIO;
+        }
+    } else {
+        if (swapped) {
+            emulation_aspect_ratio =
+                Core::kScreenBottomHeight * 4 /
+                (Core::kScreenBottomWidth * 6.0f + Core::kScreenTopWidth * 0.61f);
+            large_screen_aspect_ratio = BOT_SCREEN_ASPECT_RATIO;
+            small_screen_aspect_ratio = TOP_SCREEN_ASPECT_RATIO;
+        } else {
+            emulation_aspect_ratio =
+                Core::kScreenTopHeight * 4 /
+                (Core::kScreenTopWidth * 5.5f + Core::kScreenBottomWidth * 0.33f);
+            large_screen_aspect_ratio = TOP_SCREEN_ASPECT_RATIO;
+            small_screen_aspect_ratio = BOT_SCREEN_ASPECT_RATIO;
+        }
+    }
 
     Common::Rectangle<u32> screen_window_area{0, 0, width, height};
     Common::Rectangle<u32> total_rect = maxRectangle(screen_window_area, emulation_aspect_ratio);
@@ -287,14 +312,19 @@ FramebufferLayout MediumFrameLayout(unsigned width, unsigned height, bool swappe
     Common::Rectangle<u32> small_screen = maxRectangle(fourth_size_rect, small_screen_aspect_ratio);
 
     if (window_aspect_ratio < emulation_aspect_ratio) {
-        large_screen =
-            large_screen.TranslateX((screen_window_area.GetWidth() - total_rect.GetWidth()) / 2);
+        large_screen = large_screen.TranslateX((width - total_rect.GetWidth()) / 2);
     } else {
         large_screen = large_screen.TranslateY((height - total_rect.GetHeight()) / 2);
     }
-    small_screen =
-        small_screen.TranslateX(large_screen.right)
-            .TranslateY(large_screen.GetHeight() + large_screen.top - small_screen.GetHeight());
+    if (upright) {
+        large_screen = large_screen.TranslateY(small_screen.GetHeight());
+        small_screen = small_screen.TranslateX(large_screen.right - small_screen.GetWidth())
+                           .TranslateY(large_screen.top - small_screen.GetHeight());
+    } else {
+        small_screen =
+            small_screen.TranslateX(large_screen.right)
+                .TranslateY(large_screen.GetHeight() + large_screen.top - small_screen.GetHeight());
+    }
     res.top_screen = swapped ? small_screen : large_screen;
     res.bottom_screen = swapped ? large_screen : small_screen;
     return res;
