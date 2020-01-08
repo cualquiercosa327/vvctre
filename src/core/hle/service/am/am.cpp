@@ -336,7 +336,7 @@ InstallStatus InstallCIA(const std::string& path,
 
     FileSys::CIAContainer container;
     if (container.Load(path) == Loader::ResultStatus::Success) {
-        Service::AM::CIAFile installFile(
+        Service::AM::CIAFile install_file(
             Service::AM::GetTitleMediaType(container.GetTitleMetadata().GetTitleID()));
 
         bool title_key_available = container.GetTicket().GetTitleKey().has_value();
@@ -351,18 +351,20 @@ InstallStatus InstallCIA(const std::string& path,
         }
 
         FileUtil::IOFile file(path, "rb");
-        if (!file.IsOpen())
+        if (!file.IsOpen()) {
             return InstallStatus::ErrorFailedToOpenFile;
+        }
 
         std::array<u8, 0x10000> buffer;
         std::size_t total_bytes_read = 0;
         while (total_bytes_read != file.GetSize()) {
             std::size_t bytes_read = file.ReadBytes(buffer.data(), buffer.size());
-            auto result = installFile.Write(static_cast<u64>(total_bytes_read), bytes_read, true,
-                                            static_cast<u8*>(buffer.data()));
+            auto result = install_file.Write(static_cast<u64>(total_bytes_read), bytes_read, true,
+                                             static_cast<u8*>(buffer.data()));
 
-            if (update_callback)
+            if (update_callback) {
                 update_callback(total_bytes_read, file.GetSize());
+            }
             if (result.Failed()) {
                 LOG_ERROR(Service_AM, "CIA file installation aborted with error code {:08x}",
                           result.Code().raw);
@@ -370,7 +372,7 @@ InstallStatus InstallCIA(const std::string& path,
             }
             total_bytes_read += bytes_read;
         }
-        installFile.Close();
+        install_file.Close();
 
         LOG_INFO(Service_AM, "Installed {} successfully.", path);
         return InstallStatus::Success;
