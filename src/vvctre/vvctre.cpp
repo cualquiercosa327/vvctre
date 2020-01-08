@@ -16,6 +16,7 @@
 #endif
 
 #include <clipp.h>
+#include <portable-file-dialogs.h>
 #include "common/common_paths.h"
 #include "common/detached_tasks.h"
 #include "common/file_util.h"
@@ -44,7 +45,6 @@
 #include "vvctre/applets/keyboard.h"
 #include "vvctre/config.h"
 #include "vvctre/emu_window/emu_window_sdl2.h"
-#include "vvctre/portable-file-dialogs.h"
 
 #ifdef USE_DISCORD_PRESENCE
 #include "vvctre/discord_rp.h"
