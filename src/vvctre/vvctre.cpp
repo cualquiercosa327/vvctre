@@ -97,7 +97,7 @@ int main(int argc, char** argv) {
     } command = Command::BootOrInstall;
 
     auto cli =
-        ((clipp::value("path").set(path).doc("executable or CIA path"),
+        ((clipp::opt_value("path").set(path).doc("executable or CIA path"),
           clipp::option("--gdbstub").doc("enable the GDB stub") &
               clipp::value("port")
                   .set(Settings::values.use_gdbstub, true)
