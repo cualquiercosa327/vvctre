@@ -247,6 +247,12 @@ int main(int argc, char** argv) {
           clipp::option("--no-upright-orientation")
               .doc("force disable upright orientation")
               .set(Settings::values.upright_screen, false),
+          clipp::option("--enable-sharper-distant-objects")
+              .doc("force enable sharper distant objects")
+              .set(Settings::values.sharper_distant_objects, true),
+          clipp::option("--disable-sharper-distant-objects")
+              .doc("force disable sharper distant objects")
+              .set(Settings::values.sharper_distant_objects, false),
           clipp::option("--fullscreen").set(fullscreen).doc("start in fullscreen mode"),
           clipp::option("--regenerate-console-id")
               .set(regenerate_console_id)
