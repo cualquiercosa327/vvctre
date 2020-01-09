@@ -316,7 +316,9 @@ int main(int argc, char** argv) {
           clipp::option("--system-clock")
               .doc("force use system clock when vvctre starts (default)")
               .set(Settings::values.init_clock, Settings::InitClock::SystemTime),
-          clipp::option("--3d-intensity").doc("set 3D intensity").set(Settings::values.factor_3d),
+          clipp::option("--3d-intensity").doc("set 3D intensity").call([](const char* value) {
+              Settings::values.factor_3d = std::atoi(value);
+          }),
           clipp::option("--nearest-filtering")
               .doc("use nearest filtering")
               .set(Settings::values.filter_mode, false),
