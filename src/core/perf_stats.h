@@ -97,11 +97,14 @@ public:
      *       to resume the emu_thread.
      */
     void SetFrameAdvancing(bool value);
+
     void AdvanceFrame();
+    bool FrameAdvancingEnabled() const;
 
 private:
     /// Emulated system time (in microseconds) at the last limiter invocation
     std::chrono::microseconds previous_system_time_us{0};
+
     /// Walltime at the last limiter invocation
     Clock::time_point previous_walltime = Clock::now();
 

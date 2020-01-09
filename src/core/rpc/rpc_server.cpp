@@ -544,6 +544,34 @@ RPCServer::RPCServer() {
         }
     });
 
+    server->Get("/frameadvancing", [&](const httplib::Request& req, httplib::Response& res) {
+        res.set_content(
+            nlohmann::json{
+                {"enabled", Core::System::GetInstance().frame_limiter.FrameAdvancingEnabled()},
+            }
+                .dump(),
+            "application/json");
+    });
+
+    server->Post("/frameadvancing", [&](const httplib::Request& req, httplib::Response& res) {
+        try {
+            const nlohmann::json json = nlohmann::json::parse(req.body);
+            Core::System::GetInstance().frame_limiter.SetFrameAdvancing(
+                json["enabled"].get<bool>());
+
+            res.status = 204;
+        } catch (nlohmann::json::exception& exception) {
+            res.status = 500;
+            res.set_content(exception.what(), "text/plain");
+        }
+    });
+
+    server->Get("/frameadvancing/advance",
+                [&](const httplib::Request& req, httplib::Response& res) {
+                    Core::System::GetInstance().frame_limiter.AdvanceFrame();
+                    res.status = 204;
+                });
+
     request_handler_thread = std::thread([&] { server->listen("0.0.0.0", RPC_PORT); });
     LOG_INFO(RPC_Server, "RPC server running on port {}", RPC_PORT);
 }

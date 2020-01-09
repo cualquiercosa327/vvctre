@@ -375,3 +375,19 @@ Get or set the resolution.
   "resolution": Number
 }
 ```
+
+# GET/POST /frameadvancing
+
+Get or set whether frame advancing is enabled.
+
+## Request/Reply
+
+```json
+{
+  "enabled": Boolean
+}
+```
+
+# GET /frameadvancing/advance
+
+Advances a frame. enables frame advancing if it isn't enabled.

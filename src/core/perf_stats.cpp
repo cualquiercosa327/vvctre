@@ -171,4 +171,8 @@ void FrameLimiter::AdvanceFrame() {
     frame_advance_event.Set();
 }
 
+bool FrameLimiter::FrameAdvancingEnabled() const {
+    return frame_advancing_enabled;
+}
+
 } // namespace Core
