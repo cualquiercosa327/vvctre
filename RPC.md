@@ -248,9 +248,21 @@ Sets the layout to Large Screen Medium Screen.
 
 Sets the layout to Large Screen Medium Screen.
 
-# GET/POST /layout/upright
+# POST /layout/upright
 
-Get/set upright orientation enabled.
+Sets upright orientation enabled.
+
+## Request
+
+```json
+{
+  "upright": Boolean
+}
+```
+
+# GET/POST /backgroundcolor
+
+Get/set background color.
 
 ## Request/Reply
 
