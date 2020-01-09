@@ -32,8 +32,15 @@ public:
         return singleton;
     }
 
+    void Destroy() {
+        filter.reset();
+    }
     void SetTextureFilter(const std::string& filter_name, u16 new_scale_factor);
-    std::tuple<TextureFilterInterface*, u16, bool> GetTextureFilter();
+    // return {filter, scale_factor}
+    std::pair<TextureFilterInterface*, u16> GetTextureFilter();
+    // returns true if filter has been changed and a cache reset is needed
+    bool IsUpdated();
+    void Reset();
 };
 
 } // namespace OpenGL

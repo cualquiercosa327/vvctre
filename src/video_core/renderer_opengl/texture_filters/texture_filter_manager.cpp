@@ -42,30 +42,26 @@ void TextureFilterManager::SetTextureFilter(const std::string& filter_name, u16 
     updated = true;
 }
 
-// <filter, scale_factor, delete cache>
-std::tuple<TextureFilterInterface*, u16, bool> TextureFilterManager::GetTextureFilter() {
-    if (!updated)
-        return {filter.get(), scale_factor, false};
-    updated = false;
+std::pair<TextureFilterInterface*, u16> TextureFilterManager::GetTextureFilter() {
+    return {filter.get(), scale_factor};
+}
 
+bool TextureFilterManager::IsUpdated() {
+    return updated;
+}
+
+void TextureFilterManager::Reset() {
     std::lock_guard<std::mutex> lock{mutex};
+    updated = false;
     auto iter = TextureFilterMap().find(name);
     if (iter == TextureFilterMap().end()) {
         LOG_ERROR(Render_OpenGL, "Invalid texture filter: {}", name);
-        return {nullptr, 0, true};
+        filter = nullptr;
+        return;
     }
 
     const auto& filter_info = iter->second;
     filter = filter_info.constructor();
-    u16 scale_unclamped = scale_factor;
-    scale_factor =
-        std::clamp(scale_factor, filter_info.clamp_scale.min, filter_info.clamp_scale.max);
-    if (scale_unclamped != scale_factor) {
-        LOG_ERROR(Render_OpenGL, "Invalid scale factor {}x for texture filter {}; Clamped to {}",
-                  scale_unclamped, name, scale_factor);
-    }
-
-    return {filter.get(), scale_factor, true};
 }
 
 } // namespace OpenGL

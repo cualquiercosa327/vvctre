@@ -1422,14 +1422,6 @@ Surface RasterizerCacheOpenGL::GetTextureSurface(
 
 Surface RasterizerCacheOpenGL::GetTextureSurface(const Pica::Texture::TextureInfo& info,
                                                  u32 max_level) {
-    auto [texture_filter, filter_scale_factor, delete_cache] =
-        TextureFilterManager::GetInstance().GetTextureFilter();
-    if (delete_cache) {
-        FlushAll();
-        while (!surface_cache.empty())
-            UnregisterSurface(*surface_cache.begin()->second.begin());
-    }
-
     if (info.physical_address == 0) {
         return nullptr;
     }
@@ -1548,7 +1540,9 @@ Surface RasterizerCacheOpenGL::GetTextureSurface(const Pica::Texture::TextureInf
         }
     }
 
-    if (surface->res_scale == 1 && texture_filter) {
+    auto [texture_filter, filter_scale_factor] =
+        TextureFilterManager::GetInstance().GetTextureFilter();
+    if (texture_filter && !surface->is_filtered) {
         SurfaceParams upscale_params = params;
         upscale_params.res_scale = filter_scale_factor;
 
@@ -1663,7 +1657,9 @@ SurfaceSurfaceRect_Tuple RasterizerCacheOpenGL::GetFramebufferSurfaces(
 
     // update resolution_scale_factor and reset cache if changed
     static u16 resolution_scale_factor = VideoCore::GetResolutionScaleFactor();
-    if (resolution_scale_factor != VideoCore::GetResolutionScaleFactor()) {
+    if (resolution_scale_factor != VideoCore::GetResolutionScaleFactor() ||
+        TextureFilterManager::GetInstance().IsUpdated()) {
+        TextureFilterManager::GetInstance().Reset();
         resolution_scale_factor = VideoCore::GetResolutionScaleFactor();
         FlushAll();
         while (!surface_cache.empty())

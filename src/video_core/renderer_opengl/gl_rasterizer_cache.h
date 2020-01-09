@@ -366,6 +366,7 @@ struct CachedSurface : SurfaceParams, std::enable_shared_from_this<CachedSurface
     std::array<std::shared_ptr<SurfaceWatcher>, 7> level_watchers;
 
     bool is_custom = false;
+    bool is_filtered = false;
     Core::CustomTexInfo custom_tex_info;
 
     static constexpr unsigned int GetGLBytesPerPixel(PixelFormat format) {
