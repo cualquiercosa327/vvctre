@@ -333,6 +333,12 @@ int main(int argc, char** argv) {
           clipp::option("--static-microphone")
               .doc("force use a microphone that returns static samples")
               .set(Settings::values.mic_input_type, Settings::MicInputType::Static),
+          clipp::option("--use-vsync")
+              .doc("force use VSync (default)")
+              .set(Settings::values.use_vsync_new, true),
+          clipp::option("--no-vsync")
+              .doc("force disable VSync")
+              .set(Settings::values.use_vsync_new, false),
           clipp::option("--fullscreen").set(fullscreen).doc("start in fullscreen mode"),
           clipp::option("--regenerate-console-id")
               .set(regenerate_console_id)
