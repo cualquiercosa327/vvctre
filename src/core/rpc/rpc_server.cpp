@@ -274,6 +274,7 @@ RPCServer::RPCServer() {
             VideoCore::g_renderer->GetRenderWindow().GetFramebufferLayout();
         res.set_content(
             nlohmann::json{
+                {"is_rotated", layout.is_rotated},
                 {"width", layout.width},
                 {"height", layout.height},
                 {"top_screen",
@@ -358,6 +359,19 @@ RPCServer::RPCServer() {
         Settings::Apply();
 
         res.status = 204;
+    });
+
+    server->Post("/layout/upright", [&](const httplib::Request& req, httplib::Response& res) {
+        try {
+            const nlohmann::json json = nlohmann::json::parse(req.body);
+            Settings::values.upright_screen = json["upright"].get<bool>();
+            Settings::Apply();
+
+            res.status = 204;
+        } catch (nlohmann::json::exception& exception) {
+            res.status = 500;
+            res.set_content(exception.what(), "text/plain");
+        }
     });
 
     server->Get("/backgroundcolor", [&](const httplib::Request& req, httplib::Response& res) {

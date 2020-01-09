@@ -173,10 +173,13 @@ Replies with a screenshot in PNG format.
 
 # GET /layout
 
+Get the current layout.
+
 ## Reply
 
 ```json
 {
+  "is_rotated": Boolean,
   "width": Number,
   "height": Number,
   "top_screen": {
@@ -241,35 +244,21 @@ Sets the layout to Side by Side.
 
 Sets the layout to Large Screen Medium Screen.
 
-# GET /backgroundcolor
+# GET /layout/mediumscreen
 
-Get the background color.
+Sets the layout to Large Screen Medium Screen.
 
-## Reply
+# GET/POST /layout/upright
 
-`red`, `green` and `blue` are floats in range 0.0-1.0.
+Get/set upright orientation enabled.
 
-```json
-{
-  "red": Number,
-  "green": Number,
-  "blue": Number
-}
-```
-
-# POST /backgroundcolor
-
-Sets the background color.
-
-## Request
-
-`red`, `green` and `blue` are floats in range 0.0-1.0.
+## Request/Reply
 
 ```json
 {
-  "red": Number,
-  "green": Number,
-  "blue": Number
+  "red": Number[0.0...1.0],
+  "green": Number[0.0...1.0],
+  "blue": Number[0.0...1.0]
 }
 ```
 
@@ -331,7 +320,7 @@ Load a amiibo or remove the current amiibo.
 
 ## Request
 
-Empty body to remove the current amiibo, or amiibo file contents.
+Empty body to remove the current amiibo, or amiibo file contents to load a amiibo.
 
 # GET/POST /3d
 
@@ -342,7 +331,7 @@ Get or set 3D settings.
 ```json
 {
   "enabled": Boolean,
-  "intensity": Number(0 - 100)
+  "intensity": Number[0...100]
 }
 ```
 
