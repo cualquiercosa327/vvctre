@@ -154,6 +154,10 @@ int main(int argc, char** argv) {
               clipp::value("device").set(Settings::values.mic_input_device),
           clipp::option("--post-processing-shader").doc("set the post processing shader name") &
               clipp::value("name").set(Settings::values.pp_shader_name),
+          clipp::option("--3d-intensity").doc("set 3D intensity") &
+              clipp::value("intensity").call([](const char* value) {
+                  Settings::values.factor_3d = std::atoi(value);
+              }),
           clipp::option("--cpu-jit")
               .doc("force use CPU JIT (default)")
               .set(Settings::values.use_cpu_jit, true),
@@ -318,9 +322,6 @@ int main(int argc, char** argv) {
           clipp::option("--system-clock")
               .doc("force use system clock when vvctre starts (default)")
               .set(Settings::values.init_clock, Settings::InitClock::SystemTime),
-          clipp::option("--3d-intensity").doc("set 3D intensity").call([](const char* value) {
-              Settings::values.factor_3d = std::atoi(value);
-          }),
           clipp::option("--nearest-filtering")
               .doc("use nearest filtering")
               .set(Settings::values.filter_mode, false),
