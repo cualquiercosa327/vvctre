@@ -106,6 +106,7 @@ void LogSettings() {
     LogSetting("min_vertices_per_thread", values.min_vertices_per_thread);
     LogSetting("layout_option", static_cast<int>(values.layout_option));
     LogSetting("swap_screen", values.swap_screen);
+    LogSetting("upright_screen", values.upright_screen);
     LogSetting("custom_layout", values.custom_layout);
     LogSetting("custom_top_left", values.custom_top_left);
     LogSetting("custom_top_top", values.custom_top_top);
