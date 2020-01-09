@@ -5,7 +5,7 @@
 #include "common/version.h"
 
 namespace version {
-const semver::version vvctre{4, 2, 0};
+const semver::version vvctre{4, 3, 0};
 const u8 movie = 1;
 const u8 shader_cache = 1;
 } // namespace version
