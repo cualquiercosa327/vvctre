@@ -342,7 +342,7 @@ Get or set 3D settings.
 ```json
 {
   "enabled": Boolean,
-  "intensity": Number
+  "intensity": Number(0 - 100)
 }
 ```
 
