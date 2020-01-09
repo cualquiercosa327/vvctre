@@ -332,3 +332,31 @@ Load a amiibo or remove the current amiibo.
 ## Request
 
 Empty body to remove the current amiibo, or amiibo file contents.
+
+# GET/POST /3d
+
+Get or set 3D settings.
+
+## Request/Reply
+
+```json
+{
+  "enabled": Boolean,
+  "intensity": Number
+}
+```
+
+# GET/POST /microphone
+
+Get or set microphone settings.
+
+## Request/Reply
+
+type = 0: none, type = 1: real, type = 2: static
+
+```json
+{
+  "type": Number,
+  "device": String
+}
+```

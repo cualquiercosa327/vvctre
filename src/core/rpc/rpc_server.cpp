@@ -460,6 +460,55 @@ RPCServer::RPCServer() {
         }
     });
 
+    server->Get("/3d", [&](const httplib::Request& req, httplib::Response& res) {
+        res.set_content(
+            nlohmann::json{
+                {"mode", static_cast<int>(Settings::values.render_3d)},
+                {"intensity", Settings::values.factor_3d.load()},
+            }
+                .dump(),
+            "application/json");
+    });
+
+    server->Post("/3d", [&](const httplib::Request& req, httplib::Response& res) {
+        try {
+            const nlohmann::json json = nlohmann::json::parse(req.body);
+            Settings::values.render_3d =
+                static_cast<Settings::StereoRenderOption>(json["mode"].get<int>());
+            Settings::values.factor_3d = json["intensity"].get<u8>();
+
+            res.status = 204;
+        } catch (nlohmann::json::exception& exception) {
+            res.status = 500;
+            res.set_content(exception.what(), "text/plain");
+        }
+    });
+
+    server->Get("/microphone", [&](const httplib::Request& req, httplib::Response& res) {
+        res.set_content(
+            nlohmann::json{
+                {"type", static_cast<int>(Settings::values.mic_input_type)},
+                {"device", Settings::values.mic_input_device},
+            }
+                .dump(),
+            "application/json");
+    });
+
+    server->Post("/microphone", [&](const httplib::Request& req, httplib::Response& res) {
+        try {
+            const nlohmann::json json = nlohmann::json::parse(req.body);
+            Settings::values.mic_input_type =
+                static_cast<Settings::MicInputType>(json["type"].get<int>());
+            Settings::values.mic_input_device = json["device"].get<std::string>();
+            Settings::Apply();
+
+            res.status = 204;
+        } catch (nlohmann::json::exception& exception) {
+            res.status = 500;
+            res.set_content(exception.what(), "text/plain");
+        }
+    });
+
     request_handler_thread = std::thread([&] { server->listen("0.0.0.0", RPC_PORT); });
     LOG_INFO(RPC_Server, "RPC server running on port {}", RPC_PORT);
 }

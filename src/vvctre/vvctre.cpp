@@ -144,14 +144,22 @@ int main(int argc, char** argv) {
           clipp::option("--background-color-blue")
                   .doc("set background color blue component to a float in range 0.0-1.0") &
               clipp::value("value").set(Settings::values.bg_blue),
+          clipp::option("--start-time")
+                  .doc("set start time to a Unix timestamp")
+                  .set(Settings::values.init_clock, Settings::InitClock::FixedTime) &
+              clipp::value("value").set(Settings::values.init_time),
+          clipp::option("--real-microphone")
+                  .doc("force use a real microphone")
+                  .set(Settings::values.mic_input_type, Settings::MicInputType::Real) &
+              clipp::value("device").set(Settings::values.mic_input_device),
           clipp::option("--cpu-jit")
-              .doc("force use CPU JIT")
+              .doc("force use CPU JIT (default)")
               .set(Settings::values.use_cpu_jit, true),
           clipp::option("--cpu-interpreter")
               .doc("force use CPU interpreter")
               .set(Settings::values.use_cpu_jit, false),
           clipp::option("--dsp-hle")
-              .doc("force use DSP HLE")
+              .doc("force use DSP HLE (default)")
               .set(Settings::values.enable_dsp_lle, false),
           clipp::option("--dsp-lle")
               .doc("force use DSP LLE single-threaded")
@@ -162,13 +170,13 @@ int main(int argc, char** argv) {
               .set(Settings::values.enable_dsp_lle, true)
               .set(Settings::values.enable_dsp_lle_multithread, true),
           clipp::option("--hardware-renderer")
-              .doc("force use hardware renderer")
+              .doc("force use hardware renderer (default)")
               .set(Settings::values.use_hw_renderer, true),
           clipp::option("--software-renderer")
               .doc("force use software renderer")
               .set(Settings::values.use_hw_renderer, false),
           clipp::option("--hardware-shader")
-              .doc("force use hardware shader")
+              .doc("force use hardware shader (default)")
               .set(Settings::values.use_hw_shader, true),
           clipp::option("--software-shader")
               .doc("force use software shader")
@@ -177,10 +185,16 @@ int main(int argc, char** argv) {
               .doc("force use accurate multiplication if using hardware shader")
               .set(Settings::values.shaders_accurate_mul, true),
           clipp::option("--inaccurate-multiplication")
-              .doc("force use inaccurate multiplication if using hardware shader")
+              .doc("force use inaccurate multiplication if using hardware shader (default)")
               .set(Settings::values.shaders_accurate_mul, false),
+          clipp::option("--shader-jit")
+              .doc("force use JIT for software shader (default)")
+              .set(Settings::values.use_shader_jit, true),
+          clipp::option("--shader-interpreter")
+              .doc("force use interpreter for software shader")
+              .set(Settings::values.use_shader_jit, false),
           clipp::option("--enable-disk-shader-caching")
-              .doc("force enable disk shader caching")
+              .doc("force enable disk shader caching (default)")
               .set(Settings::values.use_disk_shader_cache, true),
           clipp::option("--disable-disk-shader-caching")
               .doc("force disable disk shader caching")
@@ -189,31 +203,31 @@ int main(int argc, char** argv) {
               .doc("force enable ignore format reinterpretation")
               .set(Settings::values.ignore_format_reinterpretation, true),
           clipp::option("--disable-ignore-format-reinterpretation")
-              .doc("force disable ignore format reinterpretation")
+              .doc("force disable ignore format reinterpretation (default)")
               .set(Settings::values.ignore_format_reinterpretation, false),
           clipp::option("--dump-textures")
               .doc("force enable texture dumping")
               .set(Settings::values.dump_textures, true),
           clipp::option("--no-dump-textures")
-              .doc("force disable texture dumping")
+              .doc("force disable texture dumping (default)")
               .set(Settings::values.dump_textures, false),
           clipp::option("--custom-textures")
               .doc("force enable custom textures")
               .set(Settings::values.custom_textures, true),
           clipp::option("--no-custom-textures")
-              .doc("force disable custom textures")
+              .doc("force disable custom textures (default)")
               .set(Settings::values.custom_textures, false),
           clipp::option("--preload-custom-textures")
               .doc("force enable custom texture preloading")
               .set(Settings::values.preload_textures, true),
           clipp::option("--no-preload-custom-textures")
-              .doc("force disable custom texture preloading")
+              .doc("force disable custom texture preloading (default)")
               .set(Settings::values.preload_textures, false),
           clipp::option("--custom-layout")
               .doc("force use custom layout")
               .set(Settings::values.custom_layout, true),
           clipp::option("--no-custom-layout")
-              .doc("force disable custom layout")
+              .doc("force disable custom layout (default)")
               .set(Settings::values.custom_layout, false),
           clipp::option("--default-layout")
               .doc("force use default layout")
@@ -239,20 +253,82 @@ int main(int argc, char** argv) {
               .doc("force swap screens")
               .set(Settings::values.swap_screen, true),
           clipp::option("--no-swap-screens")
-              .doc("force disable swap screens")
+              .doc("force disable swap screens (default)")
               .set(Settings::values.swap_screen, false),
           clipp::option("--upright-orientation")
               .doc("force upright orientation, for book style games")
               .set(Settings::values.upright_screen, true),
           clipp::option("--no-upright-orientation")
-              .doc("force disable upright orientation")
+              .doc("force disable upright orientation (default)")
               .set(Settings::values.upright_screen, false),
           clipp::option("--enable-sharper-distant-objects")
               .doc("force enable sharper distant objects")
               .set(Settings::values.sharper_distant_objects, true),
           clipp::option("--disable-sharper-distant-objects")
-              .doc("force disable sharper distant objects")
+              .doc("force disable sharper distant objects (default)")
               .set(Settings::values.sharper_distant_objects, false),
+          clipp::option("--3d-off")
+              .doc("force disable 3D rendering (default)")
+              .set(Settings::values.render_3d, Settings::StereoRenderOption::Off),
+          clipp::option("--3d-side-by-side")
+              .doc("set 3D mode to Side by Side")
+              .set(Settings::values.render_3d, Settings::StereoRenderOption::SideBySide),
+          clipp::option("--3d-anaglyph")
+              .doc("set 3D mode to Anaglyph")
+              .set(Settings::values.render_3d, Settings::StereoRenderOption::Anaglyph),
+          clipp::option("--use-sd-card")
+              .doc("use a virtual SD card (default)")
+              .set(Settings::values.use_virtual_sd, true),
+          clipp::option("--no-sd-card")
+              .doc("don't use a virtual SD card")
+              .set(Settings::values.use_virtual_sd, false),
+          clipp::option("--old-3ds")
+              .doc("makes vvctre emulate a Old 3DS (default)")
+              .set(Settings::values.is_new_3ds, false),
+          clipp::option("--new-3ds")
+              .doc("makes vvctre emulate a New 3DS (New 3DS games crashes even if this option is "
+                   "enabled)")
+              .set(Settings::values.is_new_3ds, true),
+          clipp::option("--region-auto-select")
+              .doc("auto-select the system region (default)")
+              .set(Settings::values.region_value, Settings::REGION_VALUE_AUTO_SELECT),
+          clipp::option("--region-japan")
+              .doc("set the system region to Japan")
+              .set(Settings::values.region_value, 0),
+          clipp::option("--region-usa")
+              .doc("set the system region to USA")
+              .set(Settings::values.region_value, 1),
+          clipp::option("--region-europe")
+              .doc("set the system region to Europe")
+              .set(Settings::values.region_value, 2),
+          clipp::option("--region-australia")
+              .doc("set the system region to Australia")
+              .set(Settings::values.region_value, 3),
+          clipp::option("--region-china")
+              .doc("set the system region to China")
+              .set(Settings::values.region_value, 4),
+          clipp::option("--region-korea")
+              .doc("set the system region to Korea")
+              .set(Settings::values.region_value, 5),
+          clipp::option("--region-taiwan")
+              .doc("set the system region to Taiwan")
+              .set(Settings::values.region_value, 6),
+          clipp::option("--system-clock")
+              .doc("force use system clock when vvctre starts (default)")
+              .set(Settings::values.init_clock, Settings::InitClock::SystemTime),
+          clipp::option("--3d-intensity").doc("set 3D intensity").set(Settings::values.factor_3d),
+          clipp::option("--nearest-filtering")
+              .doc("use nearest filtering")
+              .set(Settings::values.filter_mode, false),
+          clipp::option("--linear-filtering")
+              .doc("use linear filtering (default)")
+              .set(Settings::values.filter_mode, true),
+          clipp::option("--null-microphone")
+              .doc("force use a null microphone (default)")
+              .set(Settings::values.mic_input_type, Settings::MicInputType::None),
+          clipp::option("--static-microphone")
+              .doc("force use a microphone that returns static samples")
+              .set(Settings::values.mic_input_type, Settings::MicInputType::Static),
           clipp::option("--fullscreen").set(fullscreen).doc("start in fullscreen mode"),
           clipp::option("--regenerate-console-id")
               .set(regenerate_console_id)
