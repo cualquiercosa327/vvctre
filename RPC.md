@@ -362,11 +362,11 @@ type = 0: none, type = 1: real, type = 2: static
 }
 ```
 
-# POST /resolution
+# GET/POST /resolution
 
-Set the resolution.
+Get or set the resolution.
 
-## Request
+## Request/Reply
 
 0 is a special value for `resolution` to scale resolution to window size.
 

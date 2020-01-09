@@ -523,6 +523,15 @@ RPCServer::RPCServer() {
         }
     });
 
+    server->Get("/resolution", [&](const httplib::Request& req, httplib::Response& res) {
+        res.set_content(
+            nlohmann::json{
+                {"resolution", Settings::values.resolution_factor},
+            }
+                .dump(),
+            "application/json");
+    });
+
     server->Post("/resolution", [&](const httplib::Request& req, httplib::Response& res) {
         try {
             const nlohmann::json json = nlohmann::json::parse(req.body);
