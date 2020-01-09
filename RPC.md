@@ -361,3 +361,17 @@ type = 0: none, type = 1: real, type = 2: static
   "device": String
 }
 ```
+
+# POST /resolution
+
+Set the resolution.
+
+## Request
+
+0 is a special value for `resolution` to scale resolution to window size.
+
+```json
+{
+  "resolution": Number
+}
+```
