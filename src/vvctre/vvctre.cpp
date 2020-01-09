@@ -152,6 +152,8 @@ int main(int argc, char** argv) {
                   .doc("force use a real microphone")
                   .set(Settings::values.mic_input_type, Settings::MicInputType::Real) &
               clipp::value("device").set(Settings::values.mic_input_device),
+          clipp::option("--post-processing-shader").doc("set the post processing shader name") &
+              clipp::value("name").set(Settings::values.pp_shader_name),
           clipp::option("--cpu-jit")
               .doc("force use CPU JIT (default)")
               .set(Settings::values.use_cpu_jit, true),
@@ -286,7 +288,7 @@ int main(int argc, char** argv) {
               .doc("makes vvctre emulate a Old 3DS (default)")
               .set(Settings::values.is_new_3ds, false),
           clipp::option("--new-3ds")
-              .doc("makes vvctre emulate a New 3DS (New 3DS games crashes even if this option is "
+              .doc("makes vvctre emulate a New 3DS (New 3DS games crash even if this option is "
                    "enabled)")
               .set(Settings::values.is_new_3ds, true),
           clipp::option("--region-auto-select")
