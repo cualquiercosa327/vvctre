@@ -53,8 +53,6 @@ add_library(video_core STATIC
     renderer_opengl/texture_filters/texture_filter_interface.h
     renderer_opengl/texture_filters/texture_filter_manager.cpp
     renderer_opengl/texture_filters/texture_filter_manager.h
-    renderer_opengl/texture_filters/xbrz_cpu.cpp
-    renderer_opengl/texture_filters/xbrz_cpu.h
     renderer_opengl/texture_filters/xbrz_freescale.cpp
     renderer_opengl/texture_filters/xbrz_freescale.h
     shader/debug_data.h
@@ -100,7 +98,7 @@ endif()
 create_target_directory_groups(video_core)
 
 target_link_libraries(video_core PUBLIC common core)
-target_link_libraries(video_core PRIVATE glad nihstro-headers xbrz)
+target_link_libraries(video_core PRIVATE glad nihstro-headers)
 
 if (ARCHITECTURE_x86_64)
     target_link_libraries(video_core PUBLIC xbyak)

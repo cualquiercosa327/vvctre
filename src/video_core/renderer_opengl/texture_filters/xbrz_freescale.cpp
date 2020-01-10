@@ -33,20 +33,28 @@ XbrzFreescale::XbrzFreescale() {
     cur_state.Apply();
 }
 
-void XbrzFreescale::scale(const Surface& src_surface, const Surface& dst_surface) {
-    OpenGLState cur_state = OpenGLState::GetCurState();
+void XbrzFreescale::scale(const Surface& surface) {
+    const OpenGLState cur_state = OpenGLState::GetCurState();
 
-    state.texture_units[0].texture_2d = src_surface->texture.handle;
-    auto dst_rect = dst_surface->GetScaledRect();
-    state.viewport = {(GLint)dst_rect.left, (GLint)dst_rect.bottom, (GLint)dst_rect.GetWidth(),
-                      (GLint)dst_rect.GetHeight()};
+    state.texture_units[0].texture_2d = surface->texture.handle;
+    surface->res_scale *= scale_factor;
+    const auto dest_rect = surface->GetScaledRect();
+
+    OGLTexture dest_tex;
+    dest_tex.Create();
+    AllocateSurfaceTexture(dest_tex.handle, GetFormatTuple(surface->pixel_format),
+                           dest_rect.GetWidth(), dest_rect.GetHeight());
+
+    state.viewport = {(GLint)dest_rect.left, (GLint)dest_rect.bottom, (GLint)dest_rect.GetWidth(),
+                      (GLint)dest_rect.GetHeight()};
     state.Apply();
 
-    glUniform2i(output_size, dst_rect.GetWidth(), dst_rect.GetHeight());
+    glUniform2i(output_size, dest_rect.GetWidth(), dest_rect.GetHeight());
     glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D,
-                           dst_surface->texture.handle, 0);
+                           dest_tex.handle, 0);
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
     glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, NULL, 0);
+    surface->texture = std::move(dest_tex);
 
     cur_state.Apply();
 }

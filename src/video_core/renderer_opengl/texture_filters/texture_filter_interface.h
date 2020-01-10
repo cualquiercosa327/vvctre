@@ -16,7 +16,8 @@ using Surface = std::shared_ptr<CachedSurface>;
 
 class TextureFilterInterface {
 public:
-    virtual void scale(const Surface& src_surface, const Surface& dst_surface) = 0;
+    u16 scale_factor{};
+    virtual void scale(const Surface& surface) = 0;
     virtual ~TextureFilterInterface() = default;
 };
 

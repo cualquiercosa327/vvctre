@@ -52,35 +52,40 @@ Anime4kUltrafast::Anime4kUltrafast() {
     cur_state.Apply();
 }
 
-void Anime4kUltrafast::scale(const Surface& src_surface, const Surface& dst_surface) {
-    auto cur_state = OpenGLState::GetCurState();
+void Anime4kUltrafast::scale(const Surface& surface) {
+    const auto cur_state = OpenGLState::GetCurState();
     glActiveTexture(GL_TEXTURE0);
 
-    auto dst_rect = dst_surface->GetScaledRect();
-    state.viewport = {(GLint)dst_rect.left, (GLint)dst_rect.bottom, (GLint)dst_rect.GetWidth(),
-                      (GLint)dst_rect.GetHeight()};
+    surface->res_scale *= scale_factor;
+    const auto dest_rect = surface->GetScaledRect();
+    OGLTexture dest_tex;
+    dest_tex.Create();
+    AllocateSurfaceTexture(dest_tex.handle, GetFormatTuple(surface->pixel_format),
+                           dest_rect.GetWidth(), dest_rect.GetHeight());
+    state.viewport = {(GLint)dest_rect.left, (GLint)dest_rect.bottom, (GLint)dest_rect.GetWidth(),
+                      (GLint)dest_rect.GetHeight()};
     struct {
         GLfloat x, y;
-    } d{1.f / dst_rect.GetWidth(), 1.f / dst_rect.GetHeight()};
+    } d{1.f / dest_rect.GetWidth(), 1.f / dest_rect.GetHeight()};
 
     // gradient x pass
-    state.texture_units[0].texture_2d = src_surface->texture.handle;
+    state.texture_units[0].texture_2d = surface->texture.handle;
     state.draw.draw_framebuffer = out_fbo.handle;
     state.draw.shader_program = gradient_program.prog.handle;
     state.Apply();
 
     glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D,
-                           dst_surface->texture.handle, 0);
-    AllocateSurfaceTexture(LUMAD.tex.handle, GetFormatTuple(dst_surface->pixel_format),
-                           dst_rect.GetWidth(), dst_rect.GetHeight());
-    AllocateSurfaceTexture(LUMAG.tex.handle, GetFormatTuple(dst_surface->pixel_format),
-                           dst_rect.GetWidth(), dst_rect.GetHeight());
+                           dest_tex.handle, 0);
+    AllocateSurfaceTexture(LUMAD.tex.handle, GetFormatTuple(surface->pixel_format),
+                           dest_rect.GetWidth(), dest_rect.GetHeight());
+    AllocateSurfaceTexture(LUMAG.tex.handle, GetFormatTuple(surface->pixel_format),
+                           dest_rect.GetWidth(), dest_rect.GetHeight());
 
     glUniform2f(gradient_program.d, d.x, 0);
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
     // gradient y pass
-    state.texture_units[0].texture_2d = dst_surface->texture.handle;
+    state.texture_units[0].texture_2d = dest_tex.handle;
     state.draw.draw_framebuffer = LUMAD.fbo.handle;
     state.Apply();
     glUniform2f(gradient_program.d, 0, d.y);
@@ -95,19 +100,21 @@ void Anime4kUltrafast::scale(const Surface& src_surface, const Surface& dst_surf
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
     // gradient y pass
-    state.texture_units[0].texture_2d = dst_surface->texture.handle;
+    state.texture_units[0].texture_2d = dest_tex.handle;
     state.draw.draw_framebuffer = LUMAG.fbo.handle;
     state.Apply();
     glUniform2f(gaussian_program.d, 0, d.y);
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
     // refine pass
-    state.texture_units[0].texture_2d = src_surface->texture.handle;
+    state.texture_units[0].texture_2d = surface->texture.handle;
     state.draw.draw_framebuffer = out_fbo.handle;
     state.draw.shader_program = refine_program.prog.handle;
     state.Apply();
     glUniform2f(refine_program.d, d.x, d.y);
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+
+    surface->texture = std::move(dest_tex);
 
     glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, 0, 0);
     cur_state.Apply();

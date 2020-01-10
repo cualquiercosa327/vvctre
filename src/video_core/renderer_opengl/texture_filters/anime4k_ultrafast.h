@@ -293,7 +293,7 @@ public:
     }
 
     Anime4kUltrafast();
-    void scale(const Surface& src_surface, const Surface& dst_surface) override;
+    void scale(const Surface& surface) override;
 };
 
 } // namespace OpenGL

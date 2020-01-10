@@ -5,7 +5,6 @@
 #include "common/logging/log.h"
 #include "video_core/renderer_opengl/texture_filters/anime4k_ultrafast.h"
 #include "video_core/renderer_opengl/texture_filters/texture_filter_manager.h"
-#include "video_core/renderer_opengl/texture_filters/xbrz_cpu.h"
 #include "video_core/renderer_opengl/texture_filters/xbrz_freescale.h"
 
 namespace OpenGL {
@@ -28,7 +27,6 @@ const std::map<std::string, TextureFilterInfo>& TextureFilterManager::TextureFil
         FilterMapPair<NoFilter>,
         FilterMapPair<Anime4kUltrafast>,
         FilterMapPair<XbrzFreescale>,
-        FilterMapPair<XbrzCpu>,
     };
     return filter_map;
 }
@@ -42,8 +40,8 @@ void TextureFilterManager::SetTextureFilter(const std::string& filter_name, u16 
     updated = true;
 }
 
-std::pair<TextureFilterInterface*, u16> TextureFilterManager::GetTextureFilter() {
-    return {filter.get(), scale_factor};
+TextureFilterInterface* TextureFilterManager::GetTextureFilter() {
+    return filter.get();
 }
 
 bool TextureFilterManager::IsUpdated() {
@@ -62,6 +60,13 @@ void TextureFilterManager::Reset() {
 
     const auto& filter_info = iter->second;
     filter = filter_info.constructor();
+    u16 clamped_scale =
+        std::clamp(scale_factor, filter_info.clamp_scale.min, filter_info.clamp_scale.max);
+    if (clamped_scale != scale_factor)
+        LOG_ERROR(Render_OpenGL, "Invalid scale factor {} for texture filter {}, clamped to {}",
+                  scale_factor, filter_info.name, clamped_scale);
+    if (filter)
+        filter->scale_factor = clamped_scale;
 }
 
 } // namespace OpenGL

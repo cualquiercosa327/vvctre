@@ -1352,7 +1352,6 @@ SurfaceRect_Tuple RasterizerCacheOpenGL::GetSurfaceSubRect(const SurfaceParams& 
         surface = FindMatch<MatchFlags::SubRect | MatchFlags::Invalid>(surface_cache, params,
                                                                        ScaleMatch::Ignore);
         if (surface != nullptr) {
-            ASSERT(surface->res_scale < params.res_scale);
             SurfaceParams new_params = *surface;
             new_params.res_scale = params.res_scale;
 
@@ -1518,7 +1517,7 @@ Surface RasterizerCacheOpenGL::GetTextureSurface(const Pica::Texture::TextureInf
                 }
                 state.ResetTexture(level_surface->texture.handle);
                 state.Apply();
-                if (!surface->is_custom) {
+                if (!(surface->is_custom | surface->is_filtered)) {
                     glFramebufferTexture2D(GL_READ_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D,
                                            level_surface->texture.handle, 0);
                     glFramebufferTexture2D(GL_READ_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT,
@@ -1540,20 +1539,11 @@ Surface RasterizerCacheOpenGL::GetTextureSurface(const Pica::Texture::TextureInf
         }
     }
 
-    auto [texture_filter, filter_scale_factor] =
-        TextureFilterManager::GetInstance().GetTextureFilter();
-    if (texture_filter && !surface->is_filtered) {
-        SurfaceParams upscale_params = params;
-        upscale_params.res_scale = filter_scale_factor;
-
-        Surface upscaled_surface = CreateSurface(upscale_params);
-        upscaled_surface->invalid_regions.clear();
-        RegisterSurface(upscaled_surface);
-        remove_surfaces.emplace(surface);
-
-        texture_filter->scale(surface, upscaled_surface);
-
-        return upscaled_surface;
+    TextureFilterInterface* texture_filter;
+    if (surface->res_scale == 1 && !(surface->is_filtered | surface->is_custom) &&
+        (texture_filter = TextureFilterManager::GetInstance().GetTextureFilter())) {
+        texture_filter->scale(surface);
+        surface->is_filtered = true;
     }
     return surface;
 }

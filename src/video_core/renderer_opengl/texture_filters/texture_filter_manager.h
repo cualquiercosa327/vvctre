@@ -37,7 +37,7 @@ public:
     }
     void SetTextureFilter(const std::string& filter_name, u16 new_scale_factor);
     // return {filter, scale_factor}
-    std::pair<TextureFilterInterface*, u16> GetTextureFilter();
+    TextureFilterInterface* GetTextureFilter();
     // returns true if filter has been changed and a cache reset is needed
     bool IsUpdated();
     void Reset();
