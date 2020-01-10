@@ -361,6 +361,19 @@ RPCServer::RPCServer() {
         res.status = 204;
     });
 
+    server->Post("/layout/swapscreens", [&](const httplib::Request& req, httplib::Response& res) {
+        try {
+            const nlohmann::json json = nlohmann::json::parse(req.body);
+            Settings::values.swap_screen = json["enabled"].get<bool>();
+            Settings::Apply();
+
+            res.status = 204;
+        } catch (nlohmann::json::exception& exception) {
+            res.status = 500;
+            res.set_content(exception.what(), "text/plain");
+        }
+    });
+
     server->Post("/layout/upright", [&](const httplib::Request& req, httplib::Response& res) {
         try {
             const nlohmann::json json = nlohmann::json::parse(req.body);

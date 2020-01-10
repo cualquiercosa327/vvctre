@@ -244,9 +244,17 @@ Sets the layout to Side by Side.
 
 Sets the layout to Large Screen Medium Screen.
 
-# GET /layout/mediumscreen
+# POST /layout/swapscreens
 
-Sets the layout to Large Screen Medium Screen.
+Sets swap screens enabled.
+
+## Request
+
+```json
+{
+  "enabled": Boolean
+}
+```
 
 # POST /layout/upright
 
