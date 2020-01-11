@@ -629,7 +629,7 @@ Get or set whether custom texture preloading is enabled.
 # GET/POST /usecpujit
 
 Get or set whether the CPU JIT is used instead of the interpreter.  
-Changing this setting does nothing currently.
+This endpoint does nothing currently.
 
 ## Request/Reply
 
@@ -666,7 +666,7 @@ Get or set DSP emulation settings.
 
 # GET/POST /audioengine
 
-Get or set the audio engine.
+Get or set the audio output engine.
 
 ## Request/Reply
 
@@ -678,7 +678,7 @@ Get or set the audio engine.
 
 # GET/POST /audiostretching
 
-Get or set whether audio stretching is enabled.
+Get or set whether audio output stretching is enabled.
 
 ## Request/Reply
 
@@ -690,7 +690,7 @@ Get or set whether audio stretching is enabled.
 
 # GET/POST /audiodevice
 
-Get or set the audio device.
+Get or set the audio output device.
 
 ## Request/Reply
 
@@ -702,7 +702,7 @@ Get or set the audio device.
 
 # GET/POST /audiovolume
 
-Get or set the audio volume.
+Get or set the audio output volume.
 
 ## Request/Reply
 
@@ -714,7 +714,7 @@ Get or set the audio volume.
 
 # GET/POST /audiospeed
 
-Get or set the audio speed.
+Get or set the audio output speed.
 
 ## Request/Reply
 
@@ -727,7 +727,7 @@ Get or set the audio speed.
 # GET/POST /usevirtualsdcard
 
 Get or set whether a virtual SD card is used.  
-Changing this setting does nothing currently.
+This endpoint does nothing currently.
 
 ## Request/Reply
 
@@ -753,7 +753,7 @@ This doesn't fix New 3DS game crashes.
 # GET/POST /region
 
 Get or set the console's region.  
-Changing this setting does nothing currently.
+This endpoint does nothing currently.
 
 ## Request/Reply
 
@@ -766,7 +766,7 @@ Changing this setting does nothing currently.
 # GET/POST /startclock
 
 Get or set the time to use when emulation starts.  
-Changing this setting does nothing currently.
+This endpoint does nothing currently.
 
 ## Request/Reply
 
@@ -780,7 +780,7 @@ Changing this setting does nothing currently.
 # GET/POST /usevsync
 
 Get or set whether VSync is enabled.  
-Changing this setting does nothing currently.
+This endpoint does nothing currently.
 
 ## Request/Reply
 
@@ -843,7 +843,8 @@ Get or set GDB stub enabled and port.
 
 # GET/POST /llemodules
 
-Get or set LLE modules enabled.
+Get or set LLE modules.  
+This endpoint does nothing currently.
 
 ## Request/Reply
 
