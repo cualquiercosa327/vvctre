@@ -96,20 +96,60 @@ int main(int argc, char** argv) {
         Usage,
     } command = Command::BootOrInstall;
 
-    clipp::group controls;
+    clipp::group controls, cameras, lle_modules;
     for (int i = 0; i < Settings::NativeButton::NumButtons; i++) {
         controls.push_back(
             clipp::option(fmt::format("--{}", Settings::NativeButton::mapping[i]))
-                .set(Settings::values.current_input_profile.buttons[i])
                 .doc(fmt::format("Set button {}",
-                                 Common::ToUpper(Settings::NativeButton::mapping[i]))));
+                                 Common::ToUpper(Settings::NativeButton::mapping[i]))) &
+            clipp::value("value").set(Settings::values.current_input_profile.buttons[i]));
     }
     for (int i = 0; i < Settings::NativeAnalog::NumAnalogs; i++) {
         controls.push_back(
             clipp::option(fmt::format("--{}", Settings::NativeAnalog::mapping[i]))
-                .set(Settings::values.current_input_profile.analogs[i])
                 .doc(fmt::format("Set analog {}",
-                                 Common::ToUpper(Settings::NativeAnalog::mapping[i]))));
+                                 Common::ToUpper(Settings::NativeAnalog::mapping[i]))) &
+            clipp::value("value").set(Settings::values.current_input_profile.analogs[i]));
+    }
+    for (int i = 0; i < Service::CAM::NumCameras; i++) {
+        std::string camera;
+        switch (i) {
+        case Service::CAM::OuterRightCamera: {
+            camera = "outer right";
+            break;
+        }
+        case Service::CAM::InnerCamera: {
+            camera = "inner";
+            break;
+        }
+        case Service::CAM::OuterLeftCamera: {
+            camera = "outer left";
+            break;
+        }
+        }
+
+        const std::string camera_name_for_option = Common::ReplaceAll(camera, " ", "-");
+
+        cameras.push_back(clipp::option(fmt::format("--{}-camera-engine", camera_name_for_option))
+                              .doc(fmt::format("set {} camera engine. default: blank", camera)) &
+                          clipp::value("value").set(Settings::values.camera_name[i]));
+
+        cameras.push_back(
+            clipp::option(fmt::format("--{}-camera-configuration", camera_name_for_option))
+                .doc(fmt::format("set {} camera configuration", camera)) &
+            clipp::value("value").set(Settings::values.camera_config[i]));
+
+        cameras.push_back(clipp::option(fmt::format("--{}-camera-flip", camera_name_for_option))
+                              .doc(fmt::format("set {} camera flip (0: None (default), 1: "
+                                               "Horizontal, 2: Vertical, 3: Reverse)",
+                                               camera)) &
+                          clipp::value("value").set(Settings::values.camera_flip[i]));
+    }
+    for (auto& service_module : Service::service_module_map) {
+        lle_modules.push_back(
+            clipp::option(fmt::format("--lle-{}-module", Common::ToLower(service_module.name)))
+                .set(Settings::values.lle_modules[service_module.name], true)
+                .doc(fmt::format("LLE the {} module", service_module.name)));
     }
 
     auto cli =
@@ -151,6 +191,10 @@ int main(int argc, char** argv) {
                   .doc("set audio speed for DSP HLE to a float, must be greater than zero and "
                        "requires audio stretching to be enabled to work properly") &
               clipp::value("value").set(Settings::values.audio_speed),
+          clipp::option("--audio-volume").doc("set audio volume") &
+              clipp::value("value").set(Settings::values.volume),
+          clipp::option("--audio-engine").doc("set audio engine") &
+              clipp::value("name").set(Settings::values.sink_id),
           clipp::option("--background-color-red")
                   .doc("set background color red component to a float in range 0.0-1.0") &
               clipp::value("value").set(Settings::values.bg_red),
@@ -174,7 +218,7 @@ int main(int argc, char** argv) {
               clipp::value("intensity").call([](const char* value) {
                   Settings::values.factor_3d = std::atoi(value);
               }),
-          controls,
+          controls, cameras, lle_modules,
           clipp::option("--cpu-jit")
               .doc("force use CPU JIT (default)")
               .set(Settings::values.use_cpu_jit, true),
@@ -357,6 +401,18 @@ int main(int argc, char** argv) {
           clipp::option("--no-vsync")
               .doc("force disable VSync")
               .set(Settings::values.use_vsync_new, false),
+          clipp::option("--enable-audio-stretching")
+              .doc("force enable audio stretching (default)")
+              .set(Settings::values.enable_audio_stretching, true),
+          clipp::option("--disable-audio-stretching")
+              .doc("force disable audio stretching")
+              .set(Settings::values.enable_audio_stretching, false),
+          clipp::option("--enable-frame-time-recording")
+              .doc("force enable frame time recording")
+              .set(Settings::values.record_frame_times, true),
+          clipp::option("--disable-frame-time-recording")
+              .doc("force disable frame time recording (default)")
+              .set(Settings::values.record_frame_times, false),
           clipp::option("--fullscreen").set(fullscreen).doc("start in fullscreen mode"),
           clipp::option("--regenerate-console-id")
               .set(regenerate_console_id)
