@@ -96,6 +96,22 @@ int main(int argc, char** argv) {
         Usage,
     } command = Command::BootOrInstall;
 
+    clipp::group controls;
+    for (int i = 0; i < Settings::NativeButton::NumButtons; i++) {
+        controls.push_back(
+            clipp::option(fmt::format("--{}", Settings::NativeButton::mapping[i]))
+                .set(Settings::values.current_input_profile.buttons[i])
+                .doc(fmt::format("Set button {}",
+                                 Common::ToUpper(Settings::NativeButton::mapping[i]))));
+    }
+    for (int i = 0; i < Settings::NativeAnalog::NumAnalogs; i++) {
+        controls.push_back(
+            clipp::option(fmt::format("--{}", Settings::NativeAnalog::mapping[i]))
+                .set(Settings::values.current_input_profile.analogs[i])
+                .doc(fmt::format("Set analog {}",
+                                 Common::ToUpper(Settings::NativeAnalog::mapping[i]))));
+    }
+
     auto cli =
         ((clipp::opt_value("path").set(path).doc("executable or CIA path"),
           clipp::option("--gdbstub").doc("enable the GDB stub") &
@@ -158,6 +174,7 @@ int main(int argc, char** argv) {
               clipp::value("intensity").call([](const char* value) {
                   Settings::values.factor_3d = std::atoi(value);
               }),
+          controls,
           clipp::option("--cpu-jit")
               .doc("force use CPU JIT (default)")
               .set(Settings::values.use_cpu_jit, true),
