@@ -41,6 +41,7 @@ PerfStats::~PerfStats() {
     // %F Date format expanded is "%Y-%m-%d"
     const std::string filename =
         fmt::format("{}/{:%F-%H-%M}_{:016X}.csv", path, *std::localtime(&t), title_id);
+    FileUtil::CreateFullPath(filename);
     FileUtil::IOFile file(filename, "w");
     file.WriteString(stream.str());
 }
