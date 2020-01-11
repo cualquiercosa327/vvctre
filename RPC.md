@@ -653,7 +653,8 @@ Get or set whether ignore format reinterpretation is enabled.
 
 # GET/POST /dspemulation
 
-Get or set DSP emulation settings.
+Get or set DSP emulation settings.  
+This endpoint does nothing currently.
 
 ## Request/Reply
 
