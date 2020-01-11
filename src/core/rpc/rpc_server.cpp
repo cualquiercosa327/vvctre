@@ -803,7 +803,7 @@ RPCServer::RPCServer() {
     server->Get("/filtermode", [&](const httplib::Request& req, httplib::Response& res) {
         res.set_content(
             nlohmann::json{
-                {"enabled", Settings::values.filter_mode ? "linear" : "nearest"},
+                {"mode", Settings::values.filter_mode ? "linear" : "nearest"},
             }
                 .dump(),
             "application/json");
