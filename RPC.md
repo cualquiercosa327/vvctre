@@ -533,18 +533,6 @@ Get or set whether the shader JIT is used instead of the interpreter for softwar
 }
 ```
 
-# GET/POST /useshaderjit
-
-Get or set whether the shader JIT is used instead of the interpreter for software shader.
-
-## Request/Reply
-
-```json
-{
-  "enabled": Boolean
-}
-```
-
 # GET /filtermode
 
 Get the filtering mode.
