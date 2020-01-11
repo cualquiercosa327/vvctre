@@ -195,16 +195,6 @@ using Headers = std::multimap<std::string, std::string, detail::ci>;
 using Params = std::multimap<std::string, std::string>;
 using Match = std::smatch;
 
-using DataSink = std::function<void(const char *data, size_t data_len)>;
-
-using Done = std::function<void()>;
-
-using ContentProvider =
-    std::function<void(size_t offset, size_t length, DataSink sink)>;
-
-using ContentProviderWithCloser =
-    std::function<void(size_t offset, size_t length, DataSink sink, Done done)>;
-
 using Progress = std::function<bool(uint64_t current, uint64_t total)>;
 
 struct Response;
@@ -218,6 +208,22 @@ struct MultipartFormData {
 };
 using MultipartFormDataItems = std::vector<MultipartFormData>;
 using MultipartFormDataMap = std::multimap<std::string, MultipartFormData>;
+
+class DataSink {
+public:
+  DataSink() = default;
+  DataSink(const DataSink &) = delete;
+  DataSink &operator=(const DataSink &) = delete;
+  DataSink(DataSink &&) = delete;
+  DataSink &operator=(DataSink &&) = delete;
+
+  std::function<void(const char *data, size_t data_len)> write;
+  std::function<void()> done;
+  // TODO: std::function<bool()> is_alive;
+};
+
+using ContentProvider =
+    std::function<void(size_t offset, size_t length, DataSink &sink)>;
 
 using ContentReceiver =
     std::function<bool(const char *data, size_t data_length)>;
@@ -294,7 +300,7 @@ struct Request {
 
 struct Response {
   std::string version;
-  int status;
+  int status = -1;
   Headers headers;
   std::string body;
 
@@ -310,15 +316,19 @@ struct Response {
 
   void set_content_provider(
       size_t length,
-      std::function<void(size_t offset, size_t length, DataSink sink)> provider,
+      std::function<void(size_t offset, size_t length, DataSink &sink)>
+          provider,
       std::function<void()> resource_releaser = [] {});
 
   void set_chunked_content_provider(
-      std::function<void(size_t offset, DataSink sink, Done done)> provider,
+      std::function<void(size_t offset, DataSink &sink)> provider,
       std::function<void()> resource_releaser = [] {});
 
-  Response() : status(-1), content_length(0) {}
-
+  Response() = default;
+  Response(const Response &) = default;
+  Response &operator=(const Response &) = default;
+  Response(Response &&) = default;
+  Response &operator=(Response &&) = default;
   ~Response() {
     if (content_provider_resource_releaser) {
       content_provider_resource_releaser();
@@ -326,8 +336,8 @@ struct Response {
   }
 
   // private members...
-  size_t content_length;
-  ContentProviderWithCloser content_provider;
+  size_t content_length = 0;
+  ContentProvider content_provider;
   std::function<void()> content_provider_resource_releaser;
 };
 
@@ -342,41 +352,6 @@ public:
 
   template <typename... Args>
   int write_format(const char *fmt, const Args &... args);
-};
-
-class SocketStream : public Stream {
-public:
-  SocketStream(socket_t sock, time_t read_timeout_sec,
-               time_t read_timeout_usec);
-  ~SocketStream() override;
-
-  int read(char *ptr, size_t size) override;
-  int write(const char *ptr, size_t size) override;
-  int write(const char *ptr) override;
-  int write(const std::string &s) override;
-  std::string get_remote_addr() const override;
-
-private:
-  socket_t sock_;
-  time_t read_timeout_sec_;
-  time_t read_timeout_usec_;
-};
-
-class BufferStream : public Stream {
-public:
-  BufferStream() = default;
-  ~BufferStream() override = default;
-
-  int read(char *ptr, size_t size) override;
-  int write(const char *ptr, size_t size) override;
-  int write(const char *ptr) override;
-  int write(const std::string &s) override;
-  std::string get_remote_addr() const override;
-
-  const std::string &get_buffer() const;
-
-private:
-  std::string buffer;
 };
 
 class TaskQueue {
@@ -846,25 +821,6 @@ inline void Post(std::vector<Request> &requests, const char *path,
 }
 
 #ifdef CPPHTTPLIB_OPENSSL_SUPPORT
-class SSLSocketStream : public Stream {
-public:
-  SSLSocketStream(socket_t sock, SSL *ssl, time_t read_timeout_sec,
-                  time_t read_timeout_usec);
-  virtual ~SSLSocketStream();
-
-  virtual int read(char *ptr, size_t size);
-  virtual int write(const char *ptr, size_t size);
-  virtual int write(const char *ptr);
-  virtual int write(const std::string &s);
-  virtual std::string get_remote_addr() const;
-
-private:
-  socket_t sock_;
-  SSL *ssl_;
-  time_t read_timeout_sec_;
-  time_t read_timeout_usec_;
-};
-
 class SSLServer : public Server {
 public:
   SSLServer(const char *cert_path, const char *private_key_path,
@@ -1261,6 +1217,63 @@ inline bool wait_until_socket_is_ready(socket_t sock, time_t sec, time_t usec) {
 #endif
 }
 
+class SocketStream : public Stream {
+public:
+  SocketStream(socket_t sock, time_t read_timeout_sec,
+               time_t read_timeout_usec);
+  ~SocketStream() override;
+
+  int read(char *ptr, size_t size) override;
+  int write(const char *ptr, size_t size) override;
+  int write(const char *ptr) override;
+  int write(const std::string &s) override;
+  std::string get_remote_addr() const override;
+
+private:
+  socket_t sock_;
+  time_t read_timeout_sec_;
+  time_t read_timeout_usec_;
+};
+
+#ifdef CPPHTTPLIB_OPENSSL_SUPPORT
+class SSLSocketStream : public Stream {
+public:
+  SSLSocketStream(socket_t sock, SSL *ssl, time_t read_timeout_sec,
+                  time_t read_timeout_usec);
+  virtual ~SSLSocketStream();
+
+  virtual int read(char *ptr, size_t size);
+  virtual int write(const char *ptr, size_t size);
+  virtual int write(const char *ptr);
+  virtual int write(const std::string &s);
+  virtual std::string get_remote_addr() const;
+
+private:
+  socket_t sock_;
+  SSL *ssl_;
+  time_t read_timeout_sec_;
+  time_t read_timeout_usec_;
+};
+#endif
+
+class BufferStream : public Stream {
+public:
+  BufferStream() = default;
+  ~BufferStream() override = default;
+
+  int read(char *ptr, size_t size) override;
+  int write(const char *ptr, size_t size) override;
+  int write(const char *ptr) override;
+  int write(const std::string &s) override;
+  std::string get_remote_addr() const override;
+
+  const std::string &get_buffer() const;
+
+private:
+  std::string buffer;
+  int position = 0;
+};
+
 template <typename T>
 inline bool process_socket(bool is_client_request, socket_t sock,
                            size_t keep_alive_max_count, time_t read_timeout_sec,
@@ -1273,8 +1286,8 @@ inline bool process_socket(bool is_client_request, socket_t sock,
     auto count = keep_alive_max_count;
     while (count > 0 &&
            (is_client_request ||
-            detail::select_read(sock, CPPHTTPLIB_KEEPALIVE_TIMEOUT_SECOND,
-                                CPPHTTPLIB_KEEPALIVE_TIMEOUT_USECOND) > 0)) {
+            select_read(sock, CPPHTTPLIB_KEEPALIVE_TIMEOUT_SECOND,
+                        CPPHTTPLIB_KEEPALIVE_TIMEOUT_USECOND) > 0)) {
       SocketStream strm(sock, read_timeout_sec, read_timeout_usec);
       auto last_connection = count == 1;
       auto connection_close = false;
@@ -1543,6 +1556,7 @@ find_content_type(const std::string &path,
 inline const char *status_message(int status) {
   switch (status) {
   case 200: return "OK";
+  case 202: return "Accepted";
   case 204: return "No Content";
   case 206: return "Partial Content";
   case 301: return "Moved Permanently";
@@ -1812,7 +1826,7 @@ bool read_content(Stream &strm, T &x, size_t payload_max_length, int &status,
   };
 
 #ifdef CPPHTTPLIB_ZLIB_SUPPORT
-  detail::decompressor decompressor;
+  decompressor decompressor;
 
   if (!decompressor.is_valid()) {
     status = 500;
@@ -1876,47 +1890,51 @@ inline int write_headers(Stream &strm, const T &info, const Headers &headers) {
   return write_len;
 }
 
-inline ssize_t write_content(Stream &strm,
-                             ContentProviderWithCloser content_provider,
+inline ssize_t write_content(Stream &strm, ContentProvider content_provider,
                              size_t offset, size_t length) {
   size_t begin_offset = offset;
   size_t end_offset = offset + length;
   while (offset < end_offset) {
     ssize_t written_length = 0;
-    content_provider(
-        offset, end_offset - offset,
-        [&](const char *d, size_t l) {
-          offset += l;
-          written_length = strm.write(d, l);
-        },
-        [&](void) { written_length = -1; });
+
+    DataSink data_sink;
+    data_sink.write = [&](const char *d, size_t l) {
+      offset += l;
+      written_length = strm.write(d, l);
+    };
+    data_sink.done = [&](void) { written_length = -1; };
+
+    content_provider(offset, end_offset - offset, data_sink);
     if (written_length < 0) { return written_length; }
   }
   return static_cast<ssize_t>(offset - begin_offset);
 }
 
-inline ssize_t
-write_content_chunked(Stream &strm,
-                      ContentProviderWithCloser content_provider) {
+template <typename T>
+inline ssize_t write_content_chunked(Stream &strm,
+                                     ContentProvider content_provider,
+                                     T is_shutting_down) {
   size_t offset = 0;
   auto data_available = true;
   ssize_t total_written_length = 0;
-  while (data_available) {
+  while (data_available && !is_shutting_down()) {
     ssize_t written_length = 0;
-    content_provider(
-        offset, 0,
-        [&](const char *d, size_t l) {
-          data_available = l > 0;
-          offset += l;
 
-          // Emit chunked response header and footer for each chunk
-          auto chunk = from_i_to_hex(l) + "\r\n" + std::string(d, l) + "\r\n";
-          written_length = strm.write(chunk);
-        },
-        [&](void) {
-          data_available = false;
-          written_length = strm.write("0\r\n\r\n");
-        });
+    DataSink data_sink;
+    data_sink.write = [&](const char *d, size_t l) {
+      data_available = l > 0;
+      offset += l;
+
+      // Emit chunked response header and footer for each chunk
+      auto chunk = from_i_to_hex(l) + "\r\n" + std::string(d, l) + "\r\n";
+      written_length = strm.write(chunk);
+    };
+    data_sink.done = [&](void) {
+      data_available = false;
+      written_length = strm.write("0\r\n\r\n");
+    };
+
+    content_provider(offset, 0, data_sink);
 
     if (written_length < 0) { return written_length; }
     total_written_length += written_length;
@@ -2036,29 +2054,28 @@ inline bool parse_range_header(const std::string &s, Ranges &ranges) {
     auto pos = m.position(1);
     auto len = m.length(1);
     bool all_valid_ranges = true;
-    detail::split(
-        &s[pos], &s[pos + len], ',', [&](const char *b, const char *e) {
-          if (!all_valid_ranges) return;
-          static auto re_another_range = std::regex(R"(\s*(\d*)-(\d*))");
-          std::cmatch m;
-          if (std::regex_match(b, e, m, re_another_range)) {
-            ssize_t first = -1;
-            if (!m.str(1).empty()) {
-              first = static_cast<ssize_t>(std::stoll(m.str(1)));
-            }
+    split(&s[pos], &s[pos + len], ',', [&](const char *b, const char *e) {
+      if (!all_valid_ranges) return;
+      static auto re_another_range = std::regex(R"(\s*(\d*)-(\d*))");
+      std::cmatch m;
+      if (std::regex_match(b, e, m, re_another_range)) {
+        ssize_t first = -1;
+        if (!m.str(1).empty()) {
+          first = static_cast<ssize_t>(std::stoll(m.str(1)));
+        }
 
-            ssize_t last = -1;
-            if (!m.str(2).empty()) {
-              last = static_cast<ssize_t>(std::stoll(m.str(2)));
-            }
+        ssize_t last = -1;
+        if (!m.str(2).empty()) {
+          last = static_cast<ssize_t>(std::stoll(m.str(2)));
+        }
 
-            if (first != -1 && last != -1 && first > last) {
-              all_valid_ranges = false;
-              return;
-            }
-            ranges.emplace_back(std::make_pair(first, last));
-          }
-        });
+        if (first != -1 && last != -1 && first > last) {
+          all_valid_ranges = false;
+          return;
+        }
+        ranges.emplace_back(std::make_pair(first, last));
+      }
+    });
     return all_valid_ranges;
   }
   return false;
@@ -2302,7 +2319,7 @@ bool process_multipart_ranges_data(const Request &req, Response &res,
       ctoken("\r\n");
     }
 
-    auto offsets = detail::get_range_offset_and_length(req, res.body.size(), i);
+    auto offsets = get_range_offset_and_length(req, res.body.size(), i);
     auto offset = offsets.first;
     auto length = offsets.second;
 
@@ -2365,8 +2382,7 @@ inline bool write_multipart_ranges_data(Stream &strm, const Request &req,
       [&](const std::string &token) { strm.write(token); },
       [&](const char *token) { strm.write(token); },
       [&](size_t offset, size_t length) {
-        return detail::write_content(strm, res.content_provider, offset,
-                                     length) >= 0;
+        return write_content(strm, res.content_provider, offset, length) >= 0;
       });
 }
 
@@ -2410,7 +2426,6 @@ inline std::string message_digest(const std::string &s, Init init,
 }
 
 inline std::string MD5(const std::string &s) {
-  using namespace detail;
   return message_digest<MD5_CTX>(s, MD5_Init, MD5_Update, MD5_Final,
                                  MD5_DIGEST_LENGTH);
 }
@@ -2652,21 +2667,23 @@ inline void Response::set_content(const std::string &s,
 
 inline void Response::set_content_provider(
     size_t length,
-    std::function<void(size_t offset, size_t length, DataSink sink)> provider,
+    std::function<void(size_t offset, size_t length, DataSink &sink)> provider,
     std::function<void()> resource_releaser) {
   assert(length > 0);
   content_length = length;
-  content_provider = [provider](size_t offset, size_t length, DataSink sink,
-                                Done) { provider(offset, length, sink); };
+  content_provider = [provider](size_t offset, size_t length, DataSink &sink) {
+    provider(offset, length, sink);
+  };
   content_provider_resource_releaser = resource_releaser;
 }
 
 inline void Response::set_chunked_content_provider(
-    std::function<void(size_t offset, DataSink sink, Done done)> provider,
+    std::function<void(size_t offset, DataSink &sink)> provider,
     std::function<void()> resource_releaser) {
   content_length = 0;
-  content_provider = [provider](size_t offset, size_t, DataSink sink,
-                                Done done) { provider(offset, sink, done); };
+  content_provider = [provider](size_t offset, size_t, DataSink &sink) {
+    provider(offset, sink);
+  };
   content_provider_resource_releaser = resource_releaser;
 }
 
@@ -2699,6 +2716,8 @@ inline int Stream::write_format(const char *fmt, const Args &... args) {
     return write(buf.data(), n);
   }
 }
+
+namespace detail {
 
 // Socket stream implementation
 inline SocketStream::SocketStream(socket_t sock, time_t read_timeout_sec,
@@ -2734,10 +2753,12 @@ inline std::string SocketStream::get_remote_addr() const {
 // Buffer stream implementation
 inline int BufferStream::read(char *ptr, size_t size) {
 #if defined(_MSC_VER) && _MSC_VER < 1900
-  return static_cast<int>(buffer._Copy_s(ptr, size, size));
+  int len_read = static_cast<int>(buffer._Copy_s(ptr, size, size, position));
 #else
-  return static_cast<int>(buffer.copy(ptr, size));
+  int len_read = static_cast<int>(buffer.copy(ptr, size, position));
 #endif
+  position += len_read;
+  return len_read;
 }
 
 inline int BufferStream::write(const char *ptr, size_t size) {
@@ -2756,6 +2777,8 @@ inline int BufferStream::write(const std::string &s) {
 inline std::string BufferStream::get_remote_addr() const { return ""; }
 
 inline const std::string &BufferStream::get_buffer() const { return buffer; }
+
+} // namespace detail
 
 // HTTP server implementation
 inline Server::Server()
@@ -3057,7 +3080,11 @@ Server::write_content_with_provider(Stream &strm, const Request &req,
       }
     }
   } else {
-    if (detail::write_content_chunked(strm, res.content_provider) < 0) {
+    auto is_shutting_down = [this]() {
+      return this->svr_sock_ == INVALID_SOCKET;
+    };
+    if (detail::write_content_chunked(strm, res.content_provider,
+                                      is_shutting_down) < 0) {
       return false;
     }
   }
@@ -3658,7 +3685,7 @@ inline bool Client::redirect(const Request &req, Response &res) {
 
 inline bool Client::write_request(Stream &strm, const Request &req,
                                   bool last_connection) {
-  BufferStream bstrm;
+  detail::BufferStream bstrm;
 
   // Request line
   const auto &path = detail::encode_url(req.path);
@@ -3731,12 +3758,15 @@ inline bool Client::write_request(Stream &strm, const Request &req,
     if (req.content_provider) {
       size_t offset = 0;
       size_t end_offset = req.content_length;
+
+      DataSink data_sink;
+      data_sink.write = [&](const char *d, size_t l) {
+        auto written_length = strm.write(d, l);
+        offset += written_length;
+      };
+
       while (offset < end_offset) {
-        req.content_provider(offset, end_offset - offset,
-                             [&](const char *d, size_t l) {
-                               auto written_length = strm.write(d, l);
-                               offset += written_length;
-                             });
+        req.content_provider(offset, end_offset - offset, data_sink);
       }
     }
   } else {
@@ -3761,12 +3791,15 @@ inline std::shared_ptr<Response> Client::send_with_content_provider(
   if (compress_) {
     if (content_provider) {
       size_t offset = 0;
+
+      DataSink data_sink;
+      data_sink.write = [&](const char *data, size_t data_len) {
+        req.body.append(data, data_len);
+        offset += data_len;
+      };
+
       while (offset < content_length) {
-        content_provider(offset, content_length - offset,
-                         [&](const char *data, size_t data_len) {
-                           req.body.append(data, data_len);
-                           offset += data_len;
-                         });
+        content_provider(offset, content_length - offset, data_sink);
       }
     } else {
       req.body = body;
@@ -4307,10 +4340,6 @@ private:
 #endif
 };
 
-static SSLInit sslinit_;
-
-} // namespace detail
-
 // SSL socket stream implementation
 inline SSLSocketStream::SSLSocketStream(socket_t sock, SSL *ssl,
                                         time_t read_timeout_sec,
@@ -4322,7 +4351,7 @@ inline SSLSocketStream::~SSLSocketStream() {}
 
 inline int SSLSocketStream::read(char *ptr, size_t size) {
   if (SSL_pending(ssl_) > 0 ||
-      detail::select_read(sock_, read_timeout_sec_, read_timeout_usec_) > 0) {
+      select_read(sock_, read_timeout_sec_, read_timeout_usec_) > 0) {
     return SSL_read(ssl_, ptr, static_cast<int>(size));
   }
   return -1;
@@ -4343,6 +4372,10 @@ inline int SSLSocketStream::write(const std::string &s) {
 inline std::string SSLSocketStream::get_remote_addr() const {
   return detail::get_remote_addr(sock_);
 }
+
+static SSLInit sslinit_;
+
+} // namespace detail
 
 // SSL HTTP server implementation
 inline SSLServer::SSLServer(const char *cert_path, const char *private_key_path,

@@ -5,6 +5,8 @@
 #include <httplib.h>
 #include <json.hpp>
 #include <lodepng.h>
+#include "common/logging/backend.h"
+#include "common/logging/filter.h"
 #include "common/logging/log.h"
 #include "common/thread.h"
 #include "common/version.h"
@@ -17,6 +19,34 @@
 #include "core/rpc/rpc_server.h"
 #include "video_core/renderer_base.h"
 #include "video_core/video_core.h"
+
+namespace Settings {
+
+void to_json(nlohmann::json& json, const InputProfile& profile) {
+    json = nlohmann::json{
+        {"name", profile.name},
+        {"buttons", profile.buttons},
+        {"analogs", profile.analogs},
+        {"motion_device", profile.motion_device},
+        {"touch_device", profile.touch_device},
+        {"udp_input_address", profile.udp_input_address},
+        {"udp_input_port", profile.udp_input_port},
+        {"udp_pad_index", profile.udp_pad_index},
+    };
+}
+
+void from_json(const nlohmann::json& json, InputProfile& profile) {
+    json.at("name").get_to(profile.name);
+    json.at("buttons").get_to(profile.buttons);
+    json.at("analogs").get_to(profile.analogs);
+    json.at("motion_device").get_to(profile.motion_device);
+    json.at("touch_device").get_to(profile.touch_device);
+    json.at("udp_input_address").get_to(profile.udp_input_address);
+    json.at("udp_input_port").get_to(profile.udp_input_port);
+    json.at("udp_pad_index").get_to(profile.udp_pad_index);
+}
+
+} // namespace Settings
 
 namespace RPC {
 
@@ -584,6 +614,729 @@ RPCServer::RPCServer() {
                     Core::System::GetInstance().frame_limiter.AdvanceFrame();
                     res.status = 204;
                 });
+
+    server->Get("/controls", [&](const httplib::Request& req, httplib::Response& res) {
+        res.set_content(
+            nlohmann::json{
+                {"current_profile_index", Settings::values.current_input_profile_index},
+                {"current_profile", Settings::values.current_input_profile},
+                {"profiles", Settings::values.input_profiles},
+            }
+                .dump(),
+            "application/json");
+    });
+
+    server->Post("/controls", [&](const httplib::Request& req, httplib::Response& res) {
+        try {
+            const nlohmann::json json = nlohmann::json::parse(req.body);
+            const int current_profile_index = json["current_profile_index"].get<int>();
+            const std::vector<Settings::InputProfile> profiles =
+                json["profiles"].get<std::vector<Settings::InputProfile>>();
+            if ((current_profile_index < 0) ||
+                (current_profile_index > 0 &&
+                 (current_profile_index > static_cast<int>(profiles.size() - 1)))) {
+                res.status = 400;
+                res.set_content("current_profile_index out of range", "text/plain");
+            } else {
+                Settings::values.current_input_profile_index = current_profile_index;
+                Settings::values.current_input_profile =
+                    json["current_profile"].get<Settings::InputProfile>();
+                Settings::values.input_profiles = profiles;
+                Settings::Apply();
+
+                res.status = 204;
+            }
+        } catch (nlohmann::json::exception& exception) {
+            res.status = 500;
+            res.set_content(exception.what(), "text/plain");
+        }
+    });
+
+    server->Get("/cpuclockpercentage", [&](const httplib::Request& req, httplib::Response& res) {
+        res.set_content(
+            nlohmann::json{
+                {"value", Settings::values.cpu_clock_percentage},
+            }
+                .dump(),
+            "application/json");
+    });
+
+    server->Post("/cpuclockpercentage", [&](const httplib::Request& req, httplib::Response& res) {
+        try {
+            const nlohmann::json json = nlohmann::json::parse(req.body);
+            Settings::values.cpu_clock_percentage = json["value"].get<int>();
+            Settings::Apply();
+            res.status = 204;
+        } catch (nlohmann::json::exception& exception) {
+            res.status = 500;
+            res.set_content(exception.what(), "text/plain");
+        }
+    });
+
+    server->Get("/multiplayerurl", [&](const httplib::Request& req, httplib::Response& res) {
+        res.set_content(
+            nlohmann::json{
+                {"value", Settings::values.multiplayer_url},
+            }
+                .dump(),
+            "application/json");
+    });
+
+    server->Post("/multiplayerurl", [&](const httplib::Request& req, httplib::Response& res) {
+        try {
+            const nlohmann::json json = nlohmann::json::parse(req.body);
+            Settings::values.multiplayer_url = json["value"].get<std::string>();
+            res.status = 204;
+        } catch (nlohmann::json::exception& exception) {
+            res.status = 500;
+            res.set_content(exception.what(), "text/plain");
+        }
+    });
+
+    server->Get("/usehardwarerenderer", [&](const httplib::Request& req, httplib::Response& res) {
+        res.set_content(
+            nlohmann::json{
+                {"enabled", Settings::values.use_hw_renderer},
+            }
+                .dump(),
+            "application/json");
+    });
+
+    server->Post("/usehardwarerenderer", [&](const httplib::Request& req, httplib::Response& res) {
+        try {
+            const nlohmann::json json = nlohmann::json::parse(req.body);
+            Settings::values.use_hw_renderer = json["enabled"].get<bool>();
+            Settings::Apply();
+            res.status = 204;
+        } catch (nlohmann::json::exception& exception) {
+            res.status = 500;
+            res.set_content(exception.what(), "text/plain");
+        }
+    });
+
+    server->Get("/usehardwareshader", [&](const httplib::Request& req, httplib::Response& res) {
+        res.set_content(
+            nlohmann::json{
+                {"enabled", Settings::values.use_hw_shader},
+            }
+                .dump(),
+            "application/json");
+    });
+
+    server->Post("/usehardwareshader", [&](const httplib::Request& req, httplib::Response& res) {
+        try {
+            const nlohmann::json json = nlohmann::json::parse(req.body);
+            Settings::values.use_hw_shader = json["enabled"].get<bool>();
+            Settings::Apply();
+            res.status = 204;
+        } catch (nlohmann::json::exception& exception) {
+            res.status = 500;
+            res.set_content(exception.what(), "text/plain");
+        }
+    });
+
+    server->Get("/usediskshadercache", [&](const httplib::Request& req, httplib::Response& res) {
+        res.set_content(
+            nlohmann::json{
+                {"enabled", Settings::values.use_disk_shader_cache},
+            }
+                .dump(),
+            "application/json");
+    });
+
+    server->Post("/usediskshadercache", [&](const httplib::Request& req, httplib::Response& res) {
+        try {
+            const nlohmann::json json = nlohmann::json::parse(req.body);
+            Settings::values.use_disk_shader_cache = json["enabled"].get<bool>();
+            Settings::Apply();
+            res.status = 202;
+        } catch (nlohmann::json::exception& exception) {
+            res.status = 500;
+            res.set_content(exception.what(), "text/plain");
+        }
+    });
+
+    server->Get("/shaderaccuratemultiplication",
+                [&](const httplib::Request& req, httplib::Response& res) {
+                    res.set_content(
+                        nlohmann::json{
+                            {"enabled", Settings::values.shaders_accurate_mul},
+                        }
+                            .dump(),
+                        "application/json");
+                });
+
+    server->Post("/shaderaccuratemultiplication",
+                 [&](const httplib::Request& req, httplib::Response& res) {
+                     try {
+                         const nlohmann::json json = nlohmann::json::parse(req.body);
+                         Settings::values.shaders_accurate_mul = json["enabled"].get<bool>();
+                         Settings::Apply();
+                         res.status = 204;
+                     } catch (nlohmann::json::exception& exception) {
+                         res.status = 500;
+                         res.set_content(exception.what(), "text/plain");
+                     }
+                 });
+
+    server->Get("/useshaderjit", [&](const httplib::Request& req, httplib::Response& res) {
+        res.set_content(
+            nlohmann::json{
+                {"enabled", Settings::values.use_shader_jit},
+            }
+                .dump(),
+            "application/json");
+    });
+
+    server->Post("/useshaderjit", [&](const httplib::Request& req, httplib::Response& res) {
+        try {
+            const nlohmann::json json = nlohmann::json::parse(req.body);
+            Settings::values.use_shader_jit = json["enabled"].get<bool>();
+            Settings::Apply();
+            res.status = 204;
+        } catch (nlohmann::json::exception& exception) {
+            res.status = 500;
+            res.set_content(exception.what(), "text/plain");
+        }
+    });
+
+    server->Get("/filtermode", [&](const httplib::Request& req, httplib::Response& res) {
+        res.set_content(
+            nlohmann::json{
+                {"enabled", Settings::values.filter_mode ? "linear" : "nearest"},
+            }
+                .dump(),
+            "application/json");
+    });
+
+    server->Get("/filtermode/nearest", [&](const httplib::Request& req, httplib::Response& res) {
+        Settings::values.filter_mode = false;
+        Settings::Apply();
+        res.status = 204;
+    });
+
+    server->Get("/filtermode/linear", [&](const httplib::Request& req, httplib::Response& res) {
+        Settings::values.filter_mode = true;
+        Settings::Apply();
+        res.status = 204;
+    });
+
+    server->Get("/postprocessingshader", [&](const httplib::Request& req, httplib::Response& res) {
+        res.set_content(
+            nlohmann::json{
+                {"name", Settings::values.pp_shader_name},
+            }
+                .dump(),
+            "application/json");
+    });
+
+    server->Post("/postprocessingshader", [&](const httplib::Request& req, httplib::Response& res) {
+        try {
+            const nlohmann::json json = nlohmann::json::parse(req.body);
+            Settings::values.pp_shader_name = json["name"].get<std::string>();
+            Settings::Apply();
+            res.status = 204;
+        } catch (nlohmann::json::exception& exception) {
+            res.status = 500;
+            res.set_content(exception.what(), "text/plain");
+        }
+    });
+
+    server->Get("/customscreenrefreshrate",
+                [&](const httplib::Request& req, httplib::Response& res) {
+                    res.set_content(
+                        nlohmann::json{
+                            {"enabled", Settings::values.use_custom_screen_refresh_rate},
+                            {"value", Settings::values.custom_screen_refresh_rate},
+                        }
+                            .dump(),
+                        "application/json");
+                });
+
+    server->Post(
+        "/customscreenrefreshrate", [&](const httplib::Request& req, httplib::Response& res) {
+            try {
+                const nlohmann::json json = nlohmann::json::parse(req.body);
+                Settings::values.use_custom_screen_refresh_rate = json["enabled"].get<bool>();
+                Settings::values.custom_screen_refresh_rate = json["value"].get<double>();
+                res.status = 204;
+            } catch (nlohmann::json::exception& exception) {
+                res.status = 500;
+                res.set_content(exception.what(), "text/plain");
+            }
+        });
+
+    server->Get("/minverticesperthread", [&](const httplib::Request& req, httplib::Response& res) {
+        res.set_content(
+            nlohmann::json{
+                {"value", Settings::values.min_vertices_per_thread},
+            }
+                .dump(),
+            "application/json");
+    });
+
+    server->Post("/minverticesperthread", [&](const httplib::Request& req, httplib::Response& res) {
+        try {
+            const nlohmann::json json = nlohmann::json::parse(req.body);
+            Settings::values.min_vertices_per_thread = json["value"].get<int>();
+            res.status = 204;
+        } catch (nlohmann::json::exception& exception) {
+            res.status = 500;
+            res.set_content(exception.what(), "text/plain");
+        }
+    });
+
+    server->Get("/dumptextures", [&](const httplib::Request& req, httplib::Response& res) {
+        res.set_content(
+            nlohmann::json{
+                {"enabled", Settings::values.dump_textures},
+            }
+                .dump(),
+            "application/json");
+    });
+
+    server->Post("/dumptextures", [&](const httplib::Request& req, httplib::Response& res) {
+        try {
+            const nlohmann::json json = nlohmann::json::parse(req.body);
+            Settings::values.dump_textures = json["enabled"].get<bool>();
+            res.status = 204;
+        } catch (nlohmann::json::exception& exception) {
+            res.status = 500;
+            res.set_content(exception.what(), "text/plain");
+        }
+    });
+
+    server->Get("/customtextures", [&](const httplib::Request& req, httplib::Response& res) {
+        res.set_content(
+            nlohmann::json{
+                {"enabled", Settings::values.custom_textures},
+            }
+                .dump(),
+            "application/json");
+    });
+
+    server->Post("/customtextures", [&](const httplib::Request& req, httplib::Response& res) {
+        try {
+            const nlohmann::json json = nlohmann::json::parse(req.body);
+            Settings::values.custom_textures = json["enabled"].get<bool>();
+            res.status = 204;
+        } catch (nlohmann::json::exception& exception) {
+            res.status = 500;
+            res.set_content(exception.what(), "text/plain");
+        }
+    });
+
+    server->Get("/preloadcustomtextures", [&](const httplib::Request& req, httplib::Response& res) {
+        res.set_content(
+            nlohmann::json{
+                {"enabled", Settings::values.preload_textures},
+            }
+                .dump(),
+            "application/json");
+    });
+
+    server->Post("/preloadcustomtextures",
+                 [&](const httplib::Request& req, httplib::Response& res) {
+                     try {
+                         const nlohmann::json json = nlohmann::json::parse(req.body);
+                         Settings::values.preload_textures = json["enabled"].get<bool>();
+                         res.status = 202;
+                     } catch (nlohmann::json::exception& exception) {
+                         res.status = 500;
+                         res.set_content(exception.what(), "text/plain");
+                     }
+                 });
+
+    server->Get("/usecpujit", [&](const httplib::Request& req, httplib::Response& res) {
+        res.set_content(
+            nlohmann::json{
+                {"enabled", Settings::values.use_cpu_jit},
+            }
+                .dump(),
+            "application/json");
+    });
+
+    server->Post("/usecpujit", [&](const httplib::Request& req, httplib::Response& res) {
+        try {
+            const nlohmann::json json = nlohmann::json::parse(req.body);
+            Settings::values.use_cpu_jit = json["enabled"].get<bool>();
+            res.status = 202;
+        } catch (nlohmann::json::exception& exception) {
+            res.status = 500;
+            res.set_content(exception.what(), "text/plain");
+        }
+    });
+
+    server->Get("/ignoreformatreinterpretation",
+                [&](const httplib::Request& req, httplib::Response& res) {
+                    res.set_content(
+                        nlohmann::json{
+                            {"enabled", Settings::values.ignore_format_reinterpretation},
+                        }
+                            .dump(),
+                        "application/json");
+                });
+
+    server->Post(
+        "/ignoreformatreinterpretation", [&](const httplib::Request& req, httplib::Response& res) {
+            try {
+                const nlohmann::json json = nlohmann::json::parse(req.body);
+                Settings::values.ignore_format_reinterpretation = json["enabled"].get<bool>();
+                res.status = 204;
+            } catch (nlohmann::json::exception& exception) {
+                res.status = 500;
+                res.set_content(exception.what(), "text/plain");
+            }
+        });
+
+    server->Get("/dspemulation", [&](const httplib::Request& req, httplib::Response& res) {
+        res.set_content(
+            nlohmann::json{
+                {"emulation", Settings::values.enable_dsp_lle ? "lle" : "hle"},
+                {"multithreaded",
+                 Settings::values.enable_dsp_lle && Settings::values.enable_dsp_lle_multithread},
+            }
+                .dump(),
+            "application/json");
+    });
+
+    server->Post("/dspemulation", [&](const httplib::Request& req, httplib::Response& res) {
+        try {
+            const nlohmann::json json = nlohmann::json::parse(req.body);
+            Settings::values.enable_dsp_lle = json["emulation"].get<std::string>() == "lle";
+            if (Settings::values.enable_dsp_lle) {
+                Settings::values.enable_dsp_lle_multithread = json["multithreaded"].get<bool>();
+            }
+            res.status = 202;
+        } catch (nlohmann::json::exception& exception) {
+            res.status = 500;
+            res.set_content(exception.what(), "text/plain");
+        }
+    });
+
+    server->Get("/audioengine", [&](const httplib::Request& req, httplib::Response& res) {
+        res.set_content(
+            nlohmann::json{
+                {"name", Settings::values.sink_id},
+            }
+                .dump(),
+            "application/json");
+    });
+
+    server->Post("/audioengine", [&](const httplib::Request& req, httplib::Response& res) {
+        try {
+            const nlohmann::json json = nlohmann::json::parse(req.body);
+            Settings::values.sink_id = json["name"].get<std::string>();
+            Settings::Apply();
+            res.status = 204;
+        } catch (nlohmann::json::exception& exception) {
+            res.status = 500;
+            res.set_content(exception.what(), "text/plain");
+        }
+    });
+
+    server->Get("/audiostretching", [&](const httplib::Request& req, httplib::Response& res) {
+        res.set_content(
+            nlohmann::json{
+                {"enabled", Settings::values.enable_audio_stretching},
+            }
+                .dump(),
+            "application/json");
+    });
+
+    server->Post("/audiostretching", [&](const httplib::Request& req, httplib::Response& res) {
+        try {
+            const nlohmann::json json = nlohmann::json::parse(req.body);
+            Settings::values.enable_audio_stretching = json["enabled"].get<bool>();
+            Settings::Apply();
+            res.status = 204;
+        } catch (nlohmann::json::exception& exception) {
+            res.status = 500;
+            res.set_content(exception.what(), "text/plain");
+        }
+    });
+
+    server->Get("/audiodevice", [&](const httplib::Request& req, httplib::Response& res) {
+        res.set_content(
+            nlohmann::json{
+                {"value", Settings::values.audio_device_id},
+            }
+                .dump(),
+            "application/json");
+    });
+
+    server->Post("/audiodevice", [&](const httplib::Request& req, httplib::Response& res) {
+        try {
+            const nlohmann::json json = nlohmann::json::parse(req.body);
+            Settings::values.audio_device_id = json["value"].get<bool>();
+            Settings::Apply();
+            res.status = 204;
+        } catch (nlohmann::json::exception& exception) {
+            res.status = 500;
+            res.set_content(exception.what(), "text/plain");
+        }
+    });
+
+    server->Get("/audiovolume", [&](const httplib::Request& req, httplib::Response& res) {
+        res.set_content(
+            nlohmann::json{
+                {"value", Settings::values.volume},
+            }
+                .dump(),
+            "application/json");
+    });
+
+    server->Post("/audiovolume", [&](const httplib::Request& req, httplib::Response& res) {
+        try {
+            const nlohmann::json json = nlohmann::json::parse(req.body);
+            Settings::values.volume = json["value"].get<float>();
+            res.status = 204;
+        } catch (nlohmann::json::exception& exception) {
+            res.status = 500;
+            res.set_content(exception.what(), "text/plain");
+        }
+    });
+
+    server->Get("/audiospeed", [&](const httplib::Request& req, httplib::Response& res) {
+        res.set_content(
+            nlohmann::json{
+                {"value", Settings::values.audio_speed},
+            }
+                .dump(),
+            "application/json");
+    });
+
+    server->Post("/audiospeed", [&](const httplib::Request& req, httplib::Response& res) {
+        try {
+            const nlohmann::json json = nlohmann::json::parse(req.body);
+            Settings::values.audio_speed = json["value"].get<float>();
+            res.status = 204;
+        } catch (nlohmann::json::exception& exception) {
+            res.status = 500;
+            res.set_content(exception.what(), "text/plain");
+        }
+    });
+
+    server->Get("/usevirtualsdcard", [&](const httplib::Request& req, httplib::Response& res) {
+        res.set_content(
+            nlohmann::json{
+                {"enabled", Settings::values.use_virtual_sd},
+            }
+                .dump(),
+            "application/json");
+    });
+
+    server->Post("/usevirtualsdcard", [&](const httplib::Request& req, httplib::Response& res) {
+        try {
+            const nlohmann::json json = nlohmann::json::parse(req.body);
+            Settings::values.use_virtual_sd = json["enabled"].get<bool>();
+            res.status = 202;
+        } catch (nlohmann::json::exception& exception) {
+            res.status = 500;
+            res.set_content(exception.what(), "text/plain");
+        }
+    });
+
+    server->Get("/isnew3ds", [&](const httplib::Request& req, httplib::Response& res) {
+        res.set_content(
+            nlohmann::json{
+                {"enabled", Settings::values.is_new_3ds},
+            }
+                .dump(),
+            "application/json");
+    });
+
+    server->Post("/isnew3ds", [&](const httplib::Request& req, httplib::Response& res) {
+        try {
+            const nlohmann::json json = nlohmann::json::parse(req.body);
+            Settings::values.is_new_3ds = json["enabled"].get<bool>();
+            res.status = 204;
+        } catch (nlohmann::json::exception& exception) {
+            res.status = 500;
+            res.set_content(exception.what(), "text/plain");
+        }
+    });
+
+    server->Get("/region", [&](const httplib::Request& req, httplib::Response& res) {
+        res.set_content(
+            nlohmann::json{
+                {"value", Settings::values.region_value},
+            }
+                .dump(),
+            "application/json");
+    });
+
+    server->Post("/region", [&](const httplib::Request& req, httplib::Response& res) {
+        try {
+            const nlohmann::json json = nlohmann::json::parse(req.body);
+            Settings::values.region_value = json["value"].get<int>();
+            res.status = 202;
+        } catch (nlohmann::json::exception& exception) {
+            res.status = 500;
+            res.set_content(exception.what(), "text/plain");
+        }
+    });
+
+    server->Get("/startclock", [&](const httplib::Request& req, httplib::Response& res) {
+        nlohmann::json json;
+        switch (Settings::values.init_clock) {
+        case Settings::InitClock::SystemTime: {
+            json["clock"] = "system";
+            break;
+        }
+        case Settings::InitClock::FixedTime: {
+            json["clock"] = "fixed";
+            json["unix_timestamp"] = Settings::values.init_time;
+            break;
+        }
+        }
+        res.set_content(json.dump(), "application/json");
+    });
+
+    server->Post("/startclock", [&](const httplib::Request& req, httplib::Response& res) {
+        try {
+            const nlohmann::json json = nlohmann::json::parse(req.body);
+            Settings::values.init_clock = json["clock"].get<std::string>() == "system"
+                                              ? Settings::InitClock::SystemTime
+                                              : Settings::InitClock::FixedTime;
+            if (Settings::values.init_clock == Settings::InitClock::FixedTime) {
+                Settings::values.init_time = json["unix_timestamp"].get<u64>();
+            }
+            res.status = 202;
+        } catch (nlohmann::json::exception& exception) {
+            res.status = 500;
+            res.set_content(exception.what(), "text/plain");
+        }
+    });
+
+    server->Get("/usevsync", [&](const httplib::Request& req, httplib::Response& res) {
+        res.set_content(
+            nlohmann::json{
+                {"enabled", Settings::values.use_vsync_new},
+            }
+                .dump(),
+            "application/json");
+    });
+
+    server->Post("/usevsync", [&](const httplib::Request& req, httplib::Response& res) {
+        try {
+            const nlohmann::json json = nlohmann::json::parse(req.body);
+            Settings::values.use_vsync_new = json["enabled"].get<bool>();
+            res.status = 202;
+        } catch (nlohmann::json::exception& exception) {
+            res.status = 500;
+            res.set_content(exception.what(), "text/plain");
+        }
+    });
+
+    server->Get("/logfilter", [&](const httplib::Request& req, httplib::Response& res) {
+        res.set_content(
+            nlohmann::json{
+                {"value", Settings::values.log_filter},
+            }
+                .dump(),
+            "application/json");
+    });
+
+    server->Post("/logfilter", [&](const httplib::Request& req, httplib::Response& res) {
+        try {
+            const nlohmann::json json = nlohmann::json::parse(req.body);
+            Settings::values.log_filter = json["value"].get<std::string>();
+            Log::Filter log_filter(Log::Level::Debug);
+            log_filter.ParseFilterString(Settings::values.log_filter);
+            Log::SetGlobalFilter(log_filter);
+            res.status = 204;
+        } catch (nlohmann::json::exception& exception) {
+            res.status = 500;
+            res.set_content(exception.what(), "text/plain");
+        }
+    });
+
+    server->Get("/recordframetimes", [&](const httplib::Request& req, httplib::Response& res) {
+        res.set_content(
+            nlohmann::json{
+                {"enabled", Settings::values.record_frame_times},
+            }
+                .dump(),
+            "application/json");
+    });
+
+    server->Post("/recordframetimes", [&](const httplib::Request& req, httplib::Response& res) {
+        try {
+            const nlohmann::json json = nlohmann::json::parse(req.body);
+            Settings::values.record_frame_times = json["enabled"].get<bool>();
+            res.status = 204;
+        } catch (nlohmann::json::exception& exception) {
+            res.status = 500;
+            res.set_content(exception.what(), "text/plain");
+        }
+    });
+
+    server->Get("/cameras", [&](const httplib::Request& req, httplib::Response& res) {
+        res.set_content(
+            nlohmann::json{
+                {"name", Settings::values.camera_name},
+                {"config", Settings::values.camera_config},
+                {"flip", Settings::values.camera_flip},
+            }
+                .dump(),
+            "application/json");
+    });
+
+    server->Post("/cameras", [&](const httplib::Request& req, httplib::Response& res) {
+        try {
+            const nlohmann::json json = nlohmann::json::parse(req.body);
+            Settings::values.camera_name =
+                json["name"].get<std::array<std::string, Service::CAM::NumCameras>>();
+            Settings::values.camera_config =
+                json["config"].get<std::array<std::string, Service::CAM::NumCameras>>();
+            Settings::values.camera_flip =
+                json["flip"].get<std::array<int, Service::CAM::NumCameras>>();
+            Settings::Apply();
+            res.status = 204;
+        } catch (nlohmann::json::exception& exception) {
+            res.status = 500;
+            res.set_content(exception.what(), "text/plain");
+        }
+    });
+
+    server->Get("/gdbstub", [&](const httplib::Request& req, httplib::Response& res) {
+        res.set_content(
+            nlohmann::json{
+                {"enabled", Settings::values.use_gdbstub},
+                {"port", Settings::values.gdbstub_port},
+            }
+                .dump(),
+            "application/json");
+    });
+
+    server->Post("/gdbstub", [&](const httplib::Request& req, httplib::Response& res) {
+        try {
+            const nlohmann::json json = nlohmann::json::parse(req.body);
+            Settings::values.use_gdbstub = json["enabled"].get<bool>();
+            Settings::values.gdbstub_port = json["port"].get<u16>();
+            Settings::Apply();
+            res.status = 204;
+        } catch (nlohmann::json::exception& exception) {
+            res.status = 500;
+            res.set_content(exception.what(), "text/plain");
+        }
+    });
+
+    server->Get("/llemodules", [&](const httplib::Request& req, httplib::Response& res) {
+        res.set_content(nlohmann::json(Settings::values.lle_modules).dump(), "application/json");
+    });
+
+    server->Post("/llemodules", [&](const httplib::Request& req, httplib::Response& res) {
+        try {
+            const nlohmann::json json = nlohmann::json::parse(req.body);
+            Settings::values.lle_modules = json.get<std::unordered_map<std::string, bool>>();
+            res.status = 202;
+        } catch (nlohmann::json::exception& exception) {
+            res.status = 500;
+            res.set_content(exception.what(), "text/plain");
+        }
+    });
 
     request_handler_thread = std::thread([&] { server->listen("0.0.0.0", RPC_PORT); });
     LOG_INFO(RPC_Server, "RPC server running on port {}", RPC_PORT);
