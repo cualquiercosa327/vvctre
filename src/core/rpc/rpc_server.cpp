@@ -304,6 +304,7 @@ RPCServer::RPCServer() {
             VideoCore::g_renderer->GetRenderWindow().GetFramebufferLayout();
         res.set_content(
             nlohmann::json{
+                {"swap_screens", Settings::values.swap_screen},
                 {"is_rotated", layout.is_rotated},
                 {"width", layout.width},
                 {"height", layout.height},

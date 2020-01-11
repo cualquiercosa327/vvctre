@@ -179,6 +179,7 @@ Get the current layout.
 
 ```json
 {
+  "swap_screens": Boolean,
   "is_rotated": Boolean,
   "width": Number,
   "height": Number,
