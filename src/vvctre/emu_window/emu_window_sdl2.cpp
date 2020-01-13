@@ -159,12 +159,17 @@ EmuWindow_SDL2::EmuWindow_SDL2(bool fullscreen) {
 
     const std::string window_title = fmt::format("vvctre {}", version::vvctre.to_string());
 
-    render_window =
-        SDL_CreateWindow(window_title.c_str(),
-                         SDL_WINDOWPOS_UNDEFINED, // x position
-                         SDL_WINDOWPOS_UNDEFINED, // y position
-                         Core::kScreenTopWidth, Core::kScreenTopHeight + Core::kScreenBottomHeight,
-                         SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
+    render_window = SDL_CreateWindow(
+        window_title.c_str(),
+        SDL_WINDOWPOS_UNDEFINED, // x position
+        SDL_WINDOWPOS_UNDEFINED, // y position
+        Core::kScreenTopWidth, Core::kScreenTopHeight + Core::kScreenBottomHeight, [] {
+            Uint32 flags = SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI;
+            if (std::getenv("VVCTRE_HIDDEN")) {
+                flags |= SDL_WINDOW_HIDDEN;
+            }
+            return flags;
+        }());
 
     if (render_window == nullptr) {
         LOG_CRITICAL(Frontend, "Failed to create SDL2 window: {}", SDL_GetError());
