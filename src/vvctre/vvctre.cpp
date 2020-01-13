@@ -42,7 +42,7 @@
 #include "input_common/main.h"
 #include "video_core/renderer_base.h"
 #include "video_core/video_core.h"
-#include "vvctre/applets/keyboard.h"
+#include "vvctre/applets/swkbd.h"
 #include "vvctre/config.h"
 #include "vvctre/emu_window/emu_window_sdl2.h"
 

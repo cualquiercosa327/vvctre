@@ -9,8 +9,8 @@ add_executable(${PROJECT_NAME}
     emu_window/emu_window_sdl2.cpp
     emu_window/emu_window_sdl2.h
     resource.h
-    applets/keyboard.cpp
-    applets/keyboard.h
+    applets/swkbd.cpp
+    applets/swkbd.h
     $<$<BOOL:${USE_DISCORD_PRESENCE}>:discord_rp.cpp discord_rp.h>
 )
 

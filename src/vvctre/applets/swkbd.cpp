@@ -4,7 +4,7 @@
 
 #include <iostream>
 #include "common/logging/log.h"
-#include "vvctre/applets/keyboard.h"
+#include "vvctre/applets/swkbd.h"
 
 namespace Frontend {
 
