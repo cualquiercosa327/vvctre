@@ -195,6 +195,8 @@ int main(int argc, char** argv) {
               clipp::value("value").set(Settings::values.volume),
           clipp::option("--audio-engine").doc("set audio engine") &
               clipp::value("name").set(Settings::values.sink_id),
+          clipp::option("--audio-device").doc("set audio device") &
+              clipp::value("name").set(Settings::values.audio_device_id),
           clipp::option("--background-color-red")
                   .doc("set background color red component to a float in range 0.0-1.0") &
               clipp::value("value").set(Settings::values.bg_red),
