@@ -6,6 +6,7 @@
 #include <sstream>
 #include "common/file_util.h"
 #include "common/logging/log.h"
+#include "common/string_util.h"
 #include "core/file_sys/archive_extsavedata.h"
 #include "core/file_sys/file_backend.h"
 #include "core/hle/service/ptm/ptm.h"
