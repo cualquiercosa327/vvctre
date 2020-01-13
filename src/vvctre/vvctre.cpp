@@ -30,7 +30,6 @@
 #include "core/core.h"
 #include "core/dumping/backend.h"
 #include "core/file_sys/cia_container.h"
-#include "core/frontend/applets/default_applets.h"
 #include "core/frontend/framebuffer_layout.h"
 #include "core/frontend/scope_acquire_context.h"
 #include "core/gdbstub/gdbstub.h"
@@ -42,6 +41,7 @@
 #include "input_common/main.h"
 #include "video_core/renderer_base.h"
 #include "video_core/video_core.h"
+#include "vvctre/applets/appletEd.h"
 #include "vvctre/applets/swkbd.h"
 #include "vvctre/config.h"
 #include "vvctre/emu_window/emu_window_sdl2.h"
@@ -490,8 +490,8 @@ int main(int argc, char** argv) {
 
             // Register frontend applets
             Core::System& system = Core::System::GetInstance();
-            Frontend::RegisterDefaultApplets();
             system.RegisterSoftwareKeyboard(std::make_shared<Frontend::SDL2_SoftwareKeyboard>());
+            system.RegisterMiiSelector(std::make_shared<Frontend::SDL2_MiiSelector>());
 
             std::unique_ptr<EmuWindow_SDL2> emu_window =
                 std::make_unique<EmuWindow_SDL2>(fullscreen);
