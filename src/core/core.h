@@ -123,6 +123,10 @@ public:
         shutdown_requested = true;
     }
 
+    void SetResetFilePath(const std::string filepath) {
+        m_filepath = filepath;
+    }
+
     /**
      * Load an executable application.
      * @param emu_window Reference to the host-system window used for video output and keyboard
@@ -211,9 +215,6 @@ public:
 
     /// Gets a const reference to the custom texture cache system
     const Core::CustomTexCache& CustomTexCache() const;
-
-    /// Handles loading all custom textures from disk into cache.
-    void PreloadCustomTextures();
 
     /// Gets a reference to the video dumper backend
     VideoDumper::Backend& VideoDumper();
@@ -304,8 +305,11 @@ private:
 
     ResultStatus status = ResultStatus::Success;
     std::string status_details = "";
-    /// Saved variables for reset
+
+    /// Saved variable for reset
     Frontend::EmuWindow* m_emu_window;
+
+    /// Saved variable for reset and application jump
     std::string m_filepath;
 
     std::atomic<bool> reset_requested;

@@ -224,7 +224,9 @@ void EmuWindow_SDL2::Present() {
     SDL_GL_MakeCurrent(render_window, window_context);
     SDL_GL_SetSwapInterval(1);
     while (IsOpen()) {
-        VideoCore::g_renderer->TryPresent(100);
+        if (VideoCore::g_renderer != nullptr) {
+            VideoCore::g_renderer->TryPresent(100);
+        }
         SDL_GL_SwapWindow(render_window);
     }
     SDL_GL_MakeCurrent(render_window, nullptr);
@@ -286,14 +288,25 @@ void EmuWindow_SDL2::PollEvents() {
 
     const u32 current_time = SDL_GetTicks();
     if (current_time > last_time + 2000) {
-        Core::PerfStats::Results results = Core::System::GetInstance().GetAndResetPerfStats();
-        const std::string title =
-            game.empty()
-                ? fmt::format("vvctre {} | FPS: {:.0f} ({:.0f}%)", version::vvctre.to_string(),
-                              results.game_fps, results.emulation_speed * 100.0)
-                : fmt::format("vvctre {} | {} | FPS: {:.0f} ({:.0f}%)", version::vvctre.to_string(),
-                              game, results.game_fps, results.emulation_speed * 100.0);
-        SDL_SetWindowTitle(render_window, title.c_str());
+        Core::System& system = Core::System::GetInstance();
+
+        if (system.IsPoweredOn()) {
+            std::string game;
+            system.GetAppLoader().ReadTitle(game);
+
+            Core::PerfStats::Results results = system.GetAndResetPerfStats();
+
+            const std::string title =
+                game.empty()
+                    ? fmt::format("vvctre {} | FPS: {:.0f} ({:.0f}%)", version::vvctre.to_string(),
+                                  results.game_fps, results.emulation_speed * 100.0)
+                    : fmt::format("vvctre {} | {} | FPS: {:.0f} ({:.0f}%)",
+                                  version::vvctre.to_string(), game, results.game_fps,
+                                  results.emulation_speed * 100.0);
+
+            SDL_SetWindowTitle(render_window, title.c_str());
+        }
+
         last_time = current_time;
     }
 }
@@ -308,8 +321,4 @@ void EmuWindow_SDL2::DoneCurrent() {
 
 void EmuWindow_SDL2::OnMinimalClientAreaChangeRequest(std::pair<u32, u32> minimal_size) {
     SDL_SetWindowMinimumSize(render_window, minimal_size.first, minimal_size.second);
-}
-
-void EmuWindow_SDL2::SetGameName(const std::string& game) {
-    this->game = game;
 }

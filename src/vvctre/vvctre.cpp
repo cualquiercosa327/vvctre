@@ -529,11 +529,9 @@ int main(int argc, char** argv) {
                 break; // Expected case
             }
 
+#ifdef USE_DISCORD_PRESENCE
             std::string game;
             system.GetAppLoader().ReadTitle(game);
-            emu_window->SetGameName(game);
-
-#ifdef USE_DISCORD_PRESENCE
             [[maybe_unused]] DiscordRP discord_rp(game);
 #endif
 

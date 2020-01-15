@@ -5,6 +5,7 @@
 #include "common/common_paths.h"
 #include "core/core.h"
 #include "core/hle/applets/applet.h"
+#include "core/hle/service/am/am.h"
 #include "core/hle/service/apt/applet_manager.h"
 #include "core/hle/service/apt/errors.h"
 #include "core/hle/service/apt/ns.h"
@@ -513,29 +514,13 @@ ResultCode AppletManager::DoApplicationJump() {
 
     // TODO(Subv): Set the delivery parameters.
 
-    // TODO(Subv): Terminate the current Application.
-
     // Note: The real console sends signal 17 (WakeupToLaunchApplication) to the Home Menu, this
     // prompts it to call GetProgramIdOnApplicationJump and
     // PrepareToStartApplication/StartApplication on the title to launch.
+    system.SetResetFilePath(Service::AM::GetTitleContentPath(app_jump_parameters.next_media_type,
+                                                             app_jump_parameters.next_title_id));
+    system.RequestReset();
 
-    if (app_jump_parameters.next_title_id == app_jump_parameters.current_title_id) {
-        // Perform a soft-reset if we're trying to relaunch the same title.
-        // TODO(Subv): Note that this reboots the entire emulated system, a better way would be to
-        // simply re-launch the title without closing all services, but this would only work for
-        // installed titles since we have no way of getting the file path of an arbitrary game dump
-        // based only on the title id.
-        system.RequestReset();
-        return RESULT_SUCCESS;
-    }
-
-    // Launch the title directly.
-    auto process =
-        NS::LaunchTitle(app_jump_parameters.next_media_type, app_jump_parameters.next_title_id);
-    if (!process) {
-        LOG_CRITICAL(Service_APT, "Failed to launch title during application jump, exiting.");
-        system.RequestShutdown();
-    }
     return RESULT_SUCCESS;
 }
 

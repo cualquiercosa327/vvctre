@@ -168,6 +168,7 @@ System::ResultStatus System::Load(Frontend::EmuWindow& emu_window, const std::st
     // Reset counters and set time origin to current frame
     GetAndResetPerfStats();
     perf_stats->BeginSystemFrame();
+
     return status;
 }
 
@@ -355,12 +356,7 @@ void System::Shutdown() {
 }
 
 void System::Reset() {
-    // This is NOT a proper reset, but a temporary workaround by shutting down the system and
-    // reloading.
-    // TODO: Properly implement the reset
-
     Shutdown();
-    // Reload the system with the same setting
     Load(*m_emu_window, m_filepath);
 }
 

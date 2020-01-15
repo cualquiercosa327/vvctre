@@ -478,7 +478,7 @@ static void ExecuteCommand(const Command& command, u32 thread_id) {
 
     switch (command.id) {
 
-    // GX request DMA - typically used for copying memory from GSP heap to VRAM
+        // GX request DMA - typically used for copying memory from GSP heap to VRAM
     case CommandId::REQUEST_DMA: {
         Memory::MemorySystem& memory = Core::System::GetInstance().Memory();
 
@@ -498,7 +498,7 @@ static void ExecuteCommand(const Command& command, u32 thread_id) {
         SignalInterrupt(InterruptId::DMA);
         break;
     }
-    // TODO: This will need some rework in the future. (why?)
+        // TODO: This will need some rework in the future. (why?)
     case CommandId::SUBMIT_GPU_CMDLIST: {
         auto& params = command.submit_gpu_cmdlist;
 
@@ -522,8 +522,8 @@ static void ExecuteCommand(const Command& command, u32 thread_id) {
         break;
     }
 
-    // It's assumed that the two "blocks" behave equivalently.
-    // Presumably this is done simply to allow two memory fills to run in parallel.
+        // It's assumed that the two "blocks" behave equivalently.
+        // Presumably this is done simply to allow two memory fills to run in parallel.
     case CommandId::SET_MEMORY_FILL: {
         auto& params = command.memory_fill;
 
