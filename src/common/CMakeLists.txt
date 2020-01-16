@@ -61,6 +61,7 @@ endif()
 create_target_directory_groups(common)
 
 target_link_libraries(common PUBLIC fmt semver PRIVATE libzstd_static)
+target_include_directories(common PRIVATE ${PROJECT_SOURCE_DIR}/externals/zstd/lib)
 
 if (ARCHITECTURE_x86_64)
     target_link_libraries(common PRIVATE xbyak)

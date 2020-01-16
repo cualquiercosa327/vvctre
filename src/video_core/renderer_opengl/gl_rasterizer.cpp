@@ -14,7 +14,6 @@
 #include "common/math_util.h"
 #include "common/scope_exit.h"
 #include "common/vector_math.h"
-#include "core/core.h"
 #include "core/hw/gpu.h"
 #include "video_core/pica_state.h"
 #include "video_core/regs_framebuffer.h"
