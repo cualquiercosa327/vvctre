@@ -540,6 +540,7 @@ RPCServer::RPCServer() {
             Settings::values.render_3d =
                 static_cast<Settings::StereoRenderOption>(json["mode"].get<int>());
             Settings::values.factor_3d = json["intensity"].get<u8>();
+            Settings::Apply();
 
             res.status = 204;
         } catch (nlohmann::json::exception& exception) {

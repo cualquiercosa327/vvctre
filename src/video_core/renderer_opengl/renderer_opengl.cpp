@@ -235,7 +235,7 @@ void main() {
     color = vec4(color_tex_l.rgb*l+color_tex_r.rgb*r, color_tex_l.a);
 })";
 
-static const char fragment_shader_interlaced[] = R"(
+static const char fragment_shader_interlaced[] = R"(#version 330 core
 
 in vec2 frag_tex_coord;
 out vec4 color;
@@ -910,7 +910,7 @@ void RendererOpenGL::DrawScreens(const Layout::FramebufferLayout& layout) {
         Settings::values.render_3d == Settings::StereoRenderOption::Anaglyph ||
         Settings::values.render_3d == Settings::StereoRenderOption::Interlaced;
 
-    // Bind a second texture for the right eye if in Anaglyph mode
+    // Bind a second texture for the right eye if in Anaglyph or Interlaced mode
     if (stereo_single_screen) {
         glUniform1i(uniform_color_texture_r, 1);
     }
@@ -931,7 +931,7 @@ void RendererOpenGL::DrawScreens(const Layout::FramebufferLayout& layout) {
                                         ((float)top_screen.left / 2) + ((float)layout.width / 2),
                                         (float)top_screen.top, (float)top_screen.GetWidth() / 2,
                                         (float)top_screen.GetHeight());
-            } else if (Settings::values.render_3d == Settings::StereoRenderOption::Anaglyph) {
+            } else if (stereo_single_screen) {
                 DrawSingleScreenStereoRotated(
                     screen_infos[0], screen_infos[1], (float)top_screen.left, (float)top_screen.top,
                     (float)top_screen.GetWidth(), (float)top_screen.GetHeight());
@@ -948,7 +948,7 @@ void RendererOpenGL::DrawScreens(const Layout::FramebufferLayout& layout) {
                                  ((float)top_screen.left / 2) + ((float)layout.width / 2),
                                  (float)top_screen.top, (float)top_screen.GetWidth() / 2,
                                  (float)top_screen.GetHeight());
-            } else if (Settings::values.render_3d == Settings::StereoRenderOption::Anaglyph) {
+            } else if (stereo_single_screen) {
                 DrawSingleScreenStereo(screen_infos[0], screen_infos[1], (float)top_screen.left,
                                        (float)top_screen.top, (float)top_screen.GetWidth(),
                                        (float)top_screen.GetHeight());
@@ -971,7 +971,7 @@ void RendererOpenGL::DrawScreens(const Layout::FramebufferLayout& layout) {
                     screen_infos[2], ((float)bottom_screen.left / 2) + ((float)layout.width / 2),
                     (float)bottom_screen.top, (float)bottom_screen.GetWidth() / 2,
                     (float)bottom_screen.GetHeight());
-            } else if (Settings::values.render_3d == Settings::StereoRenderOption::Anaglyph) {
+            } else if (stereo_single_screen) {
                 DrawSingleScreenStereoRotated(screen_infos[2], screen_infos[2],
                                               (float)bottom_screen.left, (float)bottom_screen.top,
                                               (float)bottom_screen.GetWidth(),
@@ -991,7 +991,7 @@ void RendererOpenGL::DrawScreens(const Layout::FramebufferLayout& layout) {
                                  ((float)bottom_screen.left / 2) + ((float)layout.width / 2),
                                  (float)bottom_screen.top, (float)bottom_screen.GetWidth() / 2,
                                  (float)bottom_screen.GetHeight());
-            } else if (Settings::values.render_3d == Settings::StereoRenderOption::Anaglyph) {
+            } else if (stereo_single_screen) {
                 DrawSingleScreenStereo(screen_infos[2], screen_infos[2], (float)bottom_screen.left,
                                        (float)bottom_screen.top, (float)bottom_screen.GetWidth(),
                                        (float)bottom_screen.GetHeight());
