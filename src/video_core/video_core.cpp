@@ -64,6 +64,7 @@ void RequestScreenshot(void* data, std::function<void()> callback,
         LOG_ERROR(Render, "A screenshot is already requested or in progress, ignoring the request");
         return;
     }
+
     g_screenshot_bits = data;
     g_screenshot_complete_callback = std::move(callback);
     g_screenshot_framebuffer_layout = layout;
