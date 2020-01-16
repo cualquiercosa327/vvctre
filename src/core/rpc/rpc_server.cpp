@@ -16,6 +16,7 @@
 #include "core/hle/service/hid/hid.h"
 #include "core/hle/service/nfc/nfc_u.h"
 #include "core/memory.h"
+#include "core/movie.h"
 #include "core/rpc/rpc_server.h"
 #include "video_core/renderer_base.h"
 #include "video_core/video_core.h"
@@ -541,7 +542,6 @@ RPCServer::RPCServer() {
                 static_cast<Settings::StereoRenderOption>(json["mode"].get<int>());
             Settings::values.factor_3d = json["intensity"].get<u8>();
             Settings::Apply();
-
             res.status = 204;
         } catch (nlohmann::json::exception& exception) {
             res.status = 500;
@@ -1346,6 +1346,45 @@ RPCServer::RPCServer() {
             const nlohmann::json json = nlohmann::json::parse(req.body);
             Settings::values.lle_modules = json.get<std::unordered_map<std::string, bool>>();
             Core::System::GetInstance().RequestReset();
+            res.status = 204;
+        } catch (nlohmann::json::exception& exception) {
+            res.status = 500;
+            res.set_content(exception.what(), "text/plain");
+        }
+    });
+
+    server->Get("/movie", [&](const httplib::Request& req, httplib::Response& res) {
+        res.set_content(
+            nlohmann::json{
+                {"playing", Core::Movie::GetInstance().IsPlayingInput()},
+                {"recording", Core::Movie::GetInstance().IsRecordingInput()},
+            }
+                .dump(),
+            "application/json");
+    });
+
+    server->Get("/movie/stop", [&](const httplib::Request& req, httplib::Response& res) {
+        Core::Movie::GetInstance().Shutdown();
+        res.status = 204;
+    });
+
+    server->Post("/movie/play", [&](const httplib::Request& req, httplib::Response& res) {
+        try {
+            const nlohmann::json json = nlohmann::json::parse(req.body);
+            const std::string file = json["file"].get<std::string>();
+            Core::Movie::GetInstance().StartPlayback(file, [] {});
+            res.status = 204;
+        } catch (nlohmann::json::exception& exception) {
+            res.status = 500;
+            res.set_content(exception.what(), "text/plain");
+        }
+    });
+
+    server->Post("/movie/record", [&](const httplib::Request& req, httplib::Response& res) {
+        try {
+            const nlohmann::json json = nlohmann::json::parse(req.body);
+            const std::string file = json["file"].get<std::string>();
+            Core::Movie::GetInstance().StartRecording(file);
             res.status = 204;
         } catch (nlohmann::json::exception& exception) {
             res.status = 500;

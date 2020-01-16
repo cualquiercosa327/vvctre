@@ -900,3 +900,32 @@ If setting, the emulation will restart.
   "SSL": Boolean
 }
 ```
+
+# GET /movie
+
+Get the movie state.
+
+## Reply
+
+```json
+{
+  "playing": Boolean,
+  "recording": Boolean
+}
+```
+
+# GET /movie/stop
+
+Stop movie playback/recording.
+
+# POST /movie/play and /movie/record
+
+Play or record a movie.
+
+## Request
+
+```json
+{
+  "file": String
+}
+```
