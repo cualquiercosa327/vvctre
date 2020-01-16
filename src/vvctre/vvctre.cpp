@@ -486,13 +486,16 @@ int main(int argc, char** argv) {
             // Apply the settings
             Settings::Apply();
 
-            // Register frontend applets
-            Core::System& system = Core::System::GetInstance();
-            system.RegisterSoftwareKeyboard(std::make_shared<Frontend::SDL2_SoftwareKeyboard>());
-            system.RegisterMiiSelector(std::make_shared<Frontend::SDL2_MiiSelector>());
-
             std::unique_ptr<EmuWindow_SDL2> emu_window =
                 std::make_unique<EmuWindow_SDL2>(headless, fullscreen);
+
+            // Register frontend applets
+            Core::System& system = Core::System::GetInstance();
+            system.RegisterSoftwareKeyboard(std::make_shared<Frontend::SDL2_SoftwareKeyboard>(
+                [&emu_window] { emu_window->SoftwareKeyboardStarted(); }));
+            system.RegisterMiiSelector(std::make_shared<Frontend::SDL2_MiiSelector>(
+                [&emu_window] { emu_window->MiiPickerStarted(); }));
+
             Frontend::ScopeAcquireContext scope(*emu_window);
 
             const Core::System::ResultStatus load_result = system.Load(*emu_window, path);

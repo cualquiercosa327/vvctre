@@ -57,6 +57,9 @@ public:
     void DiskShaderCacheProgress(VideoCore::LoadCallbackStage stage, std::size_t value,
                                  std::size_t total);
 
+    void SoftwareKeyboardStarted();
+    void MiiPickerStarted();
+
 private:
     /// Called by PollEvents when a key is pressed or released.
     void OnKeyEvent(int key, u8 state);

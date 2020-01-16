@@ -14,8 +14,13 @@
 
 namespace Frontend {
 
+SDL2_MiiSelector::SDL2_MiiSelector(std::function<void()> started_callback)
+    : started_callback(std::move(started_callback)) {}
+
 void SDL2_MiiSelector::Setup(const MiiSelectorConfig& config) {
     MiiSelector::Setup(config);
+
+    started_callback();
 
     const std::string nand_directory = FileUtil::GetUserPath(FileUtil::UserPath::NANDDir);
     FileSys::ArchiveFactory_ExtSaveData extdata_archive_factory(nand_directory, true);

@@ -8,8 +8,13 @@
 
 namespace Frontend {
 
+SDL2_SoftwareKeyboard::SDL2_SoftwareKeyboard(std::function<void()> started_callback)
+    : started_callback(std::move(started_callback)) {}
+
 void SDL2_SoftwareKeyboard::Execute(const KeyboardConfig& config) {
     SoftwareKeyboard::Execute(config);
+
+    started_callback();
 
     LOG_INFO(Applet_SWKBD, "{}. Enter the text then press Ctrl+Z on Windows or Ctrl+D on Linux:",
              config.hint_text.empty() ? "No hint" : config.hint_text);

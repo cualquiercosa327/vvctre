@@ -254,6 +254,16 @@ void EmuWindow_SDL2::DiskShaderCacheProgress(VideoCore::LoadCallbackStage stage,
     }
 }
 
+void EmuWindow_SDL2::SoftwareKeyboardStarted() {
+    const std::string title = fmt::format("Enter text in the terminal.");
+    SDL_SetWindowTitle(render_window, title.c_str());
+}
+
+void EmuWindow_SDL2::MiiPickerStarted() {
+    const std::string title = fmt::format("Pick a Mii in the terminal.");
+    SDL_SetWindowTitle(render_window, title.c_str());
+}
+
 void EmuWindow_SDL2::Present() {
     if (render_window == nullptr) {
         return;
