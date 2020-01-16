@@ -520,7 +520,7 @@ void CopyDir(const std::string& source_path, const std::string& dest_path) {
 }
 
 std::optional<std::string> GetCurrentDir() {
-// Get the current working directory (getcwd uses malloc)
+    // Get the current working directory (getcwd uses malloc)
 #ifdef _WIN32
     wchar_t* dir;
     if (!(dir = _wgetcwd(nullptr, 0))) {

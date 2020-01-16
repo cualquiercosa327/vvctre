@@ -387,6 +387,7 @@ bool RasterizerOpenGL::SetupGeometryShader() {
     } else {
         LOG_ERROR(Render_OpenGL, "Accelerate draw doesn't support geometry shader");
     }
+    return false;
 }
 
 bool RasterizerOpenGL::AccelerateDrawBatch(bool is_indexed) {
@@ -400,13 +401,7 @@ bool RasterizerOpenGL::AccelerateDrawBatch(bool is_indexed) {
         }
     }
 
-    if (!SetupVertexShader())
-        return false;
-
-    if (!SetupGeometryShader())
-        return false;
-
-    return Draw(true, is_indexed);
+    return SetupVertexShader() && SetupGeometryShader() && Draw(true, is_indexed);
 }
 
 static GLenum GetCurrentPrimitiveMode() {
@@ -851,12 +846,12 @@ void RasterizerOpenGL::NotifyPicaRegisterChanged(u32 id) {
     const auto& regs = Pica::g_state.regs;
 
     switch (id) {
-    // Culling
+        // Culling
     case PICA_REG_INDEX(rasterizer.cull_mode):
         SyncCullMode();
         break;
 
-    // Clipping plane
+        // Clipping plane
     case PICA_REG_INDEX(rasterizer.clip_enable):
         SyncClipEnabled();
         break;
@@ -868,7 +863,7 @@ void RasterizerOpenGL::NotifyPicaRegisterChanged(u32 id) {
         SyncClipCoef();
         break;
 
-    // Depth modifiers
+        // Depth modifiers
     case PICA_REG_INDEX(rasterizer.viewport_depth_range):
         SyncDepthScale();
         break;
@@ -876,12 +871,12 @@ void RasterizerOpenGL::NotifyPicaRegisterChanged(u32 id) {
         SyncDepthOffset();
         break;
 
-    // Depth buffering
+        // Depth buffering
     case PICA_REG_INDEX(rasterizer.depthmap_enable):
         shader_dirty = true;
         break;
 
-    // Blending
+        // Blending
     case PICA_REG_INDEX(framebuffer.output_merger.alphablend_enable):
         SyncBlendEnabled();
         break;
@@ -892,12 +887,12 @@ void RasterizerOpenGL::NotifyPicaRegisterChanged(u32 id) {
         SyncBlendColor();
         break;
 
-    // Shadow texture
+        // Shadow texture
     case PICA_REG_INDEX(texturing.shadow):
         SyncShadowTextureBias();
         break;
 
-    // Fog state
+        // Fog state
     case PICA_REG_INDEX(texturing.fog_color):
         SyncFogColor();
         break;
@@ -912,7 +907,7 @@ void RasterizerOpenGL::NotifyPicaRegisterChanged(u32 id) {
         uniform_block_data.fog_lut_dirty = true;
         break;
 
-    // ProcTex state
+        // ProcTex state
     case PICA_REG_INDEX(texturing.proctex):
     case PICA_REG_INDEX(texturing.proctex_lut):
     case PICA_REG_INDEX(texturing.proctex_lut_offset):
@@ -954,14 +949,14 @@ void RasterizerOpenGL::NotifyPicaRegisterChanged(u32 id) {
         }
         break;
 
-    // Alpha test
+        // Alpha test
     case PICA_REG_INDEX(framebuffer.output_merger.alpha_test):
         SyncAlphaTest();
         shader_dirty = true;
         break;
 
-    // Sync GL stencil test + stencil write mask
-    // (Pica stencil test function register also contains a stencil write mask)
+        // Sync GL stencil test + stencil write mask
+        // (Pica stencil test function register also contains a stencil write mask)
     case PICA_REG_INDEX(framebuffer.output_merger.stencil_test.raw_func):
         SyncStencilTest();
         SyncStencilWriteMask();
@@ -971,23 +966,23 @@ void RasterizerOpenGL::NotifyPicaRegisterChanged(u32 id) {
         SyncStencilTest();
         break;
 
-    // Sync GL depth test + depth and color write mask
-    // (Pica depth test function register also contains a depth and color write mask)
+        // Sync GL depth test + depth and color write mask
+        // (Pica depth test function register also contains a depth and color write mask)
     case PICA_REG_INDEX(framebuffer.output_merger.depth_test_enable):
         SyncDepthTest();
         SyncDepthWriteMask();
         SyncColorWriteMask();
         break;
 
-    // Sync GL depth and stencil write mask
-    // (This is a dedicated combined depth / stencil write-enable register)
+        // Sync GL depth and stencil write mask
+        // (This is a dedicated combined depth / stencil write-enable register)
     case PICA_REG_INDEX(framebuffer.framebuffer.allow_depth_stencil_write):
         SyncDepthWriteMask();
         SyncStencilWriteMask();
         break;
 
-    // Sync GL color write mask
-    // (This is a dedicated color write-enable register)
+        // Sync GL color write mask
+        // (This is a dedicated color write-enable register)
     case PICA_REG_INDEX(framebuffer.framebuffer.allow_color_write):
         SyncColorWriteMask();
         break;
@@ -996,12 +991,12 @@ void RasterizerOpenGL::NotifyPicaRegisterChanged(u32 id) {
         SyncShadowBias();
         break;
 
-    // Scissor test
+        // Scissor test
     case PICA_REG_INDEX(rasterizer.scissor_test.mode):
         shader_dirty = true;
         break;
 
-    // Logic op
+        // Logic op
     case PICA_REG_INDEX(framebuffer.output_merger.logic_op):
         SyncLogicOp();
         break;
@@ -1010,13 +1005,13 @@ void RasterizerOpenGL::NotifyPicaRegisterChanged(u32 id) {
         shader_dirty = true;
         break;
 
-    // Texture 0 type
+        // Texture 0 type
     case PICA_REG_INDEX(texturing.texture0.type):
         shader_dirty = true;
         break;
 
-    // TEV stages
-    // (This also syncs fog_mode and fog_flip which are part of tev_combiner_buffer_input)
+        // TEV stages
+        // (This also syncs fog_mode and fog_flip which are part of tev_combiner_buffer_input)
     case PICA_REG_INDEX(texturing.tev_stage0.color_source1):
     case PICA_REG_INDEX(texturing.tev_stage0.color_modifier1):
     case PICA_REG_INDEX(texturing.tev_stage0.color_op):
@@ -1063,12 +1058,12 @@ void RasterizerOpenGL::NotifyPicaRegisterChanged(u32 id) {
         SyncTevConstColor(5, regs.texturing.tev_stage5);
         break;
 
-    // TEV combiner buffer color
+        // TEV combiner buffer color
     case PICA_REG_INDEX(texturing.tev_combiner_buffer_color):
         SyncCombinerColor();
         break;
 
-    // Fragment lighting switches
+        // Fragment lighting switches
     case PICA_REG_INDEX(lighting.disable):
     case PICA_REG_INDEX(lighting.max_light_index):
     case PICA_REG_INDEX(lighting.config0):
@@ -1079,7 +1074,7 @@ void RasterizerOpenGL::NotifyPicaRegisterChanged(u32 id) {
     case PICA_REG_INDEX(lighting.light_enable):
         break;
 
-    // Fragment lighting specular 0 color
+        // Fragment lighting specular 0 color
     case PICA_REG_INDEX(lighting.light[0].specular_0):
         SyncLightSpecular0(0);
         break;
@@ -1105,7 +1100,7 @@ void RasterizerOpenGL::NotifyPicaRegisterChanged(u32 id) {
         SyncLightSpecular0(7);
         break;
 
-    // Fragment lighting specular 1 color
+        // Fragment lighting specular 1 color
     case PICA_REG_INDEX(lighting.light[0].specular_1):
         SyncLightSpecular1(0);
         break;
@@ -1131,7 +1126,7 @@ void RasterizerOpenGL::NotifyPicaRegisterChanged(u32 id) {
         SyncLightSpecular1(7);
         break;
 
-    // Fragment lighting diffuse color
+        // Fragment lighting diffuse color
     case PICA_REG_INDEX(lighting.light[0].diffuse):
         SyncLightDiffuse(0);
         break;
@@ -1157,7 +1152,7 @@ void RasterizerOpenGL::NotifyPicaRegisterChanged(u32 id) {
         SyncLightDiffuse(7);
         break;
 
-    // Fragment lighting ambient color
+        // Fragment lighting ambient color
     case PICA_REG_INDEX(lighting.light[0].ambient):
         SyncLightAmbient(0);
         break;
@@ -1183,7 +1178,7 @@ void RasterizerOpenGL::NotifyPicaRegisterChanged(u32 id) {
         SyncLightAmbient(7);
         break;
 
-    // Fragment lighting position
+        // Fragment lighting position
     case PICA_REG_INDEX(lighting.light[0].x):
     case PICA_REG_INDEX(lighting.light[0].z):
         SyncLightPosition(0);
@@ -1217,7 +1212,7 @@ void RasterizerOpenGL::NotifyPicaRegisterChanged(u32 id) {
         SyncLightPosition(7);
         break;
 
-    // Fragment spot lighting direction
+        // Fragment spot lighting direction
     case PICA_REG_INDEX(lighting.light[0].spot_x):
     case PICA_REG_INDEX(lighting.light[0].spot_z):
         SyncLightSpotDirection(0);
@@ -1251,7 +1246,7 @@ void RasterizerOpenGL::NotifyPicaRegisterChanged(u32 id) {
         SyncLightSpotDirection(7);
         break;
 
-    // Fragment lighting light source config
+        // Fragment lighting light source config
     case PICA_REG_INDEX(lighting.light[0].config):
     case PICA_REG_INDEX(lighting.light[1].config):
     case PICA_REG_INDEX(lighting.light[2].config):
@@ -1263,7 +1258,7 @@ void RasterizerOpenGL::NotifyPicaRegisterChanged(u32 id) {
         shader_dirty = true;
         break;
 
-    // Fragment lighting distance attenuation bias
+        // Fragment lighting distance attenuation bias
     case PICA_REG_INDEX(lighting.light[0].dist_atten_bias):
         SyncLightDistanceAttenuationBias(0);
         break;
@@ -1289,7 +1284,7 @@ void RasterizerOpenGL::NotifyPicaRegisterChanged(u32 id) {
         SyncLightDistanceAttenuationBias(7);
         break;
 
-    // Fragment lighting distance attenuation scale
+        // Fragment lighting distance attenuation scale
     case PICA_REG_INDEX(lighting.light[0].dist_atten_scale):
         SyncLightDistanceAttenuationScale(0);
         break;
@@ -1315,12 +1310,12 @@ void RasterizerOpenGL::NotifyPicaRegisterChanged(u32 id) {
         SyncLightDistanceAttenuationScale(7);
         break;
 
-    // Fragment lighting global ambient color (emission + ambient * ambient)
+        // Fragment lighting global ambient color (emission + ambient * ambient)
     case PICA_REG_INDEX(lighting.global_ambient):
         SyncGlobalAmbient();
         break;
 
-    // Fragment lighting lookup tables
+        // Fragment lighting lookup tables
     case PICA_REG_INDEX(lighting.lut_data[0]):
     case PICA_REG_INDEX(lighting.lut_data[1]):
     case PICA_REG_INDEX(lighting.lut_data[2]):

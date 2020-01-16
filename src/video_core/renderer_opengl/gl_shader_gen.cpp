@@ -1230,7 +1230,8 @@ float ProcTexNoiseCoef(vec2 x) {
     }
 }
 
-std::string GenerateFragmentShader(const PicaFSConfig& config, bool separable_shader) {
+ShaderDecompiler::ProgramResult GenerateFragmentShader(const PicaFSConfig& config,
+                                                       bool separable_shader) {
     const auto& state = config.state;
 
     std::string out = R"(#version 330 core
@@ -1289,7 +1290,9 @@ float LookupLightingLUTUnsigned(int lut_index, float pos) {
 float LookupLightingLUTSigned(int lut_index, float pos) {
     int index = clamp(int(pos * 128.0), -128, 127);
     float delta = pos * 128.0 - index;
-    if (index < 0) index += 256;
+    if (index < 0) {
+        index += 256;
+    }
     return LookupLightingLUT(lut_index, index, delta);
 }
 
@@ -1334,8 +1337,9 @@ float CompareShadow(uint pixel, uint z) {
 }
 
 float SampleShadow2D(ivec2 uv, uint z) {
-    if (any(bvec4( lessThan(uv, ivec2(0)), greaterThanEqual(uv, imageSize(shadow_texture_px)) )))
+    if (any(bvec4( lessThan(uv, ivec2(0)), greaterThanEqual(uv, imageSize(shadow_texture_px)) ))) {
         return 1.0;
+    }
     return CompareShadow(imageLoad(shadow_texture_px, uv).x, z);
 }
 
@@ -1473,7 +1477,7 @@ vec4 shadowTextureCube(vec2 uv, float w) {
     // Do not do any sort of processing if it's obvious we're not going to pass the alpha test
     if (state.alpha_test_func == FramebufferRegs::CompareFunc::Never) {
         out += "discard; }";
-        return out;
+        return {out};
     }
 
     // Append the scissor test
@@ -1534,7 +1538,7 @@ vec4 shadowTextureCube(vec2 uv, float w) {
     } else if (state.fog_mode == TexturingRegs::FogMode::Gas) {
         LOG_CRITICAL(Render_OpenGL, "Unimplemented gas mode");
         out += "discard; }";
-        return out;
+        return {out};
     }
 
     if (state.shadow_rendering) {
@@ -1571,10 +1575,10 @@ do {
 
     out += "}";
 
-    return out;
+    return {out};
 }
 
-std::string GenerateTrivialVertexShader(bool separable_shader) {
+ShaderDecompiler::ProgramResult GenerateTrivialVertexShader(bool separable_shader) {
     std::string out = "#version 330 core\n";
     if (separable_shader) {
         out += "#extension GL_ARB_separate_shader_objects : enable\n";
@@ -1599,7 +1603,9 @@ std::string GenerateTrivialVertexShader(bool separable_shader) {
 
     out += UniformBlockDef;
 
-    out += R"(void main() {
+    out += R"(
+
+void main() {
     primary_color = vert_color;
     texcoord0 = vert_texcoord0;
     texcoord1 = vert_texcoord1;
@@ -1612,11 +1618,11 @@ std::string GenerateTrivialVertexShader(bool separable_shader) {
     gl_ClipDistance[1] = dot(clip_coef, vert_position);
 })";
 
-    return out;
+    return {out};
 }
 
-std::optional<std::string> GenerateVertexShader(const Pica::Shader::ShaderSetup& setup,
-                                                const PicaVSConfig& config, bool separable_shader) {
+std::optional<ShaderDecompiler::ProgramResult> GenerateVertexShader(
+    const Pica::Shader::ShaderSetup& setup, const PicaVSConfig& config, bool separable_shader) {
     std::string out = "#version 330 core\n";
     if (separable_shader) {
         out += "#extension GL_ARB_separate_shader_objects : enable\n";
@@ -1643,10 +1649,9 @@ std::optional<std::string> GenerateVertexShader(const Pica::Shader::ShaderSetup&
         setup.program_code, setup.swizzle_data, config.state.main_offset, get_input_reg,
         get_output_reg, config.state.sanitize_mul);
 
-    if (!program_source_opt)
+    if (!program_source_opt) {
         return {};
-
-    std::string& program_source = *program_source_opt;
+    }
 
     out += R"(
 #define uniforms vs_uniforms
@@ -1676,9 +1681,9 @@ layout (std140) uniform vs_config {
     }
     out += "\n    exec_shader();\n}\n\n";
 
-    out += program_source;
+    out += program_source_opt->code;
 
-    return out;
+    return {{out}};
 }
 
 static std::string GetGSCommonSource(const PicaGSConfigCommonRaw& config, bool separable_shader) {
@@ -1764,7 +1769,8 @@ void EmitPrim(Vertex vtx0, Vertex vtx1, Vertex vtx2) {
     return out;
 };
 
-std::string GenerateFixedGeometryShader(const PicaFixedGSConfig& config, bool separable_shader) {
+ShaderDecompiler::ProgramResult GenerateFixedGeometryShader(const PicaFixedGSConfig& config,
+                                                            bool separable_shader) {
     std::string out = "#version 330 core\n";
     if (separable_shader) {
         out += "#extension GL_ARB_separate_shader_objects : enable\n\n";
@@ -1794,6 +1800,6 @@ void main() {
     out += "    EmitPrim(prim_buffer[0], prim_buffer[1], prim_buffer[2]);\n";
     out += "}\n";
 
-    return out;
+    return {out};
 }
 } // namespace OpenGL

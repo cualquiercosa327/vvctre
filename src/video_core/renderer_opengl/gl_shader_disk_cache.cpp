@@ -253,6 +253,12 @@ ShaderDiskCache::LoadPrecompiledFile(FileUtil::IOFile& file) {
 }
 
 std::optional<ShaderDiskCacheDecompiled> ShaderDiskCache::LoadDecompiledEntry() {
+
+    bool sanitize_mul;
+    if (!LoadObjectFromPrecompiled(sanitize_mul)) {
+        return {};
+    }
+
     u32 code_size;
     if (!LoadObjectFromPrecompiled(code_size)) {
         return {};
@@ -264,17 +270,19 @@ std::optional<ShaderDiskCacheDecompiled> ShaderDiskCache::LoadDecompiledEntry() 
     }
 
     ShaderDiskCacheDecompiled entry;
-    entry.code = std::move(code);
+    entry.result.code = std::move(code);
+    entry.sanitize_mul = sanitize_mul;
 
     return entry;
 }
 
 bool ShaderDiskCache::SaveDecompiledFile(u64 unique_identifier,
-                                         const ShaderDecompiler::ProgramResult& code) {
-    if (!SaveObjectToPrecompiled(static_cast<u8>(PrecompiledEntryKind::Decompiled)) ||
-        !SaveObjectToPrecompiled(unique_identifier) ||
-        !SaveObjectToPrecompiled(static_cast<u32>(code.size())) ||
-        !SaveArrayToPrecompiled(code.data(), code.size())) {
+                                         const ShaderDecompiler::ProgramResult& result,
+                                         bool sanitize_mul) {
+    if (!SaveObjectToPrecompiled(PrecompiledEntryKind::Decompiled) ||
+        !SaveObjectToPrecompiled(unique_identifier) || !SaveObjectToPrecompiled(sanitize_mul) ||
+        !SaveObjectToPrecompiled(static_cast<u32>(result.code.size())) ||
+        !SaveArrayToPrecompiled(result.code.data(), result.code.size())) {
         return false;
     }
 
@@ -323,12 +331,13 @@ void ShaderDiskCache::SaveRaw(const ShaderDiskCacheRaw& entry) {
 }
 
 void ShaderDiskCache::SaveDecompiled(u64 unique_identifier,
-                                     const ShaderDecompiler::ProgramResult& code) {
+                                     const ShaderDecompiler::ProgramResult& code,
+                                     bool sanitize_mul) {
     if (!IsUsable()) {
         return;
     }
 
-    if (!SaveDecompiledFile(unique_identifier, code)) {
+    if (!SaveDecompiledFile(unique_identifier, code, sanitize_mul)) {
         LOG_ERROR(Render_OpenGL,
                   "Failed to save decompiled entry to the precompiled file - removing");
         InvalidatePrecompiled();

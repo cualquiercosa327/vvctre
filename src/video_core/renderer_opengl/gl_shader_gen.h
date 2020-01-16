@@ -16,7 +16,15 @@
 
 namespace OpenGL {
 
-enum class ProgramType : u32 { VS, GS, FS };
+namespace ShaderDecompiler {
+struct ProgramResult;
+} // namespace ShaderDecompiler
+
+enum class ProgramType : u32 {
+    VS,
+    GS,
+    FS,
+};
 
 enum Attributes {
     ATTRIBUTE_POSITION,
@@ -202,20 +210,21 @@ struct PicaFixedGSConfig : Common::HashableStruct<PicaGSConfigCommonRaw> {
  * @param separable_shader generates shader that can be used for separate shader object
  * @returns String of the shader source code
  */
-std::string GenerateTrivialVertexShader(bool separable_shader);
+ShaderDecompiler::ProgramResult GenerateTrivialVertexShader(bool separable_shader);
 
 /**
  * Generates the GLSL vertex shader program source code for the given VS program
  * @returns String of the shader source code; boost::none on failure
  */
-std::optional<std::string> GenerateVertexShader(const Pica::Shader::ShaderSetup& setup,
-                                                const PicaVSConfig& config, bool separable_shader);
+std::optional<ShaderDecompiler::ProgramResult> GenerateVertexShader(
+    const Pica::Shader::ShaderSetup& setup, const PicaVSConfig& config, bool separable_shader);
 
 /*
  * Generates the GLSL fixed geometry shader program source code for non-GS PICA pipeline
  * @returns String of the shader source code
  */
-std::string GenerateFixedGeometryShader(const PicaFixedGSConfig& config, bool separable_shader);
+ShaderDecompiler::ProgramResult GenerateFixedGeometryShader(const PicaFixedGSConfig& config,
+                                                            bool separable_shader);
 
 /**
  * Generates the GLSL fragment shader program source code for the current Pica state
@@ -224,7 +233,8 @@ std::string GenerateFixedGeometryShader(const PicaFixedGSConfig& config, bool se
  * @param separable_shader generates shader that can be used for separate shader object
  * @returns String of the shader source code
  */
-std::string GenerateFragmentShader(const PicaFSConfig& config, bool separable_shader);
+ShaderDecompiler::ProgramResult GenerateFragmentShader(const PicaFSConfig& config,
+                                                       bool separable_shader);
 
 } // namespace OpenGL
 
