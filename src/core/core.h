@@ -306,10 +306,8 @@ private:
     ResultStatus status = ResultStatus::Success;
     std::string status_details = "";
 
-    /// Saved variable for reset
+    /// Saved variables for reset and application jump
     Frontend::EmuWindow* m_emu_window;
-
-    /// Saved variable for reset and application jump
     std::string m_filepath;
 
     std::atomic<bool> reset_requested;
