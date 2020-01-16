@@ -84,7 +84,7 @@ private:
     bool is_open = true;
 
     /// Internal SDL2 render window
-    SDL_Window* render_window;
+    SDL_Window* render_window = nullptr;
 
     /// Fake hidden window for the core context
     SDL_Window* dummy_window;

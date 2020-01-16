@@ -242,6 +242,12 @@ RPCServer::RPCServer() {
     });
 
     server->Get("/screenshot", [&](const httplib::Request& req, httplib::Response& res) {
+        if (VideoCore::g_renderer == nullptr) {
+            res.status = 503;
+            res.set_content("renderer is null", "text/plain");
+            return;
+        }
+
         const Layout::FramebufferLayout& layout =
             VideoCore::g_renderer->GetRenderWindow().GetFramebufferLayout();
 

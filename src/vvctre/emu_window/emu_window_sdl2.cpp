@@ -65,7 +65,12 @@ void EmuWindow_SDL2::OnMouseButton(u32 button, u8 state, s32 x, s32 y) {
 
 std::pair<unsigned, unsigned> EmuWindow_SDL2::TouchToPixelPos(float touch_x, float touch_y) const {
     int w, h;
-    SDL_GetWindowSize(render_window, &w, &h);
+    if (render_window == nullptr) {
+        w = 400;
+        h = 480;
+    } else {
+        SDL_GetWindowSize(render_window, &w, &h);
+    }
 
     touch_x *= w;
     touch_y *= h;
@@ -105,6 +110,10 @@ bool EmuWindow_SDL2::IsOpen() const {
 }
 
 void EmuWindow_SDL2::OnResize() {
+    if (render_window == nullptr) {
+        return;
+    }
+
     int width, height;
     SDL_GetWindowSize(render_window, &width, &height);
     UpdateCurrentFramebufferLayout(width, height);
@@ -135,7 +144,7 @@ EmuWindow_SDL2::EmuWindow_SDL2(bool fullscreen) {
     // Initialize the window
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_JOYSTICK) < 0) {
         LOG_CRITICAL(Frontend, "Failed to initialize SDL2! Exiting...");
-        exit(1);
+        std::exit(1);
     }
 
     InputCommon::Init();
@@ -157,47 +166,46 @@ EmuWindow_SDL2::EmuWindow_SDL2(bool fullscreen) {
     // Enable vsync
     SDL_GL_SetSwapInterval(1);
 
-    const std::string window_title = fmt::format("vvctre {}", version::vvctre.to_string());
-
-    render_window = SDL_CreateWindow(
-        window_title.c_str(),
-        SDL_WINDOWPOS_UNDEFINED, // x position
-        SDL_WINDOWPOS_UNDEFINED, // y position
-        Core::kScreenTopWidth, Core::kScreenTopHeight + Core::kScreenBottomHeight, [] {
-            Uint32 flags = SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI;
-            if (std::getenv("VVCTRE_HIDDEN")) {
-                flags |= SDL_WINDOW_HIDDEN;
-            }
-            return flags;
-        }());
-
-    if (render_window == nullptr) {
-        LOG_CRITICAL(Frontend, "Failed to create SDL2 window: {}", SDL_GetError());
-        std::exit(1);
-    }
-
     dummy_window = SDL_CreateWindow(NULL, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 0, 0,
                                     SDL_WINDOW_HIDDEN | SDL_WINDOW_OPENGL);
 
-    if (fullscreen) {
-        Fullscreen();
+    if (std::getenv("VVCTRE_HIDDEN") == nullptr) {
+        const std::string window_title = fmt::format("vvctre {}", version::vvctre.to_string());
+
+        render_window = SDL_CreateWindow(
+            window_title.c_str(),
+            SDL_WINDOWPOS_UNDEFINED, // x position
+            SDL_WINDOWPOS_UNDEFINED, // y position
+            Core::kScreenTopWidth, Core::kScreenTopHeight + Core::kScreenBottomHeight,
+            SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
+
+        if (render_window == nullptr) {
+            LOG_CRITICAL(Frontend, "Failed to create SDL2 window: {}", SDL_GetError());
+            std::exit(1);
+        }
+
+        if (fullscreen) {
+            Fullscreen();
+        }
+
+        window_context = SDL_GL_CreateContext(render_window);
+        if (window_context == nullptr) {
+            LOG_CRITICAL(Frontend, "Failed to create SDL2 GL context: {}", SDL_GetError());
+            std::exit(1);
+        }
+    } else {
+        UpdateCurrentFramebufferLayout(400, 480);
     }
 
-    window_context = SDL_GL_CreateContext(render_window);
     core_context = CreateSharedContext();
-
-    if (window_context == nullptr) {
-        LOG_CRITICAL(Frontend, "Failed to create SDL2 GL context: {}", SDL_GetError());
-        exit(1);
-    }
     if (core_context == nullptr) {
         LOG_CRITICAL(Frontend, "Failed to create shared SDL2 GL context: {}", SDL_GetError());
-        exit(1);
+        std::exit(1);
     }
 
     if (!gladLoadGLLoader(static_cast<GLADloadproc>(SDL_GL_GetProcAddress))) {
         LOG_CRITICAL(Frontend, "Failed to initialize GL functions: {}", SDL_GetError());
-        exit(1);
+        std::exit(1);
     }
 
     OnResize();
@@ -221,6 +229,10 @@ std::unique_ptr<Frontend::GraphicsContext> EmuWindow_SDL2::CreateSharedContext()
 }
 
 void EmuWindow_SDL2::Present() {
+    if (render_window == nullptr) {
+        return;
+    }
+
     SDL_GL_MakeCurrent(render_window, window_context);
     SDL_GL_SetSwapInterval(1);
     while (IsOpen()) {
@@ -286,6 +298,10 @@ void EmuWindow_SDL2::PollEvents() {
         }
     }
 
+    if (render_window == nullptr) {
+        return;
+    }
+
     const u32 current_time = SDL_GetTicks();
     if (current_time > last_time + 2000) {
         Core::System& system = Core::System::GetInstance();
@@ -323,5 +339,9 @@ void EmuWindow_SDL2::DoneCurrent() {
 }
 
 void EmuWindow_SDL2::OnMinimalClientAreaChangeRequest(std::pair<u32, u32> minimal_size) {
+    if (render_window == nullptr) {
+        return;
+    }
+
     SDL_SetWindowMinimumSize(render_window, minimal_size.first, minimal_size.second);
 }
