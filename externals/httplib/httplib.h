@@ -49,7 +49,12 @@
 #endif
 
 #ifndef CPPHTTPLIB_THREAD_POOL_COUNT
-#define CPPHTTPLIB_THREAD_POOL_COUNT (std::thread::hardware_concurrency())
+// if hardware_concurrency() outputs 0 we still wants to use threads for this.
+// -1 because we have one thread already in the main function.
+#define CPPHTTPLIB_THREAD_POOL_COUNT                                           \
+  (std::thread::hardware_concurrency()                                         \
+       ? std::thread::hardware_concurrency() - 1                               \
+       : 2)
 #endif
 
 /*
@@ -630,6 +635,11 @@ public:
                                 size_t content_length,
                                 ContentProvider content_provider,
                                 const char *content_type);
+
+  std::shared_ptr<Response> Put(const char *path, const Params &params);
+
+  std::shared_ptr<Response> Put(const char *path, const Headers &headers,
+                                const Params &params);
 
   std::shared_ptr<Response> Patch(const char *path, const std::string &body,
                                   const char *content_type);
@@ -1571,6 +1581,7 @@ inline const char *status_message(int status) {
   case 414: return "Request-URI Too Long";
   case 415: return "Unsupported Media Type";
   case 416: return "Range Not Satisfiable";
+  case 503: return "Service Unavailable";
 
   default:
   case 500: return "Internal Server Error";
@@ -2157,6 +2168,8 @@ public:
       case 3: { // Body
         {
           auto pattern = crlf_ + dash_;
+          if (pattern.size() > buf_.size()) { return true; }
+
           auto pos = buf_.find(pattern);
           if (pos == std::string::npos) { pos = buf_.size(); }
           if (!content_callback(buf_.data(), pos)) {
@@ -4083,6 +4096,24 @@ Client::Put(const char *path, const Headers &headers, size_t content_length,
   return send_with_content_provider("PUT", path, headers, std::string(),
                                     content_length, content_provider,
                                     content_type);
+}
+
+inline std::shared_ptr<Response> Client::Put(const char *path,
+                                             const Params &params) {
+  return Put(path, Headers(), params);
+}
+
+inline std::shared_ptr<Response>
+Client::Put(const char *path, const Headers &headers, const Params &params) {
+  std::string query;
+  for (auto it = params.begin(); it != params.end(); ++it) {
+    if (it != params.begin()) { query += "&"; }
+    query += it->first;
+    query += "=";
+    query += detail::encode_url(it->second);
+  }
+
+  return Put(path, headers, query, "application/x-www-form-urlencoded");
 }
 
 inline std::shared_ptr<Response> Client::Patch(const char *path,
