@@ -254,7 +254,11 @@ RPCServer::RPCServer() {
 
         Common::Event done;
         std::vector<u8> data(layout.width * layout.height * 4);
-        VideoCore::RequestScreenshot(data.data(), [&] { done.Set(); }, layout);
+        if (VideoCore::RequestScreenshot(data.data(), [&] { done.Set(); }, layout)) {
+            res.status = 503;
+            res.set_content("another screenshot is pending", "text/plain");
+            return;
+        }
         done.Wait();
 
         // Rotate the image to put the pixels in correct order

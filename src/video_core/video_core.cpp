@@ -58,17 +58,18 @@ void Shutdown() {
     LOG_DEBUG(Render, "shutdown OK");
 }
 
-void RequestScreenshot(void* data, std::function<void()> callback,
+bool RequestScreenshot(void* data, std::function<void()> callback,
                        const Layout::FramebufferLayout& layout) {
     if (g_renderer_screenshot_requested) {
-        LOG_ERROR(Render, "A screenshot is already requested or in progress, ignoring the request");
-        return;
+        return true;
     }
 
     g_screenshot_bits = data;
     g_screenshot_complete_callback = std::move(callback);
     g_screenshot_framebuffer_layout = layout;
     g_renderer_screenshot_requested = true;
+
+    return false;
 }
 
 u16 GetResolutionScaleFactor() {

@@ -54,7 +54,8 @@ ResultStatus Init(Frontend::EmuWindow& emu_window, Memory::MemorySystem& memory)
 void Shutdown();
 
 /// Request a screenshot of the next frame
-void RequestScreenshot(void* data, std::function<void()> callback,
+/// Returns: another screenshot pending
+bool RequestScreenshot(void* data, std::function<void()> callback,
                        const Layout::FramebufferLayout& layout);
 
 u16 GetResolutionScaleFactor();
