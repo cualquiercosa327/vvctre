@@ -77,16 +77,16 @@ public:
         ErrorSystemMode,            ///< Error determining the system mode
         ErrorLoader,                ///< Error loading the specified application
         ErrorLoader_ErrorEncrypted, ///< Error loading the specified application due to encryption
-        ErrorLoader_ErrorInvalidFormat, ///< Error loading the specified application due to an
-                                        /// invalid format
+        ErrorLoader_ErrorInvalidFormat,     ///< Error loading the specified application due to an
+                                            /// invalid format
         ErrorSystemFiles,                   ///< Error in finding system files
         ErrorVideoCore,                     ///< Error in the video core
         ErrorVideoCore_ErrorGenericDrivers, ///< Error in the video core due to the user having
                                             /// generic drivers installed
-        ErrorVideoCore_ErrorBelowGL33, ///< Error in the video core due to the user not having
-                                       /// OpenGL 3.3 or higher
-        ShutdownRequested, ///< Emulated program requested a system shutdown
-        ErrorUnknown       ///< Any other error
+        ErrorVideoCore_ErrorBelowGL33,      ///< Error in the video core due to the user not having
+                                            /// OpenGL 3.3 or higher
+        ShutdownRequested,                  ///< Emulated program requested a system shutdown
+        ErrorUnknown                        ///< Any other error
     };
 
     /**

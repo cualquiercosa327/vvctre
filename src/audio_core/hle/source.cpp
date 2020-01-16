@@ -26,8 +26,9 @@ SourceStatus::Status Source::Tick(SourceConfiguration::Configuration& config,
 }
 
 void Source::MixInto(QuadFrame32& dest, std::size_t intermediate_mix_id) const {
-    if (!state.enabled)
+    if (!state.enabled) {
         return;
+    }
 
     const std::array<float, 4>& gains = state.gain.at(intermediate_mix_id);
     for (std::size_t samplei = 0; samplei < samples_per_frame; samplei++) {
@@ -289,6 +290,9 @@ void Source::GenerateFrame() {
             break;
         }
     }
+
+    // TODO(jroweboy): Keep track of frame_position independently so that it doesn't lose precision
+    // over time
     state.next_sample_number += static_cast<u32>(frame_position * state.rate_multiplier);
 
     state.filters.ProcessFrame(current_frame);
@@ -338,7 +342,7 @@ bool Source::DequeueBuffer() {
         return true;
     }
 
-    // the first playthrough starts at play_position, loops start at the beginning of the buffer
+    // The first playthrough starts at play_position, loops start at the beginning of the buffer
     state.current_sample_number = (!buf.has_played) ? buf.play_position : 0;
     state.next_sample_number = state.current_sample_number;
     state.current_buffer_id = buf.buffer_id;
