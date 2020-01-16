@@ -10,7 +10,14 @@
 
 DiscordRP::DiscordRP(const std::string& game) {
     Discord_Initialize("657225747915866157", nullptr, 1, nullptr);
+    Update(game);
+}
 
+DiscordRP::~DiscordRP() {
+    Discord_Shutdown();
+}
+
+void DiscordRP::Update(const std::string& game) {
     DiscordRichPresence presence{};
     presence.state = fmt::format("Version {} (movie version {}, shader cache version {})",
                                  version::vvctre.to_string(), version::movie, version::shader_cache)
@@ -20,8 +27,4 @@ DiscordRP::DiscordRP(const std::string& game) {
                                   std::chrono::system_clock::now().time_since_epoch())
                                   .count();
     Discord_UpdatePresence(&presence);
-}
-
-DiscordRP::~DiscordRP() {
-    Discord_Shutdown();
 }

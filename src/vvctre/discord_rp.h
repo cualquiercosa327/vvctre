@@ -8,4 +8,5 @@ class DiscordRP {
 public:
     DiscordRP(const std::string& game);
     ~DiscordRP();
+    void Update(const std::string& game);
 };

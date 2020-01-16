@@ -46,10 +46,6 @@
 #include "vvctre/config.h"
 #include "vvctre/emu_window/emu_window_sdl2.h"
 
-#ifdef USE_DISCORD_PRESENCE
-#include "vvctre/discord_rp.h"
-#endif
-
 #ifndef _MSC_VER
 #include <unistd.h>
 #endif
@@ -530,12 +526,6 @@ int main(int argc, char** argv) {
             case Core::System::ResultStatus::Success:
                 break; // Expected case
             }
-
-#ifdef USE_DISCORD_PRESENCE
-            std::string game;
-            system.GetAppLoader().ReadTitle(game);
-            [[maybe_unused]] DiscordRP discord_rp(game);
-#endif
 
             if (!movie_play.empty()) {
                 Core::Movie::GetInstance().StartPlayback(movie_play);

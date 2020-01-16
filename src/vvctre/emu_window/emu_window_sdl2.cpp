@@ -22,6 +22,10 @@
 #include "video_core/video_core.h"
 #include "vvctre/emu_window/emu_window_sdl2.h"
 
+#ifdef USE_DISCORD_PRESENCE
+#include "vvctre/discord_rp.h"
+#endif
+
 SharedContext_SDL2::SharedContext_SDL2() {
     window = SDL_CreateWindow(NULL, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 0, 0,
                               SDL_WINDOW_HIDDEN | SDL_WINDOW_OPENGL);
@@ -308,19 +312,26 @@ void EmuWindow_SDL2::PollEvents() {
 
         if (system.IsPoweredOn()) {
             const u64 current_program_id = system.Kernel().GetCurrentProcess()->codeset->program_id;
-            if (title_program_id != current_program_id) {
-                system.GetAppLoader().ReadTitle(title_program_name);
-                title_program_id = current_program_id;
+            if (program_id != current_program_id) {
+                system.GetAppLoader().ReadTitle(program_name);
+#ifdef USE_DISCORD_PRESENCE
+                if (discord_rp == nullptr) {
+                    discord_rp = std::make_unique<DiscordRP>(program_name);
+                } else {
+                    discord_rp->Update(program_name);
+                }
+#endif
+                program_id = current_program_id;
             }
 
             Core::PerfStats::Results results = system.GetAndResetPerfStats();
 
             const std::string title =
-                title_program_name.empty()
+                program_name.empty()
                     ? fmt::format("vvctre {} | FPS: {:.0f} ({:.0f}%)", version::vvctre.to_string(),
                                   results.game_fps, results.emulation_speed * 100.0)
                     : fmt::format("vvctre {} | {} | FPS: {:.0f} ({:.0f}%)",
-                                  version::vvctre.to_string(), title_program_name, results.game_fps,
+                                  version::vvctre.to_string(), program_name, results.game_fps,
                                   results.emulation_speed * 100.0);
 
             SDL_SetWindowTitle(render_window, title.c_str());

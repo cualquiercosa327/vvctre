@@ -10,6 +10,10 @@
 
 struct SDL_Window;
 
+#ifdef USE_DISCORD_PRESENCE
+class DiscordRP;
+#endif
+
 class SharedContext_SDL2 : public Frontend::GraphicsContext {
 public:
     using SDL_GLContext = void*;
@@ -100,7 +104,10 @@ private:
     /// Keeps track of how often to update the title bar during gameplay
     u32 last_time = 0;
 
-    /// Title bar stuff
-    std::string title_program_name;
-    u64 title_program_id = 0;
+    std::string program_name;
+    u64 program_id = 0;
+
+#ifdef USE_DISCORD_PRESENCE
+    std::unique_ptr<DiscordRP> discord_rp;
+#endif
 };
