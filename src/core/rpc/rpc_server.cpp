@@ -968,7 +968,8 @@ RPCServer::RPCServer() {
         try {
             const nlohmann::json json = nlohmann::json::parse(req.body);
             Settings::values.use_cpu_jit = json["enabled"].get<bool>();
-            res.status = 202;
+            Core::System::GetInstance().RequestReset();
+            res.status = 200;
         } catch (nlohmann::json::exception& exception) {
             res.status = 500;
             res.set_content(exception.what(), "text/plain");
@@ -1015,7 +1016,8 @@ RPCServer::RPCServer() {
             if (Settings::values.enable_dsp_lle) {
                 Settings::values.enable_dsp_lle_multithread = json["multithreaded"].get<bool>();
             }
-            res.status = 202;
+            Core::System::GetInstance().RequestReset();
+            res.status = 200;
         } catch (nlohmann::json::exception& exception) {
             res.status = 500;
             res.set_content(exception.what(), "text/plain");
@@ -1138,7 +1140,8 @@ RPCServer::RPCServer() {
         try {
             const nlohmann::json json = nlohmann::json::parse(req.body);
             Settings::values.use_virtual_sd = json["enabled"].get<bool>();
-            res.status = 202;
+            Core::System::GetInstance().RequestReset();
+            res.status = 200;
         } catch (nlohmann::json::exception& exception) {
             res.status = 500;
             res.set_content(exception.what(), "text/plain");
@@ -1178,7 +1181,8 @@ RPCServer::RPCServer() {
         try {
             const nlohmann::json json = nlohmann::json::parse(req.body);
             Settings::values.region_value = json["value"].get<int>();
-            res.status = 202;
+            Core::System::GetInstance().RequestReset();
+            res.status = 200;
         } catch (nlohmann::json::exception& exception) {
             res.status = 500;
             res.set_content(exception.what(), "text/plain");
@@ -1210,7 +1214,8 @@ RPCServer::RPCServer() {
             if (Settings::values.init_clock == Settings::InitClock::FixedTime) {
                 Settings::values.init_time = json["unix_timestamp"].get<u64>();
             }
-            res.status = 202;
+            Core::System::GetInstance().RequestReset();
+            res.status = 200;
         } catch (nlohmann::json::exception& exception) {
             res.status = 500;
             res.set_content(exception.what(), "text/plain");
@@ -1230,7 +1235,8 @@ RPCServer::RPCServer() {
         try {
             const nlohmann::json json = nlohmann::json::parse(req.body);
             Settings::values.use_vsync_new = json["enabled"].get<bool>();
-            res.status = 202;
+            Core::System::GetInstance().RequestReset();
+            res.status = 200;
         } catch (nlohmann::json::exception& exception) {
             res.status = 500;
             res.set_content(exception.what(), "text/plain");
@@ -1339,7 +1345,8 @@ RPCServer::RPCServer() {
         try {
             const nlohmann::json json = nlohmann::json::parse(req.body);
             Settings::values.lle_modules = json.get<std::unordered_map<std::string, bool>>();
-            res.status = 202;
+            Core::System::GetInstance().RequestReset();
+            res.status = 200;
         } catch (nlohmann::json::exception& exception) {
             res.status = 500;
             res.set_content(exception.what(), "text/plain");

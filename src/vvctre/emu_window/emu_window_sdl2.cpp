@@ -167,8 +167,7 @@ EmuWindow_SDL2::EmuWindow_SDL2(bool headless, bool fullscreen) {
     // Enable context sharing for the shared context
     SDL_GL_SetAttribute(SDL_GL_SHARE_WITH_CURRENT_CONTEXT, 1);
 
-    // Enable VSync
-    SDL_GL_SetSwapInterval(1);
+    SDL_GL_SetSwapInterval(Settings::values.use_vsync_new ? 1 : 0);
 
     dummy_window = SDL_CreateWindow(NULL, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 0, 0,
                                     SDL_WINDOW_HIDDEN | SDL_WINDOW_OPENGL);
@@ -238,12 +237,12 @@ void EmuWindow_SDL2::Present() {
     }
 
     SDL_GL_MakeCurrent(render_window, window_context);
-    SDL_GL_SetSwapInterval(1);
     while (IsOpen()) {
         if (VideoCore::g_renderer != nullptr) {
+            SDL_GL_SetSwapInterval(Settings::values.use_vsync_new ? 1 : 0);
             VideoCore::g_renderer->TryPresent(100);
+            SDL_GL_SwapWindow(render_window);
         }
-        SDL_GL_SwapWindow(render_window);
     }
     SDL_GL_MakeCurrent(render_window, nullptr);
 }

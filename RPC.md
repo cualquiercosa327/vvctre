@@ -634,8 +634,8 @@ Get or set whether custom texture preloading is enabled.
 
 # GET/POST /usecpujit
 
-Get or set whether the CPU JIT is used instead of the interpreter.  
-This endpoint does nothing currently.
+Get or set whether the CPU JIT is used instead of the interpreter.
+If setting, the emulation will restart.
 
 ## Request/Reply
 
@@ -660,7 +660,7 @@ Get or set whether ignore format reinterpretation is enabled.
 # GET/POST /dspemulation
 
 Get or set DSP emulation settings.  
-This endpoint does nothing currently.
+If setting, the emulation will restart.
 
 ## Request/Reply
 
@@ -734,7 +734,7 @@ Get or set the audio output speed.
 # GET/POST /usevirtualsdcard
 
 Get or set whether a virtual SD card is used.  
-This endpoint does nothing currently.
+If setting, the emulation will restart.
 
 ## Request/Reply
 
@@ -747,7 +747,8 @@ This endpoint does nothing currently.
 # GET/POST /isnew3ds
 
 Get or set whether the console is a New 3DS.  
-This doesn't fix New 3DS game crashes.
+This doesn't fix New 3DS game crashes.  
+If setting, the emulation will restart.
 
 ## Request/Reply
 
@@ -760,7 +761,7 @@ This doesn't fix New 3DS game crashes.
 # GET/POST /region
 
 Get or set the console's region.  
-This endpoint does nothing currently.
+If setting, the emulation will restart.
 
 ## Request/Reply
 
@@ -773,7 +774,7 @@ This endpoint does nothing currently.
 # GET/POST /startclock
 
 Get or set the time to use when emulation starts.  
-This endpoint does nothing currently.
+If setting, the emulation will restart.
 
 ## Request/Reply
 
@@ -787,7 +788,7 @@ This endpoint does nothing currently.
 # GET/POST /usevsync
 
 Get or set whether VSync is enabled.  
-This endpoint does nothing currently.
+If setting, the emulation will restart.
 
 ## Request/Reply
 
@@ -851,7 +852,7 @@ Get or set GDB stub enabled and port.
 # GET/POST /llemodules
 
 Get or set LLE modules.  
-This endpoint does nothing currently.
+If setting, the emulation will restart.
 
 ## Request/Reply
 
