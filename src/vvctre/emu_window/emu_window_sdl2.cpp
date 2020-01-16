@@ -233,6 +233,10 @@ std::unique_ptr<Frontend::GraphicsContext> EmuWindow_SDL2::CreateSharedContext()
 
 void EmuWindow_SDL2::DiskShaderCacheProgress(VideoCore::LoadCallbackStage stage, std::size_t value,
                                              std::size_t total) {
+    if (render_window == nullptr) {
+        return;
+    }
+
     switch (stage) {
     case VideoCore::LoadCallbackStage::Decompile: {
         const std::string title = fmt::format("vvctre {} | decompiling shaders ({}/{})",
@@ -255,11 +259,19 @@ void EmuWindow_SDL2::DiskShaderCacheProgress(VideoCore::LoadCallbackStage stage,
 }
 
 void EmuWindow_SDL2::SoftwareKeyboardStarted() {
+    if (render_window == nullptr) {
+        return;
+    }
+
     const std::string title = fmt::format("Enter text in the terminal.");
     SDL_SetWindowTitle(render_window, title.c_str());
 }
 
 void EmuWindow_SDL2::MiiPickerStarted() {
+    if (render_window == nullptr) {
+        return;
+    }
+
     const std::string title = fmt::format("Pick a Mii in the terminal.");
     SDL_SetWindowTitle(render_window, title.c_str());
 }

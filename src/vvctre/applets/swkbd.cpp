@@ -111,10 +111,12 @@ void SDL2_SoftwareKeyboard::Execute(const KeyboardConfig& config) {
     }
 
     case ButtonConfig::Dual: {
-        const std::string cancel =
-            config.button_text[0].empty() ? SWKBD_BUTTON_CANCEL : config.button_text[0];
-        const std::string ok =
-            config.button_text[1].empty() ? SWKBD_BUTTON_OKAY : config.button_text[1];
+        const std::string cancel = (config.button_text.size() < 1 || config.button_text[0].empty())
+                                       ? SWKBD_BUTTON_CANCEL
+                                       : config.button_text[0];
+        const std::string ok = (config.button_text.size() < 2 || config.button_text[1].empty())
+                                   ? SWKBD_BUTTON_OKAY
+                                   : config.button_text[1];
         LOG_INFO(Applet_SWKBD, "Enter the button ({} or {}):", cancel, ok);
         std::string button;
         while (button != cancel && button != ok) {
@@ -129,12 +131,15 @@ void SDL2_SoftwareKeyboard::Execute(const KeyboardConfig& config) {
     }
 
     case ButtonConfig::Triple: {
-        const std::string cancel =
-            config.button_text[0].empty() ? SWKBD_BUTTON_CANCEL : config.button_text[0];
-        const std::string forgot =
-            config.button_text[1].empty() ? SWKBD_BUTTON_FORGOT : config.button_text[1];
-        const std::string ok =
-            config.button_text[2].empty() ? SWKBD_BUTTON_OKAY : config.button_text[2];
+        const std::string cancel = (config.button_text.size() < 1 || config.button_text[0].empty())
+                                       ? SWKBD_BUTTON_CANCEL
+                                       : config.button_text[0];
+        const std::string forgot = (config.button_text.size() < 2 || config.button_text[1].empty())
+                                       ? SWKBD_BUTTON_FORGOT
+                                       : config.button_text[1];
+        const std::string ok = (config.button_text.size() < 3 || config.button_text[2].empty())
+                                   ? SWKBD_BUTTON_OKAY
+                                   : config.button_text[2];
         LOG_INFO(Applet_SWKBD, "Enter the button ({}, {} or {}):", cancel, forgot, ok);
         std::string button;
         while (button != cancel && button != forgot && button != ok) {
