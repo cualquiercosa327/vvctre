@@ -99,4 +99,8 @@ private:
 
     /// Keeps track of how often to update the title bar during gameplay
     u32 last_time = 0;
+
+    /// Title bar stuff
+    std::string title_program_name;
+    u64 title_program_id = 0;
 };

@@ -291,17 +291,20 @@ void EmuWindow_SDL2::PollEvents() {
         Core::System& system = Core::System::GetInstance();
 
         if (system.IsPoweredOn()) {
-            std::string game;
-            system.GetAppLoader().ReadTitle(game);
+            const u64 current_program_id = system.Kernel().GetCurrentProcess()->codeset->program_id;
+            if (title_program_id != current_program_id) {
+                system.GetAppLoader().ReadTitle(title_program_name);
+                title_program_id = current_program_id;
+            }
 
             Core::PerfStats::Results results = system.GetAndResetPerfStats();
 
             const std::string title =
-                game.empty()
+                title_program_name.empty()
                     ? fmt::format("vvctre {} | FPS: {:.0f} ({:.0f}%)", version::vvctre.to_string(),
                                   results.game_fps, results.emulation_speed * 100.0)
                     : fmt::format("vvctre {} | {} | FPS: {:.0f} ({:.0f}%)",
-                                  version::vvctre.to_string(), game, results.game_fps,
+                                  version::vvctre.to_string(), title_program_name, results.game_fps,
                                   results.emulation_speed * 100.0);
 
             SDL_SetWindowTitle(render_window, title.c_str());
