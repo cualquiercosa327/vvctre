@@ -29,7 +29,7 @@ private:
 
 class EmuWindow_SDL2 : public Frontend::EmuWindow {
 public:
-    explicit EmuWindow_SDL2(bool fullscreen);
+    explicit EmuWindow_SDL2(const bool headless, const bool fullscreen);
     ~EmuWindow_SDL2();
 
     void Present();

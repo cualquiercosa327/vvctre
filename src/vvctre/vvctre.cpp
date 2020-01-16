@@ -86,6 +86,7 @@ int main(int argc, char** argv) {
     std::string movie_record;
     std::string movie_play;
     std::string dump_video;
+    bool headless = false;
     bool fullscreen = false;
     bool regenerate_console_id = false;
 
@@ -415,6 +416,7 @@ int main(int argc, char** argv) {
           clipp::option("--disable-frame-time-recording")
               .doc("force disable frame time recording (default)")
               .set(Settings::values.record_frame_times, false),
+          clipp::option("--headless").set(headless).doc("start in headless mode"),
           clipp::option("--fullscreen").set(fullscreen).doc("start in fullscreen mode"),
           clipp::option("--regenerate-console-id")
               .set(regenerate_console_id)
@@ -494,7 +496,7 @@ int main(int argc, char** argv) {
             system.RegisterMiiSelector(std::make_shared<Frontend::SDL2_MiiSelector>());
 
             std::unique_ptr<EmuWindow_SDL2> emu_window =
-                std::make_unique<EmuWindow_SDL2>(fullscreen);
+                std::make_unique<EmuWindow_SDL2>(headless, fullscreen);
             Frontend::ScopeAcquireContext scope(*emu_window);
 
             const Core::System::ResultStatus load_result = system.Load(*emu_window, path);

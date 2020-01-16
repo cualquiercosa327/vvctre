@@ -140,7 +140,7 @@ void EmuWindow_SDL2::Fullscreen() {
     SDL_MaximizeWindow(render_window);
 }
 
-EmuWindow_SDL2::EmuWindow_SDL2(bool fullscreen) {
+EmuWindow_SDL2::EmuWindow_SDL2(bool headless, bool fullscreen) {
     // Initialize the window
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_JOYSTICK) < 0) {
         LOG_CRITICAL(Frontend, "Failed to initialize SDL2! Exiting...");
@@ -163,13 +163,15 @@ EmuWindow_SDL2::EmuWindow_SDL2(bool fullscreen) {
     // Enable context sharing for the shared context
     SDL_GL_SetAttribute(SDL_GL_SHARE_WITH_CURRENT_CONTEXT, 1);
 
-    // Enable vsync
+    // Enable VSync
     SDL_GL_SetSwapInterval(1);
 
     dummy_window = SDL_CreateWindow(NULL, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 0, 0,
                                     SDL_WINDOW_HIDDEN | SDL_WINDOW_OPENGL);
 
-    if (std::getenv("VVCTRE_HIDDEN") == nullptr) {
+    if (headless) {
+        UpdateCurrentFramebufferLayout(400, 480);
+    } else {
         const std::string window_title = fmt::format("vvctre {}", version::vvctre.to_string());
 
         render_window = SDL_CreateWindow(
@@ -193,8 +195,6 @@ EmuWindow_SDL2::EmuWindow_SDL2(bool fullscreen) {
             LOG_CRITICAL(Frontend, "Failed to create SDL2 GL context: {}", SDL_GetError());
             std::exit(1);
         }
-    } else {
-        UpdateCurrentFramebufferLayout(400, 480);
     }
 
     core_context = CreateSharedContext();
