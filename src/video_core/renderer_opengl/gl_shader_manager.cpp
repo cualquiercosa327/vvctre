@@ -616,6 +616,10 @@ void ShaderProgramManager::LoadDiskCache(const std::atomic_bool& stop_loading,
     if (precompiled_cache_altered) {
         disk_cache.SaveVirtualPrecompiledFile();
     }
+
+    if (callback) {
+        callback(VideoCore::LoadCallbackStage::Complete, 0, 0);
+    }
 }
 
 } // namespace OpenGL

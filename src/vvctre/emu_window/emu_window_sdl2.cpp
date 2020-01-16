@@ -231,6 +231,29 @@ std::unique_ptr<Frontend::GraphicsContext> EmuWindow_SDL2::CreateSharedContext()
     return std::make_unique<SharedContext_SDL2>();
 }
 
+void EmuWindow_SDL2::DiskShaderCacheProgress(VideoCore::LoadCallbackStage stage, std::size_t value,
+                                             std::size_t total) {
+    switch (stage) {
+    case VideoCore::LoadCallbackStage::Decompile: {
+        const std::string title = fmt::format("vvctre {} | decompiling shaders ({}/{})",
+                                              version::vvctre.to_string(), value, total);
+        SDL_SetWindowTitle(render_window, title.c_str());
+        break;
+    }
+    case VideoCore::LoadCallbackStage::Build: {
+        const std::string title = fmt::format("vvctre {} | building shaders ({}/{})",
+                                              version::vvctre.to_string(), value, total);
+        SDL_SetWindowTitle(render_window, title.c_str());
+        break;
+    }
+    case VideoCore::LoadCallbackStage::Complete: {
+        const std::string title = fmt::format("vvctre {}", version::vvctre.to_string());
+        SDL_SetWindowTitle(render_window, title.c_str());
+        return;
+    }
+    }
+}
+
 void EmuWindow_SDL2::Present() {
     if (render_window == nullptr) {
         return;

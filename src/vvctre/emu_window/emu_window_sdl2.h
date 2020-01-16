@@ -7,6 +7,7 @@
 #include <memory>
 #include <utility>
 #include "core/frontend/emu_window.h"
+#include "video_core/rasterizer_interface.h"
 
 struct SDL_Window;
 
@@ -52,6 +53,9 @@ public:
 
     /// Creates a new context that is shared with the current context
     std::unique_ptr<GraphicsContext> CreateSharedContext() const override;
+
+    void DiskShaderCacheProgress(VideoCore::LoadCallbackStage stage, std::size_t value,
+                                 std::size_t total);
 
 private:
     /// Called by PollEvents when a key is pressed or released.

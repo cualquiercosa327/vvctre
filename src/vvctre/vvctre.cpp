@@ -546,9 +546,10 @@ int main(int argc, char** argv) {
             std::atomic_bool stop_run;
             Core::System::GetInstance().Renderer().Rasterizer()->LoadDiskResources(
                 stop_run,
-                [](VideoCore::LoadCallbackStage stage, std::size_t value, std::size_t total) {
+                [&](VideoCore::LoadCallbackStage stage, std::size_t value, std::size_t total) {
                     LOG_DEBUG(Frontend, "Loading stage {} progress {} {}", static_cast<u32>(stage),
                               value, total);
+                    emu_window->DiskShaderCacheProgress(stage, value, total);
                 });
 
             while (emu_window->IsOpen()) {
