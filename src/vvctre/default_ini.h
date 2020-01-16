@@ -172,7 +172,7 @@ bg_blue =
 bg_green =
 
 # Whether and how stereoscopic 3D should be rendered
-# 0 (default): Off, 1: Side by Side, 2: Anaglyph
+# 0 (default): Off, 1: Side by Side, 2: Anaglyph, 3: Interlaced
 render_3d =
 
 # Change 3D intensity
@@ -186,7 +186,7 @@ filter_mode =
 
 # The name of the post processing shader to apply.
 # Loaded from shaders if render_3d is off or side by side.
-# Loaded from shaders/anaglyph if render_3d is anaglyph
+# Loaded from shaders/singlescreen if render_3d is anaglyph or interlaced.
 pp_shader_name =
 
 # Forces VSync on the display thread. Usually doesn't impact performance, but on some drivers it can

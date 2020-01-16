@@ -351,7 +351,7 @@ Get or set 3D settings.
 
 ```json
 {
-  "enabled": Boolean,
+  "mode": Number,
   "intensity": Number[0...100]
 }
 ```
@@ -557,6 +557,11 @@ Sets the filtering mode to linear.
 # GET/POST /postprocessingshader
 
 Get or set the post processing shader name.
+
+Builtin shaders:
+- Anaglyph 3D only: dubois (builtin)
+- Interlaced 3D only: horizontal (builtin)
+- 3D off only: none (builtin)
 
 ## Request/Reply
 

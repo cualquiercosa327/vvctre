@@ -149,12 +149,12 @@ std::vector<std::string> GetPostProcessingShaderList(bool anaglyph) {
     return shader_names;
 }
 
-std::string GetPostProcessingShaderCode(bool anaglyph, std::string shader) {
+std::string GetPostProcessingShaderCode(const bool single_screen, const std::string shader) {
     std::string shader_dir = FileUtil::GetUserPath(FileUtil::UserPath::ShaderDir);
     std::string shader_path;
 
-    if (anaglyph) {
-        shader_dir = shader_dir + "anaglyph";
+    if (single_screen) {
+        shader_dir = shader_dir + "singlescreen";
     }
 
     // Examining the directory is done because the shader extension might have an odd case
