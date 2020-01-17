@@ -119,8 +119,9 @@ ResultCode CIAFile::WriteTitleMetadata() {
     FileUtil::CreateFullPath(tmd_folder);
 
     // Save TMD so that we can start getting new .app paths
-    if (tmd.Save(tmd_path) != Loader::ResultStatus::Success)
+    if (tmd.Save(tmd_path) != Loader::ResultStatus::Success) {
         return FileSys::ERROR_INSUFFICIENT_SPACE;
+    }
 
     // Create any other .app folders which may not exist yet
     std::string app_folder;

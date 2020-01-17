@@ -556,7 +556,13 @@ int main(int argc, char** argv) {
                 });
 
             while (emu_window->IsOpen()) {
-                system.RunLoop();
+                switch (system.RunLoop()) {
+                case Core::System::ResultStatus::ShutdownRequested: {
+                    emu_window->Close();
+                    break;
+                }
+                default: { break; }
+                }
             }
 
             render_thread.join();
@@ -598,7 +604,8 @@ int main(int argc, char** argv) {
         std::vector<std::string> lines;
 
         for (const auto& mapping : Settings::NativeButton::mapping) {
-            fmt::print("Current button: {}. After pressing the enter key, press the button\n",
+            fmt::print("Current button: {}. After pressing the enter key, press "
+                       "the button\n",
                        Common::ToUpper(mapping));
             std::cin.get();
 
@@ -607,7 +614,8 @@ int main(int argc, char** argv) {
         }
 
         for (const auto& mapping : Settings::NativeAnalog::mapping) {
-            fmt::print("Current joystick: {}. After pressing the enter key, first move your "
+            fmt::print("Current joystick: {}. After pressing the enter key, first "
+                       "move your "
                        "joystick to the right, and then to the bottom\n",
                        Common::ToUpper(mapping));
             std::cin.get();
@@ -616,7 +624,8 @@ int main(int argc, char** argv) {
             lines.push_back(fmt::format("{}={}", mapping, params.Serialize()));
         }
 
-        fmt::print("Change the [Controls] section in the ini file to this:\n\n[Controls]\n");
+        fmt::print("Change the [Controls] section in the ini file to "
+                   "this:\n\n[Controls]\n");
 
         for (const std::string& line : lines) {
             fmt::print("{}\n", line);

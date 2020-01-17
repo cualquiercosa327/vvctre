@@ -113,6 +113,10 @@ bool EmuWindow_SDL2::IsOpen() const {
     return is_open;
 }
 
+void EmuWindow_SDL2::Close() {
+    is_open = false;
+}
+
 void EmuWindow_SDL2::OnResize() {
     if (render_window == nullptr) {
         return;
