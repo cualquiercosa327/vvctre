@@ -158,7 +158,7 @@ Get or set the motion state.
 
 ## Example body or reply
 
-````json
+```json
 {
   "accel": {
     "x": 0.0,
