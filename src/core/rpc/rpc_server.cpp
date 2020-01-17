@@ -49,6 +49,24 @@ void from_json(const nlohmann::json& json, InputProfile& profile) {
 
 } // namespace Settings
 
+namespace Common {
+
+void to_json(nlohmann::json& json, const Vec3<float>& v) {
+    json = nlohmann::json{
+        {"x", v.x},
+        {"y", v.y},
+        {"z", v.z},
+    };
+}
+
+void from_json(const nlohmann::json& json, Vec3<float>& v) {
+    json.at("x").get_to(v.x);
+    json.at("y").get_to(v.y);
+    json.at("z").get_to(v.z);
+}
+
+} // namespace Common
+
 namespace RPC {
 
 constexpr int RPC_PORT = 47889;
@@ -233,6 +251,38 @@ RPCServer::RPCServer() {
                     json["x"].get<float>(), json["y"].get<float>(), json["pressed"].get<bool>()));
             } else {
                 hid->SetCustomTouchState(std::nullopt);
+            }
+
+            res.status = 204;
+        } catch (nlohmann::json::exception& exception) {
+            res.status = 500;
+            res.set_content(exception.what(), "text/plain");
+        }
+    });
+
+    server->Get("/motionstate", [&](const httplib::Request& req, httplib::Response& res) {
+        auto hid = Service::HID::GetModule(Core::System::GetInstance());
+        const auto [accel, gyro] = hid->GetMotionState();
+
+        res.set_content(
+            nlohmann::json{
+                {"accel", accel},
+                {"gyro", gyro},
+            }
+                .dump(),
+            "application/json");
+    });
+
+    server->Post("/motionstate", [&](const httplib::Request& req, httplib::Response& res) {
+        try {
+            auto hid = Service::HID::GetModule(Core::System::GetInstance());
+            const nlohmann::json json = nlohmann::json::parse(req.body);
+
+            if (json.contains("accel") && json.contains("gyro")) {
+                hid->SetCustomMotionState(std::make_tuple(json["accel"].get<Common::Vec3<float>>(),
+                                                          json["gyro"].get<Common::Vec3<float>>()));
+            } else {
+                hid->SetCustomMotionState(std::nullopt);
             }
 
             res.status = 204;

@@ -167,9 +167,9 @@ void Module::UpdateAccelerometerCallback(u64 userdata, s64 cycles_late) {
     mem->accelerometer.index = next_accelerometer_index;
     next_accelerometer_index = (next_accelerometer_index + 1) % mem->accelerometer.entries.size();
 
-    Common::Vec3<float> accel;
-    std::tie(accel, std::ignore) = motion_device->GetStatus();
+    [[maybe_unused]] auto [accel, gyro] = GetMotionState();
     accel *= accelerometer_coef;
+
     // TODO(wwylele): do a time stretch like the one in UpdateGyroscopeCallback
     // The time stretch formula should be like
     // stretched_vector = (raw_vector - gravity) * stretch_ratio + gravity
@@ -214,8 +214,7 @@ void Module::UpdateGyroscopeCallback(u64 userdata, s64 cycles_late) {
 
     GyroscopeDataEntry& gyroscope_entry = mem->gyroscope.entries[mem->gyroscope.index];
 
-    Common::Vec3<float> gyro;
-    std::tie(std::ignore, gyro) = motion_device->GetStatus();
+    [[maybe_unused]] auto [accel, gyro] = GetMotionState();
     double stretch = system.perf_stats->GetLastFrameTimeScale();
     gyro *= gyroscope_coef * static_cast<float>(stretch);
     gyroscope_entry.x = static_cast<s16>(gyro.x);
@@ -436,6 +435,15 @@ void Module::SetCustomTouchState(std::optional<std::tuple<float, float, bool>> s
 
 const std::tuple<float, float, bool> Module::GetTouchState() const {
     return custom_touch_state.has_value() ? *custom_touch_state : touch_device->GetStatus();
+}
+
+void Module::SetCustomMotionState(
+    std::optional<std::tuple<Common::Vec3<float>, Common::Vec3<float>>> state) {
+    custom_motion_state = std::move(state);
+}
+
+const std::tuple<Common::Vec3<float>, Common::Vec3<float>> Module::GetMotionState() const {
+    return custom_motion_state.has_value() ? *custom_motion_state : motion_device->GetStatus();
 }
 
 std::shared_ptr<Module> GetModule(Core::System& system) {

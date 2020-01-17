@@ -42,29 +42,29 @@ Write memory.
 
 Get the pad state.
 
-## Reply
+## Example reply
 
 ```json
 {
-  "hex": Number,
-  "a": Boolean,
-  "b": Boolean,
-  "select": Boolean,
-  "start": Boolean,
-  "right": Boolean,
-  "left": Boolean,
-  "up": Boolean,
-  "down": Boolean,
-  "r": Boolean,
-  "l": Boolean,
-  "x": Boolean,
-  "y": Boolean,
-  "debug": Boolean,
-  "gpio14": Boolean,
-  "circle_right": Boolean,
-  "circle_left": Boolean,
-  "circle_up": Boolean,
-  "circle_down": Boolean
+  "a": false,
+  "b": false,
+  "circle_down": false,
+  "circle_left": false,
+  "circle_right": false,
+  "circle_up": false,
+  "debug": false,
+  "down": false,
+  "gpio14": false,
+  "hex": 0,
+  "l": false,
+  "left": false,
+  "r": false,
+  "right": false,
+  "select": false,
+  "start": false,
+  "up": false,
+  "x": false,
+  "y": false
 }
 ```
 
@@ -72,7 +72,7 @@ Get the pad state.
 
 Set the pad state.
 
-## Request for setting a custom pad state
+## Body for setting a custom pad state
 
 ```json
 {
@@ -80,7 +80,7 @@ Set the pad state.
 }
 ```
 
-## Request for using the real pad state
+## Body for using the real state
 
 ```json
 {}
@@ -113,58 +113,70 @@ Set the pad state.
 }
 ```
 
-# GET /circlepadstate
+# GET/POST /circlepadstate
 
-Get the circle pad state.
+Get or set the circle pad state.
 
-## Reply
+## Example body or reply
 
 ```json
 {
-  "x": Number[0.0...1.0],
-  "y": Number[0.0...1.0]
+  "x": 0.0,
+  "y": 0.0
 }
 ```
 
-# POST /circlepadstate
+## Body for using the real state
 
-Set the circle pad state.
+```json
+{}
+```
 
-## Request
+# GET/POST /touchstate
+
+Get or set the touch screen state.
+
+## Example body or reply
 
 ```json
 {
-  "x": Number[0.0...1.0],
-  "y": Number[0.0...1.0]
+  "pressed": false,
+  "x": 0.0,
+  "y": 0.0
 }
 ```
 
-# GET /touchstate
-
-Get the touch screen state.
-
-## Reply
+## Body for using the real state
 
 ```json
+{}
+```
+
+# GET/POST /motionstate
+
+Get or set the motion state.
+
+## Example body or reply
+
+````json
 {
-  "x": Number[0.0...1.0],
-  "y": Number[0.0...1.0],
-  "pressed": Boolean
+  "accel": {
+    "x": 0.0,
+    "y": -1.0,
+    "z": 0.0
+  },
+  "gyro": {
+    "x": 0.0,
+    "y": 0.0,
+    "z": 0.0
+  }
 }
 ```
 
-# POST /touchstate
-
-Set the touch screen state.
-
-## Request
+## Body for using the real state
 
 ```json
-{
-  "x": Number[0.0...1.0],
-  "y": Number[0.0...1.0],
-  "pressed": Boolean
-}
+{}
 ```
 
 # GET /screenshot

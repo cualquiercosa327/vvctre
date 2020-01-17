@@ -310,6 +310,10 @@ public:
     void SetCustomTouchState(std::optional<std::tuple<float, float, bool>> state);
     const std::tuple<float, float, bool> GetTouchState() const;
 
+    void SetCustomMotionState(
+        std::optional<std::tuple<Common::Vec3<float>, Common::Vec3<float>>> state);
+    const std::tuple<Common::Vec3<float>, Common::Vec3<float>> GetMotionState() const;
+
 private:
     void LoadInputDevices();
     void UpdatePadCallback(u64 userdata, s64 cycles_late);
@@ -328,19 +332,18 @@ private:
     std::shared_ptr<Kernel::Event> event_gyroscope;
     std::shared_ptr<Kernel::Event> event_debug_pad;
 
-    // Used in GetPadState which is used for cheats and RPC
     std::optional<PadState> custom_pad_state;
-
     std::optional<std::tuple<float, float>> custom_circle_pad_state;
     std::optional<std::tuple<float, float, bool>> custom_touch_state;
+    std::optional<std::tuple<Common::Vec3<float>, Common::Vec3<float>>> custom_motion_state;
 
     u32 next_pad_index = 0;
     u32 next_touch_index = 0;
     u32 next_accelerometer_index = 0;
     u32 next_gyroscope_index = 0;
 
-    int enable_accelerometer_count = 0; // positive means enabled
-    int enable_gyroscope_count = 0;     // positive means enabled
+    int enable_accelerometer_count = 0; // Positive means enabled
+    int enable_gyroscope_count = 0;     // Positive means enabled
 
     Core::TimingEventType* pad_update_event;
     Core::TimingEventType* accelerometer_update_event;
