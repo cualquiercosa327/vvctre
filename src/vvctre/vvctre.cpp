@@ -501,8 +501,14 @@ int main(int argc, char** argv) {
             const Core::System::ResultStatus load_result = system.Load(*emu_window, path);
 
             switch (load_result) {
+            case Core::System::ResultStatus::ErrorNotInitialized:
+                LOG_CRITICAL(Frontend, "CPU not initialized");
+                return -1;
             case Core::System::ResultStatus::ErrorGetLoader:
                 LOG_CRITICAL(Frontend, "Failed to obtain loader for {}!", path);
+                return -1;
+            case Core::System::ResultStatus::ErrorSystemMode:
+                LOG_CRITICAL(Frontend, "Failed to determine system mode!");
                 return -1;
             case Core::System::ResultStatus::ErrorLoader:
                 LOG_CRITICAL(Frontend, "Failed to load ROM!");
@@ -515,19 +521,25 @@ int main(int argc, char** argv) {
                              "https://citra-emu.org/wiki/dumping-game-cartridges/");
                 return -1;
             case Core::System::ResultStatus::ErrorLoader_ErrorInvalidFormat:
-                LOG_CRITICAL(Frontend, "Error while loading ROM: The ROM format is not supported.");
-                return -1;
-            case Core::System::ResultStatus::ErrorNotInitialized:
-                LOG_CRITICAL(Frontend, "CPU not initialized");
-                return -1;
-            case Core::System::ResultStatus::ErrorSystemMode:
-                LOG_CRITICAL(Frontend, "Failed to determine system mode!");
+                LOG_CRITICAL(Frontend, "The ROM format is not supported.");
                 return -1;
             case Core::System::ResultStatus::ErrorVideoCore:
-                LOG_CRITICAL(Frontend, "VideoCore not initialized");
+                LOG_CRITICAL(Frontend, "VideoCore error. Ensure that you have the latest graphics "
+                                       "drivers for your GPU.");
                 return -1;
-            case Core::System::ResultStatus::Success:
-                break; // Expected case
+            case Core::System::ResultStatus::ErrorVideoCore_ErrorGenericDrivers:
+                LOG_CRITICAL(
+                    Frontend,
+                    "You are running default Windows drivers "
+                    "for your GPU. You need to install the "
+                    "proper drivers for your graphics card from the manufacturer's website.");
+                return -1;
+            case Core::System::ResultStatus::ErrorVideoCore_ErrorBelowGL33:
+                LOG_CRITICAL(Frontend, "Your GPU may not support OpenGL 3.3, or you do not "
+                                       "have the latest graphics driver.");
+                return -1;
+            default:
+                break;
             }
 
             if (!movie_play.empty()) {
