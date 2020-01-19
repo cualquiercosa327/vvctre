@@ -870,7 +870,7 @@ void CachedSurface::DumpTexture(GLuint target_tex, u64 tex_hash) {
            the texture is only 32x32. GetTexImage conveniently only dumps the specified region.
         */
         GetTexImage(GL_TEXTURE_2D, 0, GL_RGBA, GL_UNSIGNED_BYTE, height, width, 0,
-                    &decoded_texture[0], static_cast<GLuint>(decoded_texture.size()));
+                    &decoded_texture[0], decoded_texture.size());
         glBindTexture(GL_TEXTURE_2D, 0);
         Common::FlipRGBA8Texture(decoded_texture, width, height);
         if (lodepng::encode(dump_path, decoded_texture, width, height)) {
