@@ -192,7 +192,7 @@ void RasterizerOpenGL::SyncEntireState() {
     SyncCombinerColor();
     auto& tev_stages = Pica::g_state.regs.texturing.GetTevStages();
     for (std::size_t index = 0; index < tev_stages.size(); ++index)
-        SyncTevConstColor(static_cast<int>(index), tev_stages[index]);
+        SyncTevConstColor(index, tev_stages[index]);
 
     SyncGlobalAmbient();
     for (unsigned light_index = 0; light_index < 8; light_index++) {
@@ -274,7 +274,7 @@ RasterizerOpenGL::VertexArrayInfo RasterizerOpenGL::AnalyzeVertexArray(bool is_i
         vertex_min = 0xFFFF;
         vertex_max = 0;
         std::size_t size = regs.pipeline.num_vertices * (index_u16 ? 2 : 1);
-        res_cache.FlushRegion(address, static_cast<u32>(size), nullptr);
+        res_cache.FlushRegion(address, size, nullptr);
         for (u32 index = 0; index < regs.pipeline.num_vertices; ++index) {
             u32 vertex = index_u16 ? index_address_16[index] : index_address_8[index];
             vertex_min = std::min(vertex_min, vertex);
@@ -356,15 +356,15 @@ void RasterizerOpenGL::SetupVertexArray(u8* array_ptr, GLintptr buffer_offset,
     for (std::size_t i = 0; i < enable_attributes.size(); ++i) {
         if (enable_attributes[i] != hw_vao_enabled_attributes[i]) {
             if (enable_attributes[i]) {
-                glEnableVertexAttribArray(static_cast<GLuint>(i));
+                glEnableVertexAttribArray(i);
             } else {
-                glDisableVertexAttribArray(static_cast<GLuint>(i));
+                glDisableVertexAttribArray(i);
             }
             hw_vao_enabled_attributes[i] = enable_attributes[i];
         }
 
         if (vertex_attributes.IsDefaultAttribute(i)) {
-            u32 reg = regs.vs.GetRegisterForAttribute(static_cast<unsigned int>(i));
+            u32 reg = regs.vs.GetRegisterForAttribute(i);
             if (!enable_attributes[reg]) {
                 const auto& attr = Pica::g_state.input_default_attributes.attr[i];
                 glVertexAttrib4f(reg, attr.x.ToFloat32(), attr.y.ToFloat32(), attr.z.ToFloat32(),
@@ -792,8 +792,7 @@ bool RasterizerOpenGL::Draw(bool accelerate, bool is_indexed) {
                 vertex_buffer.Map(vertex_size, sizeof(HardwareVertex));
             std::memcpy(vbo, vertex_batch.data() + base_vertex, vertex_size);
             vertex_buffer.Unmap(vertex_size);
-            glDrawArrays(GL_TRIANGLES, static_cast<GLint>(offset / sizeof(HardwareVertex)),
-                         (GLsizei)vertices);
+            glDrawArrays(GL_TRIANGLES, offset / sizeof(HardwareVertex), (GLsizei)vertices);
         }
     }
 
@@ -1966,7 +1965,7 @@ void RasterizerOpenGL::SyncAndUploadLUTs() {
                     std::memcpy(buffer + bytes_used, new_data.data(),
                                 new_data.size() * sizeof(GLvec2));
                     uniform_block_data.data.lighting_lut_offset[index / 4][index % 4] =
-                        static_cast<GLint>((offset + bytes_used) / sizeof(GLvec2));
+                        (offset + bytes_used) / sizeof(GLvec2);
                     uniform_block_data.dirty = true;
                     bytes_used += new_data.size() * sizeof(GLvec2);
                 }
@@ -1988,8 +1987,7 @@ void RasterizerOpenGL::SyncAndUploadLUTs() {
         if (new_data != fog_lut_data || invalidate) {
             fog_lut_data = new_data;
             std::memcpy(buffer + bytes_used, new_data.data(), new_data.size() * sizeof(GLvec2));
-            uniform_block_data.data.fog_lut_offset =
-                static_cast<GLint>((offset + bytes_used) / sizeof(GLvec2));
+            uniform_block_data.data.fog_lut_offset = (offset + bytes_used) / sizeof(GLvec2);
             uniform_block_data.dirty = true;
             bytes_used += new_data.size() * sizeof(GLvec2);
         }
@@ -2008,7 +2006,7 @@ void RasterizerOpenGL::SyncAndUploadLUTs() {
         if (new_data != lut_data || invalidate) {
             lut_data = new_data;
             std::memcpy(buffer + bytes_used, new_data.data(), new_data.size() * sizeof(GLvec2));
-            lut_offset = static_cast<GLint>((offset + bytes_used) / sizeof(GLvec2));
+            lut_offset = (offset + bytes_used) / sizeof(GLvec2);
             uniform_block_data.dirty = true;
             bytes_used += new_data.size() * sizeof(GLvec2);
         }
@@ -2049,8 +2047,7 @@ void RasterizerOpenGL::SyncAndUploadLUTs() {
         if (new_data != proctex_lut_data || invalidate) {
             proctex_lut_data = new_data;
             std::memcpy(buffer + bytes_used, new_data.data(), new_data.size() * sizeof(GLvec4));
-            uniform_block_data.data.proctex_lut_offset =
-                static_cast<GLint>((offset + bytes_used) / sizeof(GLvec4));
+            uniform_block_data.data.proctex_lut_offset = (offset + bytes_used) / sizeof(GLvec4);
             uniform_block_data.dirty = true;
             bytes_used += new_data.size() * sizeof(GLvec4);
         }
@@ -2072,7 +2069,7 @@ void RasterizerOpenGL::SyncAndUploadLUTs() {
             proctex_diff_lut_data = new_data;
             std::memcpy(buffer + bytes_used, new_data.data(), new_data.size() * sizeof(GLvec4));
             uniform_block_data.data.proctex_diff_lut_offset =
-                static_cast<GLint>((offset + bytes_used) / sizeof(GLvec4));
+                (offset + bytes_used) / sizeof(GLvec4);
             uniform_block_data.dirty = true;
             bytes_used += new_data.size() * sizeof(GLvec4);
         }
