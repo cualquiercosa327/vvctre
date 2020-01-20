@@ -195,6 +195,9 @@ EmuWindow_SDL2::EmuWindow_SDL2(bool headless, bool fullscreen) {
 
         if (fullscreen) {
             Fullscreen();
+        } else {
+            SDL_SetWindowMinimumSize(render_window, Core::kScreenTopWidth,
+                                     Core::kScreenTopHeight + Core::kScreenBottomHeight);
         }
 
         window_context = SDL_GL_CreateContext(render_window);
@@ -216,7 +219,6 @@ EmuWindow_SDL2::EmuWindow_SDL2(bool headless, bool fullscreen) {
     }
 
     OnResize();
-    OnMinimalClientAreaChangeRequest(GetActiveConfig().min_client_area_size);
     SDL_PumpEvents();
     LOG_INFO(Frontend, "Version: {}", version::vvctre.to_string());
     LOG_INFO(Frontend, "Movie version: {}", version::movie);
@@ -395,12 +397,4 @@ void EmuWindow_SDL2::MakeCurrent() {
 
 void EmuWindow_SDL2::DoneCurrent() {
     core_context->DoneCurrent();
-}
-
-void EmuWindow_SDL2::OnMinimalClientAreaChangeRequest(std::pair<u32, u32> minimal_size) {
-    if (render_window == nullptr) {
-        return;
-    }
-
-    SDL_SetWindowMinimumSize(render_window, minimal_size.first, minimal_size.second);
 }
