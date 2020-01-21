@@ -68,7 +68,7 @@ FramebufferLayout DefaultFrameLayout(u32 width, u32 height, bool swapped, bool u
     if (window_aspect_ratio < emulation_aspect_ratio) {
         // Window is wider than the emulation content => apply borders to the right and left sides
         if (upright) {
-            // Recalculate the bottom screen to account for the heigh difference between right and
+            // Recalculate the bottom screen to account for the height difference between right and
             // left
             screen_window_area = {0, 0, top_screen.GetWidth(), height};
             bot_screen = maxRectangle(screen_window_area, BOT_SCREEN_UPRIGHT_ASPECT_RATIO);
