@@ -272,8 +272,7 @@ void EmuWindow_SDL2::SoftwareKeyboardStarted() {
         return;
     }
 
-    const std::string title = fmt::format("Enter text in the terminal.");
-    SDL_SetWindowTitle(render_window, title.c_str());
+    SDL_SetWindowTitle(render_window, "Enter text in the terminal.");
 }
 
 void EmuWindow_SDL2::MiiPickerStarted() {
@@ -281,8 +280,7 @@ void EmuWindow_SDL2::MiiPickerStarted() {
         return;
     }
 
-    const std::string title = fmt::format("Pick a Mii in the terminal.");
-    SDL_SetWindowTitle(render_window, title.c_str());
+    SDL_SetWindowTitle(render_window, "Pick a Mii in the terminal.");
 }
 
 void EmuWindow_SDL2::Present() {
