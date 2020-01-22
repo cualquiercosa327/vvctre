@@ -1542,7 +1542,7 @@ Surface RasterizerCacheOpenGL::GetTextureSurface(const Pica::Texture::TextureInf
     }
 
     TextureFilterInterface* texture_filter;
-    if (surface->res_scale == 1 && !(surface->is_filtered | surface->is_custom) &&
+    if (!(surface->is_filtered | surface->is_custom) &&
         (texture_filter = TextureFilterManager::GetInstance().GetTextureFilter())) {
         texture_filter->scale(surface);
         surface->is_filtered = true;
