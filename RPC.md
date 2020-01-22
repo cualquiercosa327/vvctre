@@ -1,3 +1,6 @@
+vvctre has a HTTP server running on port 47889.  
+Some endpoints can only be used when the emulation is running.
+
 # GET /version
 
 Get version information.
@@ -933,6 +936,18 @@ Stop movie playback/recording.
 # POST /movie/play and /movie/record
 
 Play or record a movie.
+
+## Request
+
+```json
+{
+  "file": String
+}
+```
+
+# POST /boot
+
+Boot a file.
 
 ## Request
 

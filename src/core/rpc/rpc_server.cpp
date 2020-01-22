@@ -1540,6 +1540,25 @@ RPCServer::RPCServer() {
         }
     });
 
+    server->Post("/boot", [&](const httplib::Request& req, httplib::Response& res) {
+        if (!Core::System::GetInstance().IsPoweredOn()) {
+            res.status = 503;
+            res.set_content("emulation not running", "text/plain");
+            return;
+        }
+
+        try {
+            const nlohmann::json json = nlohmann::json::parse(req.body);
+            const std::string file = json["file"].get<std::string>();
+            Core::System::GetInstance().SetResetFilePath(file);
+            Core::System::GetInstance().RequestReset();
+            res.status = 204;
+        } catch (nlohmann::json::exception& exception) {
+            res.status = 500;
+            res.set_content(exception.what(), "text/plain");
+        }
+    });
+
     request_handler_thread = std::thread([&] { server->listen("0.0.0.0", RPC_PORT); });
     LOG_INFO(RPC_Server, "RPC server running on port {}", RPC_PORT);
 }
