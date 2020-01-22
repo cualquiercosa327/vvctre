@@ -71,6 +71,8 @@ namespace RPC {
 
 constexpr int RPC_PORT = 47889;
 
+/*static*/ RPCServer RPCServer::instance;
+
 RPCServer::RPCServer() {
     server = std::make_unique<httplib::Server>();
 
@@ -86,6 +88,12 @@ RPCServer::RPCServer() {
     });
 
     server->Post("/memory/read", [&](const httplib::Request& req, httplib::Response& res) {
+        if (!Core::System::GetInstance().IsPoweredOn()) {
+            res.status = 503;
+            res.set_content("emulation not running", "text/plain");
+            return;
+        }
+
         try {
             const nlohmann::json json = nlohmann::json::parse(req.body);
             const VAddr address = json["address"].get<VAddr>();
@@ -105,6 +113,12 @@ RPCServer::RPCServer() {
     });
 
     server->Post("/memory/write", [&](const httplib::Request& req, httplib::Response& res) {
+        if (!Core::System::GetInstance().IsPoweredOn()) {
+            res.status = 503;
+            res.set_content("emulation not running", "text/plain");
+            return;
+        }
+
         try {
             const nlohmann::json json = nlohmann::json::parse(req.body);
             const VAddr address = json["address"].get<VAddr>();
@@ -123,6 +137,12 @@ RPCServer::RPCServer() {
     });
 
     server->Get("/padstate", [&](const httplib::Request& req, httplib::Response& res) {
+        if (!Core::System::GetInstance().IsPoweredOn()) {
+            res.status = 503;
+            res.set_content("emulation not running", "text/plain");
+            return;
+        }
+
         auto hid = Service::HID::GetModule(Core::System::GetInstance());
         const Service::HID::PadState state = hid->GetPadState();
 
@@ -153,6 +173,12 @@ RPCServer::RPCServer() {
     });
 
     server->Post("/padstate", [&](const httplib::Request& req, httplib::Response& res) {
+        if (!Core::System::GetInstance().IsPoweredOn()) {
+            res.status = 503;
+            res.set_content("emulation not running", "text/plain");
+            return;
+        }
+
         try {
             auto hid = Service::HID::GetModule(Core::System::GetInstance());
             const nlohmann::json json = nlohmann::json::parse(req.body);
@@ -196,6 +222,12 @@ RPCServer::RPCServer() {
     });
 
     server->Get("/circlepadstate", [&](const httplib::Request& req, httplib::Response& res) {
+        if (!Core::System::GetInstance().IsPoweredOn()) {
+            res.status = 503;
+            res.set_content("emulation not running", "text/plain");
+            return;
+        }
+
         auto hid = Service::HID::GetModule(Core::System::GetInstance());
         const auto [x, y] = hid->GetCirclePadState();
 
@@ -209,6 +241,12 @@ RPCServer::RPCServer() {
     });
 
     server->Post("/circlepadstate", [&](const httplib::Request& req, httplib::Response& res) {
+        if (!Core::System::GetInstance().IsPoweredOn()) {
+            res.status = 503;
+            res.set_content("emulation not running", "text/plain");
+            return;
+        }
+
         try {
             auto hid = Service::HID::GetModule(Core::System::GetInstance());
             const nlohmann::json json = nlohmann::json::parse(req.body);
@@ -228,6 +266,12 @@ RPCServer::RPCServer() {
     });
 
     server->Get("/touchstate", [&](const httplib::Request& req, httplib::Response& res) {
+        if (!Core::System::GetInstance().IsPoweredOn()) {
+            res.status = 503;
+            res.set_content("emulation not running", "text/plain");
+            return;
+        }
+
         auto hid = Service::HID::GetModule(Core::System::GetInstance());
         const auto [x, y, pressed] = hid->GetTouchState();
 
@@ -242,6 +286,12 @@ RPCServer::RPCServer() {
     });
 
     server->Post("/touchstate", [&](const httplib::Request& req, httplib::Response& res) {
+        if (!Core::System::GetInstance().IsPoweredOn()) {
+            res.status = 503;
+            res.set_content("emulation not running", "text/plain");
+            return;
+        }
+
         try {
             auto hid = Service::HID::GetModule(Core::System::GetInstance());
             const nlohmann::json json = nlohmann::json::parse(req.body);
@@ -261,6 +311,12 @@ RPCServer::RPCServer() {
     });
 
     server->Get("/motionstate", [&](const httplib::Request& req, httplib::Response& res) {
+        if (!Core::System::GetInstance().IsPoweredOn()) {
+            res.status = 503;
+            res.set_content("emulation not running", "text/plain");
+            return;
+        }
+
         auto hid = Service::HID::GetModule(Core::System::GetInstance());
         const auto [accel, gyro] = hid->GetMotionState();
 
@@ -274,6 +330,12 @@ RPCServer::RPCServer() {
     });
 
     server->Post("/motionstate", [&](const httplib::Request& req, httplib::Response& res) {
+        if (!Core::System::GetInstance().IsPoweredOn()) {
+            res.status = 503;
+            res.set_content("emulation not running", "text/plain");
+            return;
+        }
+
         try {
             auto hid = Service::HID::GetModule(Core::System::GetInstance());
             const nlohmann::json json = nlohmann::json::parse(req.body);
@@ -293,9 +355,15 @@ RPCServer::RPCServer() {
     });
 
     server->Get("/screenshot", [&](const httplib::Request& req, httplib::Response& res) {
+        if (!Core::System::GetInstance().IsPoweredOn()) {
+            res.status = 503;
+            res.set_content("emulation not running", "text/plain");
+            return;
+        }
+
         if (VideoCore::g_renderer == nullptr) {
             res.status = 503;
-            res.set_content("renderer is null", "text/plain");
+            res.set_content("booting", "text/plain");
             return;
         }
 
@@ -361,6 +429,12 @@ RPCServer::RPCServer() {
     });
 
     server->Get("/layout", [&](const httplib::Request& req, httplib::Response& res) {
+        if (!Core::System::GetInstance().IsPoweredOn()) {
+            res.status = 503;
+            res.set_content("emulation not running", "text/plain");
+            return;
+        }
+
         const Layout::FramebufferLayout& layout =
             VideoCore::g_renderer->GetRenderWindow().GetFramebufferLayout();
         res.set_content(
@@ -554,6 +628,12 @@ RPCServer::RPCServer() {
     });
 
     server->Post("/amiibo", [&](const httplib::Request& req, httplib::Response& res) {
+        if (!Core::System::GetInstance().IsPoweredOn()) {
+            res.status = 503;
+            res.set_content("emulation not running", "text/plain");
+            return;
+        }
+
         std::shared_ptr<Service::NFC::Module::Interface> nfc =
             Core::System::GetInstance()
                 .ServiceManager()
@@ -1022,7 +1102,9 @@ RPCServer::RPCServer() {
         try {
             const nlohmann::json json = nlohmann::json::parse(req.body);
             Settings::values.use_cpu_jit = json["enabled"].get<bool>();
-            Core::System::GetInstance().RequestReset();
+            if (Core::System::GetInstance().IsPoweredOn()) {
+                Core::System::GetInstance().RequestReset();
+            }
             res.status = 204;
         } catch (nlohmann::json::exception& exception) {
             res.status = 500;
@@ -1070,7 +1152,9 @@ RPCServer::RPCServer() {
             if (Settings::values.enable_dsp_lle) {
                 Settings::values.enable_dsp_lle_multithread = json["multithreaded"].get<bool>();
             }
-            Core::System::GetInstance().RequestReset();
+            if (Core::System::GetInstance().IsPoweredOn()) {
+                Core::System::GetInstance().RequestReset();
+            }
             res.status = 204;
         } catch (nlohmann::json::exception& exception) {
             res.status = 500;
@@ -1194,7 +1278,9 @@ RPCServer::RPCServer() {
         try {
             const nlohmann::json json = nlohmann::json::parse(req.body);
             Settings::values.use_virtual_sd = json["enabled"].get<bool>();
-            Core::System::GetInstance().RequestReset();
+            if (Core::System::GetInstance().IsPoweredOn()) {
+                Core::System::GetInstance().RequestReset();
+            }
             res.status = 204;
         } catch (nlohmann::json::exception& exception) {
             res.status = 500;
@@ -1235,7 +1321,9 @@ RPCServer::RPCServer() {
         try {
             const nlohmann::json json = nlohmann::json::parse(req.body);
             Settings::values.region_value = json["value"].get<int>();
-            Core::System::GetInstance().RequestReset();
+            if (Core::System::GetInstance().IsPoweredOn()) {
+                Core::System::GetInstance().RequestReset();
+            }
             res.status = 204;
         } catch (nlohmann::json::exception& exception) {
             res.status = 500;
@@ -1268,7 +1356,9 @@ RPCServer::RPCServer() {
             if (Settings::values.init_clock == Settings::InitClock::FixedTime) {
                 Settings::values.init_time = json["unix_timestamp"].get<u64>();
             }
-            Core::System::GetInstance().RequestReset();
+            if (Core::System::GetInstance().IsPoweredOn()) {
+                Core::System::GetInstance().RequestReset();
+            }
             res.status = 204;
         } catch (nlohmann::json::exception& exception) {
             res.status = 500;
@@ -1289,7 +1379,9 @@ RPCServer::RPCServer() {
         try {
             const nlohmann::json json = nlohmann::json::parse(req.body);
             Settings::values.use_vsync_new = json["enabled"].get<bool>();
-            Core::System::GetInstance().RequestReset();
+            if (Core::System::GetInstance().IsPoweredOn()) {
+                Core::System::GetInstance().RequestReset();
+            }
             res.status = 204;
         } catch (nlohmann::json::exception& exception) {
             res.status = 500;
@@ -1399,7 +1491,9 @@ RPCServer::RPCServer() {
         try {
             const nlohmann::json json = nlohmann::json::parse(req.body);
             Settings::values.lle_modules = json.get<std::unordered_map<std::string, bool>>();
-            Core::System::GetInstance().RequestReset();
+            if (Core::System::GetInstance().IsPoweredOn()) {
+                Core::System::GetInstance().RequestReset();
+            }
             res.status = 204;
         } catch (nlohmann::json::exception& exception) {
             res.status = 500;

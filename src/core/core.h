@@ -28,10 +28,6 @@ namespace AudioCore {
 class DspInterface;
 } // namespace AudioCore
 
-namespace RPC {
-class RPCServer;
-} // namespace RPC
-
 namespace Service {
 namespace SM {
 class ServiceManager;
@@ -290,9 +286,6 @@ private:
 
     /// Custom texture cache system
     std::unique_ptr<Core::CustomTexCache> custom_tex_cache;
-
-    /// RPC Server for scripting support
-    std::unique_ptr<RPC::RPCServer> rpc_server;
 
     std::unique_ptr<Service::FS::ArchiveManager> archive_manager;
 

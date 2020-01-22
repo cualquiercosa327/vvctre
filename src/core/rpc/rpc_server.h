@@ -19,8 +19,7 @@ public:
     ~RPCServer();
 
 private:
-    void Start();
-    void Stop();
+    static RPCServer instance;
 
     std::unique_ptr<httplib::Server> server;
     std::thread request_handler_thread;

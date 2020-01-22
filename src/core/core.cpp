@@ -33,7 +33,6 @@
 #include "core/hw/hw.h"
 #include "core/loader/loader.h"
 #include "core/movie.h"
-#include "core/rpc/rpc_server.h"
 #include "core/settings.h"
 #include "video_core/video_core.h"
 
@@ -225,8 +224,6 @@ System::ResultStatus System::Init(Frontend::EmuWindow& emu_window, u32 system_mo
     dsp_core->SetSink(Settings::values.sink_id, Settings::values.audio_device_id);
     dsp_core->EnableStretching(Settings::values.enable_audio_stretching);
 
-    rpc_server = std::make_unique<RPC::RPCServer>();
-
     service_manager = std::make_shared<Service::SM::ServiceManager>(*this);
     archive_manager = std::make_unique<Service::FS::ArchiveManager>(*this);
 
@@ -339,7 +336,6 @@ void System::Shutdown() {
     VideoCore::Shutdown();
     HW::Shutdown();
     perf_stats.reset();
-    rpc_server.reset();
     cheat_engine.reset();
     service_manager.reset();
     dsp_core.reset();

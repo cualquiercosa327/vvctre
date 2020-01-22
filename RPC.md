@@ -647,7 +647,7 @@ Get or set whether custom texture preloading is enabled.
 # GET/POST /usecpujit
 
 Get or set whether the CPU JIT is used instead of the interpreter.
-If setting, the emulation will restart.
+If setting and the emulation is running, the emulation will restart.
 
 ## Request/Reply
 
@@ -672,7 +672,7 @@ Get or set whether ignore format reinterpretation is enabled.
 # GET/POST /dspemulation
 
 Get or set DSP emulation settings.  
-If setting, the emulation will restart.
+If setting and the emulation is running, the emulation will restart.
 
 ## Request/Reply
 
@@ -746,7 +746,7 @@ Get or set the audio output speed.
 # GET/POST /usevirtualsdcard
 
 Get or set whether a virtual SD card is used.  
-If setting, the emulation will restart.
+If setting and the emulation is running, the emulation will restart.
 
 ## Request/Reply
 
@@ -760,7 +760,7 @@ If setting, the emulation will restart.
 
 Get or set whether the console is a New 3DS.  
 This doesn't fix New 3DS game crashes.  
-If setting, the emulation will restart.
+If setting and the emulation is running, the emulation will restart.
 
 ## Request/Reply
 
@@ -773,20 +773,20 @@ If setting, the emulation will restart.
 # GET/POST /region
 
 Get or set the console's region.  
-If setting, the emulation will restart.
+If setting and the emulation is running, the emulation will restart.
 
 ## Request/Reply
 
 ```json
 {
-  "region": Number"-1=auto-select|0=Japan|1=USA|2=Europe|3=Australia|4=China|5=Korea|6=Taiwan"
+  "value": Number"-1=auto-select|0=Japan|1=USA|2=Europe|3=Australia|4=China|5=Korea|6=Taiwan"
 }
 ```
 
 # GET/POST /startclock
 
 Get or set the time to use when emulation starts.  
-If setting, the emulation will restart.
+If setting and the emulation is running, the emulation will restart.
 
 ## Request/Reply
 
@@ -800,7 +800,7 @@ If setting, the emulation will restart.
 # GET/POST /usevsync
 
 Get or set whether VSync is enabled.  
-If setting, the emulation will restart.
+If setting and the emulation is running, the emulation will restart.
 
 ## Request/Reply
 
@@ -864,7 +864,7 @@ Get or set GDB stub enabled and port.
 # GET/POST /llemodules
 
 Get or set LLE modules.  
-If setting, the emulation will restart.
+If setting and the emulation is running, the emulation will restart.
 
 ## Request/Reply
 
