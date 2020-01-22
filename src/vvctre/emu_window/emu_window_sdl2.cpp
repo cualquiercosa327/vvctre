@@ -244,6 +244,9 @@ void EmuWindow_SDL2::DiskShaderCacheProgress(VideoCore::LoadCallbackStage stage,
     }
 
     switch (stage) {
+    case VideoCore::LoadCallbackStage::Prepare:
+        loading_disk_shader_cache = true;
+        break;
     case VideoCore::LoadCallbackStage::Decompile: {
         const std::string title = fmt::format("vvctre {} | decompiling shaders ({}/{})",
                                               version::vvctre.to_string(), value, total);
@@ -259,7 +262,7 @@ void EmuWindow_SDL2::DiskShaderCacheProgress(VideoCore::LoadCallbackStage stage,
     case VideoCore::LoadCallbackStage::Complete: {
         const std::string title = fmt::format("vvctre {}", version::vvctre.to_string());
         SDL_SetWindowTitle(render_window, title.c_str());
-        running = true;
+        loading_disk_shader_cache = false;
         return;
     }
     }
@@ -360,7 +363,7 @@ void EmuWindow_SDL2::PollEvents() {
     const u32 current_time = SDL_GetTicks();
 
     if (current_time > last_time + 2000) {
-        if (running) {
+        if (!loading_disk_shader_cache) {
             Core::System& system = Core::System::GetInstance();
 
             if (system.IsPoweredOn()) {

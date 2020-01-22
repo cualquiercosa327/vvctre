@@ -20,6 +20,7 @@ struct OutputVertex;
 namespace VideoCore {
 
 enum class LoadCallbackStage {
+    Prepare,
     Decompile,
     Build,
     Complete,

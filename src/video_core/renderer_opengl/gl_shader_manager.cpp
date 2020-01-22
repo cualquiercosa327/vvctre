@@ -441,6 +441,11 @@ void ShaderProgramManager::LoadDiskCache(const std::atomic_bool& stop_loading,
                   "Cannot load disk cache as separate shader programs are unsupported!");
         return;
     }
+
+    if (callback) {
+        callback(VideoCore::LoadCallbackStage::Prepare, 0, 0);
+    }
+
     auto& disk_cache = impl->disk_cache;
     const auto transferable = disk_cache.LoadTransferable();
     if (!transferable) {
