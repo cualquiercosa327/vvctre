@@ -71,8 +71,6 @@ namespace RPC {
 
 constexpr int RPC_PORT = 47889;
 
-/*static*/ RPCServer RPCServer::instance;
-
 RPCServer::RPCServer() {
     server = std::make_unique<httplib::Server>();
 

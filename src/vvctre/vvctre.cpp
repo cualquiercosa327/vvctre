@@ -37,6 +37,7 @@
 #include "core/hle/service/cfg/cfg.h"
 #include "core/loader/loader.h"
 #include "core/movie.h"
+#include "core/rpc/rpc_server.h"
 #include "core/settings.h"
 #include "input_common/main.h"
 #include "video_core/renderer_base.h"
@@ -541,6 +542,8 @@ int main(int argc, char** argv) {
             default:
                 break;
             }
+
+            RPC::RPCServer rpc_server;
 
             if (!movie_play.empty()) {
                 Core::Movie::GetInstance().StartPlayback(movie_play);
