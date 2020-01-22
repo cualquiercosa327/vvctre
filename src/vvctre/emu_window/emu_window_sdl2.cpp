@@ -259,9 +259,12 @@ void EmuWindow_SDL2::DiskShaderCacheProgress(VideoCore::LoadCallbackStage stage,
     case VideoCore::LoadCallbackStage::Complete: {
         const std::string title = fmt::format("vvctre {}", version::vvctre.to_string());
         SDL_SetWindowTitle(render_window, title.c_str());
+        running = true;
         return;
     }
     }
+
+    PollEvents();
 }
 
 void EmuWindow_SDL2::SoftwareKeyboardStarted() {
@@ -357,34 +360,39 @@ void EmuWindow_SDL2::PollEvents() {
     }
 
     const u32 current_time = SDL_GetTicks();
+
     if (current_time > last_time + 2000) {
-        Core::System& system = Core::System::GetInstance();
+        if (running) {
+            Core::System& system = Core::System::GetInstance();
 
-        if (system.IsPoweredOn()) {
-            const u64 current_program_id = system.Kernel().GetCurrentProcess()->codeset->program_id;
-            if (program_id != current_program_id) {
-                system.GetAppLoader().ReadTitle(program_name);
+            if (system.IsPoweredOn()) {
+                const u64 current_program_id =
+                    system.Kernel().GetCurrentProcess()->codeset->program_id;
+                if (program_id != current_program_id) {
+                    system.GetAppLoader().ReadTitle(program_name);
 #ifdef USE_DISCORD_PRESENCE
-                if (discord_rp == nullptr) {
-                    discord_rp = std::make_unique<DiscordRP>(program_name);
-                } else {
-                    discord_rp->Update(program_name);
-                }
+                    if (discord_rp == nullptr) {
+                        discord_rp = std::make_unique<DiscordRP>(program_name);
+                    } else {
+                        discord_rp->Update(program_name);
+                    }
 #endif
-                program_id = current_program_id;
+                    program_id = current_program_id;
+                }
+
+                Core::PerfStats::Results results = system.GetAndResetPerfStats();
+
+                const std::string title =
+                    program_name.empty()
+                        ? fmt::format("vvctre {} | FPS: {:.0f} ({:.0f}%)",
+                                      version::vvctre.to_string(), results.game_fps,
+                                      results.emulation_speed * 100.0)
+                        : fmt::format("vvctre {} | {} | FPS: {:.0f} ({:.0f}%)",
+                                      version::vvctre.to_string(), program_name, results.game_fps,
+                                      results.emulation_speed * 100.0);
+
+                SDL_SetWindowTitle(render_window, title.c_str());
             }
-
-            Core::PerfStats::Results results = system.GetAndResetPerfStats();
-
-            const std::string title =
-                program_name.empty()
-                    ? fmt::format("vvctre {} | FPS: {:.0f} ({:.0f}%)", version::vvctre.to_string(),
-                                  results.game_fps, results.emulation_speed * 100.0)
-                    : fmt::format("vvctre {} | {} | FPS: {:.0f} ({:.0f}%)",
-                                  version::vvctre.to_string(), program_name, results.game_fps,
-                                  results.emulation_speed * 100.0);
-
-            SDL_SetWindowTitle(render_window, title.c_str());
         }
 
         last_time = current_time;
