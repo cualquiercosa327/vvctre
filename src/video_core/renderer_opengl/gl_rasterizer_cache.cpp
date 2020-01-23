@@ -1519,7 +1519,7 @@ Surface RasterizerCacheOpenGL::GetTextureSurface(const Pica::Texture::TextureInf
                 }
                 state.ResetTexture(level_surface->texture.handle);
                 state.Apply();
-                if (!(surface->is_custom | surface->is_filtered)) {
+                if (!surface->is_custom & !surface->is_filtered) {
                     glFramebufferTexture2D(GL_READ_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D,
                                            level_surface->texture.handle, 0);
                     glFramebufferTexture2D(GL_READ_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT,
@@ -1542,7 +1542,7 @@ Surface RasterizerCacheOpenGL::GetTextureSurface(const Pica::Texture::TextureInf
     }
 
     TextureFilterInterface* texture_filter;
-    if (!(surface->is_filtered | surface->is_custom) &&
+    if ((!surface->is_custom & !surface->is_filtered) &&
         (texture_filter = TextureFilterManager::GetInstance().GetTextureFilter())) {
         texture_filter->scale(surface);
         surface->is_filtered = true;

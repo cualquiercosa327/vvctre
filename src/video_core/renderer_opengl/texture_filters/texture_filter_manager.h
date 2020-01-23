@@ -10,19 +10,11 @@
 #include <mutex>
 #include <string>
 #include <tuple>
-
 #include "video_core/renderer_opengl/texture_filters/texture_filter_interface.h"
 
 namespace OpenGL {
 
 class TextureFilterManager {
-    std::atomic<bool> updated{false};
-    std::mutex mutex;
-    std::string name{"none"};
-    u16 scale_factor{1};
-
-    std::unique_ptr<TextureFilterInterface> filter;
-
 public:
     // function ensures map is initialized before use
     static const std::map<std::string, TextureFilterInfo>& TextureFilterMap();
@@ -41,6 +33,14 @@ public:
     // returns true if filter has been changed and a cache reset is needed
     bool IsUpdated();
     void Reset();
+
+private:
+    std::atomic<bool> updated{false};
+    std::mutex mutex;
+    std::string name{"none"};
+    u16 scale_factor{1};
+
+    std::unique_ptr<TextureFilterInterface> filter;
 };
 
 } // namespace OpenGL
