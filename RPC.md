@@ -956,3 +956,15 @@ Boot a file.
   "file": String
 }
 ```
+
+# POST /installciafile
+
+Install a CIA file.
+
+## Request
+
+```json
+{
+  "file": String
+}
+```

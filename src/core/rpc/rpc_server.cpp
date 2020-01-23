@@ -13,6 +13,7 @@
 #include "core/arm/arm_interface.h"
 #include "core/core.h"
 #include "core/hle/kernel/process.h"
+#include "core/hle/service/am/am.h"
 #include "core/hle/service/hid/hid.h"
 #include "core/hle/service/nfc/nfc_u.h"
 #include "core/memory.h"
@@ -1551,6 +1552,23 @@ RPCServer::RPCServer() {
             Core::System::GetInstance().SetResetFilePath(file);
             Core::System::GetInstance().RequestReset();
             res.status = 204;
+        } catch (nlohmann::json::exception& exception) {
+            res.status = 500;
+            res.set_content(exception.what(), "text/plain");
+        }
+    });
+
+    server->Post("/installciafile", [&](const httplib::Request& req, httplib::Response& res) {
+        try {
+            const nlohmann::json json = nlohmann::json::parse(req.body);
+            const std::string file = json["file"].get<std::string>();
+            const auto status = Service::AM::InstallCIA(file);
+            if (status == Service::AM::InstallStatus::Success) {
+                res.status = 204;
+            } else {
+                res.status = 500;
+                res.set_content(std::to_string(static_cast<int>(status)), "text/plain");
+            }
         } catch (nlohmann::json::exception& exception) {
             res.status = 500;
             res.set_content(exception.what(), "text/plain");
