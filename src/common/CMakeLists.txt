@@ -45,6 +45,10 @@ add_library(common STATIC
     zstd_compression.h
     version.cpp
     version.h
+    stb_image.cpp
+    stb_image.h
+    stb_image_write.cpp
+    stb_image_write.h
 )
 
 if(ARCHITECTURE_x86_64)

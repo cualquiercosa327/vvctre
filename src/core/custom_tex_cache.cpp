@@ -3,8 +3,8 @@
 // Refer to the license.txt file included.
 
 #include <fmt/format.h>
-#include <lodepng.h>
 #include "common/file_util.h"
+#include "common/stb_image.h"
 #include "common/texture.h"
 #include "core/core.h"
 #include "core/custom_tex_cache.h"
@@ -45,7 +45,7 @@ void CustomTexCache::AddTexturePath(u64 hash, const std::string& path) {
 
 void CustomTexCache::FindCustomTextures() {
     // Custom textures are currently stored as
-    // [TitleID]/tex1_[width]x[height]_[64-bit hash]_[format].png
+    // [TitleID]/tex1_[width]x[height]_[64-bit hash]_[format].[extension]
 
     const std::string load_path =
         fmt::format("{}textures/{:016X}/", FileUtil::GetUserPath(FileUtil::UserPath::LoadDir),
@@ -70,8 +70,9 @@ void CustomTexCache::FindCustomTextures() {
             u32 height;
             u64 hash;
             u32 format; // unused
+
             // TODO: more modern way of doing this
-            if (std::sscanf(file.virtualName.c_str(), "tex1_%ux%u_%llX_%u.png", &width, &height,
+            if (std::sscanf(file.virtualName.c_str(), "tex1_%ux%u_%llX_%u.%*s", &width, &height,
                             &hash, &format) == 4) {
                 AddTexturePath(hash, file.physicalName);
             }
@@ -83,7 +84,14 @@ void CustomTexCache::PreloadTextures() {
     for (const auto& path : custom_texture_paths) {
         const auto& path_info = path.second;
         Core::CustomTexInfo tex_info;
-        if (lodepng::decode(tex_info.tex, tex_info.width, tex_info.height, path_info.path) == 0) {
+        unsigned char* image =
+            stbi_load(path_info.path.c_str(), reinterpret_cast<int*>(&tex_info.width),
+                      reinterpret_cast<int*>(&tex_info.height), nullptr, 4);
+        if (image != nullptr) {
+            tex_info.tex.resize(tex_info.width * tex_info.height * 4);
+            std::memcpy(tex_info.tex.data(), image, tex_info.tex.size());
+            free(image);
+
             // Make sure the texture size is a power of 2
             std::bitset<32> width_bits(tex_info.width);
             std::bitset<32> height_bits(tex_info.height);

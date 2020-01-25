@@ -4,10 +4,10 @@
 
 #include <httplib.h>
 #include <json.hpp>
-#include <lodepng.h>
 #include "common/logging/backend.h"
 #include "common/logging/filter.h"
 #include "common/logging/log.h"
+#include "common/stb_image_write.h"
 #include "common/thread.h"
 #include "common/version.h"
 #include "core/arm/arm_interface.h"
@@ -418,12 +418,16 @@ RPCServer::RPCServer() {
         data = convert_bgra_to_rgba(rotate(data, layout), layout);
 
         std::vector<u8> out;
-        const u32 result = lodepng::encode(out, data, layout.width, layout.height);
-        if (result) {
-            res.status = 500;
-            res.set_content(lodepng_error_text(result), "text/plain");
+        stbi_write_func* f = [](void* context, void* data, int size) {
+            std::vector<u8>* out = static_cast<std::vector<u8>*>(context);
+            out->resize(out->size() + size);
+            std::memcpy(out->data() + out->size() - 1, data, size);
+        };
+        if (stbi_write_png_to_func(f, &out, layout.width, layout.height, 4, data.data(),
+                                   layout.width * 4) == 0) {
+            res.set_content("failed to encode", "text/plain");
         } else {
-            res.set_content(reinterpret_cast<const char*>(out.data()), out.size(), "image/png");
+            res.set_content(reinterpret_cast<const char*>(data.data()), data.size(), "image/png");
         }
     });
 

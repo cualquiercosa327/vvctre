@@ -14,13 +14,14 @@
 #include <vector>
 #include <boost/range/iterator_range.hpp>
 #include <glad/glad.h>
-#include <lodepng.h>
 #include "common/alignment.h"
 #include "common/bit_field.h"
 #include "common/color.h"
 #include "common/logging/log.h"
 #include "common/math_util.h"
 #include "common/scope_exit.h"
+#include "common/stb_image.h"
+#include "common/stb_image_write.h"
 #include "common/texture.h"
 #include "common/vector_math.h"
 #include "core/core.h"
@@ -805,26 +806,30 @@ bool CachedSurface::LoadCustomTexture(u64 tex_hash, Core::CustomTexInfo& tex_inf
     if (custom_tex_cache.IsTextureCached(tex_hash)) {
         tex_info = custom_tex_cache.LookupTexture(tex_hash);
         result = true;
-    } else {
-        if (custom_tex_cache.CustomTextureExists(tex_hash)) {
-            const Core::CustomTexPathInfo& path_info =
-                custom_tex_cache.LookupTexturePathInfo(tex_hash);
-            if (lodepng::decode(tex_info.tex, tex_info.width, tex_info.height, path_info.path) ==
-                0) {
-                std::bitset<32> width_bits(tex_info.width);
-                std::bitset<32> height_bits(tex_info.height);
-                if (width_bits.count() == 1 && height_bits.count() == 1) {
-                    LOG_DEBUG(Render_OpenGL, "Loaded custom texture from {}", path_info.path);
-                    Common::FlipRGBA8Texture(tex_info.tex, tex_info.width, tex_info.height);
-                    custom_tex_cache.CacheTexture(tex_hash, tex_info.tex, tex_info.width,
-                                                  tex_info.height);
-                    result = true;
-                } else {
-                    LOG_ERROR(Render_OpenGL, "Texture {} size is not a power of 2", path_info.path);
-                }
+    } else if (custom_tex_cache.CustomTextureExists(tex_hash)) {
+        const Core::CustomTexPathInfo& path_info = custom_tex_cache.LookupTexturePathInfo(tex_hash);
+        unsigned char* image =
+            stbi_load(path_info.path.c_str(), reinterpret_cast<int*>(&tex_info.width),
+                      reinterpret_cast<int*>(&tex_info.height), nullptr, 4);
+        if (image != nullptr) {
+            tex_info.tex.resize(tex_info.width * tex_info.height * 4);
+            std::memcpy(tex_info.tex.data(), image, tex_info.tex.size());
+            free(image);
+
+            // Make sure the texture size is a power of 2
+            std::bitset<32> width_bits(tex_info.width);
+            std::bitset<32> height_bits(tex_info.height);
+            if (width_bits.count() == 1 && height_bits.count() == 1) {
+                LOG_DEBUG(Render_OpenGL, "Loaded custom texture from {}", path_info.path);
+                Common::FlipRGBA8Texture(tex_info.tex, tex_info.width, tex_info.height);
+                custom_tex_cache.CacheTexture(path_info.hash, tex_info.tex, tex_info.width,
+                                              tex_info.height);
+                result = true;
             } else {
-                LOG_ERROR(Render_OpenGL, "Failed to load custom texture {}", path_info.path);
+                LOG_ERROR(Render_OpenGL, "Texture {} size is not a power of 2", path_info.path);
             }
+        } else {
+            LOG_ERROR(Render_OpenGL, "Failed to load custom texture {}", path_info.path);
         }
     }
 
@@ -873,7 +878,8 @@ void CachedSurface::DumpTexture(GLuint target_tex, u64 tex_hash) {
                     &decoded_texture[0], decoded_texture.size());
         glBindTexture(GL_TEXTURE_2D, 0);
         Common::FlipRGBA8Texture(decoded_texture, width, height);
-        if (lodepng::encode(dump_path, decoded_texture, width, height)) {
+        if (stbi_write_png(dump_path.c_str(), static_cast<int>(width), static_cast<int>(height), 4,
+                           decoded_texture.data(), static_cast<int>(width) * 4) == 0) {
             LOG_ERROR(Render_OpenGL, "Failed to save decoded texture");
         }
     }

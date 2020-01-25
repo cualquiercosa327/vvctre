@@ -158,8 +158,9 @@ System::ResultStatus System::Load(Frontend::EmuWindow& emu_window, const std::st
                                              Kernel().GetCurrentProcess()->codeset->program_id));
         custom_tex_cache->FindCustomTextures();
     }
-    if (Settings::values.preload_textures)
+    if (Settings::values.preload_textures) {
         custom_tex_cache->PreloadTextures();
+    }
     status = ResultStatus::Success;
     m_emu_window = &emu_window;
     m_filepath = filepath;

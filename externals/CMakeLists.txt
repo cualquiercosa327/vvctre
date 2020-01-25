@@ -89,7 +89,6 @@ target_include_directories(json INTERFACE ./json)
 add_library(portable-file-dialogs INTERFACE)
 target_include_directories(portable-file-dialogs INTERFACE ./portable-file-dialogs/include)
 
-add_subdirectory(lodepng)
 add_subdirectory(semver)
 add_subdirectory(clipp)
 add_subdirectory(easywsclient)
