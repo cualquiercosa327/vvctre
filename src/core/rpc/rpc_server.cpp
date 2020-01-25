@@ -420,14 +420,14 @@ RPCServer::RPCServer() {
         std::vector<u8> out;
         stbi_write_func* f = [](void* context, void* data, int size) {
             std::vector<u8>* out = static_cast<std::vector<u8>*>(context);
-            out->resize(out->size() + size);
-            std::memcpy(out->data() + out->size() - 1, data, size);
+            out->resize(size);
+            std::memcpy(out->data(), data, size);
         };
         if (stbi_write_png_to_func(f, &out, layout.width, layout.height, 4, data.data(),
                                    layout.width * 4) == 0) {
             res.set_content("failed to encode", "text/plain");
         } else {
-            res.set_content(reinterpret_cast<const char*>(data.data()), data.size(), "image/png");
+            res.set_content(reinterpret_cast<const char*>(out.data()), out.size(), "image/png");
         }
     });
 
