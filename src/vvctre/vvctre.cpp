@@ -86,7 +86,7 @@ int main(int argc, char** argv) {
     bool headless = false;
     bool fullscreen = false;
     bool regenerate_console_id = false;
-    int rpc_server_port=47889;
+    int rpc_server_port = 47889;
 
     enum class Command {
         BootOrInstall,
@@ -216,7 +216,7 @@ int main(int argc, char** argv) {
           clipp::option("--post-processing-shader").doc("set the post processing shader name") &
               clipp::value("name").set(Settings::values.pp_shader_name),
           clipp::option("--rpc-server-port").doc("set RPC server port (default: 47889)") &
-              clipp::value("name").set(rpc_server_port),
+              clipp::value("port").set(rpc_server_port),
           clipp::option("--3d-intensity").doc("set 3D intensity") &
               clipp::value("intensity").call([](const char* value) {
                   Settings::values.factor_3d = std::atoi(value);
