@@ -1,6 +1,5 @@
 # Build directory
 [Bb]uild/
-doc-build/
 
 # Project/editor files
 *.swp
