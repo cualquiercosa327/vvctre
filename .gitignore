@@ -6,7 +6,6 @@
 .idea/
 .vs/
 .vscode/
-CMakeLists.txt.user*
 
 # *nix related
 # Common convention for backup or temporary files
