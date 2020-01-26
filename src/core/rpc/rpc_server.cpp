@@ -70,9 +70,7 @@ void from_json(const nlohmann::json& json, Vec3<float>& v) {
 
 namespace RPC {
 
-constexpr int RPC_PORT = 47889;
-
-RPCServer::RPCServer() {
+RPCServer::RPCServer(const int port) {
     server = std::make_unique<httplib::Server>();
 
     server->Get("/version", [&](const httplib::Request& req, httplib::Response& res) {
@@ -1579,8 +1577,8 @@ RPCServer::RPCServer() {
         }
     });
 
-    request_handler_thread = std::thread([&] { server->listen("0.0.0.0", RPC_PORT); });
-    LOG_INFO(RPC_Server, "RPC server running on port {}", RPC_PORT);
+    request_handler_thread = std::thread([&] { server->listen("0.0.0.0", port); });
+    LOG_INFO(RPC_Server, "RPC server running on port {}", port);
 }
 
 RPCServer::~RPCServer() {

@@ -15,7 +15,7 @@ namespace RPC {
 
 class RPCServer {
 public:
-    RPCServer();
+    RPCServer(const int port);
     ~RPCServer();
 
 private:

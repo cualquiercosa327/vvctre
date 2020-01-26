@@ -1,4 +1,4 @@
-vvctre has a HTTP server running on port 47889.  
+vvctre has a HTTP server running on port 47889 (can be changed with a option).  
 Some endpoints can only be used when the emulation is running.
 
 # GET /version
@@ -423,6 +423,7 @@ Get or set input settings.
 ## Request/Reply
 
 Profile:
+
 ```json
 {
   "analogs": [
@@ -574,6 +575,7 @@ Sets the filtering mode to linear.
 Get or set the post processing shader name.
 
 Builtin shaders:
+
 - Anaglyph 3D only: dubois (builtin)
 - Interlaced 3D only: horizontal (builtin)
 - 3D off only: none (builtin)
