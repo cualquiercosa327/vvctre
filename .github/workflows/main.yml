@@ -39,13 +39,13 @@ jobs:
         shell: bash
         run: |
           cd $GITHUB_WORKSPACE
+          cp readme.md ./build/bin
+          cp license.txt ./build/bin
           if [ "$RUNNER_OS" == "Linux" ]; then
             rm ./build/bin/tests
-            cp license.txt ./build/bin
           elif [ "$RUNNER_OS" == "Windows" ]; then
             rm ./build/bin/Release/tests.exe
             rm ./build/bin/Release/*.pdb
-            cp license.txt ./build/bin/Release
           fi
       - name: Upload artifact
         uses: actions/upload-artifact@v1.0.0
