@@ -20,7 +20,3 @@ Thumbs.db
 
 # Python files
 *.pyc
-
-# Flatpak generated files
-.flatpak-builder/
-repo/
