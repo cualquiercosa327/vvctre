@@ -4,16 +4,16 @@ Refer to the license.txt file included.
 
 # Requirements
 
+- GPU with OpenGL >= 3.3
 - OS:
+  - 64-bit Windows >= 8.1
+    - [Visual C++ 2019 redistributable](https://aka.ms/vs/16/release/vc_redist.x64.exe)
   - 64-bit Ubuntu >= 18.04 with packages:
     - `libsdl2-dev`
     - `libswscale-dev`
     - `libavformat-dev`
     - `libavcodec-dev`
     - `libavdevice-dev`
-  - 64-bit Windows >= 8.1
-    - [Visual C++ 2019 redistributable](https://aka.ms/vs/16/release/vc_redist.x64.exe)
-- GPU with OpenGL >= 3.3
 
 # Usage
 
