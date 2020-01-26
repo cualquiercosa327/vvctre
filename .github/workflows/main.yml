@@ -39,7 +39,8 @@ jobs:
         shell: bash
         run: |
           cd $GITHUB_WORKSPACE
-          cp readme.md ./build/bin
+          cp README.md ./build/bin
+          cp RPC.md ./build/bin
           cp license.txt ./build/bin
           if [ "$RUNNER_OS" == "Linux" ]; then
             rm ./build/bin/tests
