@@ -11,8 +11,8 @@ add_executable(${PROJECT_NAME}
     resource.h
     applets/swkbd.cpp
     applets/swkbd.h
-    applets/appletEd.cpp
-    applets/appletEd.h
+    applets/mii_selector.cpp
+    applets/mii_selector.h
     $<$<BOOL:${USE_DISCORD_PRESENCE}>:discord_rp.cpp discord_rp.h>
 )
 

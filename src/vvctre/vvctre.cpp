@@ -44,7 +44,7 @@
 #include "input_common/main.h"
 #include "video_core/renderer_base.h"
 #include "video_core/video_core.h"
-#include "vvctre/applets/appletEd.h"
+#include "vvctre/applets/mii_selector.h"
 #include "vvctre/applets/swkbd.h"
 #include "vvctre/config.h"
 #include "vvctre/emu_window/emu_window_sdl2.h"
@@ -491,7 +491,7 @@ int main(int argc, char** argv) {
 
             // Apply the settings
             Settings::Apply();
-            
+
             Core::System& system = Core::System::GetInstance();
 
             std::unique_ptr<EmuWindow_SDL2> emu_window =

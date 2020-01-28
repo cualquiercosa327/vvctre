@@ -10,7 +10,7 @@
 #include "core/file_sys/archive_extsavedata.h"
 #include "core/file_sys/file_backend.h"
 #include "core/hle/service/ptm/ptm.h"
-#include "vvctre/applets/appletEd.h"
+#include "vvctre/applets/mii_selector.h"
 
 namespace Frontend {
 

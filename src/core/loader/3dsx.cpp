@@ -245,76 +245,87 @@ static THREEDSX_Error Load3DSXFile(FileUtil::IOFile& file, u32 base_addr,
 FileType AppLoader_THREEDSX::IdentifyType(FileUtil::IOFile& file) {
     u32 magic;
     file.Seek(0, SEEK_SET);
-    if (1 != file.ReadArray<u32>(&magic, 1))
+    if (1 != file.ReadArray<u32>(&magic, 1)) {
         return FileType::Error;
+    }
 
-    if (MakeMagic('3', 'D', 'S', 'X') == magic)
+    if (MakeMagic('3', 'D', 'S', 'X') == magic) {
         return FileType::THREEDSX;
+    }
 
     return FileType::Error;
 }
 
 ResultStatus AppLoader_THREEDSX::Load(std::shared_ptr<Kernel::Process>& process) {
-    if (is_loaded)
+    if (is_loaded) {
         return ResultStatus::ErrorAlreadyLoaded;
+    }
 
-    if (!file.IsOpen())
+    if (!file.IsOpen()) {
         return ResultStatus::Error;
+    }
 
     std::shared_ptr<CodeSet> codeset;
-    if (Load3DSXFile(file, Memory::PROCESS_IMAGE_VADDR, &codeset) != ERROR_NONE)
+    if (Load3DSXFile(file, Memory::PROCESS_IMAGE_VADDR, &codeset) != ERROR_NONE) {
         return ResultStatus::Error;
+    }
     codeset->name = filename;
 
-    process = Core::System::GetInstance().Kernel().CreateProcess(std::move(codeset));
+    Core::System& system = Core::System::GetInstance();
+
+    process = system.Kernel().CreateProcess(std::move(codeset));
     process->svc_access_mask.set();
     process->address_mappings = default_address_mappings;
 
     // Attach the default resource limit (APPLICATION) to the process
-    process->resource_limit = Core::System::GetInstance().Kernel().ResourceLimit().GetForCategory(
-        Kernel::ResourceLimitCategory::APPLICATION);
+    process->resource_limit =
+        system.Kernel().ResourceLimit().GetForCategory(Kernel::ResourceLimitCategory::APPLICATION);
 
     process->Run(48, Kernel::DEFAULT_STACK_SIZE);
 
-    Core::System::GetInstance().ArchiveManager().RegisterSelfNCCH(*this);
+    system.ArchiveManager().RegisterSelfNCCH(*this);
 
     is_loaded = true;
     return ResultStatus::Success;
 }
 
 ResultStatus AppLoader_THREEDSX::ReadRomFS(std::shared_ptr<FileSys::RomFSReader>& romfs_file) {
-    if (!file.IsOpen())
+    if (!file.IsOpen()) {
         return ResultStatus::Error;
+    }
 
     // Reset read pointer in case this file has been read before.
     file.Seek(0, SEEK_SET);
 
     THREEDSX_Header hdr;
-    if (file.ReadBytes(&hdr, sizeof(THREEDSX_Header)) != sizeof(THREEDSX_Header))
+    if (file.ReadBytes(&hdr, sizeof(THREEDSX_Header)) != sizeof(THREEDSX_Header)) {
         return ResultStatus::Error;
+    }
 
-    if (hdr.header_size != sizeof(THREEDSX_Header))
+    if (hdr.header_size != sizeof(THREEDSX_Header)) {
         return ResultStatus::Error;
+    }
 
     // Check if the 3DSX has a RomFS...
     if (hdr.fs_offset != 0) {
-        u32 romfs_offset = hdr.fs_offset;
-        u32 romfs_size = static_cast<u32>(file.GetSize()) - hdr.fs_offset;
+        const u32 romfs_size = static_cast<u32>(file.GetSize()) - hdr.fs_offset;
 
-        LOG_DEBUG(Loader, "RomFS offset:           {:#010X}", romfs_offset);
+        LOG_DEBUG(Loader, "RomFS offset:           {:#010X}", hdr.fs_offset);
         LOG_DEBUG(Loader, "RomFS size:             {:#010X}", romfs_size);
 
         // We reopen the file, to allow its position to be independent from file's
         FileUtil::IOFile romfs_file_inner(filepath, "rb");
-        if (!romfs_file_inner.IsOpen())
+        if (!romfs_file_inner.IsOpen()) {
             return ResultStatus::Error;
-
+        }
         romfs_file = std::make_shared<FileSys::RomFSReader>(std::move(romfs_file_inner),
-                                                            romfs_offset, romfs_size);
+                                                            hdr.fs_offset, romfs_size);
 
         return ResultStatus::Success;
     }
+
     LOG_DEBUG(Loader, "3DSX has no RomFS");
+
     return ResultStatus::ErrorNotUsed;
 }
 
