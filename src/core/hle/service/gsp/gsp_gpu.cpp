@@ -480,8 +480,6 @@ static void ExecuteCommand(const Command& command, u32 thread_id) {
 
         // GX request DMA - typically used for copying memory from GSP heap to VRAM
     case CommandId::REQUEST_DMA: {
-        Memory::MemorySystem& memory = Core::System::GetInstance().Memory();
-
         // TODO: Consider attempting rasterizer-accelerated surface blit if that usage is ever
         // possible/likely
         Memory::RasterizerFlushVirtualRegion(command.dma_request.source_address,
@@ -492,9 +490,10 @@ static void ExecuteCommand(const Command& command, u32 thread_id) {
 
         // TODO(Subv): These memory accesses should not go through the application's memory mapping.
         // They should go through the GSP module's memory mapping.
-        memory.CopyBlock(*Core::System::GetInstance().Kernel().GetCurrentProcess(),
-                         command.dma_request.dest_address, command.dma_request.source_address,
-                         command.dma_request.size);
+        Core::System& system = Core::System::GetInstance();
+        system.Memory().CopyBlock(*system.Kernel().GetCurrentProcess(),
+                                  command.dma_request.dest_address,
+                                  command.dma_request.source_address, command.dma_request.size);
         SignalInterrupt(InterruptId::DMA);
         break;
     }

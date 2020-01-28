@@ -860,8 +860,9 @@ static void WriteMemory() {
     auto len_pos = std::find(start_offset, command_buffer + command_length, ':');
     u32 len = HexToInt(start_offset, static_cast<u32>(len_pos - start_offset));
 
-    if (!Memory::IsValidVirtualAddress(*Core::System::GetInstance().Kernel().GetCurrentProcess(),
-                                       addr)) {
+    Core::System& system = Core::System::GetInstance();
+
+    if (!Memory::IsValidVirtualAddress(*system.Kernel().GetCurrentProcess(), addr)) {
         return SendReply("E00");
     }
 
@@ -869,7 +870,6 @@ static void WriteMemory() {
 
     GdbHexToMem(data.data(), len_pos + 1, len);
 
-    Core::System& system = Core::System::GetInstance();
     system.Memory().WriteBlock(*system.Kernel().GetCurrentProcess(), addr, data.data(), len);
     system.CPU().ClearInstructionCache();
 
