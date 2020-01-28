@@ -15,6 +15,8 @@
 #include <shellapi.h>
 #endif
 
+#define SDL_MAIN_HANDLED
+#include <SDL.h>
 #include <clipp.h>
 #include <portable-file-dialogs.h>
 #include "common/common_paths.h"
@@ -424,7 +426,7 @@ int main(int argc, char** argv) {
           clipp::option("--unlimited")
               .set(Settings::values.use_frame_limit, false)
               .doc("disable the speed limiter")) |
-         clipp::command("controls").set(command, Command::Controls).doc("configure a controller") |
+         clipp::command("controls").set(command, Command::Controls).doc("configure controls") |
          clipp::command("version").set(command, Command::Version).doc("prints vvctre's version") |
          clipp::command("usage").set(command, Command::Usage).doc("prints this"));
 
@@ -601,48 +603,135 @@ int main(int argc, char** argv) {
         break;
     }
     case Command::Controls: {
-        InputCommon::Init();
-        const auto GetInput = [](InputCommon::Polling::DeviceType type) {
-            auto pollers = InputCommon::Polling::GetPollers(type);
-            for (auto& poller : pollers) {
-                poller->Start();
-            }
-            for (;;) {
+        SDL_Event event;
+        SDL_Window* window;
+
+        const auto GetInput = [&](const char* mapping, InputCommon::Polling::DeviceType type) {
+            switch (type) {
+            case InputCommon::Polling::DeviceType::Button: {
+                fmt::print("Current button: {}. After pressing the enter key, press "
+                           "a key or button\n",
+                           Common::ToUpper(mapping));
+                std::cin.get();
+
+                InputCommon::Init();
+                SDL_Init(SDL_INIT_VIDEO);
+
+                window = SDL_CreateWindow("", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 0,
+                                          0, SDL_WINDOW_BORDERLESS);
+
+                SDL_RaiseWindow(window);
+
+                SCOPE_EXIT({
+                    InputCommon::Shutdown();
+                    SDL_Quit();
+                });
+
+                auto pollers = InputCommon::Polling::GetPollers(type);
+
                 for (auto& poller : pollers) {
-                    const Common::ParamPackage params = poller->GetNextInput();
-                    if (params.Has("engine")) {
-                        for (auto& poller : pollers) {
-                            poller->Stop();
+                    poller->Start();
+                }
+
+                SCOPE_EXIT({
+                    for (auto& poller : pollers) {
+                        poller->Stop();
+                    }
+                });
+
+                for (;;) {
+                    for (auto& poller : pollers) {
+                        const Common::ParamPackage params = poller->GetNextInput();
+                        if (params.Has("engine")) {
+                            return params;
                         }
-                        return params;
+                    }
+
+                    while (SDL_PollEvent(&event)) {
+                        if (event.type == SDL_KEYUP) {
+                            return Common::ParamPackage(
+                                InputCommon::GenerateKeyboardParam(event.key.keysym.scancode));
+                        }
                     }
                 }
 
-                using namespace std::chrono_literals;
-                std::this_thread::sleep_for(250ms);
+                break;
+            }
+            case InputCommon::Polling::DeviceType::Analog: {
+                fmt::print("Current stick: {}. After pressing the enter key,\nFor a keyboard, "
+                           "press the keys for up, down, left, right, and modifier.\nFor a "
+                           "gamepad, first move "
+                           "a stick to the right, and then to the bottom.\n",
+                           Common::ToUpper(mapping));
+                std::cin.get();
+
+                InputCommon::Init();
+                SDL_Init(SDL_INIT_VIDEO);
+
+                window = SDL_CreateWindow("", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 0,
+                                          0, SDL_WINDOW_BORDERLESS | SDL_WINDOW_INPUT_FOCUS);
+
+                SDL_RaiseWindow(window);
+
+                SCOPE_EXIT({
+                    InputCommon::Shutdown();
+                    SDL_Quit();
+                });
+
+                auto pollers = InputCommon::Polling::GetPollers(type);
+
+                for (auto& poller : pollers) {
+                    poller->Start();
+                }
+
+                SCOPE_EXIT({
+                    for (auto& poller : pollers) {
+                        poller->Stop();
+                    }
+                });
+
+                std::vector<int> keyboard_scancodes;
+
+                for (;;) {
+                    for (auto& poller : pollers) {
+                        const Common::ParamPackage params = poller->GetNextInput();
+                        if (params.Has("engine")) {
+                            return params;
+                        }
+                    }
+
+                    while (SDL_PollEvent(&event)) {
+                        if (event.type == SDL_KEYUP) {
+                            pollers.clear();
+                            keyboard_scancodes.push_back(event.key.keysym.scancode);
+                            if (keyboard_scancodes.size() == 5) {
+                                return Common::ParamPackage(
+                                    InputCommon::GenerateAnalogParamFromKeys(
+                                        keyboard_scancodes[0], keyboard_scancodes[1],
+                                        keyboard_scancodes[2], keyboard_scancodes[3],
+                                        keyboard_scancodes[4], 0.5f));
+                            }
+                        }
+                    }
+                }
+
+                break;
+            }
+            default: { return Common::ParamPackage(); }
             }
         };
 
         std::vector<std::string> lines;
 
         for (const auto& mapping : Settings::NativeButton::mapping) {
-            fmt::print("Current button: {}. After pressing the enter key, press "
-                       "the button\n",
-                       Common::ToUpper(mapping));
-            std::cin.get();
-
-            const Common::ParamPackage params = GetInput(InputCommon::Polling::DeviceType::Button);
+            const Common::ParamPackage params =
+                GetInput(mapping, InputCommon::Polling::DeviceType::Button);
             lines.push_back(fmt::format("{}={}", mapping, params.Serialize()));
         }
 
         for (const auto& mapping : Settings::NativeAnalog::mapping) {
-            fmt::print("Current joystick: {}. After pressing the enter key, first "
-                       "move your "
-                       "joystick to the right, and then to the bottom\n",
-                       Common::ToUpper(mapping));
-            std::cin.get();
-
-            const Common::ParamPackage params = GetInput(InputCommon::Polling::DeviceType::Analog);
+            const Common::ParamPackage params =
+                GetInput(mapping, InputCommon::Polling::DeviceType::Analog);
             lines.push_back(fmt::format("{}={}", mapping, params.Serialize()));
         }
 

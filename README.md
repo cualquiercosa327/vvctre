@@ -72,7 +72,7 @@ For a list of commands and options, run `vvctre usage`.
 # FAQ
 
 Q: Where's the ini?  
-A: On Windows: `AppData\Roaming\vvctre\config\sdl2-config.ini`
+A: On Windows: `AppData\Roaming\vvctre\config\sdl2-config.ini`, on Linux: `~/.config/vvctre/sdl2-config.ini`
 
 Q: Does this support cameras?  
 A: Not yet.
