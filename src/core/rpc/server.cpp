@@ -18,7 +18,7 @@
 #include "core/hle/service/nfc/nfc_u.h"
 #include "core/memory.h"
 #include "core/movie.h"
-#include "core/rpc/rpc_server.h"
+#include "core/rpc/server.h"
 #include "video_core/renderer_base.h"
 #include "video_core/video_core.h"
 
@@ -70,7 +70,7 @@ void from_json(const nlohmann::json& json, Vec3<float>& v) {
 
 namespace RPC {
 
-RPCServer::RPCServer(const int port) {
+Server::Server(Core::System& system, const int port) {
     server = std::make_unique<httplib::Server>();
 
     server->Get("/version", [&](const httplib::Request& req, httplib::Response& res) {
@@ -85,7 +85,7 @@ RPCServer::RPCServer(const int port) {
     });
 
     server->Post("/memory/read", [&](const httplib::Request& req, httplib::Response& res) {
-        if (!Core::System::GetInstance().IsPoweredOn()) {
+        if (!system.IsPoweredOn()) {
             res.status = 503;
             res.set_content("emulation not running", "text/plain");
             return;
@@ -99,8 +99,8 @@ RPCServer::RPCServer(const int port) {
             std::vector<u8> data(size);
 
             // Note: Memory read occurs asynchronously from the state of the emulator
-            Core::System::GetInstance().Memory().ReadBlock(
-                *Core::System::GetInstance().Kernel().GetCurrentProcess(), address, &data[0], size);
+            system.Memory().ReadBlock(*system.Kernel().GetCurrentProcess(), address, &data[0],
+                                      size);
 
             res.set_content(nlohmann::json(data).dump(), "application/json");
         } catch (nlohmann::json::exception& exception) {
@@ -110,7 +110,7 @@ RPCServer::RPCServer(const int port) {
     });
 
     server->Post("/memory/write", [&](const httplib::Request& req, httplib::Response& res) {
-        if (!Core::System::GetInstance().IsPoweredOn()) {
+        if (!system.IsPoweredOn()) {
             res.status = 503;
             res.set_content("emulation not running", "text/plain");
             return;
@@ -122,9 +122,8 @@ RPCServer::RPCServer(const int port) {
             const std::vector<u8> data = json["data"].get<std::vector<u8>>();
 
             // Note: Memory write occurs asynchronously from the state of the emulator
-            Core::System::GetInstance().Memory().WriteBlock(
-                *Core::System::GetInstance().Kernel().GetCurrentProcess(), address, &data[0],
-                data.size());
+            system.Memory().WriteBlock(*system.Kernel().GetCurrentProcess(), address, &data[0],
+                                       data.size());
 
             res.status = 204;
         } catch (nlohmann::json::exception& exception) {
@@ -134,13 +133,13 @@ RPCServer::RPCServer(const int port) {
     });
 
     server->Get("/padstate", [&](const httplib::Request& req, httplib::Response& res) {
-        if (!Core::System::GetInstance().IsPoweredOn()) {
+        if (!system.IsPoweredOn()) {
             res.status = 503;
             res.set_content("emulation not running", "text/plain");
             return;
         }
 
-        auto hid = Service::HID::GetModule(Core::System::GetInstance());
+        auto hid = Service::HID::GetModule(system);
         const Service::HID::PadState state = hid->GetPadState();
 
         res.set_content(
@@ -170,14 +169,14 @@ RPCServer::RPCServer(const int port) {
     });
 
     server->Post("/padstate", [&](const httplib::Request& req, httplib::Response& res) {
-        if (!Core::System::GetInstance().IsPoweredOn()) {
+        if (!system.IsPoweredOn()) {
             res.status = 503;
             res.set_content("emulation not running", "text/plain");
             return;
         }
 
         try {
-            auto hid = Service::HID::GetModule(Core::System::GetInstance());
+            auto hid = Service::HID::GetModule(system);
             const nlohmann::json json = nlohmann::json::parse(req.body);
 
             if (json.contains("hex")) {
@@ -219,13 +218,13 @@ RPCServer::RPCServer(const int port) {
     });
 
     server->Get("/circlepadstate", [&](const httplib::Request& req, httplib::Response& res) {
-        if (!Core::System::GetInstance().IsPoweredOn()) {
+        if (!system.IsPoweredOn()) {
             res.status = 503;
             res.set_content("emulation not running", "text/plain");
             return;
         }
 
-        auto hid = Service::HID::GetModule(Core::System::GetInstance());
+        auto hid = Service::HID::GetModule(system);
         const auto [x, y] = hid->GetCirclePadState();
 
         res.set_content(
@@ -238,14 +237,14 @@ RPCServer::RPCServer(const int port) {
     });
 
     server->Post("/circlepadstate", [&](const httplib::Request& req, httplib::Response& res) {
-        if (!Core::System::GetInstance().IsPoweredOn()) {
+        if (!system.IsPoweredOn()) {
             res.status = 503;
             res.set_content("emulation not running", "text/plain");
             return;
         }
 
         try {
-            auto hid = Service::HID::GetModule(Core::System::GetInstance());
+            auto hid = Service::HID::GetModule(system);
             const nlohmann::json json = nlohmann::json::parse(req.body);
 
             if (json.contains("x") && json.contains("y")) {
@@ -263,13 +262,13 @@ RPCServer::RPCServer(const int port) {
     });
 
     server->Get("/touchstate", [&](const httplib::Request& req, httplib::Response& res) {
-        if (!Core::System::GetInstance().IsPoweredOn()) {
+        if (!system.IsPoweredOn()) {
             res.status = 503;
             res.set_content("emulation not running", "text/plain");
             return;
         }
 
-        auto hid = Service::HID::GetModule(Core::System::GetInstance());
+        auto hid = Service::HID::GetModule(system);
         const auto [x, y, pressed] = hid->GetTouchState();
 
         res.set_content(
@@ -283,14 +282,14 @@ RPCServer::RPCServer(const int port) {
     });
 
     server->Post("/touchstate", [&](const httplib::Request& req, httplib::Response& res) {
-        if (!Core::System::GetInstance().IsPoweredOn()) {
+        if (!system.IsPoweredOn()) {
             res.status = 503;
             res.set_content("emulation not running", "text/plain");
             return;
         }
 
         try {
-            auto hid = Service::HID::GetModule(Core::System::GetInstance());
+            auto hid = Service::HID::GetModule(system);
             const nlohmann::json json = nlohmann::json::parse(req.body);
 
             if (json.contains("x") && json.contains("y") && json.contains("pressed")) {
@@ -308,13 +307,13 @@ RPCServer::RPCServer(const int port) {
     });
 
     server->Get("/motionstate", [&](const httplib::Request& req, httplib::Response& res) {
-        if (!Core::System::GetInstance().IsPoweredOn()) {
+        if (!system.IsPoweredOn()) {
             res.status = 503;
             res.set_content("emulation not running", "text/plain");
             return;
         }
 
-        auto hid = Service::HID::GetModule(Core::System::GetInstance());
+        auto hid = Service::HID::GetModule(system);
         const auto [accel, gyro] = hid->GetMotionState();
 
         res.set_content(
@@ -327,14 +326,14 @@ RPCServer::RPCServer(const int port) {
     });
 
     server->Post("/motionstate", [&](const httplib::Request& req, httplib::Response& res) {
-        if (!Core::System::GetInstance().IsPoweredOn()) {
+        if (!system.IsPoweredOn()) {
             res.status = 503;
             res.set_content("emulation not running", "text/plain");
             return;
         }
 
         try {
-            auto hid = Service::HID::GetModule(Core::System::GetInstance());
+            auto hid = Service::HID::GetModule(system);
             const nlohmann::json json = nlohmann::json::parse(req.body);
 
             if (json.contains("accel") && json.contains("gyro")) {
@@ -352,7 +351,7 @@ RPCServer::RPCServer(const int port) {
     });
 
     server->Get("/screenshot", [&](const httplib::Request& req, httplib::Response& res) {
-        if (!Core::System::GetInstance().IsPoweredOn()) {
+        if (!system.IsPoweredOn()) {
             res.status = 503;
             res.set_content("emulation not running", "text/plain");
             return;
@@ -430,7 +429,7 @@ RPCServer::RPCServer(const int port) {
     });
 
     server->Get("/layout", [&](const httplib::Request& req, httplib::Response& res) {
-        if (!Core::System::GetInstance().IsPoweredOn()) {
+        if (!system.IsPoweredOn()) {
             res.status = 503;
             res.set_content("emulation not running", "text/plain");
             return;
@@ -629,16 +628,14 @@ RPCServer::RPCServer(const int port) {
     });
 
     server->Post("/amiibo", [&](const httplib::Request& req, httplib::Response& res) {
-        if (!Core::System::GetInstance().IsPoweredOn()) {
+        if (!system.IsPoweredOn()) {
             res.status = 503;
             res.set_content("emulation not running", "text/plain");
             return;
         }
 
         std::shared_ptr<Service::NFC::Module::Interface> nfc =
-            Core::System::GetInstance()
-                .ServiceManager()
-                .GetService<Service::NFC::Module::Interface>("nfc:u");
+            system.ServiceManager().GetService<Service::NFC::Module::Interface>("nfc:u");
         if (nfc == nullptr) {
             res.status = 500;
             res.set_content("nfc:u is null", "text/plain");
@@ -733,7 +730,7 @@ RPCServer::RPCServer(const int port) {
     server->Get("/frameadvancing", [&](const httplib::Request& req, httplib::Response& res) {
         res.set_content(
             nlohmann::json{
-                {"enabled", Core::System::GetInstance().frame_limiter.FrameAdvancingEnabled()},
+                {"enabled", system.frame_limiter.FrameAdvancingEnabled()},
             }
                 .dump(),
             "application/json");
@@ -742,8 +739,7 @@ RPCServer::RPCServer(const int port) {
     server->Post("/frameadvancing", [&](const httplib::Request& req, httplib::Response& res) {
         try {
             const nlohmann::json json = nlohmann::json::parse(req.body);
-            Core::System::GetInstance().frame_limiter.SetFrameAdvancing(
-                json["enabled"].get<bool>());
+            system.frame_limiter.SetFrameAdvancing(json["enabled"].get<bool>());
 
             res.status = 204;
         } catch (nlohmann::json::exception& exception) {
@@ -754,7 +750,7 @@ RPCServer::RPCServer(const int port) {
 
     server->Get("/frameadvancing/advance",
                 [&](const httplib::Request& req, httplib::Response& res) {
-                    Core::System::GetInstance().frame_limiter.AdvanceFrame();
+                    system.frame_limiter.AdvanceFrame();
                     res.status = 204;
                 });
 
@@ -1103,8 +1099,8 @@ RPCServer::RPCServer(const int port) {
         try {
             const nlohmann::json json = nlohmann::json::parse(req.body);
             Settings::values.use_cpu_jit = json["enabled"].get<bool>();
-            if (Core::System::GetInstance().IsPoweredOn()) {
-                Core::System::GetInstance().RequestReset();
+            if (system.IsPoweredOn()) {
+                system.RequestReset();
             }
             res.status = 204;
         } catch (nlohmann::json::exception& exception) {
@@ -1153,8 +1149,8 @@ RPCServer::RPCServer(const int port) {
             if (Settings::values.enable_dsp_lle) {
                 Settings::values.enable_dsp_lle_multithread = json["multithreaded"].get<bool>();
             }
-            if (Core::System::GetInstance().IsPoweredOn()) {
-                Core::System::GetInstance().RequestReset();
+            if (system.IsPoweredOn()) {
+                system.RequestReset();
             }
             res.status = 204;
         } catch (nlohmann::json::exception& exception) {
@@ -1279,8 +1275,8 @@ RPCServer::RPCServer(const int port) {
         try {
             const nlohmann::json json = nlohmann::json::parse(req.body);
             Settings::values.use_virtual_sd = json["enabled"].get<bool>();
-            if (Core::System::GetInstance().IsPoweredOn()) {
-                Core::System::GetInstance().RequestReset();
+            if (system.IsPoweredOn()) {
+                system.RequestReset();
             }
             res.status = 204;
         } catch (nlohmann::json::exception& exception) {
@@ -1322,8 +1318,8 @@ RPCServer::RPCServer(const int port) {
         try {
             const nlohmann::json json = nlohmann::json::parse(req.body);
             Settings::values.region_value = json["value"].get<int>();
-            if (Core::System::GetInstance().IsPoweredOn()) {
-                Core::System::GetInstance().RequestReset();
+            if (system.IsPoweredOn()) {
+                system.RequestReset();
             }
             res.status = 204;
         } catch (nlohmann::json::exception& exception) {
@@ -1357,8 +1353,8 @@ RPCServer::RPCServer(const int port) {
             if (Settings::values.init_clock == Settings::InitClock::FixedTime) {
                 Settings::values.init_time = json["unix_timestamp"].get<u64>();
             }
-            if (Core::System::GetInstance().IsPoweredOn()) {
-                Core::System::GetInstance().RequestReset();
+            if (system.IsPoweredOn()) {
+                system.RequestReset();
             }
             res.status = 204;
         } catch (nlohmann::json::exception& exception) {
@@ -1380,8 +1376,8 @@ RPCServer::RPCServer(const int port) {
         try {
             const nlohmann::json json = nlohmann::json::parse(req.body);
             Settings::values.use_vsync_new = json["enabled"].get<bool>();
-            if (Core::System::GetInstance().IsPoweredOn()) {
-                Core::System::GetInstance().RequestReset();
+            if (system.IsPoweredOn()) {
+                system.RequestReset();
             }
             res.status = 204;
         } catch (nlohmann::json::exception& exception) {
@@ -1492,8 +1488,8 @@ RPCServer::RPCServer(const int port) {
         try {
             const nlohmann::json json = nlohmann::json::parse(req.body);
             Settings::values.lle_modules = json.get<std::unordered_map<std::string, bool>>();
-            if (Core::System::GetInstance().IsPoweredOn()) {
-                Core::System::GetInstance().RequestReset();
+            if (system.IsPoweredOn()) {
+                system.RequestReset();
             }
             res.status = 204;
         } catch (nlohmann::json::exception& exception) {
@@ -1542,7 +1538,7 @@ RPCServer::RPCServer(const int port) {
     });
 
     server->Post("/boot", [&](const httplib::Request& req, httplib::Response& res) {
-        if (!Core::System::GetInstance().IsPoweredOn()) {
+        if (!system.IsPoweredOn()) {
             res.status = 503;
             res.set_content("emulation not running", "text/plain");
             return;
@@ -1551,8 +1547,8 @@ RPCServer::RPCServer(const int port) {
         try {
             const nlohmann::json json = nlohmann::json::parse(req.body);
             const std::string file = json["file"].get<std::string>();
-            Core::System::GetInstance().SetResetFilePath(file);
-            Core::System::GetInstance().RequestReset();
+            system.SetResetFilePath(file);
+            system.RequestReset();
             res.status = 204;
         } catch (nlohmann::json::exception& exception) {
             res.status = 500;
@@ -1581,7 +1577,7 @@ RPCServer::RPCServer(const int port) {
     LOG_INFO(RPC_Server, "RPC server running on port {}", port);
 }
 
-RPCServer::~RPCServer() {
+Server::~Server() {
     server->stop();
     request_handler_thread.join();
     LOG_INFO(RPC_Server, "RPC server stopped");

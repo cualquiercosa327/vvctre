@@ -439,8 +439,8 @@ add_library(core STATIC
     movie.h
     perf_stats.cpp
     perf_stats.h
-    rpc/rpc_server.cpp
-    rpc/rpc_server.h
+    rpc/server.cpp
+    rpc/server.h
     settings.cpp
     settings.h
     tracer/citrace.h

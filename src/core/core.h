@@ -307,12 +307,4 @@ private:
     std::atomic<bool> shutdown_requested;
 };
 
-inline ARM_Interface& CPU() {
-    return System::GetInstance().CPU();
-}
-
-inline AudioCore::DspInterface& DSP() {
-    return System::GetInstance().DSP();
-}
-
 } // namespace Core

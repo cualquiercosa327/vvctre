@@ -411,11 +411,12 @@ static void RemoveBreakpoint(BreakpointType type, VAddr addr) {
               bp->second.len, bp->second.addr, static_cast<int>(type));
 
     if (type == BreakpointType::Execute) {
-        Core::System::GetInstance().Memory().WriteBlock(
-            *Core::System::GetInstance().Kernel().GetCurrentProcess(), bp->second.addr,
-            bp->second.inst.data(), bp->second.inst.size());
-        Core::CPU().ClearInstructionCache();
+        Core::System& system = Core::System::GetInstance();
+        system.Memory().WriteBlock(*system.Kernel().GetCurrentProcess(), bp->second.addr,
+                                   bp->second.inst.data(), bp->second.inst.size());
+        system.CPU().ClearInstructionCache();
     }
+
     p.erase(addr);
 }
 
@@ -601,7 +602,6 @@ static void HandleThreadAlive() {
 
 /**
  * Send signal packet to client.
- *
  * @param signal Signal to be sent to client.
  */
 static void SendSignal(Kernel::Thread* thread, u32 signal, bool full = true) {
@@ -617,11 +617,11 @@ static void SendSignal(Kernel::Thread* thread, u32 signal, bool full = true) {
 
     std::string buffer;
     if (full) {
-
+        ARM_Interface& cpu = Core::System::GetInstance().CPU();
         buffer = fmt::format("T{:02x}{:02x}:{:08x};{:02x}:{:08x};{:02x}:{:08x}", latest_signal,
-                             PC_REGISTER, htonl(Core::CPU().GetPC()), SP_REGISTER,
-                             htonl(Core::CPU().GetReg(SP_REGISTER)), LR_REGISTER,
-                             htonl(Core::CPU().GetReg(LR_REGISTER)));
+                             PC_REGISTER, htonl(cpu.GetPC()), SP_REGISTER,
+                             htonl(cpu.GetReg(SP_REGISTER)), LR_REGISTER,
+                             htonl(cpu.GetReg(LR_REGISTER)));
     } else {
         buffer = fmt::format("T{:02x}", latest_signal);
     }
@@ -782,7 +782,7 @@ static void WriteRegister() {
         return SendReply("E01");
     }
 
-    Core::CPU().LoadContext(current_thread->context);
+    Core::System::GetInstance().CPU().LoadContext(current_thread->context);
 
     SendReply("OK");
 }
@@ -791,8 +791,9 @@ static void WriteRegister() {
 static void WriteRegisters() {
     const u8* buffer_ptr = command_buffer + 1;
 
-    if (command_buffer[0] != 'G')
+    if (command_buffer[0] != 'G') {
         return SendReply("E01");
+    }
 
     for (u32 i = 0, reg = 0; reg <= FPSCR_REGISTER; i++, reg++) {
         if (reg <= PC_REGISTER) {
@@ -812,7 +813,7 @@ static void WriteRegisters() {
         }
     }
 
-    Core::CPU().LoadContext(current_thread->context);
+    Core::System::GetInstance().CPU().LoadContext(current_thread->context);
 
     SendReply("OK");
 }
@@ -867,9 +868,11 @@ static void WriteMemory() {
     std::vector<u8> data(len);
 
     GdbHexToMem(data.data(), len_pos + 1, len);
-    Core::System::GetInstance().Memory().WriteBlock(
-        *Core::System::GetInstance().Kernel().GetCurrentProcess(), addr, data.data(), len);
-    Core::CPU().ClearInstructionCache();
+
+    Core::System& system = Core::System::GetInstance();
+    system.Memory().WriteBlock(*system.Kernel().GetCurrentProcess(), addr, data.data(), len);
+    system.CPU().ClearInstructionCache();
+
     SendReply("OK");
 }
 
@@ -881,14 +884,18 @@ void Break(bool is_memory_break) {
 
 /// Tell the CPU that it should perform a single step.
 static void Step() {
+    ARM_Interface& cpu = Core::System::GetInstance().CPU();
+
     if (command_length > 1) {
         RegWrite(PC_REGISTER, GdbHexToInt(command_buffer + 1), current_thread);
-        Core::CPU().LoadContext(current_thread->context);
+        cpu.LoadContext(current_thread->context);
     }
+
     step_loop = true;
     halt_loop = true;
     send_trap = true;
-    Core::CPU().ClearInstructionCache();
+
+    cpu.ClearInstructionCache();
 }
 
 bool IsMemoryBreak() {
@@ -904,7 +911,8 @@ static void Continue() {
     memory_break = false;
     step_loop = false;
     halt_loop = false;
-    Core::CPU().ClearInstructionCache();
+
+    Core::System::GetInstance().CPU().ClearInstructionCache();
 }
 
 /**
@@ -927,10 +935,10 @@ static bool CommitBreakpoint(BreakpointType type, VAddr addr, u32 len) {
 
     static constexpr std::array<u8, 4> btrap{0x70, 0x00, 0x20, 0xe1};
     if (type == BreakpointType::Execute) {
-        Core::System::GetInstance().Memory().WriteBlock(
-            *Core::System::GetInstance().Kernel().GetCurrentProcess(), addr, btrap.data(),
-            btrap.size());
-        Core::CPU().ClearInstructionCache();
+        Core::System& system = Core::System::GetInstance();
+        system.Memory().WriteBlock(*system.Kernel().GetCurrentProcess(), addr, btrap.data(),
+                                   btrap.size());
+        system.CPU().ClearInstructionCache();
     }
     p.insert({addr, breakpoint});
 
@@ -1249,4 +1257,5 @@ void SendTrap(Kernel::Thread* thread, int trap) {
     halt_loop = true;
     send_trap = false;
 }
-}; // namespace GDBStub
+
+} // namespace GDBStub

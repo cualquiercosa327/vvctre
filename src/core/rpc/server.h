@@ -7,16 +7,20 @@
 #include <memory>
 #include <thread>
 
+namespace Core {
+class System;
+} // namespace Core
+
 namespace httplib {
 class Server;
 } // namespace httplib
 
 namespace RPC {
 
-class RPCServer {
+class Server {
 public:
-    RPCServer(const int port);
-    ~RPCServer();
+    Server(Core::System& system, const int port);
+    ~Server();
 
 private:
     std::unique_ptr<httplib::Server> server;

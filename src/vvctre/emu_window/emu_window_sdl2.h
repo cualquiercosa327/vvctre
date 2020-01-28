@@ -15,6 +15,10 @@ struct SDL_Window;
 class DiscordRP;
 #endif
 
+namespace Core {
+class System;
+} // namespace Core
+
 class SharedContext_SDL2 : public Frontend::GraphicsContext {
 public:
     using SDL_GLContext = void*;
@@ -34,7 +38,7 @@ private:
 
 class EmuWindow_SDL2 : public Frontend::EmuWindow {
 public:
-    explicit EmuWindow_SDL2(const bool headless, const bool fullscreen);
+    explicit EmuWindow_SDL2(Core::System& system, const bool headless, const bool fullscreen);
     ~EmuWindow_SDL2();
 
     void Present();
@@ -117,4 +121,6 @@ private:
 #ifdef USE_DISCORD_PRESENCE
     std::unique_ptr<DiscordRP> discord_rp;
 #endif
+
+    Core::System& system;
 };

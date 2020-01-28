@@ -39,7 +39,7 @@
 #include "core/hle/service/cfg/cfg.h"
 #include "core/loader/loader.h"
 #include "core/movie.h"
-#include "core/rpc/rpc_server.h"
+#include "core/rpc/server.h"
 #include "core/settings.h"
 #include "input_common/main.h"
 #include "video_core/renderer_base.h"
@@ -491,12 +491,13 @@ int main(int argc, char** argv) {
 
             // Apply the settings
             Settings::Apply();
+            
+            Core::System& system = Core::System::GetInstance();
 
             std::unique_ptr<EmuWindow_SDL2> emu_window =
-                std::make_unique<EmuWindow_SDL2>(headless, fullscreen);
+                std::make_unique<EmuWindow_SDL2>(system, headless, fullscreen);
 
             // Register frontend applets
-            Core::System& system = Core::System::GetInstance();
             system.RegisterSoftwareKeyboard(std::make_shared<Frontend::SDL2_SoftwareKeyboard>(
                 [&emu_window] { emu_window->SoftwareKeyboardStarted(); }));
             system.RegisterMiiSelector(std::make_shared<Frontend::SDL2_MiiSelector>(
@@ -548,7 +549,7 @@ int main(int argc, char** argv) {
                 break;
             }
 
-            RPC::RPCServer rpc_server(rpc_server_port);
+            RPC::Server rpc_server(system, rpc_server_port);
 
             if (!movie_play.empty()) {
                 Core::Movie::GetInstance().StartPlayback(movie_play);
@@ -568,7 +569,7 @@ int main(int argc, char** argv) {
 
             if (Settings::values.use_disk_shader_cache) {
                 std::atomic_bool stop_run;
-                Core::System::GetInstance().Renderer().Rasterizer()->LoadDiskResources(
+                system.Renderer().Rasterizer()->LoadDiskResources(
                     stop_run,
                     [&](VideoCore::LoadCallbackStage stage, std::size_t value, std::size_t total) {
                         LOG_DEBUG(Frontend, "Loading stage {} progress {} {}",
