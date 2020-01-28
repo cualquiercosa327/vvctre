@@ -1577,7 +1577,7 @@ RPCServer::RPCServer(const int port) {
         }
     });
 
-    request_handler_thread = std::thread([&] { server->listen("0.0.0.0", port); });
+    request_handler_thread = std::thread([this, port] { server->listen("0.0.0.0", port); });
     LOG_INFO(RPC_Server, "RPC server running on port {}", port);
 }
 
