@@ -442,10 +442,6 @@ void ShaderProgramManager::LoadDiskCache(const std::atomic_bool& stop_loading,
         return;
     }
 
-    if (callback) {
-        callback(VideoCore::LoadCallbackStage::Prepare, 0, 0);
-    }
-
     auto& disk_cache = impl->disk_cache;
     const auto transferable = disk_cache.LoadTransferable();
     if (!transferable) {
@@ -457,6 +453,10 @@ void ShaderProgramManager::LoadDiskCache(const std::atomic_bool& stop_loading,
 
     if (stop_loading) {
         return;
+    }
+
+    if (callback) {
+        callback(VideoCore::LoadCallbackStage::Prepare, 0, 0);
     }
 
     std::set<GLenum> supported_formats = GetSupportedFormats();
