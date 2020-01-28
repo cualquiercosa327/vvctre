@@ -22,6 +22,4 @@ private:
     std::unique_ptr<Client> client;
 };
 
-std::unique_ptr<State> Init();
-
 } // namespace InputCommon::CemuhookUDP

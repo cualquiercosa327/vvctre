@@ -92,7 +92,4 @@ void State::ReloadUDPClient() {
                          Settings::values.current_input_profile.udp_pad_index);
 }
 
-std::unique_ptr<State> Init() {
-    return std::make_unique<State>();
-}
 } // namespace InputCommon::CemuhookUDP

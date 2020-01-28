@@ -28,8 +28,7 @@ void Init() {
     Input::RegisterFactory<Input::MotionDevice>("motion_emu", motion_emu);
 
     sdl = SDL::Init();
-
-    udp = CemuhookUDP::Init();
+    udp = std::make_unique<CemuhookUDP::State>();
 }
 
 void Shutdown() {
@@ -73,8 +72,9 @@ std::string GenerateAnalogParamFromKeys(int key_up, int key_down, int key_left, 
 }
 
 void ReloadInputDevices() {
-    if (udp)
+    if (udp) {
         udp->ReloadUDPClient();
+    }
 }
 
 namespace Polling {
