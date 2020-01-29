@@ -970,3 +970,73 @@ Install a CIA file.
   "file": String
 }
 ```
+
+# GET /cheats
+
+Get the cheats.
+
+## Reply
+
+Array of:
+
+```json
+{
+  "name": String,
+  "type": String"can only be 'Gateway'.",
+  "code": String,
+  "comments": String,
+  "enabled": Boolean,
+  "index": Number
+}
+```
+
+# GET /reloadcheats
+
+Reloads cheats from the file.
+
+# GET /savecheats
+
+Saves the cheats to the file.
+
+# POST /addcheat
+
+Adds a cheat.
+
+## Request
+
+```json
+{
+  "name": String,
+  "type": String"can only be 'Gateway'.",
+  "code": String,
+  "comments": String,
+  "enabled": Boolean
+}
+```
+
+# POST /removecheat
+
+Removes a cheat.
+
+## Request
+
+```json
+{
+  "index": Number
+}
+```
+
+# POST /updatecheat
+
+## Request
+
+```json
+{
+  "name": String,
+  "type": String"can only be 'Gateway'.",
+  "code": String,
+  "comments": String,
+  "enabled": Boolean,
+  "index": Number
+}
+```

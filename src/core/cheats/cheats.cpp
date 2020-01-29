@@ -85,12 +85,14 @@ void CheatEngine::LoadCheatFile() {
         FileUtil::CreateDir(cheat_dir);
     }
 
-    if (!FileUtil::Exists(filepath))
+    if (!FileUtil::Exists(filepath)) {
         return;
+    }
 
     auto gateway_cheats = GatewayCheat::LoadFile(filepath);
     {
         std::unique_lock<std::shared_mutex> lock(cheats_list_mutex);
+        cheats_list.clear();
         std::move(gateway_cheats.begin(), gateway_cheats.end(), std::back_inserter(cheats_list));
     }
 }

@@ -11,6 +11,9 @@
 #include "common/thread.h"
 #include "common/version.h"
 #include "core/arm/arm_interface.h"
+#include "core/cheats/cheat_base.h"
+#include "core/cheats/cheats.h"
+#include "core/cheats/gateway_cheat.h"
 #include "core/core.h"
 #include "core/hle/kernel/process.h"
 #include "core/hle/service/am/am.h"
@@ -1566,6 +1569,107 @@ Server::Server(Core::System& system, const int port) {
             } else {
                 res.status = 500;
                 res.set_content(std::to_string(static_cast<int>(status)), "text/plain");
+            }
+        } catch (nlohmann::json::exception& exception) {
+            res.status = 500;
+            res.set_content(exception.what(), "text/plain");
+        }
+    });
+
+    server->Get("/cheats", [&](const httplib::Request& req, httplib::Response& res) {
+        nlohmann::json json = nlohmann::json::array();
+        const auto cheats = system.CheatEngine().GetCheats();
+
+        for (std::size_t i = 0; i < cheats.size(); ++i) {
+            const auto& cheat = cheats[i];
+
+            json.push_back(nlohmann::json{
+                {"name", cheat->GetName()},
+                {"type", cheat->GetType()},
+                {"code", cheat->GetCode()},
+                {"comments", cheat->GetComments()},
+                {"enabled", cheat->IsEnabled()},
+                {"index", i},
+            });
+        }
+
+        res.set_content(json.dump(), "application/json");
+    });
+
+    server->Get("/reloadcheats", [&](const httplib::Request& req, httplib::Response& res) {
+        system.CheatEngine().LoadCheatFile();
+        res.status = 204;
+    });
+
+    server->Get("/savecheats", [&](const httplib::Request& req, httplib::Response& res) {
+        system.CheatEngine().SaveCheatFile();
+        res.status = 204;
+    });
+
+    server->Post("/addcheat", [&](const httplib::Request& req, httplib::Response& res) {
+        try {
+            const nlohmann::json json = nlohmann::json::parse(req.body);
+            const std::string name = json["name"].get<std::string>();
+            const std::string type = json["type"].get<std::string>();
+            const std::string code = json["code"].get<std::string>();
+            const std::string comments = json["comments"].get<std::string>();
+            const bool enabled = json["enabled"].get<bool>();
+            if (type == "Gateway") {
+                auto cheat = std::make_shared<Cheats::GatewayCheat>(name, code, comments);
+                cheat->SetEnabled(enabled);
+                system.CheatEngine().AddCheat(cheat);
+                res.status = 204;
+            } else {
+                res.status = 400;
+                res.set_content("invalid type", "text/plain");
+            }
+        } catch (nlohmann::json::exception& exception) {
+            res.status = 500;
+            res.set_content(exception.what(), "text/plain");
+        }
+    });
+
+    server->Post("/removecheat", [&](const httplib::Request& req, httplib::Response& res) {
+        try {
+            const nlohmann::json json = nlohmann::json::parse(req.body);
+            const int index = json["index"].get<int>();
+            const auto cheats = system.CheatEngine().GetCheats();
+            if (index >= cheats.size()) {
+                res.status = 400;
+                res.set_content("invalid index", "text/plain");
+                return;
+            }
+            system.CheatEngine().RemoveCheat(index);
+            res.status = 204;
+        } catch (nlohmann::json::exception& exception) {
+            res.status = 500;
+            res.set_content(exception.what(), "text/plain");
+        }
+    });
+
+    server->Post("/updatecheat", [&](const httplib::Request& req, httplib::Response& res) {
+        try {
+            const nlohmann::json json = nlohmann::json::parse(req.body);
+            const int index = json["index"].get<int>();
+            const auto cheats = system.CheatEngine().GetCheats();
+            if (index >= cheats.size()) {
+                res.status = 400;
+                res.set_content("invalid index", "text/plain");
+                return;
+            }
+            const std::string name = json["name"].get<std::string>();
+            const std::string type = json["type"].get<std::string>();
+            const std::string code = json["code"].get<std::string>();
+            const std::string comments = json["comments"].get<std::string>();
+            const bool enabled = json["enabled"].get<bool>();
+            if (type == "Gateway") {
+                auto cheat = std::make_shared<Cheats::GatewayCheat>(name, code, comments);
+                cheat->SetEnabled(enabled);
+                system.CheatEngine().UpdateCheat(index, cheat);
+                res.status = 204;
+            } else {
+                res.status = 400;
+                res.set_content("invalid type", "text/plain");
             }
         } catch (nlohmann::json::exception& exception) {
             res.status = 500;
