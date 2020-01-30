@@ -65,6 +65,13 @@ For a list of commands and options, run `vvctre usage`.
   - Files
     - Boot executable
     - Install CIA
+  - Cheats
+    - Get cheats
+    - Add cheat
+    - Remove cheat
+    - Update cheat
+    - Reload cheats
+    - Save cheats
 - Error messages in vvctre and Citra's GUI, but not Citra's CLI:
   - You are running default Windows drivers for your GPU. You need to install the proper drivers for your graphics card from the manufacturer's website.
   - Your GPU may not support OpenGL 3.3, or you do not have the latest graphics driver.
