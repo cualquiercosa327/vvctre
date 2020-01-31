@@ -2,8 +2,8 @@ name: CI
 
 on:
   push:
-    branches:
-      - master
+    tags:
+      - "*"
 
 jobs:
   build:
@@ -14,8 +14,10 @@ jobs:
         os: [windows-latest, ubuntu-latest]
         include:
           - os: windows-latest
+            os_without_latest: windows
             options: "-DVVCTRE_USE_BUNDLED_SDL2=ON -DUSE_DISCORD_PRESENCE=ON -DENABLE_MF=ON -DENABLE_FFMPEG_VIDEO_DUMPER=ON"
           - os: ubuntu-latest
+            os_without_latest: ubuntu
             options: "-DUSE_DISCORD_PRESENCE=ON -DENABLE_FFMPEG_VIDEO_DUMPER=ON"
     steps:
       - name: Install Dependencies
@@ -51,8 +53,22 @@ jobs:
             rm ./build/bin/Release/tests.exe
             rm ./build/bin/Release/*.pdb
           fi
-      - name: Upload artifact
-        uses: actions/upload-artifact@v1.0.0
+          export VERSION=${GITHUB_REF:10}
+          echo ::set-env name=VERSION::$VERSION
+          7z a vvctre-$VERSION-${{matrix.os_without_latest}}.7z ./build/bin/*
+      - name: Upload
+        uses: svenstaro/upload-release-action@v1-release
         with:
-          name: vvctre-${{matrix.os}}
-          path: build/bin
+          repo_token: ${{secrets.GITHUB_TOKEN}}
+          file: vvctre-${{env.VERSION}}-${{matrix.os_without_latest}}.7z
+          asset_name: vvctre-${{env.VERSION}}-${{matrix.os_without_latest}}.7z
+          tag: ${{github.ref}}
+          overwrite: true
+      - name: Discord Notification
+        uses: rjstone/discord-webhook-notify@v1
+        with:
+          severity: info
+          description: |
+            vvctre ${{env.VERSION}} for ${{runner.os}} can now be downloaded from:
+            https://github.com/${{github.repository}}/releases/tag/${{env.VERSION}}
+          webhookUrl: ${{secrets.DISCORD_WEBHOOK}}
