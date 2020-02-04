@@ -60,8 +60,8 @@ void SDL2_SoftwareKeyboard::Execute(const KeyboardConfig& config) {
             break;
         }
 
-        case ValidationError::DigitNotAllowed: {
-            LOG_ERROR(Applet_SWKBD, "Digits not allowed");
+        case ValidationError::MaxDigitsExceeded: {
+            LOG_ERROR(Applet_SWKBD, "Max digits exceeded");
             break;
         }
 
