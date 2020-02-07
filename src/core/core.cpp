@@ -338,6 +338,7 @@ void System::Shutdown() {
     HW::Shutdown();
     perf_stats.reset();
     cheat_engine.reset();
+    archive_manager.reset();
     service_manager.reset();
     dsp_core.reset();
     cpu_core.reset();

@@ -2,6 +2,19 @@ vvctre is a Nintendo 3DS emulator based on Citra for Windows and Linux.
 vvctre is licensed under the GPLv2 (or any later version).
 Refer to the license.txt file included.
 
+# Definitions
+
+## user folder
+
+vvctre uses the first existing option.
+
+- On Windows:
+  - `vvctre folder/user`
+  - `AppData/Roaming/vvctre`
+- On Linux:
+  - `vvctre folder/user`
+  - `~/.local/share/vvctre` for everything except `config` and `~/.config/vvctre` for files in `config`
+
 # Requirements
 
 - GPU with OpenGL >= 3.3
@@ -42,60 +55,20 @@ For a list of commands and options, run `vvctre usage`.
 - Supported apps
   - Everything Citra supports
   - [3DSident](https://github.com/joel16/3DSident.git) <= 0.7.9
-- RPC endpoints
-  - Get version
-  - Get screenshot in PNG format
-  - Amiibo
-    - Load
-    - Remove
-  - Input
-    - Get state
-    - Set state
-  - Settings
-    - Get
-    - Set
-  - Movie
-    - Get state
-    - Play
-    - Record
-  - Frame advancing
-    - Get enabled
-    - Set enabled
-    - Advance frame
-  - Files
-    - Boot executable
-    - Install CIA
-  - Cheats
-    - Get cheats
-    - Add cheat
-    - Remove cheat
-    - Update cheat
-    - Reload cheats
-    - Save cheats
 - Error messages in vvctre and Citra's GUI, but not Citra's CLI:
   - You are running default Windows drivers for your GPU. You need to install the proper drivers for your graphics card from the manufacturer's website.
   - Your GPU may not support OpenGL 3.3, or you do not have the latest graphics driver.
+- [Better RPC](RPC.md)
 
-# FAQ
+# Removed Features
 
-Q: Where's the ini?  
-A: On Windows: `AppData\Roaming\vvctre\config\sdl2-config.ini`, on Linux: `~/.config/vvctre/sdl2-config.ini`
+- GUI
+- Camera support
 
-Q: Does this support cameras?  
-A: Not yet.
+# Incompatibilities
 
-Q: Does this support multiplayer?  
-A: Yes. it will work out of the box in most games.
-
-Q: Where's the source code of the multiplayer server?  
-A: https://github.com/vvanelslande/vvctre-multiplayer.glitch.me
-
-Q: Can I host the multiplayer server myself?  
-A: Yes. the default port is 3000 and can be changed by setting the `PORT` environment variable.
-`vvctre` has a option and setting to change the multiplayer URL.
-
-Q: Where is the multiplayer server hosted and what protocol does it use?  
-A: It's hosted on [Glitch](https://glitch.com/) and uses WebSocket.
-
-Q: What compilers are supported?  
-A: GCC and MSVC
+- No multiplayer rooms, multiplayer will work out of the box, and [anyone can host the multiplayer server](https://github.com/vvanelslande/vvctre-multiplayer.glitch.me).
+- Movies created with any Citra build can't be played.
+- Movies created with vvctre can't be played on any Citra build.
+- Different folder for mods. put mods (Luma3DS folder structure) in `user folder/sdmc/luma/titles`.
+- Different RPC server.
