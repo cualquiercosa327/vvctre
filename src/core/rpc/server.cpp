@@ -1677,6 +1677,16 @@ Server::Server(Core::System& system, const int port) {
         }
     });
 
+    server->Get("/pause", [&](const httplib::Request& req, httplib::Response& res) {
+        system.SetStatus(Core::System::ResultStatus::Paused);
+        res.status = 204;
+    });
+
+    server->Get("/continue", [&](const httplib::Request& req, httplib::Response& res) {
+        system.SetStatus(Core::System::ResultStatus::Success);
+        res.status = 204;
+    });
+
     request_handler_thread = std::thread([this, port] { server->listen("0.0.0.0", port); });
     LOG_INFO(RPC_Server, "RPC server running on port {}", port);
 }

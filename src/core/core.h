@@ -65,7 +65,8 @@ public:
         return s_instance;
     }
 
-    /// Enumeration representing the return values of the System Initialize and Load process.
+    /// Enumeration representing the return values of the System Initialize, Load, and RunLoop
+    /// functions.
     enum class ResultStatus : u32 {
         Success,                    ///< Succeeded
         ErrorNotInitialized,        ///< Error trying to use core prior to initialization
@@ -82,26 +83,19 @@ public:
         ErrorVideoCore_ErrorBelowGL33,      ///< Error in the video core due to the user not having
                                             /// OpenGL 3.3 or higher
         ShutdownRequested,                  ///< Emulated program requested a system shutdown
-        ErrorUnknown                        ///< Any other error
+        Paused,                             ///< Emulation paused
+        ErrorUnknown,                       ///< Any other error
     };
 
     /**
      * Run the core CPU loop
      * This function runs the core for the specified number of CPU instructions before trying to
-     * update hardware. This is much faster than SingleStep (and should be equivalent), as the CPU
-     * is not required to do a full dispatch with each instruction. NOTE: the number of instructions
-     * requested is not guaranteed to run, as this will be interrupted preemptively if a hardware
-     * update is requested (e.g. on a thread switch).
+     * update hardware. NOTE: the number of instructions requested is not guaranteed to run, as this
+     * will be interrupted preemptively if a hardware update is requested (e.g. on a thread switch).
      * @param tight_loop If false, the CPU single-steps.
      * @return Result status, indicating whethor or not the operation succeeded.
      */
     ResultStatus RunLoop(bool tight_loop = true);
-
-    /**
-     * Step the CPU one instruction
-     * @return Result status, indicating whethor or not the operation succeeded.
-     */
-    ResultStatus SingleStep();
 
     /// Shutdown the emulated system.
     void Shutdown();
@@ -226,6 +220,10 @@ public:
         if (details) {
             status_details = details;
         }
+    }
+
+    const ResultStatus& GetStatus() const {
+        return status;
     }
 
     const std::string& GetStatusDetails() const {

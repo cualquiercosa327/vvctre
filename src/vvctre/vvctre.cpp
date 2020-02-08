@@ -582,8 +582,17 @@ int main(int argc, char** argv) {
 
             while (emu_window->IsOpen()) {
                 switch (system.RunLoop()) {
+                case Core::System::ResultStatus::Success: {
+                    break;
+                }
                 case Core::System::ResultStatus::ShutdownRequested: {
                     emu_window->Close();
+                    break;
+                }
+                case Core::System::ResultStatus::Paused: {
+                    while (system.GetStatus() == Core::System::ResultStatus::Paused) {
+                        std::this_thread::yield();
+                    }
                     break;
                 }
                 default: { break; }

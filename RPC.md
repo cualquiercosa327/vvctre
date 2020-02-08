@@ -1040,3 +1040,11 @@ Removes a cheat.
   "index": Number
 }
 ```
+
+# GET /pause
+
+Pauses emulation.
+
+# GET /continue
+
+Continues emulation.

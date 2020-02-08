@@ -92,10 +92,6 @@ System::ResultStatus System::RunLoop(bool tight_loop) {
     return status;
 }
 
-System::ResultStatus System::SingleStep() {
-    return RunLoop(false);
-}
-
 System::ResultStatus System::Load(Frontend::EmuWindow& emu_window, const std::string& filepath) {
     app_loader = Loader::GetLoader(filepath);
     if (!app_loader) {
