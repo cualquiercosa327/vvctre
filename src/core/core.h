@@ -65,8 +65,8 @@ public:
         return s_instance;
     }
 
-    /// Enumeration representing the return values of the System Initialize, Load, and RunLoop
-    /// functions.
+    /// Enumeration representing the return values of the System Initialize, Load, RunLoop, and
+    /// GetStatus functions.
     enum class ResultStatus : u32 {
         Success,                    ///< Succeeded
         ErrorNotInitialized,        ///< Error trying to use core prior to initialization

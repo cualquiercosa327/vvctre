@@ -1687,6 +1687,217 @@ Server::Server(Core::System& system, const int port) {
         res.status = 204;
     });
 
+    server->Get("/registers/0-15", [&](const httplib::Request& req, httplib::Response& res) {
+        res.set_content(
+            nlohmann::json(std::vector<u32>{system.CPU().GetReg(0), system.CPU().GetReg(1),
+                                            system.CPU().GetReg(2), system.CPU().GetReg(3),
+                                            system.CPU().GetReg(4), system.CPU().GetReg(5),
+                                            system.CPU().GetReg(6), system.CPU().GetReg(7),
+                                            system.CPU().GetReg(8), system.CPU().GetReg(9),
+                                            system.CPU().GetReg(10), system.CPU().GetReg(11),
+                                            system.CPU().GetReg(12), system.CPU().GetReg(13),
+                                            system.CPU().GetReg(14), system.CPU().GetReg(15)})
+                .dump(),
+            "application/json");
+    });
+
+    server->Post("/registers/0-15", [&](const httplib::Request& req, httplib::Response& res) {
+        try {
+            const nlohmann::json json = nlohmann::json::parse(req.body);
+            const int index = json["index"].get<int>();
+            const u32 value = json["value"].get<u32>();
+            system.CPU().SetReg(index, value);
+            res.status = 204;
+        } catch (nlohmann::json::exception& exception) {
+            res.status = 500;
+            res.set_content(exception.what(), "text/plain");
+        }
+    });
+
+    server->Get("/registers/cpsr", [&](const httplib::Request& req, httplib::Response& res) {
+        res.set_content(std::to_string(system.CPU().GetCPSR()), "text/plain");
+    });
+
+    server->Post("/registers/cpsr", [&](const httplib::Request& req, httplib::Response& res) {
+        try {
+            const nlohmann::json json = nlohmann::json::parse(req.body);
+            const u32 value = json["value"].get<u32>();
+            system.CPU().SetCPSR(value);
+            res.status = 204;
+        } catch (nlohmann::json::exception& exception) {
+            res.status = 500;
+            res.set_content(exception.what(), "text/plain");
+        }
+    });
+
+    server->Get("/registers/vfp", [&](const httplib::Request& req, httplib::Response& res) {
+        res.set_content(
+            nlohmann::json(std::vector<u32>{system.CPU().GetVFPReg(0),  system.CPU().GetVFPReg(1),
+                                            system.CPU().GetVFPReg(2),  system.CPU().GetVFPReg(3),
+                                            system.CPU().GetVFPReg(4),  system.CPU().GetVFPReg(5),
+                                            system.CPU().GetVFPReg(6),  system.CPU().GetVFPReg(7),
+                                            system.CPU().GetVFPReg(8),  system.CPU().GetVFPReg(9),
+                                            system.CPU().GetVFPReg(10), system.CPU().GetVFPReg(11),
+                                            system.CPU().GetVFPReg(12), system.CPU().GetVFPReg(13),
+                                            system.CPU().GetVFPReg(14), system.CPU().GetVFPReg(15),
+                                            system.CPU().GetVFPReg(16), system.CPU().GetVFPReg(17),
+                                            system.CPU().GetVFPReg(18), system.CPU().GetVFPReg(19),
+                                            system.CPU().GetVFPReg(20), system.CPU().GetVFPReg(21),
+                                            system.CPU().GetVFPReg(22), system.CPU().GetVFPReg(23),
+                                            system.CPU().GetVFPReg(24), system.CPU().GetVFPReg(25),
+                                            system.CPU().GetVFPReg(26), system.CPU().GetVFPReg(27),
+                                            system.CPU().GetVFPReg(28), system.CPU().GetVFPReg(29),
+                                            system.CPU().GetVFPReg(30), system.CPU().GetVFPReg(31)})
+                .dump(),
+            "application/json");
+    });
+
+    server->Post("/registers/vfp", [&](const httplib::Request& req, httplib::Response& res) {
+        try {
+            const nlohmann::json json = nlohmann::json::parse(req.body);
+            const int index = json["index"].get<int>();
+            const u32 value = json["value"].get<u32>();
+            system.CPU().SetVFPReg(index, value);
+            res.status = 204;
+        } catch (nlohmann::json::exception& exception) {
+            res.status = 500;
+            res.set_content(exception.what(), "text/plain");
+        }
+    });
+
+    server->Get("/registers/vfpsystem", [&](const httplib::Request& req, httplib::Response& res) {
+        res.set_content(nlohmann::json(std::vector<u32>{system.CPU().GetVFPSystemReg(VFP_FPSID),
+                                                        system.CPU().GetVFPSystemReg(VFP_FPSCR),
+                                                        system.CPU().GetVFPSystemReg(VFP_FPEXC),
+                                                        system.CPU().GetVFPSystemReg(VFP_FPINST),
+                                                        system.CPU().GetVFPSystemReg(VFP_FPINST2),
+                                                        system.CPU().GetVFPSystemReg(VFP_MVFR0),
+                                                        system.CPU().GetVFPSystemReg(VFP_MVFR1)})
+                            .dump(),
+                        "application/json");
+    });
+
+    server->Post("/registers/vfpsystem", [&](const httplib::Request& req, httplib::Response& res) {
+        try {
+            const nlohmann::json json = nlohmann::json::parse(req.body);
+            const int index = json["index"].get<int>();
+            const u32 value = json["value"].get<u32>();
+            system.CPU().SetVFPSystemReg(static_cast<VFPSystemRegister>(index), value);
+            res.status = 204;
+        } catch (nlohmann::json::exception& exception) {
+            res.status = 500;
+            res.set_content(exception.what(), "text/plain");
+        }
+    });
+
+    server->Get("/registers/cp15", [&](const httplib::Request& req, httplib::Response& res) {
+        res.set_content(
+            nlohmann::json(
+                std::vector<u32>{
+                    system.CPU().GetCP15Register(CP15_MAIN_ID),
+                    system.CPU().GetCP15Register(CP15_CACHE_TYPE),
+                    system.CPU().GetCP15Register(CP15_TCM_STATUS),
+                    system.CPU().GetCP15Register(CP15_TLB_TYPE),
+                    system.CPU().GetCP15Register(CP15_CPU_ID),
+                    system.CPU().GetCP15Register(CP15_PROCESSOR_FEATURE_0),
+                    system.CPU().GetCP15Register(CP15_PROCESSOR_FEATURE_1),
+                    system.CPU().GetCP15Register(CP15_DEBUG_FEATURE_0),
+                    system.CPU().GetCP15Register(CP15_AUXILIARY_FEATURE_0),
+                    system.CPU().GetCP15Register(CP15_MEMORY_MODEL_FEATURE_0),
+                    system.CPU().GetCP15Register(CP15_MEMORY_MODEL_FEATURE_1),
+                    system.CPU().GetCP15Register(CP15_MEMORY_MODEL_FEATURE_2),
+                    system.CPU().GetCP15Register(CP15_MEMORY_MODEL_FEATURE_3),
+                    system.CPU().GetCP15Register(CP15_ISA_FEATURE_0),
+                    system.CPU().GetCP15Register(CP15_ISA_FEATURE_1),
+                    system.CPU().GetCP15Register(CP15_ISA_FEATURE_2),
+                    system.CPU().GetCP15Register(CP15_ISA_FEATURE_3),
+                    system.CPU().GetCP15Register(CP15_ISA_FEATURE_4),
+                    system.CPU().GetCP15Register(CP15_CONTROL),
+                    system.CPU().GetCP15Register(CP15_AUXILIARY_CONTROL),
+                    system.CPU().GetCP15Register(CP15_COPROCESSOR_ACCESS_CONTROL),
+                    system.CPU().GetCP15Register(CP15_TRANSLATION_BASE_TABLE_0),
+                    system.CPU().GetCP15Register(CP15_TRANSLATION_BASE_TABLE_1),
+                    system.CPU().GetCP15Register(CP15_TRANSLATION_BASE_CONTROL),
+                    system.CPU().GetCP15Register(CP15_DOMAIN_ACCESS_CONTROL),
+                    system.CPU().GetCP15Register(CP15_RESERVED),
+                    system.CPU().GetCP15Register(CP15_FAULT_STATUS),
+                    system.CPU().GetCP15Register(CP15_INSTR_FAULT_STATUS),
+                    system.CPU().GetCP15Register(CP15_INST_FSR),
+                    system.CPU().GetCP15Register(CP15_FAULT_ADDRESS),
+                    system.CPU().GetCP15Register(CP15_WFAR),
+                    system.CPU().GetCP15Register(CP15_IFAR),
+                    system.CPU().GetCP15Register(CP15_WAIT_FOR_INTERRUPT),
+                    system.CPU().GetCP15Register(CP15_PHYS_ADDRESS),
+                    system.CPU().GetCP15Register(CP15_INVALIDATE_INSTR_CACHE),
+                    system.CPU().GetCP15Register(CP15_INVALIDATE_INSTR_CACHE_USING_MVA),
+                    system.CPU().GetCP15Register(CP15_INVALIDATE_INSTR_CACHE_USING_INDEX),
+                    system.CPU().GetCP15Register(CP15_FLUSH_PREFETCH_BUFFER),
+                    system.CPU().GetCP15Register(CP15_FLUSH_BRANCH_TARGET_CACHE),
+                    system.CPU().GetCP15Register(CP15_FLUSH_BRANCH_TARGET_CACHE_ENTRY),
+                    system.CPU().GetCP15Register(CP15_INVALIDATE_DATA_CACHE),
+                    system.CPU().GetCP15Register(CP15_INVALIDATE_DATA_CACHE_LINE_USING_MVA),
+                    system.CPU().GetCP15Register(CP15_INVALIDATE_DATA_CACHE_LINE_USING_INDEX),
+                    system.CPU().GetCP15Register(CP15_INVALIDATE_DATA_AND_INSTR_CACHE),
+                    system.CPU().GetCP15Register(CP15_CLEAN_DATA_CACHE),
+                    system.CPU().GetCP15Register(CP15_CLEAN_DATA_CACHE_LINE_USING_MVA),
+                    system.CPU().GetCP15Register(CP15_CLEAN_DATA_CACHE_LINE_USING_INDEX),
+                    system.CPU().GetCP15Register(CP15_DATA_SYNC_BARRIER),
+                    system.CPU().GetCP15Register(CP15_DATA_MEMORY_BARRIER),
+                    system.CPU().GetCP15Register(CP15_CLEAN_AND_INVALIDATE_DATA_CACHE),
+                    system.CPU().GetCP15Register(
+                        CP15_CLEAN_AND_INVALIDATE_DATA_CACHE_LINE_USING_MVA),
+                    system.CPU().GetCP15Register(
+                        CP15_CLEAN_AND_INVALIDATE_DATA_CACHE_LINE_USING_INDEX),
+                    system.CPU().GetCP15Register(CP15_INVALIDATE_ITLB),
+                    system.CPU().GetCP15Register(CP15_INVALIDATE_ITLB_SINGLE_ENTRY),
+                    system.CPU().GetCP15Register(CP15_INVALIDATE_ITLB_ENTRY_ON_ASID_MATCH),
+                    system.CPU().GetCP15Register(CP15_INVALIDATE_ITLB_ENTRY_ON_MVA),
+                    system.CPU().GetCP15Register(CP15_INVALIDATE_DTLB),
+                    system.CPU().GetCP15Register(CP15_INVALIDATE_DTLB_SINGLE_ENTRY),
+                    system.CPU().GetCP15Register(CP15_INVALIDATE_DTLB_ENTRY_ON_ASID_MATCH),
+                    system.CPU().GetCP15Register(CP15_INVALIDATE_DTLB_ENTRY_ON_MVA),
+                    system.CPU().GetCP15Register(CP15_INVALIDATE_UTLB),
+                    system.CPU().GetCP15Register(CP15_INVALIDATE_UTLB_SINGLE_ENTRY),
+                    system.CPU().GetCP15Register(CP15_INVALIDATE_UTLB_ENTRY_ON_ASID_MATCH),
+                    system.CPU().GetCP15Register(CP15_INVALIDATE_UTLB_ENTRY_ON_MVA),
+                    system.CPU().GetCP15Register(CP15_DATA_CACHE_LOCKDOWN),
+                    system.CPU().GetCP15Register(CP15_TLB_LOCKDOWN),
+                    system.CPU().GetCP15Register(CP15_PRIMARY_REGION_REMAP),
+                    system.CPU().GetCP15Register(CP15_NORMAL_REGION_REMAP),
+                    system.CPU().GetCP15Register(CP15_PID),
+                    system.CPU().GetCP15Register(CP15_CONTEXT_ID),
+                    system.CPU().GetCP15Register(CP15_THREAD_UPRW),
+                    system.CPU().GetCP15Register(CP15_THREAD_URO),
+                    system.CPU().GetCP15Register(CP15_THREAD_PRW),
+                    system.CPU().GetCP15Register(CP15_PERFORMANCE_MONITOR_CONTROL),
+                    system.CPU().GetCP15Register(CP15_CYCLE_COUNTER),
+                    system.CPU().GetCP15Register(CP15_COUNT_0),
+                    system.CPU().GetCP15Register(CP15_COUNT_1),
+                    system.CPU().GetCP15Register(CP15_READ_MAIN_TLB_LOCKDOWN_ENTRY),
+                    system.CPU().GetCP15Register(CP15_WRITE_MAIN_TLB_LOCKDOWN_ENTRY),
+                    system.CPU().GetCP15Register(CP15_MAIN_TLB_LOCKDOWN_VIRT_ADDRESS),
+                    system.CPU().GetCP15Register(CP15_MAIN_TLB_LOCKDOWN_PHYS_ADDRESS),
+                    system.CPU().GetCP15Register(CP15_MAIN_TLB_LOCKDOWN_ATTRIBUTE),
+                    system.CPU().GetCP15Register(CP15_TLB_DEBUG_CONTROL),
+                    system.CPU().GetCP15Register(CP15_TLB_FAULT_ADDR),
+                    system.CPU().GetCP15Register(CP15_TLB_FAULT_STATUS)})
+                .dump(),
+            "application/json");
+    });
+
+    server->Post("/registers/cp15", [&](const httplib::Request& req, httplib::Response& res) {
+        try {
+            const nlohmann::json json = nlohmann::json::parse(req.body);
+            const int index = json["index"].get<int>();
+            const u32 value = json["value"].get<u32>();
+            system.CPU().SetCP15Register(static_cast<CP15Register>(index), value);
+            res.status = 204;
+        } catch (nlohmann::json::exception& exception) {
+            res.status = 500;
+            res.set_content(exception.what(), "text/plain");
+        }
+    });
+
     request_handler_thread = std::thread([this, port] { server->listen("0.0.0.0", port); });
     LOG_INFO(RPC_Server, "RPC server running on port {}", port);
 }

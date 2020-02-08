@@ -1048,3 +1048,259 @@ Pauses emulation.
 # GET /continue
 
 Continues emulation.
+
+# GET /registers/0-15
+
+Get the ARM 0-15 register values.
+
+## Reply
+
+```json
+[
+  Number"0",
+  Number"1",
+  Number"2",
+  Number"3",
+  Number"4",
+  Number"5",
+  Number"6",
+  Number"7",
+  Number"8",
+  Number"9",
+  Number"10",
+  Number"11",
+  Number"12",
+  Number"13",
+  Number"14",
+  Number"15"
+]
+```
+
+# POST /registers/0-15
+
+Set a ARM 0-15 register value.
+
+## Request
+
+```json
+{
+  "index": Number,
+  "value": Number
+}
+```
+
+# GET /registers/cpsr
+
+Get the ARM CPSR register value.
+
+## Reply
+
+Value
+
+# POST /registers/cpsr
+
+Set the ARM CPSR register value.
+
+## Request
+
+```json
+{
+  "value": Number
+}
+```
+
+# GET /registers/vfp
+
+Get the ARM VFP register values.
+
+## Reply
+
+```json
+[
+  Number"0",
+  Number"1",
+  Number"2",
+  Number"3",
+  Number"4",
+  Number"5",
+  Number"6",
+  Number"7",
+  Number"8",
+  Number"9",
+  Number"10",
+  Number"11",
+  Number"12",
+  Number"13",
+  Number"14",
+  Number"15",
+  Number"16",
+  Number"17",
+  Number"18",
+  Number"19",
+  Number"20",
+  Number"21",
+  Number"22",
+  Number"23",
+  Number"24",
+  Number"25",
+  Number"26",
+  Number"27",
+  Number"28",
+  Number"29",
+  Number"30",
+  Number"31"
+]
+```
+
+# POST /registers/vfp
+
+Set a ARM VFP register value.
+
+## Request
+
+```json
+{
+  "index": Number,
+  "value": Number
+}
+```
+
+# GET /registers/vfpsystem
+
+Get the ARM VFP system register values.
+
+## Reply
+
+```json
+[
+  Number"0 (FPSID)",
+  Number"1 (FPSCR)",
+  Number"2 (FPEXC)",
+  Number"3 (FPINST)",
+  Number"4 (FPINST2)",
+  Number"5 (MVFR0)",
+  Number"6 (MVFR1)"
+]
+```
+
+# POST /registers/vfpsystem
+
+Set a ARM VFP system register value.
+
+## Request
+
+```json
+{
+  "index": Number,
+  "value": Number
+}
+```
+
+# GET /registers/cp15
+
+Get the ARM CP15 register values.
+
+## Reply
+
+```json
+[
+  Number"0 (CP15_MAIN_ID)",
+  Number"1 (CP15_CACHE_TYPE)",
+  Number"2 (CP15_TCM_STATUS)",
+  Number"3 (CP15_TLB_TYPE)",
+  Number"4 (CP15_CPU_ID)",
+  Number"5 (CP15_PROCESSOR_FEATURE_0)",
+  Number"6 (CP15_PROCESSOR_FEATURE_1)",
+  Number"7 (CP15_DEBUG_FEATURE_0)",
+  Number"8 (CP15_AUXILIARY_FEATURE_0)",
+  Number"9 (CP15_MEMORY_MODEL_FEATURE_0)",
+  Number"10 (CP15_MEMORY_MODEL_FEATURE_1)",
+  Number"11 (CP15_MEMORY_MODEL_FEATURE_2)",
+  Number"12 (CP15_MEMORY_MODEL_FEATURE_3)",
+  Number"13 (CP15_ISA_FEATURE_0)",
+  Number"14 (CP15_ISA_FEATURE_1)",
+  Number"15 (CP15_ISA_FEATURE_2)",
+  Number"16 (CP15_ISA_FEATURE_3)",
+  Number"17 (CP15_ISA_FEATURE_4)",
+  Number"18 (CP15_CONTROL)",
+  Number"19 (CP15_AUXILIARY_CONTROL)",
+  Number"20 (CP15_COPROCESSOR_ACCESS_CONTROL)",
+  Number"21 (CP15_TRANSLATION_BASE_TABLE_0)",
+  Number"22 (CP15_TRANSLATION_BASE_TABLE_1)",
+  Number"23 (CP15_TRANSLATION_BASE_CONTROL)",
+  Number"24 (CP15_DOMAIN_ACCESS_CONTROL)",
+  Number"25 (CP15_RESERVED)",
+  Number"26 (CP15_FAULT_STATUS)",
+  Number"27 (CP15_INSTR_FAULT_STATUS)",
+  Number"28 (CP15_INST_FSR)",
+  Number"29 (CP15_FAULT_ADDRESS)",
+  Number"30 (CP15_WFAR)",
+  Number"31 (CP15_IFAR)",
+  Number"32 (CP15_WAIT_FOR_INTERRUPT)",
+  Number"33 (CP15_PHYS_ADDRESS)",
+  Number"34 (CP15_INVALIDATE_INSTR_CACHE)",
+  Number"35 (CP15_INVALIDATE_INSTR_CACHE_USING_MVA)",
+  Number"36 (CP15_INVALIDATE_INSTR_CACHE_USING_INDEX)",
+  Number"37 (CP15_FLUSH_PREFETCH_BUFFER)",
+  Number"38 (CP15_FLUSH_BRANCH_TARGET_CACHE)",
+  Number"39 (CP15_FLUSH_BRANCH_TARGET_CACHE_ENTRY)",
+  Number"40 (CP15_INVALIDATE_DATA_CACHE)",
+  Number"41 (CP15_INVALIDATE_DATA_CACHE_LINE_USING_MVA)",
+  Number"42 (CP15_INVALIDATE_DATA_CACHE_LINE_USING_INDEX)",
+  Number"43 (CP15_INVALIDATE_DATA_AND_INSTR_CACHE)",
+  Number"44 (CP15_CLEAN_DATA_CACHE)",
+  Number"45 (CP15_CLEAN_DATA_CACHE_LINE_USING_MVA)",
+  Number"46 (CP15_CLEAN_DATA_CACHE_LINE_USING_INDEX)",
+  Number"47 (CP15_DATA_SYNC_BARRIER)",
+  Number"48 (CP15_DATA_MEMORY_BARRIER)",
+  Number"49 (CP15_CLEAN_AND_INVALIDATE_DATA_CACHE)",
+  Number"50 (CP15_CLEAN_AND_INVALIDATE_DATA_CACHE_LINE_USING_MVA)",
+  Number"51 (CP15_CLEAN_AND_INVALIDATE_DATA_CACHE_LINE_USING_INDEX)",
+  Number"52 (CP15_INVALIDATE_ITLB)",
+  Number"53 (CP15_INVALIDATE_ITLB_SINGLE_ENTRY)",
+  Number"54 (CP15_INVALIDATE_ITLB_ENTRY_ON_ASID_MATCH)",
+  Number"55 (CP15_INVALIDATE_ITLB_ENTRY_ON_MVA)",
+  Number"56 (CP15_INVALIDATE_DTLB)",
+  Number"57 (CP15_INVALIDATE_DTLB_SINGLE_ENTRY)",
+  Number"58 (CP15_INVALIDATE_DTLB_ENTRY_ON_ASID_MATCH)",
+  Number"59 (CP15_INVALIDATE_DTLB_ENTRY_ON_MVA)",
+  Number"60 (CP15_INVALIDATE_UTLB)",
+  Number"61 (CP15_INVALIDATE_UTLB_SINGLE_ENTRY)",
+  Number"62 (CP15_INVALIDATE_UTLB_ENTRY_ON_ASID_MATCH)",
+  Number"63 (CP15_INVALIDATE_UTLB_ENTRY_ON_MVA)",
+  Number"64 (CP15_DATA_CACHE_LOCKDOWN)",
+  Number"65 (CP15_TLB_LOCKDOWN)",
+  Number"66 (CP15_PRIMARY_REGION_REMAP)",
+  Number"67 (CP15_NORMAL_REGION_REMAP)",
+  Number"68 (CP15_PID)",
+  Number"69 (CP15_CONTEXT_ID)",
+  Number"70 (CP15_THREAD_UPRW)",
+  Number"71 (CP15_THREAD_URO)",
+  Number"72 (CP15_THREAD_PRW)",
+  Number"73 (CP15_PERFORMANCE_MONITOR_CONTROL)",
+  Number"74 (CP15_CYCLE_COUNTER)",
+  Number"75 (CP15_COUNT_0)",
+  Number"76 (CP15_COUNT_1)",
+  Number"77 (CP15_READ_MAIN_TLB_LOCKDOWN_ENTRY)",
+  Number"78 (CP15_WRITE_MAIN_TLB_LOCKDOWN_ENTRY)",
+  Number"79 (CP15_MAIN_TLB_LOCKDOWN_VIRT_ADDRESS)",
+  Number"80 (CP15_MAIN_TLB_LOCKDOWN_PHYS_ADDRESS)",
+  Number"81 (CP15_MAIN_TLB_LOCKDOWN_ATTRIBUTE)",
+  Number"82 (CP15_TLB_DEBUG_CONTROL)",
+  Number"83 (CP15_TLB_FAULT_ADDR)",
+  Number"84 (CP15_TLB_FAULT_STATUS)"
+]
+```
+
+# POST /registers/cp15
+
+Set a ARM CP15 register value.
+
+## Request
+
+```json
+{
+  "index": Number,
+  "value": Number
+}
+```
