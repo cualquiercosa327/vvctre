@@ -792,6 +792,7 @@ int main(int argc, char** argv) {
         auto loader = Loader::GetLoader(path);
         if (loader != nullptr &&
             loader->DumpRomFS(dump_romfs_dir) == Loader::ResultStatus::Success) {
+            loader->DumpUpdateRomFS(dump_romfs_dir);
             LOG_INFO(Frontend, "Done");
         }
 
