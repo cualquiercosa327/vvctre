@@ -187,7 +187,7 @@ public:
     }
 
     /**
-     * Dump the RomFS of the applciation
+     * Dump the RomFS of the application
      * @param target_path The target path to dump to
      * @return ResultStatus result of function
      */
@@ -206,7 +206,7 @@ public:
     }
 
     /**
-     * Dump the update RomFS of the applciation
+     * Dump the update RomFS of the application
      * @param target_path The target path to dump to
      * @return ResultStatus result of function
      */
