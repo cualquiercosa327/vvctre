@@ -79,9 +79,20 @@ bool EndsWithIgnoreCase(const std::string& str, const std::string& suffix) {
 /// Application entry point
 int main(int argc, char** argv) {
     Common::DetachedTasks detached_tasks;
-    Config config;
 
+    enum class Command {
+        BootOrInstall,
+        Controls,
+        DumpRomFS,
+        Version,
+        Usage,
+    } command = Command::BootOrInstall;
+
+    // for BootOrInstall and DumpRomFS
     std::string path;
+
+    // for BootOrInstall
+    Config config;
     std::string movie_record;
     std::string movie_play;
     std::string dump_video;
@@ -90,12 +101,8 @@ int main(int argc, char** argv) {
     bool regenerate_console_id = false;
     int rpc_server_port = 47889;
 
-    enum class Command {
-        BootOrInstall,
-        Controls,
-        Version,
-        Usage,
-    } command = Command::BootOrInstall;
+    // for DumpRomFS
+    std::string dump_romfs_dir;
 
     clipp::group controls, cameras, lle_modules;
     for (int i = 0; i < Settings::NativeButton::NumButtons; i++) {
@@ -427,6 +434,8 @@ int main(int argc, char** argv) {
               .set(Settings::values.use_frame_limit, false)
               .doc("disable the speed limiter")) |
          clipp::command("controls").set(command, Command::Controls).doc("configure controls") |
+         (clipp::command("dump-romfs").set(command, Command::DumpRomFS).doc("dump RomFS"),
+          clipp::opt_value("file").set(path), clipp::opt_value("dir").set(dump_romfs_dir)) |
          clipp::command("version").set(command, Command::Version).doc("prints vvctre's version") |
          clipp::command("usage").set(command, Command::Usage).doc("prints this"));
 
@@ -750,6 +759,40 @@ int main(int argc, char** argv) {
 
         for (const std::string& line : lines) {
             fmt::print("{}\n", line);
+        }
+
+        break;
+    }
+    case Command::DumpRomFS: {
+        InitializeLogging();
+
+        if (path.empty()) {
+            const std::vector<std::string> result =
+                pfd::open_file("Open File", ".",
+                               {"3DS Executables", "*.cci *.3ds *.cxi *.3dsx *.app"})
+                    .result();
+
+            if (result.empty()) {
+                return -1;
+            } else {
+                path = result[0];
+            }
+        }
+
+        if (dump_romfs_dir.empty()) {
+            const std::string result = pfd::select_folder("Dump RomFS", ".").result();
+
+            if (result.empty()) {
+                return -1;
+            } else {
+                dump_romfs_dir = result;
+            }
+        }
+
+        auto loader = Loader::GetLoader(path);
+        if (loader != nullptr &&
+            loader->DumpRomFS(dump_romfs_dir) == Loader::ResultStatus::Success) {
+            LOG_INFO(Frontend, "Done");
         }
 
         break;
