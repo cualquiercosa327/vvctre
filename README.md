@@ -9,8 +9,8 @@ Refer to the license.txt file included.
 vvctre uses the first existing option.
 
 - On Windows:
-  - `vvctre folder/user`
-  - `AppData/Roaming/vvctre`
+  - `vvctre folder\user`
+  - `%AppData%\vvctre`
 - On Linux:
   - `vvctre folder/user`
   - `~/.local/share/vvctre` for everything except `config` and `~/.config/vvctre` for files in `config`
