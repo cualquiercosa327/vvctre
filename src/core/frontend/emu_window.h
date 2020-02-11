@@ -70,18 +70,14 @@ public:
 
 /**
  * Abstraction class used to provide an interface between emulation code and the frontend
- * (e.g. SDL, QGLWidget, GLFW, etc...).
- *
  * Design notes on the interaction between EmuWindow and the emulation core:
- * - Generally, decisions on anything visible to the user should be left up to the GUI.
+ * - Generally, decisions on anything visible to the user should be left up to the frontend.
  *   For example, the emulation core should not try to dictate some window title or size.
  *   This stuff is not the core's business and only causes problems with regards to thread-safety
  *   anyway.
  * - EmuWindow may expose some of its state as read-only to the emulation core, however care
  *   should be taken to make sure the provided information is self-consistent. This requires
  *   some sort of synchronization (most of this is still a TODO).
- * - DO NOT TREAT THIS CLASS AS A GUI TOOLKIT ABSTRACTION LAYER. That's not what it is. Please
- *   re-read the upper points again and think about it if you don't see this.
  */
 class EmuWindow : public GraphicsContext {
 public:
