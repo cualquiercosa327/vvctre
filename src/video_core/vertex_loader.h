@@ -22,8 +22,7 @@ public:
     }
 
     void Setup(const PipelineRegs& regs);
-    void LoadVertex(u32 base_address, int index, int vertex, Shader::AttributeBuffer& input,
-                    DebugUtils::MemoryAccessTracker& memory_accesses);
+    void LoadVertex(u32 base_address, int index, int vertex, Shader::AttributeBuffer& input);
 
     int GetNumTotalAttributes() const {
         return num_total_attributes;

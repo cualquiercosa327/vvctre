@@ -21,10 +21,6 @@
 #include "video_core/regs_shader.h"
 #include "video_core/regs_texturing.h"
 
-namespace CiTrace {
-class Recorder;
-}
-
 namespace Pica {
 
 namespace Shader {
@@ -50,8 +46,6 @@ public:
 
     /**
      * Inherit from this class to be notified of events registered to some debug context.
-     * Most importantly this is used for our debugger GUI.
-     *
      * To implement event handling, override the OnPicaBreakPointHit and OnPicaResume methods.
      * @warning All BreakPointObservers need to be on the same thread to guarantee thread-safe state
      * access
@@ -158,8 +152,6 @@ public:
     std::array<BreakPoint, (int)Event::NumEvents> breakpoints;
     Event active_breakpoint;
     bool at_breakpoint = false;
-
-    std::shared_ptr<CiTrace::Recorder> recorder = nullptr;
 
 private:
     /**

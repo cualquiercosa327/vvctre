@@ -15,7 +15,6 @@
 #include "core/hw/gpu.h"
 #include "core/memory.h"
 #include "core/settings.h"
-#include "core/tracer/recorder.h"
 #include "video_core/command_processor.h"
 #include "video_core/debug_utils/debug_utils.h"
 #include "video_core/pica_state.h"
@@ -350,25 +349,6 @@ static void WritePicaReg(u32 id, u32 value, u32 mask) {
                               : (index + regs.pipeline.vertex_offset);
         };
 
-        if (g_debug_context && g_debug_context->recorder) {
-            for (int i = 0; i < 3; ++i) {
-                const auto texture = regs.texturing.GetTextures()[i];
-                if (!texture.enabled) {
-                    continue;
-                }
-
-                u8* texture_data =
-                    VideoCore::g_memory->GetPhysicalPointer(texture.config.GetPhysicalAddress());
-                g_debug_context->recorder->MemoryAccessed(
-                    texture_data,
-                    Pica::TexturingRegs::NibblesPerPixel(texture.format) * texture.config.width /
-                        2 * texture.config.height,
-                    texture.config.GetPhysicalAddress());
-            }
-        }
-
-        DebugUtils::MemoryAccessTracker memory_accesses;
-
         Pica::Shader::ShaderEngine* shader_engine = Shader::GetEngine();
         Shader::UnitState shader_unit;
 
@@ -387,12 +367,6 @@ static void WritePicaReg(u32 id, u32 value, u32 mask) {
                 CachedVertex& cached_vertex = vs_output[is_indexed ? vertex : index];
 
                 if (is_indexed) {
-                    if (g_debug_context && Pica::g_debug_context->recorder) {
-                        const int size = index_u16 ? 2 : 1;
-                        memory_accesses.AddAccess(base_address + index_info.offset + size * index,
-                                                  size);
-                    }
-
                     if (!single_thread) {
                         // Try locking this vertex
                         if (cached_vertex.lock.test_and_set(std::memory_order_acquire)) {
@@ -414,7 +388,7 @@ static void WritePicaReg(u32 id, u32 value, u32 mask) {
                     use_gs ? cached_vertex.output_attr : attribute_buffer;
 
                 // Initialize data for the current vertex
-                loader.LoadVertex(base_address, index, vertex, attribute_buffer, memory_accesses);
+                loader.LoadVertex(base_address, index, vertex, attribute_buffer);
 
                 // Send to vertex shader
                 if (g_debug_context) {
@@ -492,11 +466,6 @@ static void WritePicaReg(u32 id, u32 value, u32 mask) {
 
         for (std::future<void>& future : futures) {
             future.get();
-        }
-
-        for (auto& range : memory_accesses.ranges) {
-            g_debug_context->recorder->MemoryAccessed(
-                VideoCore::g_memory->GetPhysicalPointer(range.first), range.second, range.first);
         }
 
         VideoCore::g_renderer->Rasterizer()->DrawTriangles();

@@ -11,7 +11,6 @@
 #include <mutex>
 #include <stdexcept>
 #include <string>
-
 #include <nihstro/bit_field.h>
 #include <nihstro/float24.h>
 #include <nihstro/shader_binary.h>

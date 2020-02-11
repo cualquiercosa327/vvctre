@@ -25,7 +25,6 @@
 #include "core/hw/lcd.h"
 #include "core/memory.h"
 #include "core/settings.h"
-#include "core/tracer/recorder.h"
 #include "video_core/debug_utils/debug_utils.h"
 #include "video_core/rasterizer_interface.h"
 #include "video_core/renderer_opengl/post_processing_opengl.h"
@@ -363,10 +362,6 @@ void RendererOpenGL::SwapBuffers() {
 
     prev_state.Apply();
     RefreshRasterizerSetting();
-
-    if (Pica::g_debug_context && Pica::g_debug_context->recorder) {
-        Pica::g_debug_context->recorder->FrameFinished();
-    }
 }
 
 void RendererOpenGL::RenderScreenshot() {

@@ -445,9 +445,6 @@ add_library(core STATIC
     rpc/server.h
     settings.cpp
     settings.h
-    tracer/citrace.h
-    tracer/recorder.cpp
-    tracer/recorder.h
 )
 
 if (ENABLE_FFMPEG_VIDEO_DUMPER)

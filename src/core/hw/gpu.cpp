@@ -17,7 +17,6 @@
 #include "core/hw/hw.h"
 #include "core/memory.h"
 #include "core/settings.h"
-#include "core/tracer/recorder.h"
 #include "video_core/command_processor.h"
 #include "video_core/debug_utils/debug_utils.h"
 #include "video_core/rasterizer_interface.h"
@@ -464,14 +463,7 @@ inline void Write(u32 addr, const T data) {
         const auto& config = g_regs.command_processor_config;
         if (config.trigger & 1) {
             u32* buffer = (u32*)g_memory->GetPhysicalPointer(config.GetPhysicalAddress());
-
-            if (Pica::g_debug_context && Pica::g_debug_context->recorder) {
-                Pica::g_debug_context->recorder->MemoryAccessed((u8*)buffer, config.size,
-                                                                config.GetPhysicalAddress());
-            }
-
             Pica::CommandProcessor::ProcessCommandList(buffer, config.size);
-
             g_regs.command_processor_config.trigger = 0;
         }
         break;
@@ -479,14 +471,6 @@ inline void Write(u32 addr, const T data) {
 
     default:
         break;
-    }
-
-    // Notify tracer about the register write
-    // This is happening *after* handling the write to make sure we properly catch all memory reads.
-    if (Pica::g_debug_context && Pica::g_debug_context->recorder) {
-        // addr + GPU VBase - IO VBase + IO PBase
-        Pica::g_debug_context->recorder->RegisterWritten<T>(
-            addr + 0x1EF00000 - 0x1EC00000 + 0x10100000, data);
     }
 }
 
