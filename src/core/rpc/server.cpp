@@ -1301,6 +1301,9 @@ Server::Server(Core::System& system, const int port) {
         try {
             const nlohmann::json json = nlohmann::json::parse(req.body);
             Settings::values.is_new_3ds = json["enabled"].get<bool>();
+            if (system.IsPoweredOn()) {
+                system.RequestReset();
+            }
             res.status = 204;
         } catch (nlohmann::json::exception& exception) {
             res.status = 500;
@@ -1577,6 +1580,12 @@ Server::Server(Core::System& system, const int port) {
     });
 
     server->Get("/cheats", [&](const httplib::Request& req, httplib::Response& res) {
+        if (!system.IsPoweredOn()) {
+            res.status = 503;
+            res.set_content("emulation not running", "text/plain");
+            return;
+        }
+
         nlohmann::json json = nlohmann::json::array();
         const auto cheats = system.CheatEngine().GetCheats();
 
@@ -1597,16 +1606,34 @@ Server::Server(Core::System& system, const int port) {
     });
 
     server->Get("/reloadcheats", [&](const httplib::Request& req, httplib::Response& res) {
+        if (!system.IsPoweredOn()) {
+            res.status = 503;
+            res.set_content("emulation not running", "text/plain");
+            return;
+        }
+
         system.CheatEngine().LoadCheatFile();
         res.status = 204;
     });
 
     server->Get("/savecheats", [&](const httplib::Request& req, httplib::Response& res) {
+        if (!system.IsPoweredOn()) {
+            res.status = 503;
+            res.set_content("emulation not running", "text/plain");
+            return;
+        }
+
         system.CheatEngine().SaveCheatFile();
         res.status = 204;
     });
 
     server->Post("/addcheat", [&](const httplib::Request& req, httplib::Response& res) {
+        if (!system.IsPoweredOn()) {
+            res.status = 503;
+            res.set_content("emulation not running", "text/plain");
+            return;
+        }
+
         try {
             const nlohmann::json json = nlohmann::json::parse(req.body);
             const std::string name = json["name"].get<std::string>();
@@ -1630,6 +1657,12 @@ Server::Server(Core::System& system, const int port) {
     });
 
     server->Post("/removecheat", [&](const httplib::Request& req, httplib::Response& res) {
+        if (!system.IsPoweredOn()) {
+            res.status = 503;
+            res.set_content("emulation not running", "text/plain");
+            return;
+        }
+
         try {
             const nlohmann::json json = nlohmann::json::parse(req.body);
             const int index = json["index"].get<int>();
@@ -1648,6 +1681,12 @@ Server::Server(Core::System& system, const int port) {
     });
 
     server->Post("/updatecheat", [&](const httplib::Request& req, httplib::Response& res) {
+        if (!system.IsPoweredOn()) {
+            res.status = 503;
+            res.set_content("emulation not running", "text/plain");
+            return;
+        }
+
         try {
             const nlohmann::json json = nlohmann::json::parse(req.body);
             const int index = json["index"].get<int>();
@@ -1678,16 +1717,34 @@ Server::Server(Core::System& system, const int port) {
     });
 
     server->Get("/pause", [&](const httplib::Request& req, httplib::Response& res) {
+        if (!system.IsPoweredOn()) {
+            res.status = 503;
+            res.set_content("emulation not running", "text/plain");
+            return;
+        }
+
         system.SetStatus(Core::System::ResultStatus::Paused);
         res.status = 204;
     });
 
     server->Get("/continue", [&](const httplib::Request& req, httplib::Response& res) {
+        if (!system.IsPoweredOn()) {
+            res.status = 503;
+            res.set_content("emulation not running", "text/plain");
+            return;
+        }
+
         system.SetStatus(Core::System::ResultStatus::Success);
         res.status = 204;
     });
 
     server->Get("/registers/0-15", [&](const httplib::Request& req, httplib::Response& res) {
+        if (!system.IsPoweredOn()) {
+            res.status = 503;
+            res.set_content("emulation not running", "text/plain");
+            return;
+        }
+
         res.set_content(
             nlohmann::json(std::vector<u32>{system.CPU().GetReg(0), system.CPU().GetReg(1),
                                             system.CPU().GetReg(2), system.CPU().GetReg(3),
@@ -1702,6 +1759,12 @@ Server::Server(Core::System& system, const int port) {
     });
 
     server->Post("/registers/0-15", [&](const httplib::Request& req, httplib::Response& res) {
+        if (!system.IsPoweredOn()) {
+            res.status = 503;
+            res.set_content("emulation not running", "text/plain");
+            return;
+        }
+
         try {
             const nlohmann::json json = nlohmann::json::parse(req.body);
             const int index = json["index"].get<int>();
@@ -1715,10 +1778,22 @@ Server::Server(Core::System& system, const int port) {
     });
 
     server->Get("/registers/cpsr", [&](const httplib::Request& req, httplib::Response& res) {
+        if (!system.IsPoweredOn()) {
+            res.status = 503;
+            res.set_content("emulation not running", "text/plain");
+            return;
+        }
+
         res.set_content(std::to_string(system.CPU().GetCPSR()), "text/plain");
     });
 
     server->Post("/registers/cpsr", [&](const httplib::Request& req, httplib::Response& res) {
+        if (!system.IsPoweredOn()) {
+            res.status = 503;
+            res.set_content("emulation not running", "text/plain");
+            return;
+        }
+
         try {
             const nlohmann::json json = nlohmann::json::parse(req.body);
             const u32 value = json["value"].get<u32>();
@@ -1731,6 +1806,12 @@ Server::Server(Core::System& system, const int port) {
     });
 
     server->Get("/registers/vfp", [&](const httplib::Request& req, httplib::Response& res) {
+        if (!system.IsPoweredOn()) {
+            res.status = 503;
+            res.set_content("emulation not running", "text/plain");
+            return;
+        }
+
         res.set_content(
             nlohmann::json(std::vector<u32>{system.CPU().GetVFPReg(0),  system.CPU().GetVFPReg(1),
                                             system.CPU().GetVFPReg(2),  system.CPU().GetVFPReg(3),
@@ -1753,6 +1834,12 @@ Server::Server(Core::System& system, const int port) {
     });
 
     server->Post("/registers/vfp", [&](const httplib::Request& req, httplib::Response& res) {
+        if (!system.IsPoweredOn()) {
+            res.status = 503;
+            res.set_content("emulation not running", "text/plain");
+            return;
+        }
+
         try {
             const nlohmann::json json = nlohmann::json::parse(req.body);
             const int index = json["index"].get<int>();
@@ -1766,6 +1853,12 @@ Server::Server(Core::System& system, const int port) {
     });
 
     server->Get("/registers/vfpsystem", [&](const httplib::Request& req, httplib::Response& res) {
+        if (!system.IsPoweredOn()) {
+            res.status = 503;
+            res.set_content("emulation not running", "text/plain");
+            return;
+        }
+
         res.set_content(nlohmann::json(std::vector<u32>{system.CPU().GetVFPSystemReg(VFP_FPSID),
                                                         system.CPU().GetVFPSystemReg(VFP_FPSCR),
                                                         system.CPU().GetVFPSystemReg(VFP_FPEXC),
@@ -1778,6 +1871,12 @@ Server::Server(Core::System& system, const int port) {
     });
 
     server->Post("/registers/vfpsystem", [&](const httplib::Request& req, httplib::Response& res) {
+        if (!system.IsPoweredOn()) {
+            res.status = 503;
+            res.set_content("emulation not running", "text/plain");
+            return;
+        }
+
         try {
             const nlohmann::json json = nlohmann::json::parse(req.body);
             const int index = json["index"].get<int>();
@@ -1791,6 +1890,12 @@ Server::Server(Core::System& system, const int port) {
     });
 
     server->Get("/registers/cp15", [&](const httplib::Request& req, httplib::Response& res) {
+        if (!system.IsPoweredOn()) {
+            res.status = 503;
+            res.set_content("emulation not running", "text/plain");
+            return;
+        }
+
         res.set_content(
             nlohmann::json(
                 std::vector<u32>{
@@ -1886,6 +1991,12 @@ Server::Server(Core::System& system, const int port) {
     });
 
     server->Post("/registers/cp15", [&](const httplib::Request& req, httplib::Response& res) {
+        if (!system.IsPoweredOn()) {
+            res.status = 503;
+            res.set_content("emulation not running", "text/plain");
+            return;
+        }
+
         try {
             const nlohmann::json json = nlohmann::json::parse(req.body);
             const int index = json["index"].get<int>();
@@ -1896,6 +2007,17 @@ Server::Server(Core::System& system, const int port) {
             res.status = 500;
             res.set_content(exception.what(), "text/plain");
         }
+    });
+
+    server->Get("/restart", [&](const httplib::Request& req, httplib::Response& res) {
+        if (!system.IsPoweredOn()) {
+            res.status = 503;
+            res.set_content("emulation not running", "text/plain");
+            return;
+        }
+
+        system.RequestReset();
+        res.status = 204;
     });
 
     request_handler_thread = std::thread([this, port] { server->listen("0.0.0.0", port); });

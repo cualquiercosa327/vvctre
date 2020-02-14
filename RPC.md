@@ -651,7 +651,7 @@ Get or set whether custom texture preloading is enabled.
 
 # GET/POST /usecpujit
 
-Get or set whether the CPU JIT is used instead of the interpreter.
+Get or set whether the CPU JIT is used instead of the interpreter.  
 If setting and the emulation is running, the emulation will restart.
 
 ## Request/Reply
@@ -1304,3 +1304,7 @@ Set a ARM CP15 register value.
   "value": Number
 }
 ```
+
+# GET /restart
+
+Restarts emulation.

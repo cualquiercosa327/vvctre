@@ -123,16 +123,16 @@ if (VVCTRE_USE_BUNDLED_SDL2)
         set(SDL2_INCLUDE_DIR "${SDL2_PREFIX}/include")
         set(SDL2_LIBRARY "${SDL2_PREFIX}/lib/x64/SDL2.lib")
         set(SDL2_DLL_DIR "${SDL2_PREFIX}/lib/x64/")
+
+        add_library(SDL2 INTERFACE)
+        target_link_libraries(SDL2 INTERFACE "${SDL2_LIBRARY}")
+        target_include_directories(SDL2 INTERFACE "${SDL2_INCLUDE_DIR}")
     endif()
 else()
     find_package(SDL2 REQUIRED)
-endif()
-
-if (SDL2_FOUND)
-    # TODO(yuriks): Make FindSDL2.cmake export an IMPORTED library instead
     add_library(SDL2 INTERFACE)
-    target_link_libraries(SDL2 INTERFACE "${SDL2_LIBRARY}")
-    target_include_directories(SDL2 INTERFACE "${SDL2_INCLUDE_DIR}")
+    target_include_directories(SDL2 INTERFACE ${SDL2_INCLUDE_DIRS})
+    target_link_libraries(SDL2 INTERFACE "${SDL2_LIBRARIES}")
 endif()
 
 if (ENABLE_FFMPEG)
