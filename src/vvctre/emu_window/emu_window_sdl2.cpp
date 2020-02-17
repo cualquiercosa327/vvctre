@@ -3,11 +3,11 @@
 // Refer to the license.txt file included.
 
 #include <algorithm>
+#include <condition_variable>
 #include <cstdlib>
+#include <mutex>
 #include <string>
 #define SDL_MAIN_HANDLED
-#include <condition_variable>
-#include <mutex>
 #include <SDL.h>
 #include <fmt/format.h>
 #include <glad/glad.h>
