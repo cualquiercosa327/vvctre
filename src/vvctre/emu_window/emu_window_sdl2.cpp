@@ -298,6 +298,9 @@ void EmuWindow_SDL2::Present() {
             SDL_GL_SetSwapInterval(Settings::values.use_vsync_new ? 1 : 0);
             VideoCore::g_renderer->TryPresent(100);
             SDL_GL_SwapWindow(render_window);
+        } else {
+            // Wait for the renderer to initialize
+            std::this_thread::sleep_for(std::chrono::nanoseconds(1));
         }
     }
     SDL_GL_MakeCurrent(render_window, nullptr);
