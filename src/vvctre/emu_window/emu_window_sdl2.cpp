@@ -6,6 +6,8 @@
 #include <cstdlib>
 #include <string>
 #define SDL_MAIN_HANDLED
+#include <condition_variable>
+#include <mutex>
 #include <SDL.h>
 #include <fmt/format.h>
 #include <glad/glad.h>
@@ -299,8 +301,10 @@ void EmuWindow_SDL2::Present() {
             VideoCore::g_renderer->TryPresent(100);
             SDL_GL_SwapWindow(render_window);
         } else {
-            // Wait for the renderer to initialize
-            std::this_thread::sleep_for(std::chrono::nanoseconds(1));
+            std::mutex m;
+            std::unique_lock<std::mutex> lock(m);
+            std::condition_variable cv;
+            cv.wait(lock, [] { return VideoCore::g_renderer == nullptr; });
         }
     }
     SDL_GL_MakeCurrent(render_window, nullptr);
