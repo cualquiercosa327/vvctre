@@ -46,3 +46,6 @@
 [submodule "clipp"]
     path = externals/clipp
     url = https://github.com/muellan/clipp.git
+[submodule "indicators"]
+    path = externals/indicators
+    url = https://github.com/p-ranav/indicators.git

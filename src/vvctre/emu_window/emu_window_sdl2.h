@@ -7,7 +7,6 @@
 #include <memory>
 #include <utility>
 #include "core/frontend/emu_window.h"
-#include "video_core/rasterizer_interface.h"
 
 struct SDL_Window;
 
@@ -60,9 +59,6 @@ public:
     /// Creates a new context that is shared with the current context
     std::unique_ptr<GraphicsContext> CreateSharedContext() const override;
 
-    void DiskShaderCacheProgress(VideoCore::LoadCallbackStage stage, std::size_t value,
-                                 std::size_t total);
-
     void SoftwareKeyboardStarted();
     void MiiPickerStarted();
 
@@ -114,7 +110,6 @@ private:
     /// Keeps track of how often to update the title bar during gameplay
     u32 last_time = 0;
 
-    bool loading_disk_shader_cache = false;
     std::string program_name;
     u64 program_id = 0;
 

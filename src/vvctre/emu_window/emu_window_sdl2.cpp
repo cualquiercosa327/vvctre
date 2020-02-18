@@ -240,39 +240,6 @@ std::unique_ptr<Frontend::GraphicsContext> EmuWindow_SDL2::CreateSharedContext()
     return std::make_unique<SharedContext_SDL2>();
 }
 
-void EmuWindow_SDL2::DiskShaderCacheProgress(VideoCore::LoadCallbackStage stage, std::size_t value,
-                                             std::size_t total) {
-    if (render_window == nullptr) {
-        return;
-    }
-
-    switch (stage) {
-    case VideoCore::LoadCallbackStage::Prepare:
-        loading_disk_shader_cache = true;
-        break;
-    case VideoCore::LoadCallbackStage::Decompile: {
-        const std::string title = fmt::format("vvctre {} | decompiling shaders ({}/{})",
-                                              version::vvctre.to_string(), value, total);
-        SDL_SetWindowTitle(render_window, title.c_str());
-        break;
-    }
-    case VideoCore::LoadCallbackStage::Build: {
-        const std::string title = fmt::format("vvctre {} | building shaders ({}/{})",
-                                              version::vvctre.to_string(), value, total);
-        SDL_SetWindowTitle(render_window, title.c_str());
-        break;
-    }
-    case VideoCore::LoadCallbackStage::Complete: {
-        const std::string title = fmt::format("vvctre {}", version::vvctre.to_string());
-        SDL_SetWindowTitle(render_window, title.c_str());
-        loading_disk_shader_cache = false;
-        return;
-    }
-    }
-
-    PollEvents();
-}
-
 void EmuWindow_SDL2::SoftwareKeyboardStarted() {
     if (render_window == nullptr) {
         return;
@@ -371,7 +338,7 @@ void EmuWindow_SDL2::PollEvents() {
     const u32 current_time = SDL_GetTicks();
 
     if (current_time > last_time + 2000) {
-        if (!loading_disk_shader_cache && system.IsPoweredOn()) {
+        if (system.IsPoweredOn()) {
             const u64 current_program_id = system.Kernel().GetCurrentProcess()->codeset->program_id;
             if (program_id != current_program_id) {
                 system.GetAppLoader().ReadTitle(program_name);

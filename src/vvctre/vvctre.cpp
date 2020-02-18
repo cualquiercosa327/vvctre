@@ -18,6 +18,7 @@
 #define SDL_MAIN_HANDLED
 #include <SDL.h>
 #include <clipp.h>
+#include <indicators/progress_bar.hpp>
 #include <portable-file-dialogs.h>
 #include "common/common_paths.h"
 #include "common/detached_tasks.h"
@@ -463,12 +464,13 @@ int main(int argc, char** argv) {
         }
 
         if (EndsWithIgnoreCase(path, ".cia")) {
-            const auto cia_progress = [](std::size_t written, std::size_t total) {
-                LOG_INFO(Frontend, "{:d}%", (written * 100 / total));
-            };
+            indicators::ProgressBar bar;
+            bar.set_option(indicators::option::PrefixText{"Installing CIA "});
 
-            return Service::AM::InstallCIA(path, cia_progress) ==
-                           Service::AM::InstallStatus::Success
+            return Service::AM::InstallCIA(path,
+                                           [&](std::size_t written, std::size_t total) {
+                                               bar.set_progress(written * 100 / total);
+                                           }) == Service::AM::InstallStatus::Success
                        ? 0
                        : -1;
         } else {
@@ -577,16 +579,30 @@ int main(int argc, char** argv) {
             std::thread render_thread([&emu_window] { emu_window->Present(); });
 
             if (Settings::values.use_disk_shader_cache) {
-                std::atomic_bool stop_run;
+                indicators::ProgressBar bar;
+                std::atomic_bool stop_run{false};
+
                 system.Renderer().Rasterizer()->LoadDiskResources(
                     stop_run,
                     [&](VideoCore::LoadCallbackStage stage, std::size_t value, std::size_t total) {
-                        LOG_DEBUG(Frontend, "Loading stage {} progress {} {}",
-                                  static_cast<u32>(stage), value, total);
-                        emu_window->DiskShaderCacheProgress(stage, value, total);
+                        switch (stage) {
+                        case VideoCore::LoadCallbackStage::Prepare:
+                            break;
+                        case VideoCore::LoadCallbackStage::Decompile: {
+                            bar.set_option(indicators::option::PrefixText{"Decompiling shaders "});
+                            bar.set_progress(value * 100 / total);
+                            break;
+                        }
+                        case VideoCore::LoadCallbackStage::Build: {
+                            bar.set_option(indicators::option::PrefixText{"Building shaders "});
+                            bar.set_progress(value * 100 / total);
+                            break;
+                        }
+                        case VideoCore::LoadCallbackStage::Complete: {
+                            break;
+                        }
+                        }
                     });
-            } else {
-                emu_window->DiskShaderCacheProgress(VideoCore::LoadCallbackStage::Complete, 0, 0);
             }
 
             while (emu_window->IsOpen()) {

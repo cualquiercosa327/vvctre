@@ -92,3 +92,4 @@ target_include_directories(portable-file-dialogs INTERFACE ./portable-file-dialo
 add_subdirectory(semver)
 add_subdirectory(clipp)
 add_subdirectory(easywsclient)
+add_subdirectory(indicators)

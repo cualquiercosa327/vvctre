@@ -19,7 +19,7 @@ add_executable(${PROJECT_NAME}
 create_target_directory_groups(${PROJECT_NAME})
 
 target_link_libraries(${PROJECT_NAME} PRIVATE common core input_common)
-target_link_libraries(${PROJECT_NAME} PRIVATE inih glad clipp portable-file-dialogs ${PLATFORM_LIBRARIES} SDL2 Threads::Threads)
+target_link_libraries(${PROJECT_NAME} PRIVATE inih glad clipp portable-file-dialogs indicators ${PLATFORM_LIBRARIES} SDL2 Threads::Threads)
 
 if(USE_DISCORD_PRESENCE)
     target_compile_definitions(${PROJECT_NAME} PRIVATE -DUSE_DISCORD_PRESENCE)
