@@ -239,7 +239,7 @@ upright_screen =
 # 0 (default): Off, 1: On
 dump_textures =
 
-# Reads PNG files from load/textures/[Title ID]/ and replaces textures.
+# Reads files from load/textures/[Title ID]/ and replaces textures.
 # 0 (default): Off, 1: On
 custom_textures =
 
