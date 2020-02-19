@@ -49,6 +49,8 @@ add_library(common STATIC
     stb_image.h
     stb_image_write.cpp
     stb_image_write.h
+    stb_image_resize.cpp
+    stb_image_resize.h
 )
 
 if(ARCHITECTURE_x86_64)

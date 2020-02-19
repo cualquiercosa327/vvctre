@@ -286,9 +286,11 @@ audio_speed =
 [Camera]
 # Which camera engine to use for the right outer camera
 # blank (default): a dummy camera that always returns black image
+# image: still image
 camera_outer_right_name =
 
-# A config string for the right outer camera. Its meaning is defined by the camera engine
+# A config string for the right outer camera.
+# for engine "image", this is the file path
 camera_outer_right_config =
 
 # The image flip to apply

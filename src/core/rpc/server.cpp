@@ -2020,6 +2020,21 @@ Server::Server(Core::System& system, const int port) {
         res.status = 204;
     });
 
+    server->Get("/reloadcameras", [&](const httplib::Request& req, httplib::Response& res) {
+        if (!system.IsPoweredOn()) {
+            res.status = 503;
+            res.set_content("emulation not running", "text/plain");
+            return;
+        }
+
+        auto cam = Service::CAM::GetModule(system);
+        if (cam != nullptr) {
+            cam->ReloadCameraDevices();
+        }
+
+        res.status = 204;
+    });
+
     request_handler_thread = std::thread([this, port] { server->listen("0.0.0.0", port); });
     LOG_INFO(RPC_Server, "RPC server running on port {}", port);
 }

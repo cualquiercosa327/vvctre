@@ -1308,3 +1308,7 @@ Set a ARM CP15 register value.
 # GET /restart
 
 Restarts emulation.
+
+# GET /reloadcameras
+
+Reloads cameras.

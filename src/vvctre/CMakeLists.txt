@@ -13,6 +13,10 @@ add_executable(${PROJECT_NAME}
     applets/swkbd.h
     applets/mii_selector.cpp
     applets/mii_selector.h
+    camera/image.cpp
+    camera/image.h
+    camera/util.cpp
+    camera/util.h
     $<$<BOOL:${USE_DISCORD_PRESENCE}>:discord_rp.cpp discord_rp.h>
 )
 

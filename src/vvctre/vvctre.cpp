@@ -47,6 +47,7 @@
 #include "video_core/video_core.h"
 #include "vvctre/applets/mii_selector.h"
 #include "vvctre/applets/swkbd.h"
+#include "vvctre/camera/image.h"
 #include "vvctre/config.h"
 #include "vvctre/emu_window/emu_window_sdl2.h"
 
@@ -513,6 +514,9 @@ int main(int argc, char** argv) {
                 [&emu_window] { emu_window->SoftwareKeyboardStarted(); }));
             system.RegisterMiiSelector(std::make_shared<Frontend::SDL2_MiiSelector>(
                 [&emu_window] { emu_window->MiiPickerStarted(); }));
+
+            // Register camera implementations
+            Camera::RegisterFactory("image", std::make_unique<Camera::ImageCameraFactory>());
 
             Frontend::ScopeAcquireContext scope(*emu_window);
 
