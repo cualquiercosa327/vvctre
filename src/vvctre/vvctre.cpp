@@ -324,29 +324,33 @@ int main(int argc, char** argv) {
               .doc("force disable ignore format reinterpretation (default)")
               .set(Settings::values.ignore_format_reinterpretation, false),
           clipp::option("--dump-textures")
-              .doc("force enable texture dumping")
+              .doc("dump textures")
               .set(Settings::values.dump_textures, true),
-          clipp::option("--no-dump-textures")
-              .doc("force disable texture dumping (default)")
-              .set(Settings::values.dump_textures, false),
           clipp::option("--custom-textures")
-              .doc("force enable custom textures")
+              .doc("use custom textures")
               .set(Settings::values.custom_textures, true),
-          clipp::option("--no-custom-textures")
-              .doc("force disable custom textures (default)")
-              .set(Settings::values.custom_textures, false),
           clipp::option("--preload-custom-textures")
-              .doc("force enable custom texture preloading")
+              .doc("preload custom textures")
               .set(Settings::values.preload_textures, true),
-          clipp::option("--no-preload-custom-textures")
-              .doc("force disable custom texture preloading (default)")
-              .set(Settings::values.preload_textures, false),
           clipp::option("--custom-layout")
-              .doc("force use custom layout")
+              .doc("use custom layout")
               .set(Settings::values.custom_layout, true),
-          clipp::option("--no-custom-layout")
-              .doc("force disable custom layout (default)")
-              .set(Settings::values.custom_layout, false),
+          clipp::option("--custom-layout-top-left").doc("set custom layout top left") &
+              clipp::value("value").set(Settings::values.custom_top_left),
+          clipp::option("--custom-layout-top-top").doc("set custom layout top top") &
+              clipp::value("value").set(Settings::values.custom_top_top),
+          clipp::option("--custom-layout-top-right").doc("set custom layout top right") &
+              clipp::value("value").set(Settings::values.custom_top_right),
+          clipp::option("--custom-layout-top-bottom").doc("set custom layout top bottom") &
+              clipp::value("value").set(Settings::values.custom_top_bottom),
+          clipp::option("--custom-layout-bottom-left").doc("set custom layout bottom left") &
+              clipp::value("value").set(Settings::values.custom_bottom_left),
+          clipp::option("--custom-layout-bottom-top").doc("set custom layout bottom top") &
+              clipp::value("value").set(Settings::values.custom_bottom_top),
+          clipp::option("--custom-layout-bottom-right").doc("set custom layout bottom right") &
+              clipp::value("value").set(Settings::values.custom_bottom_right),
+          clipp::option("--custom-layout-bottom-bottom").doc("set custom layout bottom bottom") &
+              clipp::value("value").set(Settings::values.custom_bottom_bottom),
           clipp::option("--single-screen-layout")
               .doc("use single screen layout")
               .set(Settings::values.custom_layout, false)
