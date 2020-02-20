@@ -98,7 +98,7 @@ void LogSettings() {
     LogSetting("factor_3d", values.factor_3d.load());
     LogSetting("filter_mode", values.filter_mode);
     LogSetting("pp_shader_name", values.pp_shader_name);
-    LogSetting("use_vsync_new", values.use_vsync_new);
+    LogSetting("enable_vsync", values.enable_vsync);
     LogSetting("sharper_distant_objects", values.sharper_distant_objects);
     LogSetting("ignore_format_reinterpretation", values.ignore_format_reinterpretation);
     LogSetting("use_custom_screen_refresh_rate", values.use_custom_screen_refresh_rate);

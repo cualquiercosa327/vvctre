@@ -1,0 +1,24 @@
+Buttons
+------------
+A: A
+B: S
+X: Z
+Y: X
+Up: T
+Down: G
+Left: F
+Right: H
+L: Q
+R: W
+START: M
+SELECT: N
+Debug: 0
+GPIO14: P
+ZL: 1
+ZR: 2
+HOME: B
+
+Analogs
+------------
+Circle Pad: Up: Up, Down: Down, Left: Left, Right: Right, Modifier: D
+C-Stick: Up: I, Down: K, Left: J, Right: L, Modifier: D

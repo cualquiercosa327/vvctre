@@ -7,10 +7,8 @@
 #include <string>
 #include <vector>
 #include "audio_core/null_sink.h"
-#include "audio_core/sink_details.h"
-#ifdef HAVE_SDL2
 #include "audio_core/sdl2_sink.h"
-#endif
+#include "audio_core/sink_details.h"
 #ifdef HAVE_CUBEB
 #include "audio_core/cubeb_sink.h"
 #endif
@@ -39,13 +37,11 @@ constexpr SinkDetails sink_details[] = {
                 },
                 &ListCubebSinkDevices},
 #endif
-#ifdef HAVE_SDL2
     SinkDetails{"sdl2",
                 [](std::string_view device_id) -> std::unique_ptr<Sink> {
                     return std::make_unique<SDL2Sink>(std::string(device_id));
                 },
                 &ListSDL2SinkDevices},
-#endif
     SinkDetails{"null",
                 [](std::string_view device_id) -> std::unique_ptr<Sink> {
                     return std::make_unique<NullSink>(device_id);

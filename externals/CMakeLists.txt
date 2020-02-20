@@ -27,9 +27,6 @@ add_library(fmt::fmt ALIAS fmt)
 # Glad
 add_subdirectory(glad)
 
-# inih
-add_subdirectory(inih)
-
 # Nihstro
 add_library(nihstro-headers INTERFACE)
 target_include_directories(nihstro-headers INTERFACE ./nihstro/include)

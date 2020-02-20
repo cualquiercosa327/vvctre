@@ -80,12 +80,7 @@ void ReloadInputDevices() {
 namespace Polling {
 
 std::vector<std::unique_ptr<DevicePoller>> GetPollers(DeviceType type) {
-    std::vector<std::unique_ptr<DevicePoller>> pollers;
-
-#ifdef HAVE_SDL2
-    pollers = sdl->GetPollers(type);
-#endif
-
+    std::vector<std::unique_ptr<DevicePoller>> pollers = sdl->GetPollers(type);
     return pollers;
 }
 

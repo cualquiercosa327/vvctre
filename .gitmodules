@@ -22,9 +22,6 @@
 [submodule "fmt"]
     path = externals/fmt
     url = https://github.com/fmtlib/fmt.git
-[submodule "inih"]
-    path = externals/inih/inih
-    url = https://github.com/benhoyt/inih.git
 [submodule "libressl"]
     path = externals/libressl
     url = https://github.com/citra-emu/ext-libressl-portable.git

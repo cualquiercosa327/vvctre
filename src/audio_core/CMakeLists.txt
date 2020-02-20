@@ -28,8 +28,8 @@ add_library(audio_core STATIC
     sink_details.h
     time_stretch.cpp
     time_stretch.h
-
-    $<$<BOOL:${SDL2_FOUND}>:sdl2_sink.cpp sdl2_sink.h>
+    sdl2_sink.cpp
+    sdl2_sink.h
     $<$<BOOL:${ENABLE_CUBEB}>:cubeb_sink.cpp cubeb_sink.h cubeb_input.cpp cubeb_input.h>
 )
 
@@ -62,11 +62,6 @@ elseif(ENABLE_FFMPEG_AUDIO_DECODER)
         target_include_directories(audio_core PRIVATE ${FFMPEG_DIR}/include)
     endif()
     target_compile_definitions(audio_core PUBLIC HAVE_FFMPEG)
-endif()
-
-if(SDL2_FOUND)
-    target_link_libraries(audio_core PRIVATE SDL2)
-    target_compile_definitions(audio_core PRIVATE HAVE_SDL2)
 endif()
 
 if(ENABLE_CUBEB)

@@ -31,14 +31,6 @@ public:
 
     virtual Pollers GetPollers(Polling::DeviceType type) = 0;
 };
-
-class NullState : public State {
-public:
-    Pollers GetPollers(Polling::DeviceType type) override {
-        return {};
-    }
-};
-
 std::unique_ptr<State> Init();
 
 } // namespace InputCommon::SDL

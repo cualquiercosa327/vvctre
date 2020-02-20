@@ -130,7 +130,7 @@ void EmuWindow_SDL2::Fullscreen() {
     SDL_MaximizeWindow(render_window);
 }
 
-EmuWindow_SDL2::EmuWindow_SDL2(Core::System& system, bool headless, bool fullscreen)
+EmuWindow_SDL2::EmuWindow_SDL2(Core::System& system, bool hidden, bool fullscreen)
     : system(system) {
     // Initialize the window
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_JOYSTICK) < 0) {
@@ -159,7 +159,7 @@ EmuWindow_SDL2::EmuWindow_SDL2(Core::System& system, bool headless, bool fullscr
         SDL_WINDOWPOS_UNDEFINED, // y position
         Core::kScreenTopWidth, Core::kScreenTopHeight + Core::kScreenBottomHeight, [&] {
             Uint32 flags = SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI;
-            if (headless) {
+            if (hidden) {
                 flags |= SDL_WINDOW_HIDDEN;
             }
             return flags;
@@ -188,7 +188,7 @@ EmuWindow_SDL2::EmuWindow_SDL2(Core::System& system, bool headless, bool fullscr
         std::exit(1);
     }
 
-    SDL_GL_SetSwapInterval(Settings::values.use_vsync_new ? 1 : 0);
+    SDL_GL_SetSwapInterval(Settings::values.enable_vsync ? 1 : 0);
 
     OnResize();
     SDL_PumpEvents();

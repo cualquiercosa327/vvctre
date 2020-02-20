@@ -3,9 +3,6 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PROJECT_SOURCE_DIR}/CMakeModules)
 add_executable(${PROJECT_NAME}
     ${PROJECT_NAME}.cpp
     ${PROJECT_NAME}.rc
-    config.cpp
-    config.h
-    default_ini.h
     emu_window/emu_window_sdl2.cpp
     emu_window/emu_window_sdl2.h
     resource.h
@@ -23,7 +20,7 @@ add_executable(${PROJECT_NAME}
 create_target_directory_groups(${PROJECT_NAME})
 
 target_link_libraries(${PROJECT_NAME} PRIVATE common core input_common)
-target_link_libraries(${PROJECT_NAME} PRIVATE inih glad clipp portable-file-dialogs indicators ${PLATFORM_LIBRARIES} SDL2 Threads::Threads)
+target_link_libraries(${PROJECT_NAME} PRIVATE glad clipp portable-file-dialogs indicators ${PLATFORM_LIBRARIES} Threads::Threads)
 
 if(USE_DISCORD_PRESENCE)
     target_compile_definitions(${PROJECT_NAME} PRIVATE -DUSE_DISCORD_PRESENCE)

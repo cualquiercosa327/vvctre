@@ -1372,7 +1372,7 @@ Server::Server(Core::System& system, const int port) {
     server->Get("/usevsync", [&](const httplib::Request& req, httplib::Response& res) {
         res.set_content(
             nlohmann::json{
-                {"enabled", Settings::values.use_vsync_new},
+                {"enabled", Settings::values.enable_vsync},
             }
                 .dump(),
             "application/json");

@@ -47,7 +47,6 @@
 #include "vvctre/applets/mii_selector.h"
 #include "vvctre/applets/swkbd.h"
 #include "vvctre/camera/image.h"
-#include "vvctre/config.h"
 #include "vvctre/emu_window/emu_window_sdl2.h"
 
 #ifndef _MSC_VER
@@ -93,11 +92,10 @@ int main(int argc, char** argv) {
     std::string path;
 
     // for BootOrInstall
-    Config config;
     std::string movie_record;
     std::string movie_play;
     std::string dump_video;
-    bool headless = false;
+    bool hidden = false;
     bool fullscreen = false;
     bool regenerate_console_id = false;
     int rpc_server_port = 47889;
@@ -181,39 +179,52 @@ int main(int argc, char** argv) {
               clipp::value("rate")
                   .set(Settings::values.use_custom_screen_refresh_rate, true)
                   .set(Settings::values.custom_screen_refresh_rate),
-          clipp::option("--custom-cpu-ticks").doc("set custom CPU ticks") &
+          clipp::option("--custom-cpu-ticks").doc("set custom CPU ticks\ndefault: 77") &
               clipp::value("ticks")
                   .set(Settings::values.use_custom_cpu_ticks, true)
                   .set(Settings::values.custom_cpu_ticks),
-          clipp::option("--cpu-clock-percentage").doc("set CPU clock percentage") &
+          clipp::option("--cpu-clock-percentage")
+                  .doc("set CPU clock percentage\n"
+                       "underclocking can increase the performance of the game at the risk of "
+                       "freezing.\noverclocking may fix lag that happens on console, but also "
+                       "comes with the risk of freezing.\n"
+                       "range is any positive integer (but we suspect 25 - 400 is a good "
+                       "idea)\ndefault: 100") &
               clipp::value("percentage").set(Settings::values.cpu_clock_percentage),
-          clipp::option("--multiplayer-server-url").doc("set the multiplayer server URL") &
+          clipp::option("--multiplayer-server-url")
+                  .doc("set the multiplayer server URL\ndefault: "
+                       "ws://vvctre-multiplayer.glitch.me") &
               clipp::value("url").set(Settings::values.multiplayer_url),
-          clipp::option("--log-filter").doc("set the log filter") &
+          clipp::option("--log-filter").doc("set the log filter\ndefault: *:Info") &
               clipp::value("filter").set(Settings::values.log_filter),
           clipp::option("--minimum-vertices-per-thread")
-                  .doc("set minimum vertices per thread (only used for software shader)") &
+                  .doc("set minimum vertices per thread (only used for software shader)\ndefault: "
+                       "10") &
               clipp::value("value").set(Settings::values.min_vertices_per_thread),
-          clipp::option("--resolution").doc("set resolution") &
+          clipp::option("--resolution").doc("set resolution\ndefault: 1\n0 means use window size") &
               clipp::value("value").set(Settings::values.resolution_factor),
           clipp::option("--audio-speed")
                   .doc("set audio speed for DSP HLE to a float, must be greater than zero and "
                        "requires audio stretching to be enabled to work properly") &
               clipp::value("value").set(Settings::values.audio_speed),
-          clipp::option("--audio-volume").doc("set audio volume") &
+          clipp::option("--audio-volume").doc("set audio volume\ntype: float\ndefault: 1.0") &
               clipp::value("value").set(Settings::values.volume),
-          clipp::option("--audio-engine").doc("set audio engine") &
+          clipp::option("--audio-engine").doc("set audio engine\ndefault:") &
               clipp::value("name").set(Settings::values.sink_id),
           clipp::option("--audio-device").doc("set audio device") &
               clipp::value("name").set(Settings::values.audio_device_id),
           clipp::option("--background-color-red")
-                  .doc("set background color red component to a float in range 0.0-1.0") &
+                  .doc("set background color red component\ntype: float\nrange: 0.0-1.0\ndefault: "
+                       "0.0") &
               clipp::value("value").set(Settings::values.bg_red),
           clipp::option("--background-color-green")
-                  .doc("set background color green component to a float in range 0.0-1.0") &
+                  .doc(
+                      "set background color green component\ntype: float\nrange: 0.0-1.0\ndefault: "
+                      "0.0") &
               clipp::value("value").set(Settings::values.bg_green),
           clipp::option("--background-color-blue")
-                  .doc("set background color blue component to a float in range 0.0-1.0") &
+                  .doc("set background color blue component\ntype: float\nrange: 0.0-1.0\ndefault: "
+                       "0.0") &
               clipp::value("value").set(Settings::values.bg_blue),
           clipp::option("--start-time")
                   .doc("set start time to a Unix timestamp")
@@ -234,11 +245,11 @@ int main(int argc, char** argv) {
                   Settings::values.factor_3d = std::atoi(value);
               }),
           controls,
-          clipp::option("--udp-input-address").doc("set UDP input address") &
+          clipp::option("--udp-input-address").doc("set UDP input address\ndefault: 127.0.0.1") &
               clipp::value("address").set(Settings::values.current_input_profile.udp_input_address),
-          clipp::option("--udp-input-port").doc("set UDP input port") &
+          clipp::option("--udp-input-port").doc("set UDP input port\ndefault: 26760") &
               clipp::value("port").set(Settings::values.current_input_profile.udp_input_port),
-          clipp::option("--udp-pad-index").doc("set UDP pad index") &
+          clipp::option("--udp-pad-index").doc("set UDP pad index\ndefault: 0") &
               clipp::value("index").set(Settings::values.current_input_profile.udp_pad_index),
           clipp::option("--motion-device").doc("set motion device parameters") &
               clipp::value("parameters").set(Settings::values.current_input_profile.motion_device),
@@ -322,111 +333,77 @@ int main(int argc, char** argv) {
           clipp::option("--no-custom-layout")
               .doc("force disable custom layout (default)")
               .set(Settings::values.custom_layout, false),
-          clipp::option("--default-layout")
-              .doc("force use default layout")
-              .set(Settings::values.custom_layout, false)
-              .set(Settings::values.layout_option, Settings::LayoutOption::Default),
           clipp::option("--single-screen-layout")
-              .doc("force use single screen layout")
+              .doc("use single screen layout")
               .set(Settings::values.custom_layout, false)
               .set(Settings::values.layout_option, Settings::LayoutOption::SingleScreen),
           clipp::option("--large-screen-layout")
-              .doc("force use Large Screen Small Screen layout")
+              .doc("use Large Screen Small Screen layout")
               .set(Settings::values.custom_layout, false)
               .set(Settings::values.layout_option, Settings::LayoutOption::LargeScreen),
           clipp::option("--side-by-side-layout")
-              .doc("force use side by side layout")
+              .doc("use side by side layout")
               .set(Settings::values.custom_layout, false)
               .set(Settings::values.layout_option, Settings::LayoutOption::SideScreen),
           clipp::option("--medium-screen-layout")
-              .doc("force use Large Screen Medium Screen layout")
+              .doc("use Large Screen Medium Screen layout")
               .set(Settings::values.custom_layout, false)
               .set(Settings::values.layout_option, Settings::LayoutOption::MediumScreen),
           clipp::option("--swap-screens")
-              .doc("force swap screens")
+              .doc("swap screens")
               .set(Settings::values.swap_screen, true),
-          clipp::option("--no-swap-screens")
-              .doc("force disable swap screens (default)")
-              .set(Settings::values.swap_screen, false),
           clipp::option("--upright-orientation")
-              .doc("force upright orientation, for book style games")
+              .doc("use upright orientation, for book style games")
               .set(Settings::values.upright_screen, true),
-          clipp::option("--no-upright-orientation")
-              .doc("force disable upright orientation (default)")
-              .set(Settings::values.upright_screen, false),
           clipp::option("--enable-sharper-distant-objects")
-              .doc("force enable sharper distant objects")
+              .doc("enable sharper distant objects")
               .set(Settings::values.sharper_distant_objects, true),
-          clipp::option("--disable-sharper-distant-objects")
-              .doc("force disable sharper distant objects (default)")
-              .set(Settings::values.sharper_distant_objects, false),
-          clipp::option("--3d-off")
-              .doc("force disable 3D rendering (default)")
-              .set(Settings::values.render_3d, Settings::StereoRenderOption::Off),
           clipp::option("--3d-side-by-side")
-              .doc("set 3D mode to Side by Side")
+              .doc("use Side by Side 3D")
               .set(Settings::values.render_3d, Settings::StereoRenderOption::SideBySide),
           clipp::option("--3d-anaglyph")
-              .doc("set 3D mode to Anaglyph")
+              .doc("use Anaglyph 3D")
               .set(Settings::values.render_3d, Settings::StereoRenderOption::Anaglyph),
-          clipp::option("--use-sd-card")
-              .doc("use a virtual SD card (default)")
-              .set(Settings::values.use_virtual_sd, true),
           clipp::option("--no-sd-card")
               .doc("don't use a virtual SD card")
               .set(Settings::values.use_virtual_sd, false),
-          clipp::option("--old-3ds")
-              .doc("makes vvctre emulate a Old 3DS (default)")
-              .set(Settings::values.is_new_3ds, false),
           clipp::option("--new-3ds")
               .doc("makes vvctre emulate a New 3DS (New 3DS games crash even if this option is "
                    "enabled)")
               .set(Settings::values.is_new_3ds, true),
-          clipp::option("--region-auto-select")
-              .doc("auto-select the system region (default)")
-              .set(Settings::values.region_value, Settings::REGION_VALUE_AUTO_SELECT),
           clipp::option("--region-japan")
-              .doc("set the system region to Japan")
+              .doc("force the system region to Japan")
               .set(Settings::values.region_value, 0),
           clipp::option("--region-usa")
-              .doc("set the system region to USA")
+              .doc("force the system region to USA")
               .set(Settings::values.region_value, 1),
           clipp::option("--region-europe")
-              .doc("set the system region to Europe")
+              .doc("force the system region to Europe")
               .set(Settings::values.region_value, 2),
           clipp::option("--region-australia")
-              .doc("set the system region to Australia")
+              .doc("force the system region to Australia")
               .set(Settings::values.region_value, 3),
           clipp::option("--region-china")
-              .doc("set the system region to China")
+              .doc("force the system region to China")
               .set(Settings::values.region_value, 4),
           clipp::option("--region-korea")
-              .doc("set the system region to Korea")
+              .doc("force the system region to Korea")
               .set(Settings::values.region_value, 5),
           clipp::option("--region-taiwan")
-              .doc("set the system region to Taiwan")
+              .doc("force the system region to Taiwan")
               .set(Settings::values.region_value, 6),
-          clipp::option("--system-clock")
-              .doc("force use system clock when vvctre starts (default)")
-              .set(Settings::values.init_clock, Settings::InitClock::SystemTime),
           clipp::option("--nearest-filtering")
-              .doc("use nearest filtering")
+              .doc("use nearest filtering instead of linear filtering")
               .set(Settings::values.filter_mode, false),
           clipp::option("--linear-filtering")
               .doc("use linear filtering (default)")
               .set(Settings::values.filter_mode, true),
-          clipp::option("--null-microphone")
-              .doc("force use a null microphone (default)")
-              .set(Settings::values.mic_input_type, Settings::MicInputType::None),
           clipp::option("--static-microphone")
               .doc("force use a microphone that returns static samples")
               .set(Settings::values.mic_input_type, Settings::MicInputType::Static),
-          clipp::option("--use-vsync")
-              .doc("force use VSync (default)")
-              .set(Settings::values.use_vsync_new, true),
-          clipp::option("--no-vsync")
-              .doc("force disable VSync")
-              .set(Settings::values.use_vsync_new, false),
+          clipp::option("--enable-vsync")
+              .doc("enable VSync")
+              .set(Settings::values.enable_vsync, true),
           clipp::option("--enable-audio-stretching")
               .doc("force enable audio stretching (default)")
               .set(Settings::values.enable_audio_stretching, true),
@@ -439,7 +416,7 @@ int main(int argc, char** argv) {
           clipp::option("--disable-frame-time-recording")
               .doc("force disable frame time recording (default)")
               .set(Settings::values.record_frame_times, false),
-          clipp::option("--headless").set(headless).doc("start in headless mode"),
+          clipp::option("--hidden").set(hidden).doc("hide the window"),
           clipp::option("--fullscreen").set(fullscreen).doc("start in fullscreen mode"),
           clipp::option("--regenerate-console-id")
               .set(regenerate_console_id)
@@ -519,7 +496,7 @@ int main(int argc, char** argv) {
             Core::System& system = Core::System::GetInstance();
 
             std::unique_ptr<EmuWindow_SDL2> emu_window =
-                std::make_unique<EmuWindow_SDL2>(system, headless, fullscreen);
+                std::make_unique<EmuWindow_SDL2>(system, hidden, fullscreen);
 
             // Register frontend applets
             system.RegisterSoftwareKeyboard(std::make_shared<Frontend::SDL2_SoftwareKeyboard>(

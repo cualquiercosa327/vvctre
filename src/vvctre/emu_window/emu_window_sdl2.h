@@ -20,7 +20,7 @@ class System;
 
 class EmuWindow_SDL2 : public Frontend::EmuWindow {
 public:
-    explicit EmuWindow_SDL2(Core::System& system, const bool headless, const bool fullscreen);
+    explicit EmuWindow_SDL2(Core::System& system, const bool hidden, const bool fullscreen);
     ~EmuWindow_SDL2();
 
     /// Swap buffers to display the next frame
