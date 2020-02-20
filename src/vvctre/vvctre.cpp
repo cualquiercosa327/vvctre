@@ -409,9 +409,6 @@ int main(int argc, char** argv) {
           clipp::option("--nearest-filtering")
               .doc("use nearest filtering instead of linear filtering")
               .set(Settings::values.filter_mode, false),
-          clipp::option("--linear-filtering")
-              .doc("use linear filtering (default)")
-              .set(Settings::values.filter_mode, true),
           clipp::option("--static-microphone")
               .doc("use a microphone that returns static samples")
               .set(Settings::values.mic_input_type, Settings::MicInputType::Static),
