@@ -223,7 +223,9 @@ int main(int argc, char** argv) {
                   .doc("force use a real microphone")
                   .set(Settings::values.mic_input_type, Settings::MicInputType::Real) &
               clipp::value("device").set(Settings::values.mic_input_device),
-          clipp::option("--post-processing-shader").doc("set the post processing shader name") &
+          clipp::option("--post-processing-shader")
+                  .doc("set the post processing shader name, vvctre includes \"dubois (builtin)\" "
+                       "and \"horizontal (builtin)\" ") &
               clipp::value("name").set(Settings::values.pp_shader_name),
           clipp::option("--rpc-server-port").doc("set RPC server port (default: 47889)") &
               clipp::value("port").set(rpc_server_port),
