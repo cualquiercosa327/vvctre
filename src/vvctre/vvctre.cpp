@@ -753,26 +753,21 @@ int main(int argc, char** argv) {
             }
         };
 
-        std::vector<std::string> lines;
+        std::string options;
 
         for (const auto& mapping : Settings::NativeButton::mapping) {
             const Common::ParamPackage params =
                 GetInput(mapping, InputCommon::Polling::DeviceType::Button);
-            lines.push_back(fmt::format("{}={}", mapping, params.Serialize()));
+            options += fmt::format("--{} \"{}\" ", mapping, params.Serialize());
         }
 
         for (const auto& mapping : Settings::NativeAnalog::mapping) {
             const Common::ParamPackage params =
                 GetInput(mapping, InputCommon::Polling::DeviceType::Analog);
-            lines.push_back(fmt::format("{}={}", mapping, params.Serialize()));
+            options += fmt::format("--{} \"{}\" ", mapping, params.Serialize());
         }
 
-        fmt::print("Change the [Controls] section in the ini file to "
-                   "this:\n\n[Controls]\n");
-
-        for (const std::string& line : lines) {
-            fmt::print("{}\n", line);
-        }
+        fmt::print("Options: {}\n", options);
 
         break;
     }
