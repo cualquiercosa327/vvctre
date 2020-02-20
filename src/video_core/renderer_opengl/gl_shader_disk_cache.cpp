@@ -434,23 +434,23 @@ bool ShaderDiskCache::EnsureDirectories() const {
 }
 
 std::string ShaderDiskCache::GetTransferablePath() {
-    return FileUtil::SanitizePath(GetTransferableDir() + DIR_SEP_CHR + GetTitleID() + ".bin");
+    return FileUtil::SanitizePath(GetTransferableDir() + '/' + GetTitleID() + ".bin");
 }
 
 std::string ShaderDiskCache::GetPrecompiledPath() {
-    return FileUtil::SanitizePath(GetPrecompiledDir() + DIR_SEP_CHR + GetTitleID() + ".bin");
+    return FileUtil::SanitizePath(GetPrecompiledDir() + '/' + GetTitleID() + ".bin");
 }
 
 std::string ShaderDiskCache::GetTransferableDir() const {
-    return GetBaseDir() + DIR_SEP "transferable";
+    return GetBaseDir() + "/transferable";
 }
 
 std::string ShaderDiskCache::GetPrecompiledDir() const {
-    return GetBaseDir() + DIR_SEP "precompiled";
+    return GetBaseDir() + "/precompiled";
 }
 
 std::string ShaderDiskCache::GetBaseDir() const {
-    return FileUtil::GetUserPath(FileUtil::UserPath::ShaderDir) + DIR_SEP "opengl";
+    return FileUtil::GetUserPath(FileUtil::UserPath::ShaderDir) + "/opengl";
 }
 
 u64 ShaderDiskCache::GetProgramID() {

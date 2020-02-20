@@ -64,9 +64,10 @@ static void StripTailDirSlashes(std::string& fname) {
     }
 
     std::size_t i = fname.length();
-    while (i > 0 && fname[i - 1] == DIR_SEP_CHR) {
+    while (i > 0 && fname[i - 1] == '/') {
         --i;
     }
+
     fname.resize(i);
 }
 
@@ -78,8 +79,9 @@ bool Exists(const std::string& filename) {
 
 #ifdef _WIN32
     // Windows needs a slash to identify a driver root
-    if (copy.size() != 0 && copy.back() == ':')
-        copy += DIR_SEP_CHR;
+    if (copy.size() != 0 && copy.back() == ':') {
+        copy += '/';
+    }
 
     int result = _wstat64(Common::UTF8ToUTF16W(copy).c_str(), &file_info);
 #else
@@ -97,8 +99,9 @@ bool IsDirectory(const std::string& filename) {
 
 #ifdef _WIN32
     // Windows needs a slash to identify a driver root
-    if (copy.size() != 0 && copy.back() == ':')
-        copy += DIR_SEP_CHR;
+    if (copy.size() != 0 && copy.back() == ':') {
+        copy += '/';
+    }
 
     int result = _wstat64(Common::UTF8ToUTF16W(copy).c_str(), &file_info);
 #else
@@ -184,11 +187,12 @@ bool CreateFullPath(const std::string& fullPath) {
     std::size_t position = 0;
     while (true) {
         // Find next sub path
-        position = fullPath.find(DIR_SEP_CHR, position);
+        position = fullPath.find('/', position);
 
-        // we're done, yay!
-        if (position == fullPath.npos)
+        // We're done, yay!
+        if (position == fullPath.npos) {
             return true;
+        }
 
         // Include the '/' so the first call is CreateDir("/") rather than CreateDir("")
         std::string const subPath(fullPath.substr(0, position + 1));
@@ -425,7 +429,7 @@ u64 ScanDirectoryTree(const std::string& directory, FSTEntry& parent_entry,
                                                      const std::string& virtual_name) -> bool {
         FSTEntry entry;
         entry.virtualName = virtual_name;
-        entry.physicalName = directory + DIR_SEP + virtual_name;
+        entry.physicalName = directory + "/" + virtual_name;
 
         if (IsDirectory(entry.physicalName)) {
             entry.isDirectory = true;
@@ -465,7 +469,7 @@ void GetAllFilesFromNestedEntries(FSTEntry& directory, std::vector<FSTEntry>& ou
 bool DeleteDirRecursively(const std::string& directory, unsigned int recursion) {
     const auto callback = [recursion](u64* num_entries_out, const std::string& directory,
                                       const std::string& virtual_name) -> bool {
-        std::string new_path = directory + DIR_SEP_CHR + virtual_name;
+        std::string new_path = directory + '/' + virtual_name;
 
         if (IsDirectory(new_path)) {
             if (recursion == 0)
@@ -602,14 +606,13 @@ static const std::string GetUserDirectory(const std::string& envvar) {
         user_dir = directory;
     } else {
         std::string subdirectory;
-        if (envvar == "XDG_DATA_HOME")
-            subdirectory = DIR_SEP ".local" DIR_SEP "share";
-        else if (envvar == "XDG_CONFIG_HOME")
-            subdirectory = DIR_SEP ".config";
-        else if (envvar == "XDG_CACHE_HOME")
-            subdirectory = DIR_SEP ".cache";
-        else
-            ASSERT_MSG(false, "Unknown XDG variable {}.", envvar);
+
+        if (envvar == "XDG_DATA_HOME") {
+            subdirectory = "/.local/share";
+        } else {
+            UNIMPLEMENTED_MSG("XDG variable {}", envvar);
+        }
+
         user_dir = GetHomeDirectory() + subdirectory;
     }
 
@@ -630,45 +633,35 @@ void SetUserPath(const std::string& path) {
     if (!path.empty() && CreateFullPath(path)) {
         LOG_INFO(Common_Filesystem, "Using {} as the user directory", path);
         user_path = path;
-        g_paths.emplace(UserPath::ConfigDir, user_path + CONFIG_DIR DIR_SEP);
-        g_paths.emplace(UserPath::CacheDir, user_path + CACHE_DIR DIR_SEP);
     } else {
 #ifdef _WIN32
-        user_path = GetExeDirectory() + DIR_SEP USERDATA_DIR DIR_SEP;
+        user_path = GetExeDirectory() + "/" USERDATA_DIR "/";
         if (!FileUtil::IsDirectory(user_path)) {
-            user_path = AppDataRoamingDirectory() + DIR_SEP EMU_DATA_DIR DIR_SEP;
+            user_path = AppDataRoamingDirectory() + "/" EMU_DATA_DIR "/";
         } else {
             LOG_INFO(Common_Filesystem, "Using the local user directory");
         }
 
-        g_paths.emplace(UserPath::ConfigDir, user_path + CONFIG_DIR DIR_SEP);
-        g_paths.emplace(UserPath::CacheDir, user_path + CACHE_DIR DIR_SEP);
 #else
-        if (FileUtil::Exists(ROOT_DIR DIR_SEP USERDATA_DIR)) {
-            user_path = ROOT_DIR DIR_SEP USERDATA_DIR DIR_SEP;
-            g_paths.emplace(UserPath::ConfigDir, user_path + CONFIG_DIR DIR_SEP);
-            g_paths.emplace(UserPath::CacheDir, user_path + CACHE_DIR DIR_SEP);
+        if (FileUtil::Exists(ROOT_DIR "/" USERDATA_DIR)) {
+            user_path = ROOT_DIR "/" USERDATA_DIR "/";
         } else {
             std::string data_dir = GetUserDirectory("XDG_DATA_HOME");
-            std::string config_dir = GetUserDirectory("XDG_CONFIG_HOME");
-            std::string cache_dir = GetUserDirectory("XDG_CACHE_HOME");
 
-            user_path = data_dir + DIR_SEP EMU_DATA_DIR DIR_SEP;
-            g_paths.emplace(UserPath::ConfigDir, config_dir + DIR_SEP EMU_DATA_DIR DIR_SEP);
-            g_paths.emplace(UserPath::CacheDir, cache_dir + DIR_SEP EMU_DATA_DIR DIR_SEP);
+            user_path = data_dir + "/" EMU_DATA_DIR "/";
+            g_paths.emplace(UserPath::ConfigDir, config_dir + "/" EMU_DATA_DIR "/");
         }
 #endif
     }
-    g_paths.emplace(UserPath::SDMCDir, user_path + SDMC_DIR DIR_SEP);
-    g_paths.emplace(UserPath::NANDDir, user_path + NAND_DIR DIR_SEP);
-    g_paths.emplace(UserPath::SysDataDir, user_path + SYSDATA_DIR DIR_SEP);
-    // TODO: Put the logs in a better location for each OS
-    g_paths.emplace(UserPath::LogDir, user_path + LOG_DIR DIR_SEP);
-    g_paths.emplace(UserPath::CheatsDir, user_path + CHEATS_DIR DIR_SEP);
-    g_paths.emplace(UserPath::DLLDir, user_path + DLL_DIR DIR_SEP);
-    g_paths.emplace(UserPath::ShaderDir, user_path + SHADER_DIR DIR_SEP);
-    g_paths.emplace(UserPath::DumpDir, user_path + DUMP_DIR DIR_SEP);
-    g_paths.emplace(UserPath::LoadDir, user_path + LOAD_DIR DIR_SEP);
+    g_paths.emplace(UserPath::SDMCDir, user_path + SDMC_DIR "/");
+    g_paths.emplace(UserPath::NANDDir, user_path + NAND_DIR "/");
+    g_paths.emplace(UserPath::SysDataDir, user_path + SYSDATA_DIR "/");
+    g_paths.emplace(UserPath::LogDir, user_path + LOG_DIR "/");
+    g_paths.emplace(UserPath::CheatsDir, user_path + CHEATS_DIR "/");
+    g_paths.emplace(UserPath::DLLDir, user_path + DLL_DIR "/");
+    g_paths.emplace(UserPath::ShaderDir, user_path + SHADER_DIR "/");
+    g_paths.emplace(UserPath::DumpDir, user_path + DUMP_DIR "/");
+    g_paths.emplace(UserPath::LoadDir, user_path + LOAD_DIR "/");
 }
 
 const std::string& GetUserPath(UserPath path) {

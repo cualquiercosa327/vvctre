@@ -130,7 +130,7 @@ std::vector<std::string> GetPostProcessingShaderList(bool anaglyph) {
     // Would it make more sense to just add a directory list function to FileUtil?
     const auto callback = [&shader_names](u64* num_entries_out, const std::string& directory,
                                           const std::string& virtual_name) -> bool {
-        const std::string physical_name = directory + DIR_SEP + virtual_name;
+        const std::string physical_name = directory + "/" + virtual_name;
         if (!FileUtil::IsDirectory(physical_name)) {
             std::size_t dot_pos = virtual_name.rfind(".");
             if (dot_pos != std::string::npos) {
@@ -162,7 +162,7 @@ std::string GetPostProcessingShaderCode(const bool single_screen, const std::str
     const auto callback = [&shader, &shader_path](u64* num_entries_out,
                                                   const std::string& directory,
                                                   const std::string& virtual_name) -> bool {
-        const std::string physical_name = directory + DIR_SEP + virtual_name;
+        const std::string physical_name = directory + "/" + virtual_name;
         if (!FileUtil::IsDirectory(physical_name)) {
             std::size_t dot_pos = virtual_name.rfind(".");
             if (dot_pos != std::string::npos) {

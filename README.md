@@ -13,7 +13,7 @@ vvctre uses the first existing option.
   - `%AppData%\vvctre`
 - On Linux:
   - `vvctre folder/user`
-  - `~/.local/share/vvctre` for everything except `config` and `~/.config/vvctre` for files in `config`
+  - `~/.local/share/vvctre`
 
 # Requirements
 

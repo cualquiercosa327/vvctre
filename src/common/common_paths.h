@@ -4,10 +4,6 @@
 
 #pragma once
 
-// Directory separators, do we need this?
-#define DIR_SEP "/"
-#define DIR_SEP_CHR '/'
-
 #ifndef MAX_PATH
 #define MAX_PATH 260
 #endif
@@ -34,11 +30,6 @@
 #define DUMP_DIR "dump"
 #define LOAD_DIR "load"
 #define SHADER_DIR "shaders"
-
-// Files in the directory returned by GetUserPath(UserPath::ConfigDir)
-#define EMU_CONFIG "emu.ini"
-#define DEBUGGER_CONFIG "debugger.ini"
-#define LOGGER_CONFIG "logger.ini"
 
 // System files
 #define SHARED_FONT "shared_font.bin"
