@@ -12,62 +12,6 @@
 
 namespace Frontend {
 
-struct Frame;
-
-/**
- * For smooth VSync rendering, we want to always present the latest frame that the core generates,
- * but also make sure that rendering happens at the pace that the frontend dictates. This is a
- * helper class that the renderer can define to sync frames between the render thread and the
- * presentation thread
- */
-class TextureMailbox {
-public:
-    virtual ~TextureMailbox() = default;
-
-    /**
-     * Recreate the render objects attached to this frame with the new specified width/height
-     */
-    virtual void ReloadRenderFrame(Frontend::Frame* frame, u32 width, u32 height) = 0;
-
-    /**
-     * Recreate the presentation objects attached to this frame with the new specified width/height
-     */
-    virtual void ReloadPresentFrame(Frontend::Frame* frame, u32 width, u32 height) = 0;
-
-    /**
-     * Render thread calls this to get an available frame to present
-     */
-    virtual Frontend::Frame* GetRenderFrame() = 0;
-
-    /**
-     * Render thread calls this after draw commands are done to add to the presentation mailbox
-     */
-    virtual void ReleaseRenderFrame(Frame* frame) = 0;
-
-    /**
-     * Presentation thread calls this to get the latest frame available to present. If there is no
-     * frame available after timeout, returns the previous frame. If there is no previous frame it
-     * returns nullptr
-     */
-    virtual Frontend::Frame* TryGetPresentFrame(int timeout_ms) = 0;
-};
-
-/**
- * Represents a graphics context that can be used for background computation or drawing. If the
- * graphics backend doesn't require the context, then the implementation of these methods can be
- * stubs
- */
-class GraphicsContext {
-public:
-    virtual ~GraphicsContext();
-
-    /// Makes the graphics context current for the caller thread
-    virtual void MakeCurrent() = 0;
-
-    /// Releases (dunno if this is the "right" word) the context from the caller thread
-    virtual void DoneCurrent() = 0;
-};
-
 /**
  * Abstraction class used to provide an interface between emulation code and the frontend
  * Design notes on the interaction between EmuWindow and the emulation core:
@@ -79,23 +23,19 @@ public:
  *   should be taken to make sure the provided information is self-consistent. This requires
  *   some sort of synchronization (most of this is still a TODO).
  */
-class EmuWindow : public GraphicsContext {
+class EmuWindow {
 public:
+    /// Swap buffers to display the next frame
+    virtual void SwapBuffers() = 0;
+
     /// Polls window events
     virtual void PollEvents() = 0;
 
-    /**
-     * Returns a GraphicsContext that the frontend provides that is shared with the emu window. This
-     * context can be used from other threads for background graphics computation. If the frontend
-     * is using a graphics backend that doesn't need anything specific to run on a different thread,
-     * then it can use a stubbed implemenation for GraphicsContext.
-     *
-     * If the return value is null, then the core should assume that the frontend cannot provide a
-     * Shared Context
-     */
-    virtual std::unique_ptr<GraphicsContext> CreateSharedContext() const {
-        return nullptr;
-    }
+    /// Makes the graphics context current for the caller thread
+    virtual void MakeCurrent() = 0;
+
+    /// Releases (dunno if this is the "right" word) the GLFW context from the caller thread
+    virtual void DoneCurrent() = 0;
 
     /**
      * Signal that a touch pressed event has occurred (e.g. mouse click pressed)
@@ -127,8 +67,6 @@ public:
      * Read from the current settings to determine which layout to use.
      */
     void UpdateCurrentFramebufferLayout(unsigned width, unsigned height);
-
-    std::unique_ptr<TextureMailbox> mailbox = nullptr;
 
 protected:
     EmuWindow();

@@ -11,24 +11,6 @@
 
 namespace OpenGL {
 
-void OGLRenderbuffer::Create() {
-    if (handle != 0) {
-        return;
-    }
-
-    glGenRenderbuffers(1, &handle);
-}
-
-void OGLRenderbuffer::Release() {
-    if (handle == 0) {
-        return;
-    }
-
-    glDeleteRenderbuffers(1, &handle);
-    OpenGLState::GetCurState().ResetRenderbuffer(handle).Apply();
-    handle = 0;
-}
-
 void OGLTexture::Create() {
     if (handle != 0) {
         return;

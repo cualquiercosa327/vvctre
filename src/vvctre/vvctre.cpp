@@ -34,7 +34,6 @@
 #include "core/dumping/backend.h"
 #include "core/file_sys/cia_container.h"
 #include "core/frontend/framebuffer_layout.h"
-#include "core/frontend/scope_acquire_context.h"
 #include "core/gdbstub/gdbstub.h"
 #include "core/hle/service/am/am.h"
 #include "core/hle/service/cfg/cfg.h"
@@ -518,8 +517,6 @@ int main(int argc, char** argv) {
             // Register camera implementations
             Camera::RegisterFactory("image", std::make_unique<Camera::ImageCameraFactory>());
 
-            Frontend::ScopeAcquireContext scope(*emu_window);
-
             const Core::System::ResultStatus load_result = system.Load(*emu_window, path);
 
             switch (load_result) {
@@ -580,8 +577,6 @@ int main(int argc, char** argv) {
                 system.VideoDumper().StartDumping(dump_video, "webm", layout);
             }
 
-            std::thread render_thread([&emu_window] { emu_window->Present(); });
-
             if (Settings::values.use_disk_shader_cache) {
                 indicators::ProgressBar bar;
                 std::atomic_bool stop_run{false};
@@ -627,8 +622,6 @@ int main(int argc, char** argv) {
                 default: { break; }
                 }
             }
-
-            render_thread.join();
 
             Core::Movie::GetInstance().Shutdown();
 

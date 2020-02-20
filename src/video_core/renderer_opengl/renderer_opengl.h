@@ -36,29 +36,19 @@ struct ScreenInfo {
     TextureInfo texture;
 };
 
-struct PresentationTexture {
-    u32 width = 0;
-    u32 height = 0;
-    OGLTexture texture;
-};
-
 class RendererOpenGL : public RendererBase {
 public:
     explicit RendererOpenGL(Frontend::EmuWindow& window);
     ~RendererOpenGL() override;
+
+    /// Swap buffers (render frame)
+    void SwapBuffers() override;
 
     /// Initialize the renderer
     VideoCore::ResultStatus Init() override;
 
     /// Shutdown the renderer
     void ShutDown() override;
-
-    /// Finalizes rendering the guest frame
-    void SwapBuffers() override;
-
-    /// Draws the latest frame from texture mailbox to the currently bound draw framebuffer in this
-    /// context
-    void TryPresent(int timeout_ms) override;
 
     /// Prepares for video dumping (e.g. create necessary buffers, etc)
     void PrepareVideoDumping() override;
@@ -70,9 +60,6 @@ private:
     void InitOpenGLObjects();
     void ReloadSampler();
     void ReloadShader();
-    void PrepareRendertarget();
-    void RenderScreenshot();
-    void RenderVideoDumping();
     void ConfigureFramebufferTexture(TextureInfo& texture,
                                      const GPU::Regs::FramebufferConfig& framebuffer);
     void DrawScreens(const Layout::FramebufferLayout& layout);

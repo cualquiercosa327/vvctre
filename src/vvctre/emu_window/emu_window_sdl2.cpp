@@ -28,26 +28,6 @@
 #include "vvctre/discord_rp.h"
 #endif
 
-SharedContext_SDL2::SharedContext_SDL2() {
-    window = SDL_CreateWindow(NULL, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 0, 0,
-                              SDL_WINDOW_HIDDEN | SDL_WINDOW_OPENGL);
-    context = SDL_GL_CreateContext(window);
-}
-
-SharedContext_SDL2::~SharedContext_SDL2() {
-    DoneCurrent();
-    SDL_GL_DeleteContext(context);
-    SDL_DestroyWindow(window);
-}
-
-void SharedContext_SDL2::MakeCurrent() {
-    SDL_GL_MakeCurrent(window, context);
-}
-
-void SharedContext_SDL2::DoneCurrent() {
-    SDL_GL_MakeCurrent(window, nullptr);
-}
-
 void EmuWindow_SDL2::OnMouseMotion(s32 x, s32 y) {
     TouchMoved((unsigned)std::max(x, 0), (unsigned)std::max(y, 0));
     InputCommon::GetMotionEmu()->Tilt(x, y);
@@ -171,48 +151,37 @@ EmuWindow_SDL2::EmuWindow_SDL2(Core::System& system, bool headless, bool fullscr
     SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 8);
     SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, 0);
 
-    // Enable context sharing for the shared context
-    SDL_GL_SetAttribute(SDL_GL_SHARE_WITH_CURRENT_CONTEXT, 1);
-
     SDL_GL_SetSwapInterval(Settings::values.use_vsync_new ? 1 : 0);
 
-    dummy_window = SDL_CreateWindow(NULL, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 0, 0,
-                                    SDL_WINDOW_HIDDEN | SDL_WINDOW_OPENGL);
+    const std::string window_title = fmt::format("vvctre {}", version::vvctre.to_string());
 
-    if (headless) {
-        UpdateCurrentFramebufferLayout(400, 480);
-    } else {
-        const std::string window_title = fmt::format("vvctre {}", version::vvctre.to_string());
+    render_window = SDL_CreateWindow(
+        window_title.c_str(),
+        SDL_WINDOWPOS_UNDEFINED, // x position
+        SDL_WINDOWPOS_UNDEFINED, // y position
+        Core::kScreenTopWidth, Core::kScreenTopHeight + Core::kScreenBottomHeight, [&] {
+            Uint32 flags = SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI;
+            if (headless) {
+                flags |= SDL_WINDOW_HIDDEN;
+            }
+            return flags;
+        }());
 
-        render_window = SDL_CreateWindow(
-            window_title.c_str(),
-            SDL_WINDOWPOS_UNDEFINED, // x position
-            SDL_WINDOWPOS_UNDEFINED, // y position
-            Core::kScreenTopWidth, Core::kScreenTopHeight + Core::kScreenBottomHeight,
-            SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
-
-        if (render_window == nullptr) {
-            LOG_CRITICAL(Frontend, "Failed to create SDL2 window: {}", SDL_GetError());
-            std::exit(1);
-        }
-
-        if (fullscreen) {
-            Fullscreen();
-        } else {
-            SDL_SetWindowMinimumSize(render_window, Core::kScreenTopWidth,
-                                     Core::kScreenTopHeight + Core::kScreenBottomHeight);
-        }
-
-        window_context = SDL_GL_CreateContext(render_window);
-        if (window_context == nullptr) {
-            LOG_CRITICAL(Frontend, "Failed to create SDL2 GL context: {}", SDL_GetError());
-            std::exit(1);
-        }
+    if (render_window == nullptr) {
+        LOG_CRITICAL(Frontend, "Failed to create SDL2 window: {}", SDL_GetError());
+        std::exit(1);
     }
 
-    core_context = CreateSharedContext();
-    if (core_context == nullptr) {
-        LOG_CRITICAL(Frontend, "Failed to create shared SDL2 GL context: {}", SDL_GetError());
+    if (fullscreen) {
+        Fullscreen();
+    } else {
+        SDL_SetWindowMinimumSize(render_window, Core::kScreenTopWidth,
+                                 Core::kScreenTopHeight + Core::kScreenBottomHeight);
+    }
+
+    gl_context = SDL_GL_CreateContext(render_window);
+    if (gl_context == nullptr) {
+        LOG_CRITICAL(Frontend, "Failed to create SDL2 GL context: {}", SDL_GetError());
         std::exit(1);
     }
 
@@ -227,17 +196,18 @@ EmuWindow_SDL2::EmuWindow_SDL2(Core::System& system, bool headless, bool fullscr
     LOG_INFO(Frontend, "Movie version: {}", version::movie);
     LOG_INFO(Frontend, "Shader cache version: {}", version::shader_cache);
     Settings::LogSettings();
+
+    DoneCurrent();
 }
 
 EmuWindow_SDL2::~EmuWindow_SDL2() {
-    core_context.reset();
     InputCommon::Shutdown();
-    SDL_GL_DeleteContext(window_context);
+    SDL_GL_DeleteContext(gl_context);
     SDL_Quit();
 }
 
-std::unique_ptr<Frontend::GraphicsContext> EmuWindow_SDL2::CreateSharedContext() const {
-    return std::make_unique<SharedContext_SDL2>();
+void EmuWindow_SDL2::SwapBuffers() {
+    SDL_GL_SwapWindow(render_window);
 }
 
 void EmuWindow_SDL2::SoftwareKeyboardStarted() {
@@ -254,27 +224,6 @@ void EmuWindow_SDL2::MiiPickerStarted() {
     }
 
     SDL_SetWindowTitle(render_window, "Pick a Mii in the terminal.");
-}
-
-void EmuWindow_SDL2::Present() {
-    if (render_window == nullptr) {
-        return;
-    }
-
-    SDL_GL_MakeCurrent(render_window, window_context);
-    while (IsOpen()) {
-        if (VideoCore::g_renderer != nullptr) {
-            SDL_GL_SetSwapInterval(Settings::values.use_vsync_new ? 1 : 0);
-            VideoCore::g_renderer->TryPresent(100);
-            SDL_GL_SwapWindow(render_window);
-        } else {
-            std::mutex m;
-            std::unique_lock<std::mutex> lock(m);
-            std::condition_variable cv;
-            cv.wait(lock, [] { return VideoCore::g_renderer == nullptr; });
-        }
-    }
-    SDL_GL_MakeCurrent(render_window, nullptr);
 }
 
 void EmuWindow_SDL2::PollEvents() {
@@ -370,9 +319,9 @@ void EmuWindow_SDL2::PollEvents() {
 }
 
 void EmuWindow_SDL2::MakeCurrent() {
-    core_context->MakeCurrent();
+    SDL_GL_MakeCurrent(render_window, gl_context);
 }
 
 void EmuWindow_SDL2::DoneCurrent() {
-    core_context->DoneCurrent();
+    SDL_GL_MakeCurrent(render_window, nullptr);
 }

@@ -144,8 +144,6 @@ public:
 
     std::array<bool, 2> clip_distance; // GL_CLIP_DISTANCE
 
-    GLuint renderbuffer; // GL_RENDERBUFFER_BINDING
-
     OpenGLState();
 
     /// Get the currently active OpenGL state
@@ -164,7 +162,6 @@ public:
     OpenGLState& ResetBuffer(GLuint handle);
     OpenGLState& ResetVertexArray(GLuint handle);
     OpenGLState& ResetFramebuffer(GLuint handle);
-    OpenGLState& ResetRenderbuffer(GLuint handle);
 
 private:
     static OpenGLState cur_state;
