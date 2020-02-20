@@ -335,21 +335,27 @@ int main(int argc, char** argv) {
           clipp::option("--custom-layout")
               .doc("use custom layout")
               .set(Settings::values.custom_layout, true),
-          clipp::option("--custom-layout-top-left").doc("set custom layout top left") &
+          clipp::option("--custom-layout-top-left").doc("set custom layout top left\ndefault: 0") &
               clipp::value("value").set(Settings::values.custom_top_left),
-          clipp::option("--custom-layout-top-top").doc("set custom layout top top") &
+          clipp::option("--custom-layout-top-top").doc("set custom layout top top\ndefault: 0") &
               clipp::value("value").set(Settings::values.custom_top_top),
-          clipp::option("--custom-layout-top-right").doc("set custom layout top right") &
+          clipp::option("--custom-layout-top-right")
+                  .doc("set custom layout top right\ndefault: 400") &
               clipp::value("value").set(Settings::values.custom_top_right),
-          clipp::option("--custom-layout-top-bottom").doc("set custom layout top bottom") &
+          clipp::option("--custom-layout-top-bottom")
+                  .doc("set custom layout top bottom\ndefault: 240") &
               clipp::value("value").set(Settings::values.custom_top_bottom),
-          clipp::option("--custom-layout-bottom-left").doc("set custom layout bottom left") &
+          clipp::option("--custom-layout-bottom-left")
+                  .doc("set custom layout bottom left\ndefault: 40") &
               clipp::value("value").set(Settings::values.custom_bottom_left),
-          clipp::option("--custom-layout-bottom-top").doc("set custom layout bottom top") &
+          clipp::option("--custom-layout-bottom-top")
+                  .doc("set custom layout bottom top\ndefault: 240") &
               clipp::value("value").set(Settings::values.custom_bottom_top),
-          clipp::option("--custom-layout-bottom-right").doc("set custom layout bottom right") &
+          clipp::option("--custom-layout-bottom-right")
+                  .doc("set custom layout bottom right\ndefault: 360") &
               clipp::value("value").set(Settings::values.custom_bottom_right),
-          clipp::option("--custom-layout-bottom-bottom").doc("set custom layout bottom bottom") &
+          clipp::option("--custom-layout-bottom-bottom")
+                  .doc("set custom layout bottom bottom\ndefault: 480") &
               clipp::value("value").set(Settings::values.custom_bottom_bottom),
           clipp::option("--single-screen-layout")
               .doc("use single screen layout")
