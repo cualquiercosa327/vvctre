@@ -231,7 +231,14 @@ int main(int argc, char** argv) {
               clipp::value("intensity").call([](const char* value) {
                   Settings::values.factor_3d = std::atoi(value);
               }),
-          controls, cameras, lle_modules,
+          controls,
+          clipp::option("--udp-input-address").doc("set UDP input address") &
+              clipp::value("address").set(Settings::values.current_input_profile.udp_input_address),
+          clipp::option("--udp-input-port").doc("set UDP input port") &
+              clipp::value("port").set(Settings::values.current_input_profile.udp_input_port),
+          clipp::option("--udp-pad-index").doc("set UDP pad index") &
+              clipp::value("index").set(Settings::values.current_input_profile.udp_pad_index),
+          cameras, lle_modules,
           clipp::option("--cpu-jit")
               .doc("force use CPU JIT (default)")
               .set(Settings::values.use_cpu_jit, true),
