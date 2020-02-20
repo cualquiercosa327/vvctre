@@ -151,8 +151,6 @@ EmuWindow_SDL2::EmuWindow_SDL2(Core::System& system, bool headless, bool fullscr
     SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 8);
     SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, 0);
 
-    SDL_GL_SetSwapInterval(Settings::values.use_vsync_new ? 1 : 0);
-
     const std::string window_title = fmt::format("vvctre {}", version::vvctre.to_string());
 
     render_window = SDL_CreateWindow(
@@ -189,6 +187,8 @@ EmuWindow_SDL2::EmuWindow_SDL2(Core::System& system, bool headless, bool fullscr
         LOG_CRITICAL(Frontend, "Failed to initialize GL functions: {}", SDL_GetError());
         std::exit(1);
     }
+
+    SDL_GL_SetSwapInterval(Settings::values.use_vsync_new ? 1 : 0);
 
     OnResize();
     SDL_PumpEvents();
