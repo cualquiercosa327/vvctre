@@ -649,7 +649,6 @@ void SetUserPath(const std::string& path) {
             std::string data_dir = GetUserDirectory("XDG_DATA_HOME");
 
             user_path = data_dir + "/" EMU_DATA_DIR "/";
-            g_paths.emplace(UserPath::ConfigDir, config_dir + "/" EMU_DATA_DIR "/");
         }
 #endif
     }
