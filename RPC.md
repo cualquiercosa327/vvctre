@@ -802,12 +802,11 @@ If setting and the emulation is running, the emulation will restart.
 }
 ```
 
-# GET/POST /usevsync
+# GET /usevsync
 
-Get or set whether VSync is enabled.  
-If setting and the emulation is running, the emulation will restart.
+Get whether VSync is enabled.
 
-## Request/Reply
+## Reply
 
 ```json
 {
