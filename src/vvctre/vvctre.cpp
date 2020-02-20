@@ -137,18 +137,23 @@ int main(int argc, char** argv) {
 
         const std::string camera_name_for_option = Common::ReplaceAll(camera, " ", "-");
 
-        cameras.push_back(clipp::option(fmt::format("--{}-camera-engine", camera_name_for_option))
-                              .doc(fmt::format("set {} camera engine. default: blank", camera)) &
-                          clipp::value("value").set(Settings::values.camera_name[i]));
+        cameras.push_back(
+            clipp::option(fmt::format("--{}-camera-engine", camera_name_for_option))
+                .doc(fmt::format("set {} camera engine.\ndefault: blank\nengine \"blank\" returns "
+                                 "a black image.\nengine \"image\" returns a static image.",
+                                 camera)) &
+            clipp::value("value").set(Settings::values.camera_name[i]));
 
         cameras.push_back(
             clipp::option(fmt::format("--{}-camera-configuration", camera_name_for_option))
-                .doc(fmt::format("set {} camera configuration", camera)) &
+                .doc(fmt::format(
+                    "set {} camera configuration\nfor engine \"image\", this is the file path.",
+                    camera)) &
             clipp::value("value").set(Settings::values.camera_config[i]));
 
         cameras.push_back(clipp::option(fmt::format("--{}-camera-flip", camera_name_for_option))
-                              .doc(fmt::format("set {} camera flip (0: None (default), 1: "
-                                               "Horizontal, 2: Vertical, 3: Reverse)",
+                              .doc(fmt::format("set {} camera flip\n0: None (default)\n1: "
+                                               "Horizontal\n2: Vertical\n3: Reverse)",
                                                camera)) &
                           clipp::value("value").set(Settings::values.camera_flip[i]));
     }
@@ -209,9 +214,12 @@ int main(int argc, char** argv) {
               clipp::value("value").set(Settings::values.audio_speed),
           clipp::option("--audio-volume").doc("set audio volume\ntype: float\ndefault: 1.0") &
               clipp::value("value").set(Settings::values.volume),
-          clipp::option("--audio-engine").doc("set audio engine\ndefault:") &
+          clipp::option("--audio-engine")
+                  .doc("set audio engine\ndefault: auto (uses the highest available "
+                       "engine)\nengines:\n- "
+                       "(optional) cubeb\n- sdl2") &
               clipp::value("name").set(Settings::values.sink_id),
-          clipp::option("--audio-device").doc("set audio device") &
+          clipp::option("--audio-device").doc("set audio device\ndefault: auto") &
               clipp::value("name").set(Settings::values.audio_device_id),
           clipp::option("--background-color-red")
                   .doc("set background color red component\ntype: float\nrange: 0.0-1.0\ndefault: "
@@ -231,7 +239,7 @@ int main(int argc, char** argv) {
                   .set(Settings::values.init_clock, Settings::InitClock::FixedTime) &
               clipp::value("value").set(Settings::values.init_time),
           clipp::option("--real-microphone")
-                  .doc("force use a real microphone")
+                  .doc("use a real microphone")
                   .set(Settings::values.mic_input_type, Settings::MicInputType::Real) &
               clipp::value("device").set(Settings::values.mic_input_device),
           clipp::option("--post-processing-shader")
@@ -399,23 +407,17 @@ int main(int argc, char** argv) {
               .doc("use linear filtering (default)")
               .set(Settings::values.filter_mode, true),
           clipp::option("--static-microphone")
-              .doc("force use a microphone that returns static samples")
+              .doc("use a microphone that returns static samples")
               .set(Settings::values.mic_input_type, Settings::MicInputType::Static),
           clipp::option("--enable-vsync")
               .doc("enable VSync")
               .set(Settings::values.enable_vsync, true),
-          clipp::option("--enable-audio-stretching")
-              .doc("force enable audio stretching (default)")
-              .set(Settings::values.enable_audio_stretching, true),
           clipp::option("--disable-audio-stretching")
-              .doc("force disable audio stretching")
+              .doc("disable audio stretching")
               .set(Settings::values.enable_audio_stretching, false),
-          clipp::option("--enable-frame-time-recording")
-              .doc("force enable frame time recording")
+          clipp::option("--record-frame-times")
+              .doc("record frame times")
               .set(Settings::values.record_frame_times, true),
-          clipp::option("--disable-frame-time-recording")
-              .doc("force disable frame time recording (default)")
-              .set(Settings::values.record_frame_times, false),
           clipp::option("--hidden").set(hidden).doc("hide the window"),
           clipp::option("--fullscreen").set(fullscreen).doc("start in fullscreen mode"),
           clipp::option("--regenerate-console-id")
