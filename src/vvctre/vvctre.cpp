@@ -240,6 +240,10 @@ int main(int argc, char** argv) {
               clipp::value("port").set(Settings::values.current_input_profile.udp_input_port),
           clipp::option("--udp-pad-index").doc("set UDP pad index") &
               clipp::value("index").set(Settings::values.current_input_profile.udp_pad_index),
+          clipp::option("--motion-device").doc("set motion device parameters") &
+              clipp::value("parameters").set(Settings::values.current_input_profile.motion_device),
+          clipp::option("--touch-device").doc("set touch device parameters") &
+              clipp::value("parameters").set(Settings::values.current_input_profile.touch_device),
           cameras, lle_modules,
           clipp::option("--cpu-jit")
               .doc("force use CPU JIT (default)")
