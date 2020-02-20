@@ -259,9 +259,15 @@ int main(int argc, char** argv) {
               clipp::value("port").set(Settings::values.current_input_profile.udp_input_port),
           clipp::option("--udp-pad-index").doc("set UDP pad index\ndefault: 0") &
               clipp::value("index").set(Settings::values.current_input_profile.udp_pad_index),
-          clipp::option("--motion-device").doc("set motion device parameters") &
+          clipp::option("--motion-device")
+                  .doc("set motion device parameters\nuse the emulator window (default): "
+                       "engine:motion_emu,update_period:100,sensitivity:0.01,tilt_clamp:90.0\nuse "
+                       "controller: engine:cemuhookudp") &
               clipp::value("parameters").set(Settings::values.current_input_profile.motion_device),
-          clipp::option("--touch-device").doc("set touch device parameters") &
+          clipp::option("--touch-device")
+                  .doc("set touch device parameters\nuse the emulator window (default): "
+                       "engine:emu_window\nuse controller: "
+                       "engine:cemuhookudp,min_x:__,min_y:__,max_x:__,max_y:__") &
               clipp::value("parameters").set(Settings::values.current_input_profile.touch_device),
           cameras, lle_modules,
           clipp::option("--cpu-jit")
