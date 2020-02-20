@@ -13,11 +13,15 @@ namespace Camera {
 
 ImageCamera::ImageCamera(const std::string& file) {
     image = stbi_load(file.c_str(), &file_width, &file_height, nullptr, 3);
-    ASSERT(image != nullptr);
+    if (image == nullptr) {
+        LOG_ERROR(Service_CAM, "Failed to load image");
+    }
 }
 
 ImageCamera::~ImageCamera() {
-    free(image);
+    if (image != nullptr) {
+        free(image);
+    }
 }
 
 void ImageCamera::SetResolution(const Service::CAM::Resolution& resolution) {
@@ -30,6 +34,13 @@ void ImageCamera::SetFormat(Service::CAM::OutputFormat format) {
 }
 
 std::vector<u16> ImageCamera::ReceiveFrame() {
+    if (image == nullptr) {
+        // Note: 0x80008000 stands for two black pixels in YUV422
+        std::vector<u16> frame(requested_width * requested_height,
+                               format == Service::CAM::OutputFormat::RGB565 ? 0 : 0x8000);
+        return frame;
+    }
+
     std::vector<unsigned char> resized(requested_width * requested_height * 3, 0);
     ASSERT(stbir_resize_uint8(image, file_width, file_height, 0, resized.data(), requested_width,
                               requested_height, 0, 3) == 1);
