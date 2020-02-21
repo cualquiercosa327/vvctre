@@ -269,6 +269,12 @@ int main(int argc, char** argv) {
                        "engine:emu_window\nuse controller: "
                        "engine:cemuhookudp,min_x:__,min_y:__,max_x:__,max_y:__") &
               clipp::value("parameters").set(Settings::values.current_input_profile.touch_device),
+          clipp::option("--texture-filter-name")
+                  .doc("set texture filter name\ndefault: none\nvalid values:\n- none\n- xBRZ "
+                       "freescale\n- Anime4K Ultrafast") &
+              clipp::value("name").set(Settings::values.texture_filter_name),
+          clipp::option("--texture-filter-factor").doc("set texture filter name\ndefault: 1") &
+              clipp::value("factor").set(Settings::values.texture_filter_factor),
           cameras, lle_modules,
           clipp::option("--cpu-jit")
               .doc("force use CPU JIT (default)")

@@ -1310,3 +1310,16 @@ Restarts emulation.
 # GET /reloadcameras
 
 Reloads cameras.
+
+# GET/POST /texturefilter
+
+Get or set texture filtering settings.
+
+## Request/Reply
+
+```json
+{
+  "name": String,
+  "factor": Number
+}
+```

@@ -2034,6 +2034,28 @@ Server::Server(Core::System& system, const int port) {
         res.status = 204;
     });
 
+    server->Get("/texturefilter", [&](const httplib::Request& req, httplib::Response& res) {
+        res.set_content(
+            nlohmann::json{
+                {"name", Settings::values.texture_filter_name},
+                {"factor", Settings::values.texture_filter_factor},
+            },
+            "application/json");
+    });
+
+    server->Post("/texturefilter", [&](const httplib::Request& req, httplib::Response& res) {
+        try {
+            const nlohmann::json json = nlohmann::json::parse(req.body);
+            Settings::values.texture_filter_name = json["name"].get<std::string>();
+            Settings::values.texture_filter_factor = json["factor"].get<u16>();
+            Settings::Apply();
+            res.status = 204;
+        } catch (nlohmann::json::exception& exception) {
+            res.status = 500;
+            res.set_content(exception.what(), "text/plain");
+        }
+    });
+
     request_handler_thread = std::thread([this, port] { server->listen("0.0.0.0", port); });
     LOG_INFO(RPC_Server, "RPC server running on port {}", port);
 }
