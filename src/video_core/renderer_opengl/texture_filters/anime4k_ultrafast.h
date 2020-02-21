@@ -15,6 +15,7 @@ public:
     static TextureFilterInfo GetInfo() {
         TextureFilterInfo info;
         info.name = "Anime4K Ultrafast";
+        info.clamp_scale = {1, 2};
         info.constructor = std::make_unique<Anime4kUltrafast>;
         return info;
     }
