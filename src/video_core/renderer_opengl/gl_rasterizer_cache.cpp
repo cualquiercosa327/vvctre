@@ -1448,7 +1448,7 @@ Surface RasterizerCacheOpenGL::GetTextureSurface(const Pica::Texture::TextureInf
     }
 
     auto surface = GetSurface(params, ScaleMatch::Ignore, true);
-    if (!surface) 
+    if (!surface)
         return nullptr;
 
     // Update mipmap if necessary
