@@ -89,4 +89,4 @@ jobs:
           description: |
             vvctre ${{env.VERSION}} for ${{matrix.name}} can now be downloaded from:
             https://github.com/${{github.repository}}/releases/tag/${{env.VERSION}}
-          webhookUrl: ${{secrets.DISCORD_WEBHOOK}}
+          webhookUrl: ${{secrets.DISCORD_WEBHOOK____}}
