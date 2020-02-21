@@ -280,11 +280,11 @@ int main(int argc, char** argv) {
               .doc("use CPU interpreter instead of JIT")
               .set(Settings::values.use_cpu_jit, false),
           clipp::option("--dsp-lle")
-              .doc("use DSP LLE single-threaded")
+              .doc("use DSP LLE single-threaded instead of HLE")
               .set(Settings::values.enable_dsp_lle, true)
               .set(Settings::values.enable_dsp_lle_multithread, false),
           clipp::option("--dsp-lle-multi-threaded")
-              .doc("use DSP LLE multi-threaded")
+              .doc("use DSP LLE multi-threaded instead of HLE")
               .set(Settings::values.enable_dsp_lle, true)
               .set(Settings::values.enable_dsp_lle_multithread, true),
           clipp::option("--software-renderer")
@@ -304,7 +304,10 @@ int main(int argc, char** argv) {
               .doc("disable disk shader caching")
               .set(Settings::values.use_disk_shader_cache, false),
           clipp::option("--enable-ignore-format-reinterpretation")
-              .doc("enable ignore format reinterpretation")
+              .doc("enable ignore format reinterpretation\nignores flushing surfaces from CPU "
+                   "memory if the surface was created by the GPU\nand has a different format. This "
+                   "can speed up many games, potentially break some, but is rightfully\njust a "
+                   "hack as a placeholder for GPU texture encoding/decoding")
               .set(Settings::values.ignore_format_reinterpretation, true),
           clipp::option("--dump-textures")
               .doc("dump textures")
