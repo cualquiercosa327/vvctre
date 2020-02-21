@@ -153,7 +153,7 @@ int main(int argc, char** argv) {
 
         cameras.push_back(clipp::option(fmt::format("--{}-camera-flip", camera_name_for_option))
                               .doc(fmt::format("set {} camera flip\n0: None (default)\n1: "
-                                               "Horizontal\n2: Vertical\n3: Reverse)",
+                                               "Horizontal\n2: Vertical\n3: Reverse",
                                                camera)) &
                           clipp::value("value").set(Settings::values.camera_flip[i]));
     }
@@ -276,59 +276,36 @@ int main(int argc, char** argv) {
           clipp::option("--texture-filter-factor").doc("set texture filter name\ndefault: 1") &
               clipp::value("factor").set(Settings::values.texture_filter_factor),
           cameras, lle_modules,
-          clipp::option("--cpu-jit")
-              .doc("force use CPU JIT (default)")
-              .set(Settings::values.use_cpu_jit, true),
           clipp::option("--cpu-interpreter")
-              .doc("force use CPU interpreter")
+              .doc("use CPU interpreter instead of JIT")
               .set(Settings::values.use_cpu_jit, false),
-          clipp::option("--dsp-hle")
-              .doc("force use DSP HLE (default)")
-              .set(Settings::values.enable_dsp_lle, false),
           clipp::option("--dsp-lle")
-              .doc("force use DSP LLE single-threaded")
+              .doc("use DSP LLE single-threaded")
               .set(Settings::values.enable_dsp_lle, true)
               .set(Settings::values.enable_dsp_lle_multithread, false),
           clipp::option("--dsp-lle-multi-threaded")
-              .doc("force use DSP LLE multi-threaded")
+              .doc("use DSP LLE multi-threaded")
               .set(Settings::values.enable_dsp_lle, true)
               .set(Settings::values.enable_dsp_lle_multithread, true),
-          clipp::option("--hardware-renderer")
-              .doc("force use hardware renderer (default)")
-              .set(Settings::values.use_hw_renderer, true),
           clipp::option("--software-renderer")
-              .doc("force use software renderer")
+              .doc("use software renderer instead of hardware renderer")
               .set(Settings::values.use_hw_renderer, false),
-          clipp::option("--hardware-shader")
-              .doc("force use hardware shader (default)")
-              .set(Settings::values.use_hw_shader, true),
           clipp::option("--software-shader")
-              .doc("force use software shader")
+              .doc("use software shader instead of hardware shader")
               .set(Settings::values.use_hw_shader, false),
           clipp::option("--accurate-multiplication")
-              .doc("force use accurate multiplication if using hardware shader")
+              .doc("use accurate multiplication instead of inaccurate multiplication if using "
+                   "hardware shader")
               .set(Settings::values.shaders_accurate_mul, true),
-          clipp::option("--inaccurate-multiplication")
-              .doc("force use inaccurate multiplication if using hardware shader (default)")
-              .set(Settings::values.shaders_accurate_mul, false),
-          clipp::option("--shader-jit")
-              .doc("force use JIT for software shader (default)")
-              .set(Settings::values.use_shader_jit, true),
           clipp::option("--shader-interpreter")
-              .doc("force use interpreter for software shader")
+              .doc("use interpreter instead of JIT for software shader")
               .set(Settings::values.use_shader_jit, false),
-          clipp::option("--enable-disk-shader-caching")
-              .doc("force enable disk shader caching (default)")
-              .set(Settings::values.use_disk_shader_cache, true),
           clipp::option("--disable-disk-shader-caching")
-              .doc("force disable disk shader caching")
+              .doc("disable disk shader caching")
               .set(Settings::values.use_disk_shader_cache, false),
           clipp::option("--enable-ignore-format-reinterpretation")
-              .doc("force enable ignore format reinterpretation")
+              .doc("enable ignore format reinterpretation")
               .set(Settings::values.ignore_format_reinterpretation, true),
-          clipp::option("--disable-ignore-format-reinterpretation")
-              .doc("force disable ignore format reinterpretation (default)")
-              .set(Settings::values.ignore_format_reinterpretation, false),
           clipp::option("--dump-textures")
               .doc("dump textures")
               .set(Settings::values.dump_textures, true),
