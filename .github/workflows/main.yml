@@ -14,10 +14,10 @@ jobs:
         os: [windows-latest, ubuntu-latest]
         include:
           - os: windows-latest
-            os_without_latest: windows
+            os_for_file_name: windows
             options: "-DVVCTRE_USE_BUNDLED_SDL2=ON -DUSE_DISCORD_PRESENCE=ON -DENABLE_MF=ON -DENABLE_FFMPEG_VIDEO_DUMPER=ON"
           - os: ubuntu-latest
-            os_without_latest: ubuntu
+            os_for_file_name: linux
             options: "-DUSE_DISCORD_PRESENCE=ON -DENABLE_FFMPEG_VIDEO_DUMPER=ON"
     steps:
       - name: Install Dependencies
@@ -56,13 +56,13 @@ jobs:
           fi
           export VERSION=${GITHUB_REF:10}
           echo ::set-env name=VERSION::$VERSION
-          7z a vvctre-$VERSION-${{matrix.os_without_latest}}.7z ./build/bin/*
+          7z a vvctre-$VERSION-${{matrix.os_for_file_name}}.7z ./build/bin/*
       - name: Upload
         uses: svenstaro/upload-release-action@v1-release
         with:
           repo_token: ${{secrets.GITHUB_TOKEN}}
-          file: vvctre-${{env.VERSION}}-${{matrix.os_without_latest}}.7z
-          asset_name: vvctre-${{env.VERSION}}-${{matrix.os_without_latest}}.7z
+          file: vvctre-${{env.VERSION}}-${{matrix.os_for_file_name}}.7z
+          asset_name: vvctre-${{env.VERSION}}-${{matrix.os_for_file_name}}.7z
           tag: ${{github.ref}}
           overwrite: true
       - name: Discord Notification
