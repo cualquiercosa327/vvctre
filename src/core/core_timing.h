@@ -132,6 +132,8 @@ struct TimingEventType {
     const std::string* name;
 };
 
+constexpr int MAX_SLICE_LENGTH = 20000;
+
 class Timing {
 public:
     struct Event {
@@ -144,11 +146,15 @@ public:
         bool operator<(const Event& right) const;
     };
 
-    static constexpr int MAX_SLICE_LENGTH = 20000;
-
     class Timer {
     public:
+        explicit Timer(u32 cpu_clock_percentage);
         ~Timer();
+
+        /**
+         * Updates the value of the cpu clock scaling to the new percentage.
+         */
+        void UpdateClockSpeed(u32 cpu_clock_percentage);
 
         s64 GetMaxSliceLength() const;
 
@@ -169,12 +175,14 @@ public:
 
     private:
         friend class Timing;
+
         // The queue is a min-heap using std::make_heap/push_heap/pop_heap.
         // We don't use std::priority_queue because we need to be able to serialize, unserialize and
         // erase arbitrary events (RemoveEvent()) regardless of the queue order. These aren't
         // accomodated by the standard adaptor class.
         std::vector<Event> event_queue;
         u64 event_fifo_id = 0;
+
         // the queue for storing the events from other threads threadsafe until they will be added
         // to the event_queue by the emu thread
         Common::MPSCQueue<Event> ts_queue;
@@ -191,11 +199,14 @@ public:
         s64 downcount = MAX_SLICE_LENGTH;
         s64 executed_ticks = 0;
         u64 idled_cycles;
+
+        // Stores a scaling for the internal clockspeed. Changing this number results in
+        // under/overclocking the core
+        double cpu_clock_scale = 1.0;
     };
 
     explicit Timing(u32 cpu_clock_percentage, std::size_t num_cores);
-
-    ~Timing(){};
+    ~Timing();
 
     /**
      * Updates the value of the cpu clock scaling to the new percentage.
@@ -238,10 +249,6 @@ private:
 
     std::vector<std::shared_ptr<Timer>> timers;
     std::shared_ptr<Timer> current_timer;
-
-    // Stores a scaling for the internal clockspeed. Changing this number results in
-    // under/overclocking the guest CPU
-    double cpu_clock_scale = 1.0;
 };
 
 } // namespace Core

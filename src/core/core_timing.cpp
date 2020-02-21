@@ -21,19 +21,21 @@ bool Timing::Event::operator<(const Timing::Event& right) const {
     return std::tie(time, fifo_order) < std::tie(right.time, right.fifo_order);
 }
 
-Timing::Timing(u32 cpu_clock_percentage, std::size_t num_cores)
-    : cpu_clock_scale(100.0 / cpu_clock_percentage) {
+Timing::Timing(u32 cpu_clock_percentage, std::size_t num_cores) {
     timers.resize(num_cores);
     for (std::size_t i = 0; i < num_cores; ++i) {
-        timers[i] = std::make_shared<Timer>();
+        timers[i] = std::make_shared<Timer>(cpu_clock_percentage);
     }
     current_timer = timers[0];
 }
 
+Timing::~Timing() = default;
+
 void Timing::UpdateClockSpeed(u32 cpu_clock_percentage) {
-    this->cpu_clock_scale = 100.0 / cpu_clock_percentage;
+    for (std::size_t i = 0; i < num_cores; ++i) {
+        timers[i]->UpdateClockSpeed(cpu_clock_percentage);
+    }
 }
-Timing::Timing(std::size_t num_cores) {}
 
 TimingEventType* Timing::RegisterEvent(const std::string& name, TimedCallback callback) {
     // check for existing type with same name.
@@ -122,6 +124,14 @@ std::chrono::microseconds Timing::GetGlobalTimeUs() const {
 
 std::shared_ptr<Timing::Timer> Timing::GetTimer(std::size_t cpu_id) {
     return timers[cpu_id];
+}
+
+Timing::Timer(u32 cpu_clock_percentage) {
+    cpu_clock_scale = 100.0 / cpu_clock_percentage;
+}
+
+void Timing::Timer::UpdateClockSpeed(u32 cpu_clock_percentage) {
+    cpu_clock_scale = 100.0 / cpu_clock_percentage;
 }
 
 Timing::Timer::~Timer() {
