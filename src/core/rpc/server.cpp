@@ -128,6 +128,8 @@ Server::Server(Core::System& system, const int port) {
             system.Memory().WriteBlock(*system.Kernel().GetCurrentProcess(), address, &data[0],
                                        data.size());
 
+            system.InvalidateCacheRange(address, data.size());
+
             res.status = 204;
         } catch (nlohmann::json::exception& exception) {
             res.status = 500;
