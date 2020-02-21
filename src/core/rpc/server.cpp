@@ -1655,7 +1655,7 @@ Server::Server(Core::System& system, const int port) {
             const nlohmann::json json = nlohmann::json::parse(req.body);
             const int index = json["index"].get<int>();
             const auto cheats = system.CheatEngine().GetCheats();
-            if (index >= cheats.size()) {
+            if (index < 0 || index >= cheats.size()) {
                 res.status = 400;
                 res.set_content("invalid index", "text/plain");
                 return;
@@ -1679,7 +1679,7 @@ Server::Server(Core::System& system, const int port) {
             const nlohmann::json json = nlohmann::json::parse(req.body);
             const int index = json["index"].get<int>();
             const auto cheats = system.CheatEngine().GetCheats();
-            if (index >= cheats.size()) {
+            if (index < 0 || index >= cheats.size()) {
                 res.status = 400;
                 res.set_content("invalid index", "text/plain");
                 return;

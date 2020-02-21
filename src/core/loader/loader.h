@@ -113,8 +113,8 @@ public:
     }
 
     /**
-     * Loads the N3ds mode that this application uses.
-     * It defaults to 1 (Mode6)  if it can't read the information.
+     * Loads the N3DS mode that this application uses.
+     * It defaults to 1 (Mode6) if it can't read the information.
      * @returns A pair with the optional N3ds mode, and the status.
      */
     virtual std::pair<std::optional<u8>, ResultStatus> LoadKernelN3dsMode() {
