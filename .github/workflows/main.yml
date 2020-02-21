@@ -24,9 +24,9 @@ jobs:
             options: "-DUSE_DISCORD_PRESENCE=ON -DENABLE_FFMPEG_VIDEO_DUMPER=ON"
             config: Release
           - os: windows-latest
-            name: Windows (debug, slow, no CMake options)
+            name: Windows (debug, slow, minimum CMake options)
             build_type: windows-debug
-            options: ""
+            options: "-DVVCTRE_USE_BUNDLED_SDL2=ON"
             config: Debug
           - os: ubuntu-latest
             name: Linux (debug, slow, no CMake options)
