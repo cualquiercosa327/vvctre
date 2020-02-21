@@ -1319,7 +1319,7 @@ Get or set texture filtering settings.
 
 ```json
 {
-  "name": String,
+  "name": String"can be none, xBRZ freescale, or Anime4K Ultrafast",
   "factor": Number
 }
 ```
