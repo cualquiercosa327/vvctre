@@ -160,10 +160,14 @@ BreakpointMap breakpoints_write;
 } // Anonymous namespace
 
 static Kernel::Thread* FindThreadById(int id) {
-    const auto& threads = Core::System::GetInstance().Kernel().GetThreadManager().GetThreadList();
-    for (auto& thread : threads) {
-        if (thread->GetThreadId() == static_cast<u32>(id)) {
-            return thread.get();
+    u32 num_cores = Core::GetNumCores();
+    for (u32 i = 0; i < num_cores; ++i) {
+        const auto& threads =
+            Core::System::GetInstance().Kernel().GetThreadManager(i).GetThreadList();
+        for (auto& thread : threads) {
+            if (thread->GetThreadId() == static_cast<u32>(id)) {
+                return thread.get();
+            }
         }
     }
     return nullptr;
@@ -414,7 +418,10 @@ static void RemoveBreakpoint(BreakpointType type, VAddr addr) {
         Core::System& system = Core::System::GetInstance();
         system.Memory().WriteBlock(*system.Kernel().GetCurrentProcess(), bp->second.addr,
                                    bp->second.inst.data(), bp->second.inst.size());
-        system.CPU().ClearInstructionCache();
+        u32 num_cores = system.GetNumCores();
+        for (u32 i = 0; i < num_cores; ++i) {
+            system.GetCore(i).ClearInstructionCache();
+        }
     }
 
     p.erase(addr);
@@ -541,10 +548,13 @@ static void HandleQuery() {
         SendReply(target_xml);
     } else if (strncmp(query, "fThreadInfo", strlen("fThreadInfo")) == 0) {
         std::string val = "m";
-        const auto& threads =
-            Core::System::GetInstance().Kernel().GetThreadManager().GetThreadList();
-        for (const auto& thread : threads) {
-            val += fmt::format("{:x},", thread->GetThreadId());
+        u32 num_cores = Core::GetNumCores();
+        for (u32 i = 0; i < num_cores; ++i) {
+            const auto& threads =
+                Core::System::GetInstance().Kernel().GetThreadManager(i).GetThreadList();
+            for (const auto& thread : threads) {
+                val += fmt::format("{:x},", thread->GetThreadId());
+            }
         }
         val.pop_back();
         SendReply(val.c_str());
@@ -554,11 +564,14 @@ static void HandleQuery() {
         std::string buffer;
         buffer += "l<?xml version=\"1.0\"?>";
         buffer += "<threads>";
-        const auto& threads =
-            Core::System::GetInstance().Kernel().GetThreadManager().GetThreadList();
-        for (const auto& thread : threads) {
-            buffer += fmt::format(R"*(<thread id="{:x}" name="Thread {:x}"></thread>)*",
-                                  thread->GetThreadId(), thread->GetThreadId());
+        u32 num_cores = Core::GetNumCores();
+        for (u32 i = 0; i < num_cores; ++i) {
+            const auto& threads =
+                Core::System::GetInstance().Kernel().GetThreadManager(i).GetThreadList();
+            for (const auto& thread : threads) {
+                buffer += fmt::format(R"*(<thread id="{:x}" name="Thread {:x}"></thread>)*",
+                                      thread->GetThreadId(), thread->GetThreadId());
+            }
         }
         buffer += "</threads>";
         SendReply(buffer.c_str());
@@ -617,7 +630,7 @@ static void SendSignal(Kernel::Thread* thread, u32 signal, bool full = true) {
 
     std::string buffer;
     if (full) {
-        ARM_Interface& cpu = Core::System::GetInstance().CPU();
+        ARM_Interface& cpu = Core::System::GetInstance().GetRunningCore();
         buffer = fmt::format("T{:02x}{:02x}:{:08x};{:02x}:{:08x};{:02x}:{:08x}", latest_signal,
                              PC_REGISTER, htonl(cpu.GetPC()), SP_REGISTER,
                              htonl(cpu.GetReg(SP_REGISTER)), LR_REGISTER,
@@ -782,7 +795,7 @@ static void WriteRegister() {
         return SendReply("E01");
     }
 
-    Core::System::GetInstance().CPU().LoadContext(current_thread->context);
+    Core::System::GetInstance().GetRunningCore().LoadContext(current_thread->context);
 
     SendReply("OK");
 }
@@ -813,7 +826,7 @@ static void WriteRegisters() {
         }
     }
 
-    Core::System::GetInstance().CPU().LoadContext(current_thread->context);
+    Core::System::GetInstance().GetRunningCore().LoadContext(current_thread->context);
 
     SendReply("OK");
 }
@@ -869,10 +882,8 @@ static void WriteMemory() {
     std::vector<u8> data(len);
 
     GdbHexToMem(data.data(), len_pos + 1, len);
-
     system.Memory().WriteBlock(*system.Kernel().GetCurrentProcess(), addr, data.data(), len);
-    system.CPU().ClearInstructionCache();
-
+    system.GetRunningCore().ClearInstructionCache();
     SendReply("OK");
 }
 
@@ -884,7 +895,7 @@ void Break(bool is_memory_break) {
 
 /// Tell the CPU that it should perform a single step.
 static void Step() {
-    ARM_Interface& cpu = Core::System::GetInstance().CPU();
+    ARM_Interface& cpu = Core::System::GetInstance().GetRunningCore();
 
     if (command_length > 1) {
         RegWrite(PC_REGISTER, GdbHexToInt(command_buffer + 1), current_thread);
@@ -911,8 +922,7 @@ static void Continue() {
     memory_break = false;
     step_loop = false;
     halt_loop = false;
-
-    Core::System::GetInstance().CPU().ClearInstructionCache();
+    Core::System::GetInstance().GetRunningCore().ClearInstructionCache();
 }
 
 /**
@@ -938,7 +948,7 @@ static bool CommitBreakpoint(BreakpointType type, VAddr addr, u32 len) {
         Core::System& system = Core::System::GetInstance();
         system.Memory().WriteBlock(*system.Kernel().GetCurrentProcess(), addr, btrap.data(),
                                    btrap.size());
-        system.CPU().ClearInstructionCache();
+        system.GetRunningCore().ClearInstructionCache();
     }
     p.insert({addr, breakpoint});
 
