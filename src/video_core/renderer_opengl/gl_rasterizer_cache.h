@@ -138,30 +138,9 @@ struct SurfaceParams {
         Invalid = 5
     };
 
-    static constexpr std::array<unsigned int, 18> BPP_TABLE = {
-        32, // RGBA8
-        24, // RGB8
-        16, // RGB5A1
-        16, // RGB565
-        16, // RGBA4
-        16, // IA8
-        16, // RG8
-        8,  // I8
-        8,  // A8
-        8,  // IA4
-        4,  // I4
-        4,  // A4
-        4,  // ETC1
-        8,  // ETC1A4
-        16, // D16
-        0,
-        24, // D24
-        32, // D24S8
-    };
-
     static constexpr unsigned int GetFormatBpp(PixelFormat format) {
         const auto format_idx = static_cast<std::size_t>(format);
-        DEBUG_ASSERT_MSG(format_idx < bpp_table.size(), "Invalid pixel format {}", format_idx);
+        DEBUG_ASSERT_MSG(format_idx < BPP_TABLE.size(), "Invalid pixel format {}", format_idx);
         return BPP_TABLE[format_idx];
     }
 
@@ -302,6 +281,28 @@ struct SurfaceParams {
     bool is_tiled = false;
     PixelFormat pixel_format = PixelFormat::Invalid;
     SurfaceType type = SurfaceType::Invalid;
+
+private:
+    static constexpr std::array<unsigned int, 18> BPP_TABLE = {
+        32, // RGBA8
+        24, // RGB8
+        16, // RGB5A1
+        16, // RGB565
+        16, // RGBA4
+        16, // IA8
+        16, // RG8
+        8,  // I8
+        8,  // A8
+        8,  // IA4
+        4,  // I4
+        4,  // A4
+        4,  // ETC1
+        8,  // ETC1A4
+        16, // D16
+        0,
+        24, // D24
+        32, // D24S8
+    };
 };
 
 /**
