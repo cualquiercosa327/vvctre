@@ -160,10 +160,10 @@ BreakpointMap breakpoints_write;
 } // Anonymous namespace
 
 static Kernel::Thread* FindThreadById(int id) {
-    u32 num_cores = Core::GetNumCores();
+    Core::System& system = Core::System::GetInstance();
+    u32 num_cores = system.GetNumCores();
     for (u32 i = 0; i < num_cores; ++i) {
-        const auto& threads =
-            Core::System::GetInstance().Kernel().GetThreadManager(i).GetThreadList();
+        const auto& threads = system.Kernel().GetThreadManager(i).GetThreadList();
         for (auto& thread : threads) {
             if (thread->GetThreadId() == static_cast<u32>(id)) {
                 return thread.get();
@@ -548,10 +548,10 @@ static void HandleQuery() {
         SendReply(target_xml);
     } else if (strncmp(query, "fThreadInfo", strlen("fThreadInfo")) == 0) {
         std::string val = "m";
-        u32 num_cores = Core::GetNumCores();
+        Core::System& system = Core::System::GetInstance();
+        u32 num_cores = system.GetNumCores();
         for (u32 i = 0; i < num_cores; ++i) {
-            const auto& threads =
-                Core::System::GetInstance().Kernel().GetThreadManager(i).GetThreadList();
+            const auto& threads = system.Kernel().GetThreadManager(i).GetThreadList();
             for (const auto& thread : threads) {
                 val += fmt::format("{:x},", thread->GetThreadId());
             }
@@ -564,10 +564,10 @@ static void HandleQuery() {
         std::string buffer;
         buffer += "l<?xml version=\"1.0\"?>";
         buffer += "<threads>";
-        u32 num_cores = Core::GetNumCores();
+        Core::System& system = Core::System::GetInstance();
+        u32 num_cores = system.GetNumCores();
         for (u32 i = 0; i < num_cores; ++i) {
-            const auto& threads =
-                Core::System::GetInstance().Kernel().GetThreadManager(i).GetThreadList();
+            const auto& threads = system.GetInstance().Kernel().GetThreadManager(i).GetThreadList();
             for (const auto& thread : threads) {
                 buffer += fmt::format(R"*(<thread id="{:x}" name="Thread {:x}"></thread>)*",
                                       thread->GetThreadId(), thread->GetThreadId());
