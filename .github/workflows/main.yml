@@ -82,11 +82,11 @@ jobs:
           asset_name: vvctre-${{env.VERSION}}-${{matrix.build_type}}.7z
           tag: ${{github.ref}}
           overwrite: true
-      #- name: Discord Notification
-      #  uses: rjstone/discord-webhook-notify@v1
-      #  with:
-      #    severity: info
-      #    description: |
-      #      vvctre ${{env.VERSION}} for ${{matrix.name}} can now be downloaded from:
-      #      https://github.com/${{github.repository}}/releases/tag/${{env.VERSION}}
-      #    webhookUrl: ${{secrets.DISCORD_WEBHOOK}}
+      - name: Discord Notification
+        uses: rjstone/discord-webhook-notify@v1
+        with:
+          severity: info
+          description: |
+            vvctre ${{env.VERSION}} for ${{matrix.name}} can now be downloaded from:
+            https://github.com/${{github.repository}}/releases/tag/${{env.VERSION}}
+          webhookUrl: ${{secrets.DISCORD_WEBHOOK}}
