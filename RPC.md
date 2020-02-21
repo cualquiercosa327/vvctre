@@ -764,7 +764,6 @@ If setting and the emulation is running, the emulation will restart.
 # GET/POST /isnew3ds
 
 Get or set whether the console is a New 3DS.  
-This doesn't fix New 3DS game crashes.  
 If setting and the emulation is running, the emulation will restart.
 
 ## Request/Reply

@@ -392,8 +392,7 @@ int main(int argc, char** argv) {
               .doc("don't use a virtual SD card")
               .set(Settings::values.use_virtual_sd, false),
           clipp::option("--new-3ds")
-              .doc("makes vvctre emulate a New 3DS (New 3DS games crash even if this option is "
-                   "enabled)")
+              .doc("makes vvctre emulate a New 3DS")
               .set(Settings::values.is_new_3ds, true),
           clipp::option("--region-japan")
               .doc("force the system region to Japan")
