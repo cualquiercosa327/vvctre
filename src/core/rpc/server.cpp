@@ -403,8 +403,8 @@ Server::Server(Core::System& system, const int port) {
             int offset = 0;
             std::vector<u8> output(input.size());
 
-            for (int y = 0; y < layout.height; y++) {
-                for (int x = 0; x < layout.width; x++) {
+            for (u32 y = 0; y < layout.height; ++y) {
+                for (u32 x = 0; x < layout.width; ++x) {
                     output[offset] = input[offset + 2];
                     output[offset + 1] = input[offset + 1];
                     output[offset + 2] = input[offset];
@@ -1655,7 +1655,7 @@ Server::Server(Core::System& system, const int port) {
             const nlohmann::json json = nlohmann::json::parse(req.body);
             const int index = json["index"].get<int>();
             const auto cheats = system.CheatEngine().GetCheats();
-            if (index < 0 || index >= cheats.size()) {
+            if (index < 0 || index >= static_cast<int>(cheats.size())) {
                 res.status = 400;
                 res.set_content("invalid index", "text/plain");
                 return;
@@ -1679,7 +1679,7 @@ Server::Server(Core::System& system, const int port) {
             const nlohmann::json json = nlohmann::json::parse(req.body);
             const int index = json["index"].get<int>();
             const auto cheats = system.CheatEngine().GetCheats();
-            if (index < 0 || index >= cheats.size()) {
+            if (index < 0 || index >= static_cast<int>(cheats.size())) {
                 res.status = 400;
                 res.set_content("invalid index", "text/plain");
                 return;
