@@ -51,10 +51,10 @@ jobs:
       - name: Build
         working-directory: ./build
         shell: bash
-        run: cmake --build . --config Release
+        run: cmake --build . --config ${{matrix.config}}
       - name: Test
         working-directory: ./build
-        run: ctest -C Release
+        run: ctest -C ${{matrix.config}}
       - name: Prepare to upload
         shell: bash
         run: |
@@ -63,11 +63,13 @@ jobs:
           cp DEFAULT_CONTROLS.txt ./build/bin
           cp RPC.md ./build/bin
           cp license.txt ./build/bin
-          if [ "$RUNNER_OS" == "Linux" ]; then
-            rm ./build/bin/tests
-          elif [ "$RUNNER_OS" == "Windows" ]; then
-            rm ./build/bin/Release/tests.exe
-            rm ./build/bin/Release/*.pdb
+          if [ "${{matrix.config}}" == "Release" ]; then
+            if [ "$RUNNER_OS" == "Linux" ]; then
+              rm ./build/bin/tests
+            elif [ "$RUNNER_OS" == "Windows" ]; then
+              rm ./build/bin/Release/tests.exe
+              rm ./build/bin/Release/*.pdb
+            fi
           fi
           export VERSION=${GITHUB_REF:10}
           echo ::set-env name=VERSION::$VERSION
