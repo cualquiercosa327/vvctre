@@ -75,7 +75,7 @@ void KernelSystem::MemoryInit(u32 mem_type, u8 n3ds_mode) {
     }
 
     // We must've allocated the entire FCRAM by the end
-    ASSERT(base == is_new_3ds ? Memory::FCRAM_N3DS_SIZE : Memory::FCRAM_SIZE);
+    ASSERT(base == (is_new_3ds ? Memory::FCRAM_N3DS_SIZE : Memory::FCRAM_SIZE));
 
     config_mem_handler = std::make_unique<ConfigMem::Handler>();
     auto& config_mem = config_mem_handler->GetConfigMem();
