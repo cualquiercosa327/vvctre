@@ -32,7 +32,7 @@ Timing::Timing(u32 cpu_clock_percentage, std::size_t num_cores) {
 Timing::~Timing() = default;
 
 void Timing::UpdateClockSpeed(u32 cpu_clock_percentage) {
-    for (std::size_t i = 0; i < num_cores; ++i) {
+    for (std::size_t i = 0; i < timers.size(); ++i) {
         timers[i]->UpdateClockSpeed(cpu_clock_percentage);
     }
 }
@@ -126,16 +126,16 @@ std::shared_ptr<Timing::Timer> Timing::GetTimer(std::size_t cpu_id) {
     return timers[cpu_id];
 }
 
-Timing::Timer(u32 cpu_clock_percentage) {
-    cpu_clock_scale = 100.0 / cpu_clock_percentage;
-}
-
-void Timing::Timer::UpdateClockSpeed(u32 cpu_clock_percentage) {
+Timing::Timer::Timer(u32 cpu_clock_percentage) {
     cpu_clock_scale = 100.0 / cpu_clock_percentage;
 }
 
 Timing::Timer::~Timer() {
     MoveEvents();
+}
+
+void Timing::Timer::UpdateClockSpeed(u32 cpu_clock_percentage) {
+    cpu_clock_scale = 100.0 / cpu_clock_percentage;
 }
 
 u64 Timing::Timer::GetTicks() const {
