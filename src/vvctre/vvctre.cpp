@@ -176,7 +176,7 @@ int main(int argc, char** argv) {
               clipp::value("path").set(movie_play),
           clipp::option("--dump-video").doc("dump audio and video to a file") &
               clipp::value("path").set(dump_video),
-          clipp::option("--speed-limit").doc("set the speed limit") &
+          clipp::option("--speed-limit").doc("set the speed limit\ndefault: 100") &
               clipp::value("limit")
                   .set(Settings::values.use_frame_limit, true)
                   .set(Settings::values.frame_limit),
