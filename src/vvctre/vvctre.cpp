@@ -191,7 +191,7 @@ int main(int argc, char** argv) {
           clipp::option("--cpu-clock-percentage")
                   .doc("set CPU clock percentage\n"
                        "underclocking can increase the performance of the game at the risk of "
-                       "freezing.\noverclocking may fix lag that happens on console,\nbut also "
+                       "freezing.\noverclocking may fix lag that happens on console, but also "
                        "comes with the risk of freezing.\n"
                        "range is any positive integer (but we suspect 25 - 400 is a good "
                        "idea)\ndefault: 100") &
@@ -209,8 +209,8 @@ int main(int argc, char** argv) {
           clipp::option("--resolution").doc("set resolution\ndefault: 1\n0 means use window size") &
               clipp::value("value").set(Settings::values.resolution_factor),
           clipp::option("--audio-speed")
-                  .doc("set audio speed for DSP HLE to a float, must be greater than zero and "
-                       "requires audio stretching to be enabled to work properly") &
+                  .doc("set audio speed for DSP HLE\ntype: float\nmust be greater than zero\naudio "
+                       "stretching to be enabled to work properly") &
               clipp::value("value").set(Settings::values.audio_speed),
           clipp::option("--audio-volume").doc("set audio volume\ntype: float\ndefault: 1.0") &
               clipp::value("value").set(Settings::values.volume),
@@ -243,7 +243,7 @@ int main(int argc, char** argv) {
                   .set(Settings::values.mic_input_type, Settings::MicInputType::Real) &
               clipp::value("device").set(Settings::values.mic_input_device),
           clipp::option("--post-processing-shader")
-                  .doc("set the post processing shader name, vvctre includes:\n- \"dubois "
+                  .doc("use a post processing shader, vvctre includes:\n- \"dubois "
                        "(builtin)\" "
                        "(anaglyph 3D only)\n- \"horizontal (builtin)\" (interlaced 3D only)") &
               clipp::value("name").set(Settings::values.pp_shader_name),
