@@ -304,10 +304,11 @@ int main(int argc, char** argv) {
               .doc("disable disk shader caching")
               .set(Settings::values.use_disk_shader_cache, false),
           clipp::option("--enable-ignore-format-reinterpretation")
-              .doc("enable ignore format reinterpretation\nignores flushing surfaces from CPU "
-                   "memory if the surface was created by the GPU\nand has a different format. This "
-                   "can speed up many games, potentially break some,\nbut is rightfully just a "
-                   "hack as a placeholder for GPU texture encoding/decoding")
+              .doc(
+                  "enable ignore format reinterpretation\nignores flushing surfaces from CPU "
+                  "memory if the surface was created by the GPU\nand has a different format.\nThis "
+                  "can speed up many games, potentially break some,\nbut is rightfully just a "
+                  "hack as a placeholder for GPU texture encoding/decoding")
               .set(Settings::values.ignore_format_reinterpretation, true),
           clipp::option("--dump-textures")
               .doc("dump textures")
@@ -374,6 +375,9 @@ int main(int argc, char** argv) {
           clipp::option("--3d-anaglyph")
               .doc("use Anaglyph 3D")
               .set(Settings::values.render_3d, Settings::StereoRenderOption::Anaglyph),
+          clipp::option("--3d-interlaced")
+              .doc("use Interlaced 3D")
+              .set(Settings::values.render_3d, Settings::StereoRenderOption::Interlaced),
           clipp::option("--no-sd-card")
               .doc("don't use a virtual SD card")
               .set(Settings::values.use_virtual_sd, false),
