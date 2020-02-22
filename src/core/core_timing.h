@@ -148,13 +148,7 @@ public:
 
     class Timer {
     public:
-        explicit Timer(u32 cpu_clock_percentage);
         ~Timer();
-
-        /**
-         * Updates the value of the cpu clock scaling to the new percentage.
-         */
-        void UpdateClockSpeed(u32 cpu_clock_percentage);
 
         s64 GetMaxSliceLength() const;
 
@@ -199,19 +193,10 @@ public:
         s64 downcount = MAX_SLICE_LENGTH;
         s64 executed_ticks = 0;
         u64 idled_cycles;
-
-        // Stores a scaling for the internal clockspeed. Changing this number results in
-        // under/overclocking the core
-        double cpu_clock_scale = 1.0;
     };
 
-    explicit Timing(u32 cpu_clock_percentage, std::size_t num_cores);
+    explicit Timing(std::size_t num_cores);
     ~Timing();
-
-    /**
-     * Updates the value of the cpu clock scaling to the new percentage.
-     */
-    void UpdateClockSpeed(u32 cpu_clock_percentage);
 
     /**
      * Returns the event_type identifier. if name is not unique, it will assert.
