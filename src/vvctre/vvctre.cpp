@@ -191,7 +191,7 @@ int main(int argc, char** argv) {
           clipp::option("--cpu-clock-percentage")
                   .doc("set CPU clock percentage\n"
                        "underclocking can increase the performance of the game at the risk of "
-                       "freezing.\noverclocking may fix lag that happens on console, but also "
+                       "freezing.\noverclocking may fix lag that happens on console,\nbut also "
                        "comes with the risk of freezing.\n"
                        "range is any positive integer (but we suspect 25 - 400 is a good "
                        "idea)\ndefault: 100") &
