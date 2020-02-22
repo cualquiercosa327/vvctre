@@ -36,7 +36,8 @@ namespace {
 //
 // adapted from
 // https://github.com/bloc97/Anime4K/blob/533cee5f7018d0e57ad2a26d76d43f13b9d8782a/glsl/Anime4K_Adaptive_v1.0RC2_UltraFast.glsl
-constexpr char rect_vert[] = R"(
+constexpr char rect_vert[] = R"(#version 330 core
+
 in vec4 vertex_coord;
 
 out vec2 tex_coord;
@@ -47,7 +48,8 @@ void main() {
 }
 )";
 
-constexpr char compute_gradient[] = R"(
+constexpr char compute_gradient[] = R"(#version 330 core
+
 in vec2 tex_coord;
 
 out vec4 frag_color;
@@ -118,7 +120,8 @@ void main(){
 }
 )";
 
-constexpr char compute_line_gaussian[] = R"(
+constexpr char compute_line_gaussian[] = R"(#version 330 core
+
 in vec2 tex_coord;
 
 out vec4 frag_color;
@@ -140,7 +143,8 @@ void main() {
 
 )";
 
-constexpr char refine[] = R"(
+constexpr char refine[] = R"(#version 330 core
+
 in vec2 tex_coord;
 
 out vec4 frag_color;
@@ -262,6 +266,7 @@ void main(){
     frag_color = Compute();
 }
 )";
+
 } // namespace
 
 Anime4kUltrafast::Anime4kUltrafast() {

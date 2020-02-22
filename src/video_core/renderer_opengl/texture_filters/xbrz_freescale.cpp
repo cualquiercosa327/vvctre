@@ -46,7 +46,8 @@ namespace {
 */
 // adapted from
 // https://github.com/libretro/glsl-shaders/blob/d7a8b8eb2a61a5732da4cbe2e0f9ad30600c3f17/xbrz/shaders/xbrz-freescale.glsl
-constexpr char xbrz_vert[] = R"(
+constexpr char xbrz_vert[] = R"(#version 330 core
+
 out vec2 tex_coord;
 out vec2 source_size;
 out vec2 scale;
@@ -65,7 +66,8 @@ void main() {
 }
 )";
 
-constexpr char xbrz_frag[] = R"(
+constexpr char xbrz_frag[] = R"(#version 330 core
+
 in vec2 tex_coord;
 in vec2 source_size;
 in vec2 scale;
@@ -315,6 +317,7 @@ void main() {
     frag_color = res;
 }
 )";
+
 } // namespace
 
 XbrzFreescale::XbrzFreescale() {
