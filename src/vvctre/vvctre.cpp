@@ -243,8 +243,9 @@ int main(int argc, char** argv) {
                   .set(Settings::values.mic_input_type, Settings::MicInputType::Real) &
               clipp::value("device").set(Settings::values.mic_input_device),
           clipp::option("--post-processing-shader")
-                  .doc("set the post processing shader name, vvctre includes \"dubois (builtin)\" "
-                       "(anaglyph 3D only) and \"horizontal (builtin)\" (interlaced 3D only)") &
+                  .doc(
+                      "set the post processing shader name, vvctre includes:\n\"dubois (builtin)\" "
+                      "(anaglyph 3D only)\n- \"horizontal (builtin)\" (interlaced 3D only)") &
               clipp::value("name").set(Settings::values.pp_shader_name),
           clipp::option("--rpc-server-port").doc("set RPC server port (default: 47889)") &
               clipp::value("port").set(rpc_server_port),
@@ -270,8 +271,8 @@ int main(int argc, char** argv) {
                        "engine:cemuhookudp,min_x:__,min_y:__,max_x:__,max_y:__") &
               clipp::value("parameters").set(Settings::values.current_input_profile.touch_device),
           clipp::option("--texture-filter-name")
-                  .doc("set texture filter name\ndefault: none\nvalid values:\n- none\n- xBRZ "
-                       "freescale\n- Anime4K Ultrafast") &
+                  .doc("set texture filter name\ndefault: none\nvalid values:\n- none\n- \"xBRZ "
+                       "freescale\"\n- \"Anime4K Ultrafast\"") &
               clipp::value("name").set(Settings::values.texture_filter_name),
           clipp::option("--texture-filter-factor").doc("set texture filter factor\ndefault: 1") &
               clipp::value("factor").set(Settings::values.texture_filter_factor),
