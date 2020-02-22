@@ -247,7 +247,7 @@ int main(int argc, char** argv) {
                        "(builtin)\" "
                        "(anaglyph 3D only)\n- \"horizontal (builtin)\" (interlaced 3D only)") &
               clipp::value("name").set(Settings::values.pp_shader_name),
-          clipp::option("--rpc-server-port").doc("set RPC server port (default: 47889)") &
+          clipp::option("--rpc-server-port").doc("set RPC server port\ndefault: 47889") &
               clipp::value("port").set(rpc_server_port),
           clipp::option("--3d-intensity").doc("set 3D intensity") &
               clipp::value("intensity").call([](const char* value) {
