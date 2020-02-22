@@ -203,7 +203,7 @@ int main(int argc, char** argv) {
           clipp::option("--log-filter").doc("set the log filter\ndefault: *:Info") &
               clipp::value("filter").set(Settings::values.log_filter),
           clipp::option("--minimum-vertices-per-thread")
-                  .doc("set minimum vertices per thread (only used for software shader)\ndefault: "
+                  .doc("set minimum vertices per thread\nonly used for software shader\ndefault: "
                        "10") &
               clipp::value("value").set(Settings::values.min_vertices_per_thread),
           clipp::option("--resolution").doc("set resolution\ndefault: 1\n0 means use window size") &
