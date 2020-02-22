@@ -306,7 +306,7 @@ int main(int argc, char** argv) {
           clipp::option("--enable-ignore-format-reinterpretation")
               .doc("enable ignore format reinterpretation\nignores flushing surfaces from CPU "
                    "memory if the surface was created by the GPU\nand has a different format. This "
-                   "can speed up many games, potentially break some, but is rightfully\njust a "
+                   "can speed up many games, potentially break some,\nbut is rightfully just a "
                    "hack as a placeholder for GPU texture encoding/decoding")
               .set(Settings::values.ignore_format_reinterpretation, true),
           clipp::option("--dump-textures")
