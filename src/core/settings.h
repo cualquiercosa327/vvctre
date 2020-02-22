@@ -166,9 +166,6 @@ struct Values {
 
     // Core
     bool use_cpu_jit = true;
-    int cpu_clock_percentage = 100;
-    bool use_custom_cpu_ticks = false;
-    u64 custom_cpu_ticks = 77;
     std::string multiplayer_url = "ws://vvctre-multiplayer.glitch.me";
 
     // Data Storage

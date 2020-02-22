@@ -184,18 +184,6 @@ int main(int argc, char** argv) {
               clipp::value("rate")
                   .set(Settings::values.use_custom_screen_refresh_rate, true)
                   .set(Settings::values.custom_screen_refresh_rate),
-          clipp::option("--custom-cpu-ticks").doc("set custom CPU ticks\ndefault: 77") &
-              clipp::value("ticks")
-                  .set(Settings::values.use_custom_cpu_ticks, true)
-                  .set(Settings::values.custom_cpu_ticks),
-          clipp::option("--cpu-clock-percentage")
-                  .doc("set CPU clock percentage\n"
-                       "underclocking can increase the performance of the game at the risk of "
-                       "freezing.\noverclocking may fix lag that happens on console,\nbut also "
-                       "comes with the risk of freezing.\n"
-                       "range is any positive integer (but we suspect 25 - 400 is a good "
-                       "idea)\ndefault: 100") &
-              clipp::value("percentage").set(Settings::values.cpu_clock_percentage),
           clipp::option("--multiplayer-server-url")
                   .doc("set the multiplayer server URL\ndefault: "
                        "ws://vvctre-multiplayer.glitch.me") &

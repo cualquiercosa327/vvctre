@@ -584,30 +584,6 @@ Server::Server(Core::System& system, const int port) {
         }
     });
 
-    server->Get("/customticks", [&](const httplib::Request& req, httplib::Response& res) {
-        res.set_content(
-            nlohmann::json{
-                {"enabled", Settings::values.use_custom_cpu_ticks},
-                {"ticks", Settings::values.custom_cpu_ticks},
-            }
-                .dump(),
-            "application/json");
-    });
-
-    server->Post("/customticks", [&](const httplib::Request& req, httplib::Response& res) {
-        try {
-            const nlohmann::json json = nlohmann::json::parse(req.body);
-            Settings::values.use_custom_cpu_ticks = json["enabled"].get<bool>();
-            Settings::values.custom_cpu_ticks = json["ticks"].get<u64>();
-            Settings::Apply();
-
-            res.status = 204;
-        } catch (nlohmann::json::exception& exception) {
-            res.status = 500;
-            res.set_content(exception.what(), "text/plain");
-        }
-    });
-
     server->Get("/speedlimit", [&](const httplib::Request& req, httplib::Response& res) {
         res.set_content(
             nlohmann::json{
@@ -790,27 +766,6 @@ Server::Server(Core::System& system, const int port) {
 
                 res.status = 204;
             }
-        } catch (nlohmann::json::exception& exception) {
-            res.status = 500;
-            res.set_content(exception.what(), "text/plain");
-        }
-    });
-
-    server->Get("/cpuclockpercentage", [&](const httplib::Request& req, httplib::Response& res) {
-        res.set_content(
-            nlohmann::json{
-                {"value", Settings::values.cpu_clock_percentage},
-            }
-                .dump(),
-            "application/json");
-    });
-
-    server->Post("/cpuclockpercentage", [&](const httplib::Request& req, httplib::Response& res) {
-        try {
-            const nlohmann::json json = nlohmann::json::parse(req.body);
-            Settings::values.cpu_clock_percentage = json["value"].get<int>();
-            Settings::Apply();
-            res.status = 204;
         } catch (nlohmann::json::exception& exception) {
             res.status = 500;
             res.set_content(exception.what(), "text/plain");
