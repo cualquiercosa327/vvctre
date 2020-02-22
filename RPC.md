@@ -298,32 +298,6 @@ Get/set background color.
 }
 ```
 
-# GET /customticks
-
-Get custom tick settings.
-
-## Reply
-
-```json
-{
-  "enabled": Boolean,
-  "ticks": Number
-}
-```
-
-# POST /customticks
-
-Set custom tick settings.
-
-## Request
-
-```json
-{
-  "enabled": Boolean,
-  "ticks": Number
-}
-```
-
 # GET /speedlimit
 
 Get speed limit settings.
@@ -463,18 +437,6 @@ Profile:
   "current_profile": Profile,
   "current_profile_index": Number,
   "profiles": Array<Profile>
-}
-```
-
-# GET/POST /cpuclockpercentage
-
-Get or set CPU clock percentage.
-
-## Request/Reply
-
-```json
-{
-  "value": Number
 }
 ```
 
