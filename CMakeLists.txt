@@ -25,6 +25,8 @@ option(USE_DISCORD_PRESENCE "Enables Discord Rich Presence" OFF)
 
 CMAKE_DEPENDENT_OPTION(ENABLE_MF "Use Media Foundation decoder (preferred over FFmpeg)" ON "WIN32" OFF)
 
+CMAKE_DEPENDENT_OPTION(ENABLE_FDK "Use FDK AAC decoder" OFF "NOT ENABLE_FFMPEG_AUDIO_DECODER;NOT ENABLE_MF" OFF)
+
 # Sanity check : Check that all submodules are present
 # =======================================================================
 
@@ -168,6 +170,12 @@ if (ENABLE_FFMPEG_VIDEO_DUMPER)
     add_definitions(-DENABLE_FFMPEG_VIDEO_DUMPER)
 endif()
 
+if (ENABLE_FDK)
+    find_library(FDK_AAC fdk-aac DOC "The path to fdk_aac library")
+    if(FDK_AAC STREQUAL "FDK_AAC-NOTFOUND")
+        message(FATAL_ERROR "fdk_aac library not found.")
+    endif()
+endif()
 # Platform-specific library requirements
 # ======================================
 
