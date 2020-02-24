@@ -1048,8 +1048,10 @@ static void RemoveBreakpoint() {
 }
 
 void HandlePacket() {
-    if (!IsConnected() && defer_start) {
-        ToggleServer(true);
+    if (!IsConnected()) {
+        if (defer_start) {
+            ToggleServer(true);
+        }
         return;
     }
 
