@@ -180,10 +180,6 @@ int main(int argc, char** argv) {
               clipp::value("limit")
                   .set(Settings::values.use_frame_limit, true)
                   .set(Settings::values.frame_limit),
-          clipp::option("--screen-refresh-rate").doc("set a custom 3DS screen refresh rate") &
-              clipp::value("rate")
-                  .set(Settings::values.use_custom_screen_refresh_rate, true)
-                  .set(Settings::values.custom_screen_refresh_rate),
           clipp::option("--multiplayer-server-url")
                   .doc("set the multiplayer server URL\ndefault: "
                        "ws://vvctre-multiplayer.glitch.me") &

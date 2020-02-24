@@ -102,8 +102,6 @@ void LogSettings() {
     LogSetting("enable_vsync", values.enable_vsync);
     LogSetting("sharper_distant_objects", values.sharper_distant_objects);
     LogSetting("ignore_format_reinterpretation", values.ignore_format_reinterpretation);
-    LogSetting("use_custom_screen_refresh_rate", values.use_custom_screen_refresh_rate);
-    LogSetting("custom_screen_refresh_rate", values.custom_screen_refresh_rate);
     LogSetting("min_vertices_per_thread", values.min_vertices_per_thread);
     LogSetting("layout_option", static_cast<int>(values.layout_option));
     LogSetting("swap_screen", values.swap_screen);

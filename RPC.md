@@ -550,19 +550,6 @@ Builtin shaders:
 }
 ```
 
-# GET/POST /customscreenrefreshrate
-
-Get or set the 3DS screen refresh rate.
-
-## Request/Reply
-
-```json
-{
-  "enabled": Boolean,
-  "value": Number
-}
-```
-
 # GET/POST /minverticesperthread
 
 Get or set the minimum vertices per thread (software shader only).

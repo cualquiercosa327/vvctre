@@ -198,8 +198,6 @@ struct Values {
     bool enable_vsync = false;
     bool sharper_distant_objects = false;
     bool ignore_format_reinterpretation = false;
-    bool use_custom_screen_refresh_rate = false;
-    double custom_screen_refresh_rate = 60.0;
     int min_vertices_per_thread = 10;
 
     // Layout
