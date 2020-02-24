@@ -5,7 +5,7 @@
 #include <algorithm>
 #include <thread>
 #include <unordered_map>
-#include <boost/functional/hash.hpp>
+#include <boost/container_hash/hash.hpp>
 #include <boost/variant.hpp>
 #include "core/core.h"
 #include "video_core/renderer_opengl/gl_shader_disk_cache.h"
