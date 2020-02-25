@@ -94,13 +94,16 @@ add_library(imgui
     imgui/imgui_widgets.cpp
     imgui/imgui.cpp
     imgui/imgui.h
+    imgui/imgui_demo.cpp
     imgui/imstb_rectpack.h
     imgui/imstb_textedit.h
     imgui/imstb_truetype.h
     imgui/examples/imgui_impl_opengl3.cpp
     imgui/examples/imgui_impl_opengl3.h
+    imgui/examples/imgui_impl_sdl.cpp
+    imgui/examples/imgui_impl_sdl.h
 )
-target_link_libraries(imgui PRIVATE glad)
+target_link_libraries(imgui PRIVATE glad SDL2)
 target_include_directories(imgui INTERFACE ./imgui ./imgui/examples)
 target_include_directories(imgui PRIVATE ./imgui ./imgui/examples)
 

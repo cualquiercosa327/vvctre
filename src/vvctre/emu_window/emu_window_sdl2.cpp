@@ -13,6 +13,7 @@
 #include <glad/glad.h>
 #include <imgui.h>
 #include <imgui_impl_opengl3.h>
+#include <imgui_impl_sdl.h>
 #include "common/logging/log.h"
 #include "common/version.h"
 #include "core/3ds.h"
@@ -190,16 +191,31 @@ EmuWindow_SDL2::EmuWindow_SDL2(Core::System& system, bool hidden, bool fullscree
     LOG_INFO(Frontend, "Shader cache version: {}", version::shader_cache);
     Settings::LogSettings();
 
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGui::StyleColorsDark();
+    ImGui_ImplSDL2_InitForOpenGL(render_window, gl_context);
+    ImGui_ImplOpenGL3_Init("#version 330 core");
+
     DoneCurrent();
 }
 
 EmuWindow_SDL2::~EmuWindow_SDL2() {
     InputCommon::Shutdown();
+    ImGui_ImplOpenGL3_Shutdown();
+    ImGui_ImplSDL2_Shutdown();
+    ImGui::DestroyContext();
     SDL_GL_DeleteContext(gl_context);
     SDL_Quit();
 }
 
 void EmuWindow_SDL2::SwapBuffers() {
+    ImGui_ImplOpenGL3_NewFrame();
+    ImGui_ImplSDL2_NewFrame(render_window);
+    ImGui::NewFrame();
+    ImGui::ShowAboutWindow();
+    ImGui::Render();
+    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
     SDL_GL_SwapWindow(render_window);
 }
 
@@ -216,6 +232,8 @@ void EmuWindow_SDL2::PollEvents() {
 
     // SDL_PollEvent returns 0 when there are no more events in the event queue
     while (SDL_PollEvent(&event)) {
+        ImGui_ImplSDL2_ProcessEvent(&event);
+
         switch (event.type) {
         case SDL_WINDOWEVENT:
             switch (event.window.event) {
@@ -236,25 +254,53 @@ void EmuWindow_SDL2::PollEvents() {
             OnKeyEvent(static_cast<int>(event.key.keysym.scancode), event.key.state);
             break;
         case SDL_MOUSEMOTION:
+            // ignore it if a Dear ImGui window is focused
+            if (ImGui::IsWindowFocused()) {
+                return;
+            }
+
             // ignore if it came from touch
-            if (event.button.which != SDL_TOUCH_MOUSEID)
+            if (event.button.which != SDL_TOUCH_MOUSEID) {
                 OnMouseMotion(event.motion.x, event.motion.y);
+            }
+
             break;
         case SDL_MOUSEBUTTONDOWN:
         case SDL_MOUSEBUTTONUP:
+            // ignore it if a Dear ImGui window is focused
+            if (ImGui::IsWindowFocused()) {
+                return;
+            }
+
             // ignore if it came from touch
             if (event.button.which != SDL_TOUCH_MOUSEID) {
                 OnMouseButton(event.button.button, event.button.state, event.button.x,
                               event.button.y);
             }
+
             break;
         case SDL_FINGERDOWN:
+            // ignore it if a Dear ImGui window is focused
+            if (ImGui::IsWindowFocused()) {
+                return;
+            }
+
             OnFingerDown(event.tfinger.x, event.tfinger.y);
             break;
         case SDL_FINGERMOTION:
+            // ignore it if a Dear ImGui window is focused
+            if (ImGui::IsWindowFocused()) {
+                return;
+            }
+
             OnFingerMotion(event.tfinger.x, event.tfinger.y);
             break;
         case SDL_FINGERUP:
+            // ignore it if a Dear ImGui window is focused
+            if (ImGui::IsWindowFocused()) {
+                return;
+            }
+
             OnFingerUp();
             break;
         case SDL_QUIT:
