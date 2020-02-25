@@ -19,3 +19,6 @@ Thumbs.db
 
 # Python files
 *.pyc
+
+# Dear ImGui
+imgui.ini

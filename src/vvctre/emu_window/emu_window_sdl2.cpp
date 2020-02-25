@@ -213,10 +213,10 @@ void EmuWindow_SDL2::SwapBuffers() {
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplSDL2_NewFrame(render_window);
     ImGui::NewFrame();
-    if (ImGui::Begin("Performance")) {
-        auto perf = system.GetAndResetPerfStats();
-        ImGui::Text("Speed: %d%%", static_cast<int>(perf.emulation_speed) * 100);
-        ImGui::Text("FPS: %d", static_cast<int>(ImGui::GetIO().Framerate));
+    if (ImGui::Begin("FPS", nullptr,
+                     ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoSavedSettings |
+                         ImGuiWindowFlags_NoBackground)) {
+        ImGui::Text("%d FPS", static_cast<int>(ImGui::GetIO().Framerate));
         ImGui::End();
     }
     ImGui::Render();
@@ -323,6 +323,7 @@ void EmuWindow_SDL2::PollEvents() {
             const u64 current_program_id = system.Kernel().GetCurrentProcess()->codeset->program_id;
             if (program_id != current_program_id) {
                 system.GetAppLoader().ReadTitle(program_name);
+
 #ifdef USE_DISCORD_PRESENCE
                 if (discord_rp == nullptr) {
                     discord_rp = std::make_unique<DiscordRP>(program_name);
@@ -330,6 +331,12 @@ void EmuWindow_SDL2::PollEvents() {
                     discord_rp->Update(program_name);
                 }
 #endif
+
+                const std::string window_title =
+                    fmt::format("vvctre {} | {}", version::vvctre.to_string(), program_name);
+
+                SDL_SetWindowTitle(render_window, window_title.c_str());
+
                 program_id = current_program_id;
             }
         }
