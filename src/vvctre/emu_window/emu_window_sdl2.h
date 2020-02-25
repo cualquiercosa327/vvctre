@@ -93,4 +93,5 @@ private:
 #endif
 
     Core::System& system;
+    bool hidden = false;
 };

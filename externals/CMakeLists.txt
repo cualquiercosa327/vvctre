@@ -86,6 +86,24 @@ target_include_directories(json INTERFACE ./json)
 add_library(portable-file-dialogs INTERFACE)
 target_include_directories(portable-file-dialogs INTERFACE ./portable-file-dialogs/include)
 
+# Dear ImGui
+add_library(imgui
+    imgui/imconfig.h
+    imgui/imgui_draw.cpp
+    imgui/imgui_internal.h
+    imgui/imgui_widgets.cpp
+    imgui/imgui.cpp
+    imgui/imgui.h
+    imgui/imstb_rectpack.h
+    imgui/imstb_textedit.h
+    imgui/imstb_truetype.h
+    imgui/examples/imgui_impl_opengl3.cpp
+    imgui/examples/imgui_impl_opengl3.h
+)
+target_link_libraries(imgui PRIVATE glad)
+target_include_directories(imgui INTERFACE ./imgui ./imgui/examples)
+target_include_directories(imgui PRIVATE ./imgui ./imgui/examples)
+
 add_subdirectory(semver)
 add_subdirectory(clipp)
 add_subdirectory(easywsclient)

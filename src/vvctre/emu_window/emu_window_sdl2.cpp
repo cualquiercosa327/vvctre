@@ -11,6 +11,8 @@
 #include <SDL.h>
 #include <fmt/format.h>
 #include <glad/glad.h>
+#include <imgui.h>
+#include <imgui_impl_opengl3.h>
 #include "common/logging/log.h"
 #include "common/version.h"
 #include "core/3ds.h"
@@ -122,7 +124,7 @@ void EmuWindow_SDL2::Fullscreen() {
 }
 
 EmuWindow_SDL2::EmuWindow_SDL2(Core::System& system, bool hidden, bool fullscreen)
-    : system(system) {
+    : system(system), hidden(hidden) {
     // Initialize the window
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_JOYSTICK) < 0) {
         LOG_CRITICAL(Frontend, "Failed to initialize SDL2! Exiting...");
