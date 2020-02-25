@@ -260,7 +260,7 @@ void EmuWindow_SDL2::PollEvents() {
         case SDL_KEYDOWN:
         case SDL_KEYUP:
             // ignore it if a Dear ImGui window is focused
-            if (ImGui::IsAnyWindowFocused()) {
+            if (ImGui::IsWindowFocused(ImGuiFocusedFlags_AnyWindow)) {
                 return;
             }
 
@@ -268,7 +268,7 @@ void EmuWindow_SDL2::PollEvents() {
             break;
         case SDL_MOUSEMOTION:
             // ignore it if a Dear ImGui window is focused
-            if (ImGui::IsAnyWindowFocused()) {
+            if (ImGui::IsWindowFocused(ImGuiFocusedFlags_AnyWindow)) {
                 return;
             }
 
@@ -281,7 +281,7 @@ void EmuWindow_SDL2::PollEvents() {
         case SDL_MOUSEBUTTONDOWN:
         case SDL_MOUSEBUTTONUP:
             // ignore it if a Dear ImGui window is focused
-            if (ImGui::IsAnyWindowFocused()) {
+            if (ImGui::IsWindowFocused(ImGuiFocusedFlags_AnyWindow)) {
                 return;
             }
 
@@ -294,7 +294,7 @@ void EmuWindow_SDL2::PollEvents() {
             break;
         case SDL_FINGERDOWN:
             // ignore it if a Dear ImGui window is focused
-            if (ImGui::IsAnyWindowFocused()) {
+            if (ImGui::IsWindowFocused(ImGuiFocusedFlags_AnyWindow)) {
                 return;
             }
 
@@ -302,7 +302,7 @@ void EmuWindow_SDL2::PollEvents() {
             break;
         case SDL_FINGERMOTION:
             // ignore it if a Dear ImGui window is focused
-            if (ImGui::IsAnyWindowFocused()) {
+            if (ImGui::IsWindowFocused(ImGuiFocusedFlags_AnyWindow)) {
                 return;
             }
 
@@ -310,7 +310,7 @@ void EmuWindow_SDL2::PollEvents() {
             break;
         case SDL_FINGERUP:
             // ignore it if a Dear ImGui window is focused
-            if (ImGui::IsAnyWindowFocused()) {
+            if (ImGui::IsWindowFocused(ImGuiFocusedFlags_AnyWindow)) {
                 return;
             }
 
