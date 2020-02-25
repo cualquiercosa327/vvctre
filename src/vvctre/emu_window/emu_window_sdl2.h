@@ -6,6 +6,7 @@
 
 #include <memory>
 #include <utility>
+#include <imgui.h>
 #include "core/frontend/emu_window.h"
 
 struct SDL_Window;
@@ -94,4 +95,6 @@ private:
 
     Core::System& system;
     bool hidden = false;
+
+    ImVec4 fps_color{1.0f, 1.0f, 1.0f, 1.0f};
 };

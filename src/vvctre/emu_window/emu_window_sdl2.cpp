@@ -215,8 +215,11 @@ void EmuWindow_SDL2::SwapBuffers() {
     ImGui::NewFrame();
     if (ImGui::Begin("FPS", nullptr,
                      ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoSavedSettings |
-                         ImGuiWindowFlags_NoBackground)) {
-        ImGui::Text("%d FPS", static_cast<int>(ImGui::GetIO().Framerate));
+                         ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_AlwaysAutoResize)) {
+        ImGui::TextColored(fps_color, "%d FPS", static_cast<int>(ImGui::GetIO().Framerate));
+        if (ImGui::IsWindowFocused()) {
+            ImGui::ColorPicker4("##picker", (float*)&fps_color);
+        }
         ImGui::End();
     }
     ImGui::Render();
@@ -256,11 +259,16 @@ void EmuWindow_SDL2::PollEvents() {
             break;
         case SDL_KEYDOWN:
         case SDL_KEYUP:
+            // ignore it if a Dear ImGui window is focused
+            if (ImGui::IsAnyWindowFocused()) {
+                return;
+            }
+
             OnKeyEvent(static_cast<int>(event.key.keysym.scancode), event.key.state);
             break;
         case SDL_MOUSEMOTION:
             // ignore it if a Dear ImGui window is focused
-            if (!ImGui::IsWindowFocused()) {
+            if (ImGui::IsAnyWindowFocused()) {
                 return;
             }
 
@@ -273,7 +281,7 @@ void EmuWindow_SDL2::PollEvents() {
         case SDL_MOUSEBUTTONDOWN:
         case SDL_MOUSEBUTTONUP:
             // ignore it if a Dear ImGui window is focused
-            if (!ImGui::IsWindowFocused()) {
+            if (ImGui::IsAnyWindowFocused()) {
                 return;
             }
 
@@ -286,7 +294,7 @@ void EmuWindow_SDL2::PollEvents() {
             break;
         case SDL_FINGERDOWN:
             // ignore it if a Dear ImGui window is focused
-            if (!ImGui::IsWindowFocused()) {
+            if (ImGui::IsAnyWindowFocused()) {
                 return;
             }
 
@@ -294,7 +302,7 @@ void EmuWindow_SDL2::PollEvents() {
             break;
         case SDL_FINGERMOTION:
             // ignore it if a Dear ImGui window is focused
-            if (!ImGui::IsWindowFocused()) {
+            if (ImGui::IsAnyWindowFocused()) {
                 return;
             }
 
@@ -302,7 +310,7 @@ void EmuWindow_SDL2::PollEvents() {
             break;
         case SDL_FINGERUP:
             // ignore it if a Dear ImGui window is focused
-            if (!ImGui::IsWindowFocused()) {
+            if (ImGui::IsAnyWindowFocused()) {
                 return;
             }
 
