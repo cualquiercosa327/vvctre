@@ -124,8 +124,7 @@ void EmuWindow_SDL2::Fullscreen() {
     SDL_MaximizeWindow(render_window);
 }
 
-EmuWindow_SDL2::EmuWindow_SDL2(Core::System& system, bool hidden, bool fullscreen)
-    : system(system), hidden(hidden) {
+EmuWindow_SDL2::EmuWindow_SDL2(Core::System& system, bool fullscreen) : system(system) {
     // Initialize the window
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_JOYSTICK) < 0) {
         LOG_CRITICAL(Frontend, "Failed to initialize SDL2! Exiting...");
@@ -147,17 +146,12 @@ EmuWindow_SDL2::EmuWindow_SDL2(Core::System& system, bool hidden, bool fullscree
 
     const std::string window_title = fmt::format("vvctre {}", version::vvctre.to_string());
 
-    render_window = SDL_CreateWindow(
-        window_title.c_str(),
-        SDL_WINDOWPOS_UNDEFINED, // x position
-        SDL_WINDOWPOS_UNDEFINED, // y position
-        Core::kScreenTopWidth, Core::kScreenTopHeight + Core::kScreenBottomHeight, [&] {
-            Uint32 flags = SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI;
-            if (hidden) {
-                flags |= SDL_WINDOW_HIDDEN;
-            }
-            return flags;
-        }());
+    render_window =
+        SDL_CreateWindow(window_title.c_str(),
+                         SDL_WINDOWPOS_UNDEFINED, // x position
+                         SDL_WINDOWPOS_UNDEFINED, // y position
+                         Core::kScreenTopWidth, Core::kScreenTopHeight + Core::kScreenBottomHeight,
+                         SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
 
     if (render_window == nullptr) {
         LOG_CRITICAL(Frontend, "Failed to create SDL2 window: {}", SDL_GetError());
@@ -213,26 +207,32 @@ void EmuWindow_SDL2::SwapBuffers() {
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplSDL2_NewFrame(render_window);
     ImGui::NewFrame();
+
     if (ImGui::Begin("FPS", nullptr,
                      ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoSavedSettings |
                          ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_AlwaysAutoResize)) {
+        ImGui::SetWindowPos(ImVec2(), ImGuiCond_Once);
         ImGui::TextColored(fps_color, "%d FPS", static_cast<int>(ImGui::GetIO().Framerate));
-        if (ImGui::IsWindowFocused()) {
+        if (ImGui::IsWindowFocused() && ImGui::IsMouseDown(ImGuiMouseButton_Right)) {
             ImGui::ColorPicker4("##picker", (float*)&fps_color);
         }
         ImGui::End();
     }
+
+    auto it = windows.begin();
+
+    while (it != windows.end()) {
+        if (it->second == nullptr || !it->second->function) {
+            it = windows.erase(it);
+        } else {
+            it->second->function();
+            ++it;
+        }
+    }
+
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
     SDL_GL_SwapWindow(render_window);
-}
-
-void EmuWindow_SDL2::SoftwareKeyboardStarted() {
-    SDL_SetWindowTitle(render_window, "Enter text in the terminal.");
-}
-
-void EmuWindow_SDL2::MiiPickerStarted() {
-    SDL_SetWindowTitle(render_window, "Pick a Mii in the terminal.");
 }
 
 void EmuWindow_SDL2::PollEvents() {

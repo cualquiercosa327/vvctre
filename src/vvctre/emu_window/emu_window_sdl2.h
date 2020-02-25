@@ -4,7 +4,11 @@
 
 #pragma once
 
+#include <condition_variable>
+#include <functional>
 #include <memory>
+#include <mutex>
+#include <unordered_map>
 #include <utility>
 #include <imgui.h>
 #include "core/frontend/emu_window.h"
@@ -21,7 +25,7 @@ class System;
 
 class EmuWindow_SDL2 : public Frontend::EmuWindow {
 public:
-    explicit EmuWindow_SDL2(Core::System& system, const bool hidden, const bool fullscreen);
+    explicit EmuWindow_SDL2(Core::System& system, const bool fullscreen);
     ~EmuWindow_SDL2();
 
     /// Swap buffers to display the next frame
@@ -41,8 +45,11 @@ public:
 
     void Close();
 
-    void SoftwareKeyboardStarted();
-    void MiiPickerStarted();
+    struct WindowCallback {
+        std::function<void()> function;
+    };
+    std::unordered_map<std::string, WindowCallback*>
+        windows; ///< Dear ImGui windows to draw after the screens
 
 private:
     /// Called by PollEvents when a key is pressed or released.
@@ -83,7 +90,7 @@ private:
     /// The OpenGL context associated with the window
     SDL_GLContext gl_context;
 
-    /// Keeps track of how often to update the title bar during gameplay
+    /// Keeps track of how often to update the title bar and Discord Rich Presence during gameplay
     u32 last_time = 0;
 
     std::string program_name;
@@ -94,7 +101,5 @@ private:
 #endif
 
     Core::System& system;
-    bool hidden = false;
-
-    ImVec4 fps_color{1.0f, 1.0f, 1.0f, 1.0f};
+    ImVec4 fps_color{0.0f, 1.0f, 0.0f, 1.0f}; // Green
 };

@@ -51,7 +51,6 @@ For a list of commands and options, run `vvctre usage`.
 # Unique Features
 
 - [SemVer](https://semver.org/) versions instead of a simple numbers and random strings
-- Hidden mode (can be controlled with RPC)
 - Supported apps
   - Everything Citra supports
   - [3DSident](https://github.com/joel16/3DSident.git) <= 0.7.9

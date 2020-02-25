@@ -95,7 +95,6 @@ int main(int argc, char** argv) {
     std::string movie_record;
     std::string movie_play;
     std::string dump_video;
-    bool hidden = false;
     bool fullscreen = false;
     bool regenerate_console_id = false;
     int rpc_server_port = 47889;
@@ -405,7 +404,6 @@ int main(int argc, char** argv) {
           clipp::option("--record-frame-times")
               .doc("record frame times")
               .set(Settings::values.record_frame_times, true),
-          clipp::option("--hidden").set(hidden).doc("hide the window"),
           clipp::option("--fullscreen").set(fullscreen).doc("start in fullscreen mode"),
           clipp::option("--regenerate-console-id")
               .set(regenerate_console_id)
@@ -485,13 +483,11 @@ int main(int argc, char** argv) {
             Core::System& system = Core::System::GetInstance();
 
             std::unique_ptr<EmuWindow_SDL2> emu_window =
-                std::make_unique<EmuWindow_SDL2>(system, hidden, fullscreen);
+                std::make_unique<EmuWindow_SDL2>(system, fullscreen);
 
             // Register frontend applets
-            system.RegisterSoftwareKeyboard(std::make_shared<Frontend::SDL2_SoftwareKeyboard>(
-                [&emu_window] { emu_window->SoftwareKeyboardStarted(); }));
-            system.RegisterMiiSelector(std::make_shared<Frontend::SDL2_MiiSelector>(
-                [&emu_window] { emu_window->MiiPickerStarted(); }));
+            system.RegisterSoftwareKeyboard(std::make_shared<Frontend::SDL2_SoftwareKeyboard>());
+            system.RegisterMiiSelector(std::make_shared<Frontend::SDL2_MiiSelector>(*emu_window));
 
             // Register camera implementations
             Camera::RegisterFactory("image", std::make_unique<Camera::ImageCameraFactory>());

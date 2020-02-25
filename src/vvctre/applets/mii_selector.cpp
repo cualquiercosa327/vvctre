@@ -2,25 +2,22 @@
 // Licensed under GPLv2 or any later version
 // Refer to the license.txt file included.
 
-#include <iostream>
-#include <sstream>
+#include <atomic>
+#include <glad/glad.h>
 #include "common/file_util.h"
-#include "common/logging/log.h"
 #include "common/string_util.h"
 #include "core/file_sys/archive_extsavedata.h"
 #include "core/file_sys/file_backend.h"
 #include "core/hle/service/ptm/ptm.h"
+#include "video_core/renderer_opengl/renderer_opengl.h"
 #include "vvctre/applets/mii_selector.h"
 
 namespace Frontend {
 
-SDL2_MiiSelector::SDL2_MiiSelector(std::function<void()> started_callback)
-    : started_callback(std::move(started_callback)) {}
+SDL2_MiiSelector::SDL2_MiiSelector(EmuWindow_SDL2& emu_window) : emu_window(emu_window) {}
 
 void SDL2_MiiSelector::Setup(const MiiSelectorConfig& config) {
     MiiSelector::Setup(config);
-
-    started_callback();
 
     const std::string nand_directory = FileUtil::GetUserPath(FileUtil::UserPath::NANDDir);
     FileSys::ArchiveFactory_ExtSaveData extdata_archive_factory(nand_directory, true);
@@ -53,43 +50,44 @@ void SDL2_MiiSelector::Setup(const MiiSelectorConfig& config) {
         }
     }
 
-    LOG_INFO(Applet, "Miis:");
+    const std::string title = config.title.empty() ? "Mii Selector" : config.title;
+    std::atomic<bool> done{false};
+    std::size_t selected_mii = 0;
+    u32 code = 1;
 
-    for (std::size_t index = 0; index < miis.size(); ++index) {
-        LOG_INFO(Applet, "{} {}", index, Common::UTF16BufferToUTF8(miis[index].mii_name));
-    }
+    ImGuiIO& io = ImGui::GetIO();
 
-    std::size_t index = miis.size();
-    std::string button, line;
-
-    while (index >= miis.size() || (config.enable_cancel_button && button != MII_BUTTON_CANCEL &&
-                                    button != MII_BUTTON_OKAY)) {
-        if (config.enable_cancel_button) {
-            LOG_INFO(Applet, "{}. enter the number of a Mii, and then {} or {}.",
-                     config.title.empty() ? "Mii Selector" : config.title, MII_BUTTON_CANCEL,
-                     MII_BUTTON_OKAY);
-        } else {
-            LOG_INFO(Applet, "{}. enter the number of a Mii.",
-                     config.title.empty() ? "Mii Selector" : config.title);
+    EmuWindow_SDL2::WindowCallback cb;
+    cb.function = [&] {
+        ImGui::SetNextWindowPos(ImVec2(io.DisplaySize.x * 0.5f, io.DisplaySize.y * 0.5f),
+                                ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
+        if (ImGui::Begin(title.c_str(), nullptr,
+                         ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_AlwaysAutoResize)) {
+            if (ImGui::ListBoxHeader("")) {
+                for (std::size_t index = 0; index < miis.size(); ++index) {
+                    if (ImGui::Selectable(
+                            Common::UTF16BufferToUTF8(miis[index].mii_name).c_str())) {
+                        selected_mii = index;
+                        code = 0;
+                        done = true;
+                    }
+                }
+                ImGui::ListBoxFooter();
+            }
+            if (ImGui::Button("Cancel")) {
+                done = true;
+            }
+            ImGui::End();
         }
+    };
 
-        std::getline(std::cin, line);
-        std::istringstream iss(line);
+    emu_window.windows.emplace("SDL2_MiiSelector", &cb);
 
-        iss >> index;
-
-        if (config.enable_cancel_button) {
-            iss >> button;
-        }
+    while (emu_window.IsOpen() && !done) {
+        VideoCore::g_renderer->SwapBuffers();
     }
 
-    if (button.empty()) {
-        Finalize(0, miis[index]);
-    } else if (button == MII_BUTTON_CANCEL) {
-        Finalize(1, miis[index]);
-    } else if (button == MII_BUTTON_OKAY) {
-        Finalize(0, miis[index]);
-    }
+    Finalize(code, miis[selected_mii]);
 }
 
 } // namespace Frontend
