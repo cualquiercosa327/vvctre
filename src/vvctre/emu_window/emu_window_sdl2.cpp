@@ -51,12 +51,7 @@ void EmuWindow_SDL2::OnMouseButton(u32 button, u8 state, s32 x, s32 y) {
 
 std::pair<unsigned, unsigned> EmuWindow_SDL2::TouchToPixelPos(float touch_x, float touch_y) const {
     int w, h;
-    if (render_window == nullptr) {
-        w = 400;
-        h = 480;
-    } else {
-        SDL_GetWindowSize(render_window, &w, &h);
-    }
+    SDL_GetWindowSize(render_window, &w, &h);
 
     touch_x *= w;
     touch_y *= h;
@@ -100,10 +95,6 @@ void EmuWindow_SDL2::Close() {
 }
 
 void EmuWindow_SDL2::OnResize() {
-    if (render_window == nullptr) {
-        return;
-    }
-
     int width, height;
     SDL_GetWindowSize(render_window, &width, &height);
     UpdateCurrentFramebufferLayout(width, height);
@@ -207,26 +198,14 @@ EmuWindow_SDL2::~EmuWindow_SDL2() {
 }
 
 void EmuWindow_SDL2::SwapBuffers() {
-    if (render_window == nullptr) {
-        return;
-    }
-
     SDL_GL_SwapWindow(render_window);
 }
 
 void EmuWindow_SDL2::SoftwareKeyboardStarted() {
-    if (render_window == nullptr) {
-        return;
-    }
-
     SDL_SetWindowTitle(render_window, "Enter text in the terminal.");
 }
 
 void EmuWindow_SDL2::MiiPickerStarted() {
-    if (render_window == nullptr) {
-        return;
-    }
-
     SDL_SetWindowTitle(render_window, "Pick a Mii in the terminal.");
 }
 
@@ -282,10 +261,6 @@ void EmuWindow_SDL2::PollEvents() {
         default:
             break;
         }
-    }
-
-    if (render_window == nullptr) {
-        return;
     }
 
     const u32 current_time = SDL_GetTicks();
