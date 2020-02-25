@@ -94,7 +94,6 @@ add_library(imgui
     imgui/imgui_widgets.cpp
     imgui/imgui.cpp
     imgui/imgui.h
-    imgui/imgui_demo.cpp
     imgui/imstb_rectpack.h
     imgui/imstb_textedit.h
     imgui/imstb_truetype.h

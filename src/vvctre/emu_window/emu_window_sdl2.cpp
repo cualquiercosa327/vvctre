@@ -213,7 +213,12 @@ void EmuWindow_SDL2::SwapBuffers() {
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplSDL2_NewFrame(render_window);
     ImGui::NewFrame();
-    ImGui::ShowAboutWindow();
+    if (ImGui::Begin("Performance")) {
+        auto perf = system.GetAndResetPerfStats();
+        ImGui::Text("Speed: %d%%", static_cast<int>(perf.emulation_speed) * 100);
+        ImGui::Text("FPS: %d", static_cast<int>(ImGui::GetIO().Framerate));
+        ImGui::End();
+    }
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
     SDL_GL_SwapWindow(render_window);
@@ -255,7 +260,7 @@ void EmuWindow_SDL2::PollEvents() {
             break;
         case SDL_MOUSEMOTION:
             // ignore it if a Dear ImGui window is focused
-            if (ImGui::IsWindowFocused()) {
+            if (!ImGui::IsWindowFocused()) {
                 return;
             }
 
@@ -268,7 +273,7 @@ void EmuWindow_SDL2::PollEvents() {
         case SDL_MOUSEBUTTONDOWN:
         case SDL_MOUSEBUTTONUP:
             // ignore it if a Dear ImGui window is focused
-            if (ImGui::IsWindowFocused()) {
+            if (!ImGui::IsWindowFocused()) {
                 return;
             }
 
@@ -281,7 +286,7 @@ void EmuWindow_SDL2::PollEvents() {
             break;
         case SDL_FINGERDOWN:
             // ignore it if a Dear ImGui window is focused
-            if (ImGui::IsWindowFocused()) {
+            if (!ImGui::IsWindowFocused()) {
                 return;
             }
 
@@ -289,7 +294,7 @@ void EmuWindow_SDL2::PollEvents() {
             break;
         case SDL_FINGERMOTION:
             // ignore it if a Dear ImGui window is focused
-            if (ImGui::IsWindowFocused()) {
+            if (!ImGui::IsWindowFocused()) {
                 return;
             }
 
@@ -297,7 +302,7 @@ void EmuWindow_SDL2::PollEvents() {
             break;
         case SDL_FINGERUP:
             // ignore it if a Dear ImGui window is focused
-            if (ImGui::IsWindowFocused()) {
+            if (!ImGui::IsWindowFocused()) {
                 return;
             }
 
@@ -327,18 +332,6 @@ void EmuWindow_SDL2::PollEvents() {
 #endif
                 program_id = current_program_id;
             }
-
-            Core::PerfStats::Results results = system.GetAndResetPerfStats();
-
-            const std::string title =
-                program_name.empty()
-                    ? fmt::format("vvctre {} | FPS: {:.0f} ({:.0f}%)", version::vvctre.to_string(),
-                                  results.game_fps, results.emulation_speed * 100.0)
-                    : fmt::format("vvctre {} | {} | FPS: {:.0f} ({:.0f}%)",
-                                  version::vvctre.to_string(), program_name, results.game_fps,
-                                  results.emulation_speed * 100.0);
-
-            SDL_SetWindowTitle(render_window, title.c_str());
         }
 
         last_time = current_time;
