@@ -2,9 +2,11 @@
 // Licensed under GPLv2 or any later version
 // Refer to the license.txt file included.
 
-#include <iostream>
-#include "common/logging/log.h"
+#include "video_core/renderer_opengl/renderer_opengl.h"
 #include "vvctre/applets/swkbd.h"
+#include "vvctre/emu_window/emu_window_sdl2.h"
+
+#include <imgui_stdlib.h>
 
 namespace Frontend {
 
@@ -13,21 +15,90 @@ SDL2_SoftwareKeyboard::SDL2_SoftwareKeyboard(EmuWindow_SDL2& emu_window) : emu_w
 void SDL2_SoftwareKeyboard::Execute(const KeyboardConfig& config) {
     SoftwareKeyboard::Execute(config);
 
-    LOG_INFO(Applet_SWKBD, "{}. Enter the text then press Ctrl+Z on Windows or Ctrl+D on Linux:",
-             config.hint_text.empty() ? "No hint" : config.hint_text);
+    std::atomic<bool> done{false};
+    std::string text;
+    u8 button = 0;
+    ImGuiIO& io = ImGui::GetIO();
 
-    std::string text, line;
+    EmuWindow_SDL2::WindowCallback cb;
+    cb.function = [&] {
+        ImGui::SetNextWindowPos(ImVec2(io.DisplaySize.x * 0.5f, io.DisplaySize.y * 0.5f),
+                                ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
+        if (ImGui::Begin("Keyboard", nullptr,
+                         ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_AlwaysAutoResize)) {
+            ImGui::InputTextWithHint("", config.hint_text.c_str(), &text);
 
-    const auto GetText = [&] {
-        text.clear();
-        while (std::getline(std::cin, line)) {
-            text += line.append(1, '\n');
+            switch (config.button_config) {
+            case ButtonConfig::None:
+            case ButtonConfig::Single: {
+                if (ImGui::Button(
+                        (config.button_text[0].empty() ? SWKBD_BUTTON_OKAY : config.button_text[0])
+                            .c_str())) {
+                    done = true;
+                }
+                break;
+            }
+
+            case ButtonConfig::Dual: {
+                const std::string cancel =
+                    (config.button_text.size() < 1 || config.button_text[0].empty())
+                        ? SWKBD_BUTTON_CANCEL
+                        : config.button_text[0];
+                const std::string ok =
+                    (config.button_text.size() < 2 || config.button_text[1].empty())
+                        ? SWKBD_BUTTON_OKAY
+                        : config.button_text[1];
+                if (ImGui::Button(cancel.c_str())) {
+                    done = true;
+                }
+                ImGui::SameLine();
+                if (ImGui::Button(ok.c_str())) {
+                    button = 1;
+                    done = true;
+                }
+                break;
+            }
+
+            case ButtonConfig::Triple: {
+                const std::string cancel =
+                    (config.button_text.size() < 1 || config.button_text[0].empty())
+                        ? SWKBD_BUTTON_CANCEL
+                        : config.button_text[0];
+                const std::string forgot =
+                    (config.button_text.size() < 2 || config.button_text[1].empty())
+                        ? SWKBD_BUTTON_FORGOT
+                        : config.button_text[1];
+                const std::string ok =
+                    (config.button_text.size() < 3 || config.button_text[2].empty())
+                        ? SWKBD_BUTTON_OKAY
+                        : config.button_text[2];
+                if (ImGui::Button(cancel.c_str())) {
+                    done = true;
+                }
+                ImGui::SameLine();
+                if (ImGui::Button(forgot.c_str())) {
+                    button = 1;
+                    done = true;
+                }
+                ImGui::SameLine();
+                if (ImGui::Button(ok.c_str())) {
+                    button = 2;
+                    done = true;
+                }
+            }
+            }
+
+            ImGui::End();
         }
-        text.pop_back();
-        std::cin.clear();
     };
 
-    GetText();
+    emu_window.windows.emplace("SDL2_SoftwareKeyboard", &cb);
+
+    while (emu_window.IsOpen() && !done) {
+        VideoCore::g_renderer->SwapBuffers();
+    }
+
+    Finalize(text, button);
 
     ValidationError error;
     while ((error = ValidateInput(text)) != ValidationError::None) {
@@ -93,63 +164,6 @@ void SDL2_SoftwareKeyboard::Execute(const KeyboardConfig& config) {
             break;
         }
         }
-
-        GetText();
-    }
-
-    switch (config.button_config) {
-    case ButtonConfig::None: {
-        break;
-    }
-
-    case ButtonConfig::Single: {
-        Finalize(text, 0);
-        break;
-    }
-
-    case ButtonConfig::Dual: {
-        const std::string cancel = (config.button_text.size() < 1 || config.button_text[0].empty())
-                                       ? SWKBD_BUTTON_CANCEL
-                                       : config.button_text[0];
-        const std::string ok = (config.button_text.size() < 2 || config.button_text[1].empty())
-                                   ? SWKBD_BUTTON_OKAY
-                                   : config.button_text[1];
-        LOG_INFO(Applet_SWKBD, "Enter the button ({} or {}):", cancel, ok);
-        std::string button;
-        while (button != cancel && button != ok) {
-            std::getline(std::cin, button);
-        }
-        if (button == cancel) {
-            Finalize(text, 0);
-        } else if (button == ok) {
-            Finalize(text, 1);
-        }
-        break;
-    }
-
-    case ButtonConfig::Triple: {
-        const std::string cancel = (config.button_text.size() < 1 || config.button_text[0].empty())
-                                       ? SWKBD_BUTTON_CANCEL
-                                       : config.button_text[0];
-        const std::string forgot = (config.button_text.size() < 2 || config.button_text[1].empty())
-                                       ? SWKBD_BUTTON_FORGOT
-                                       : config.button_text[1];
-        const std::string ok = (config.button_text.size() < 3 || config.button_text[2].empty())
-                                   ? SWKBD_BUTTON_OKAY
-                                   : config.button_text[2];
-        LOG_INFO(Applet_SWKBD, "Enter the button ({}, {} or {}):", cancel, forgot, ok);
-        std::string button;
-        while (button != cancel && button != forgot && button != ok) {
-            std::getline(std::cin, button);
-        }
-        if (button == cancel) {
-            Finalize(text, 0);
-        } else if (button == forgot) {
-            Finalize(text, 1);
-        } else if (button == ok) {
-            Finalize(text, 2);
-        }
-    }
     }
 }
 

@@ -62,7 +62,6 @@ For a list of commands and options, run `vvctre usage`.
 
 # Removed Features
 
-- GUI
 - System camera support
 
 # Incompatibilities

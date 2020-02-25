@@ -74,7 +74,7 @@ void SDL2_MiiSelector::Setup(const MiiSelectorConfig& config) {
                 }
                 ImGui::ListBoxFooter();
             }
-            if (ImGui::Button("Cancel")) {
+            if (config.enable_cancel_button && ImGui::Button("Cancel")) {
                 done = true;
             }
             ImGui::End();

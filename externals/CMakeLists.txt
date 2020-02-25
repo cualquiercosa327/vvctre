@@ -101,10 +101,12 @@ add_library(imgui
     imgui/examples/imgui_impl_opengl3.h
     imgui/examples/imgui_impl_sdl.cpp
     imgui/examples/imgui_impl_sdl.h
+    imgui/misc/cpp/imgui_stdlib.cpp
+    imgui/misc/cpp/imgui_stdlib.h
 )
 target_link_libraries(imgui PRIVATE glad SDL2)
-target_include_directories(imgui INTERFACE ./imgui ./imgui/examples)
-target_include_directories(imgui PRIVATE ./imgui ./imgui/examples)
+target_include_directories(imgui INTERFACE ./imgui ./imgui/examples ./imgui/misc/cpp)
+target_include_directories(imgui PRIVATE ./imgui ./imgui/examples ./imgui/misc/cpp)
 
 add_subdirectory(semver)
 add_subdirectory(clipp)
