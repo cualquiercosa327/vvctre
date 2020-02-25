@@ -207,6 +207,10 @@ EmuWindow_SDL2::~EmuWindow_SDL2() {
 }
 
 void EmuWindow_SDL2::SwapBuffers() {
+    if (render_window == nullptr) {
+        return;
+    }
+
     SDL_GL_SwapWindow(render_window);
 }
 
