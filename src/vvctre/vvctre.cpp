@@ -486,7 +486,8 @@ int main(int argc, char** argv) {
                 std::make_unique<EmuWindow_SDL2>(system, fullscreen);
 
             // Register frontend applets
-            system.RegisterSoftwareKeyboard(std::make_shared<Frontend::SDL2_SoftwareKeyboard>());
+            system.RegisterSoftwareKeyboard(
+                std::make_shared<Frontend::SDL2_SoftwareKeyboard>(*emu_window));
             system.RegisterMiiSelector(std::make_shared<Frontend::SDL2_MiiSelector>(*emu_window));
 
             // Register camera implementations

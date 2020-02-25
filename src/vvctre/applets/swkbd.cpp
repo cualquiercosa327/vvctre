@@ -8,6 +8,8 @@
 
 namespace Frontend {
 
+SDL2_SoftwareKeyboard::SDL2_SoftwareKeyboard(EmuWindow_SDL2& emu_window) : emu_window(emu_window) {}
+
 void SDL2_SoftwareKeyboard::Execute(const KeyboardConfig& config) {
     SoftwareKeyboard::Execute(config);
 
