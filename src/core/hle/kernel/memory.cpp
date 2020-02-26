@@ -41,11 +41,13 @@ static const u32 memory_region_sizes[8][3] = {
     {0x0B200000, 0x02E00000, 0x02000000}, // 7
 };
 
+namespace MemoryMode {
 enum N3DSMode : u8 {
     Mode6 = 1,
     Mode7 = 2,
     Mode6_2 = 3,
 };
+}
 
 void KernelSystem::MemoryInit(u32 mem_type, u8 n3ds_mode) {
     ASSERT(mem_type != 1);
@@ -53,10 +55,10 @@ void KernelSystem::MemoryInit(u32 mem_type, u8 n3ds_mode) {
     const bool is_new_3ds = Settings::values.is_new_3ds;
     u32 reported_mem_type = mem_type;
     if (is_new_3ds) {
-        if (n3ds_mode == Mode6 || n3ds_mode == Mode6_2) {
+        if (n3ds_mode == MemoryMode::Mode6 || n3ds_mode == MemoryMode::Mode6_2) {
             mem_type = 6;
             reported_mem_type = 6;
-        } else if (n3ds_mode == Mode7) {
+        } else if (n3ds_mode == MemoryMode::Mode7) {
             mem_type = 7;
             reported_mem_type = 7;
         } else {
