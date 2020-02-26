@@ -19,7 +19,7 @@
 #pragma GCC diagnostic pop
 #endif
 #include <unordered_map>
-#include <boost/container_hash/hash.hpp>
+#include <boost/functional/hash.hpp>
 #include <boost/pool/pool_alloc.hpp>
 #include <glad/glad.h>
 #include "common/assert.h"
