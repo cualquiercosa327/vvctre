@@ -1150,15 +1150,10 @@ Surface FindMatch(const SurfaceCache& surface_cache, const SurfaceParams& params
             });
         }
     }
-    if (match_surface)
-        match_surface->LRUBump();
     return match_surface;
 }
 
 RasterizerCacheOpenGL::RasterizerCacheOpenGL() {
-    // 1GB / max size of surface with mips
-    lru_max_size = (1024 * 1024 * 1024) / (1024 * 1024 * 4 / 3);
-
     read_framebuffer.Create();
     draw_framebuffer.Create();
 
@@ -2001,11 +1996,6 @@ void RasterizerCacheOpenGL::RegisterSurface(const Surface& surface) {
     }
     surface->registered = true;
     surface_cache.add({surface->GetInterval(), SurfaceSet{surface}});
-
-    if (lru.size() == lru_max_size)
-        UnregisterSurface(lru.back()->shared_from_this());
-    surface->AddToLRU(lru);
-
     UpdatePagesCachedCount(surface->addr, surface->size, 1);
 }
 
@@ -2014,7 +2004,6 @@ void RasterizerCacheOpenGL::UnregisterSurface(const Surface& surface) {
         return;
     }
     surface->registered = false;
-    surface->RemoveFromLRU();
     UpdatePagesCachedCount(surface->addr, surface->size, -1);
     surface_cache.subtract({surface->GetInterval(), SurfaceSet{surface}});
 }
