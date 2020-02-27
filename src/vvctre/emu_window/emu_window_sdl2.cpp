@@ -445,32 +445,26 @@ void EmuWindow_SDL2::PollEvents() {
         }
     }
 
-    const u32 current_time = SDL_GetTicks();
-
-    if (current_time > last_time + 2000) {
-        if (system.IsPoweredOn()) {
-            const u64 current_program_id = system.Kernel().GetCurrentProcess()->codeset->program_id;
-            if (program_id != current_program_id) {
-                system.GetAppLoader().ReadTitle(program_name);
+    if (system.IsPoweredOn()) {
+        const u64 current_program_id = system.Kernel().GetCurrentProcess()->codeset->program_id;
+        if (program_id != current_program_id) {
+            system.GetAppLoader().ReadTitle(program_name);
 
 #ifdef USE_DISCORD_PRESENCE
-                if (discord_rp == nullptr) {
-                    discord_rp = std::make_unique<DiscordRP>(program_name);
-                } else {
-                    discord_rp->Update(program_name);
-                }
+            if (discord_rp == nullptr) {
+                discord_rp = std::make_unique<DiscordRP>(program_name);
+            } else {
+                discord_rp->Update(program_name);
+            }
 #endif
 
-                const std::string window_title =
-                    fmt::format("vvctre {} | {}", version::vvctre.to_string(), program_name);
+            const std::string window_title =
+                fmt::format("vvctre {} | {}", version::vvctre.to_string(), program_name);
 
-                SDL_SetWindowTitle(render_window, window_title.c_str());
+            SDL_SetWindowTitle(render_window, window_title.c_str());
 
-                program_id = current_program_id;
-            }
+            program_id = current_program_id;
         }
-
-        last_time = current_time;
     }
 }
 

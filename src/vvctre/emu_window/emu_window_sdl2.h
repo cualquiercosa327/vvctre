@@ -91,9 +91,6 @@ private:
     /// The OpenGL context associated with the window
     SDL_GLContext gl_context;
 
-    /// Keeps track of how often to update the title bar and Discord Rich Presence during gameplay
-    u32 last_time = 0;
-
     std::string program_name;
     u64 program_id = 0;
 
