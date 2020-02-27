@@ -4,9 +4,7 @@
 
 #pragma once
 
-#include <atomic>
 #include <memory>
-#include <optional>
 #include <utility>
 #include <imgui.h>
 #include "core/frontend/applets/mii_selector.h"
