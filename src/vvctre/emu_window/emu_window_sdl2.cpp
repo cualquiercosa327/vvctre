@@ -99,6 +99,10 @@ void EmuWindow_SDL2::Close() {
     is_open = false;
 }
 
+void EmuWindow_SDL2::DiskShaderCacheProgress(const float value) {
+    disk_shader_cache_loading_progress = value;
+}
+
 void EmuWindow_SDL2::OnResize() {
     int width, height;
     SDL_GetWindowSize(render_window, &width, &height);
@@ -347,6 +351,14 @@ void EmuWindow_SDL2::SwapBuffers() {
                 mii_selector_code = nullptr;
                 mii_selector_selected_mii = nullptr;
             }
+            ImGui::End();
+        }
+    }
+
+    if (disk_shader_cache_loading_progress != -1.0f) {
+        if (ImGui::Begin("Loading Shaders", nullptr,
+                         ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_AlwaysAutoResize)) {
+            ImGui::ProgressBar(disk_shader_cache_loading_progress, ImVec2(0.0f, 0.0f));
             ImGui::End();
         }
     }

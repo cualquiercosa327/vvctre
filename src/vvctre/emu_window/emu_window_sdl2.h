@@ -43,6 +43,11 @@ public:
 
     void Close();
 
+    /// Updates the disk shader cache loading progress bar
+    /// If the progress bar is hidden, it will be shown
+    /// If value == -1.0f, the progress bar will hide
+    void DiskShaderCacheProgress(const float value);
+
     const Frontend::KeyboardConfig* swkbd_config = nullptr;
     u8* swkbd_code = nullptr;
     std::string* swkbd_text = nullptr;
@@ -93,6 +98,8 @@ private:
 
     std::string program_name;
     u64 program_id = 0;
+
+    float disk_shader_cache_loading_progress = -1.0f;
 
 #ifdef USE_DISCORD_PRESENCE
     std::unique_ptr<DiscordRP> discord_rp;

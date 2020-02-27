@@ -554,7 +554,6 @@ int main(int argc, char** argv) {
             }
 
             if (Settings::values.use_disk_shader_cache) {
-                indicators::ProgressBar bar;
                 std::atomic_bool stop_run{false};
 
                 system.Renderer().Rasterizer()->LoadDiskResources(
@@ -564,19 +563,20 @@ int main(int argc, char** argv) {
                         case VideoCore::LoadCallbackStage::Prepare:
                             break;
                         case VideoCore::LoadCallbackStage::Decompile: {
-                            bar.set_option(indicators::option::PrefixText{"Decompiling shaders "});
-                            bar.set_progress(value * 100 / total);
+                            emu_window->DiskShaderCacheProgress(static_cast<float>(value) / total);
                             break;
                         }
                         case VideoCore::LoadCallbackStage::Build: {
-                            bar.set_option(indicators::option::PrefixText{"Building shaders "});
-                            bar.set_progress(value * 100 / total);
+                            emu_window->DiskShaderCacheProgress(static_cast<float>(value) / total);
                             break;
                         }
                         case VideoCore::LoadCallbackStage::Complete: {
+                            emu_window->DiskShaderCacheProgress(-1.0f);
                             break;
                         }
                         }
+
+                        VideoCore::g_renderer->SwapBuffers();
                     });
             }
 

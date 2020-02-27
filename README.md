@@ -48,16 +48,14 @@ For a list of commands and options, run `vvctre usage`.
 
 </details>
 
-# GUI
+# GUI Features
 
-## Applets
-
-vvctre has a keyboard and Mii selector GUI.
-
-## FPS
-
-You can move the text when the left mouse button is held.  
-You can change its color when the right mouse button is held.
+- Disk Shader Cache Loading Progress Bar
+- FPS
+  - You can move the text while the left mouse button is held.
+  - You can change its color while the right mouse button is held.
+- Keyboard applet
+- Mii selector applet
 
 # Unique Features
 
