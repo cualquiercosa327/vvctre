@@ -50,7 +50,7 @@ For a list of commands and options, run `vvctre usage`.
 
 # GUI Features
 
-- Disk Shader Cache Loading Progress Bar
+- Disk shader cache loading progress bar
 - FPS
   - You can move the text while the left mouse button is held.
   - You can change its color while the right mouse button is held.
