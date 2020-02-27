@@ -55,33 +55,33 @@ void SDL2_MiiSelector::Setup(const MiiSelectorConfig& config) {
     std::size_t selected_mii = 0;
     u32 code = 1;
 
-    ImGuiIO& io = ImGui::GetIO();
+    // ImGuiIO& io = ImGui::GetIO();
 
-    EmuWindow_SDL2::WindowCallback cb;
-    cb.function = [&] {
-        ImGui::SetNextWindowPos(ImVec2(io.DisplaySize.x * 0.5f, io.DisplaySize.y * 0.5f),
-                                ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
-        if (ImGui::Begin(title.c_str(), nullptr,
-                         ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_AlwaysAutoResize)) {
-            if (ImGui::ListBoxHeader("")) {
-                for (std::size_t index = 0; index < miis.size(); ++index) {
-                    if (ImGui::Selectable(
-                            Common::UTF16BufferToUTF8(miis[index].mii_name).c_str())) {
-                        selected_mii = index;
-                        code = 0;
-                        done = true;
-                    }
-                }
-                ImGui::ListBoxFooter();
-            }
-            if (config.enable_cancel_button && ImGui::Button("Cancel")) {
-                done = true;
-            }
-            ImGui::End();
-        }
-    };
+    // EmuWindow_SDL2::WindowCallback cb;
+    // cb.function = [&] {
+    //     ImGui::SetNextWindowPos(ImVec2(io.DisplaySize.x * 0.5f, io.DisplaySize.y * 0.5f),
+    //                             ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
+    //     if (ImGui::Begin(title.c_str(), nullptr,
+    //                      ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_AlwaysAutoResize)) {
+    //         if (ImGui::ListBoxHeader("")) {
+    //             for (std::size_t index = 0; index < miis.size(); ++index) {
+    //                 if (ImGui::Selectable(
+    //                         Common::UTF16BufferToUTF8(miis[index].mii_name).c_str())) {
+    //                     selected_mii = index;
+    //                     code = 0;
+    //                     done = true;
+    //                 }
+    //             }
+    //             ImGui::ListBoxFooter();
+    //         }
+    //         if (config.enable_cancel_button && ImGui::Button("Cancel")) {
+    //             done = true;
+    //         }
+    //         ImGui::End();
+    //     }
+    // };
 
-    emu_window.windows.emplace("SDL2_MiiSelector", &cb);
+    // emu_window.windows.emplace("SDL2_MiiSelector", &cb);
 
     while (emu_window.IsOpen() && !done) {
         VideoCore::g_renderer->SwapBuffers();

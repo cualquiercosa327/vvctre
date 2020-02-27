@@ -1,7 +1,8 @@
 // Copyright 2016 Citra Emulator Project
 // Licensed under GPLv2 or any later version
 // Refer to the license.txt file included.
-
+#pragma GCC push_options
+#pragma GCC optimize("O0")
 #include <algorithm>
 #include <condition_variable>
 #include <cstdlib>
@@ -14,6 +15,7 @@
 #include <imgui.h>
 #include <imgui_impl_opengl3.h>
 #include <imgui_impl_sdl.h>
+#include <imgui_stdlib.h>
 #include "common/logging/log.h"
 #include "common/version.h"
 #include "core/3ds.h"
@@ -207,6 +209,7 @@ void EmuWindow_SDL2::SwapBuffers() {
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplSDL2_NewFrame(render_window);
     ImGui::NewFrame();
+    ImGuiIO& io = ImGui::GetIO();
 
     if (ImGui::Begin("FPS", nullptr,
                      ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoSavedSettings |
@@ -219,14 +222,97 @@ void EmuWindow_SDL2::SwapBuffers() {
         ImGui::End();
     }
 
-    auto it = windows.begin();
+    if (swkbd_config != nullptr && swkbd_code != nullptr && swkbd_text != nullptr) {
+        ImGui::SetNextWindowPos(ImVec2(io.DisplaySize.x * 0.5f, io.DisplaySize.y * 0.5f),
+                                ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
+        if (ImGui::Begin("Keyboard", nullptr,
+                         ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_AlwaysAutoResize)) {
+            ImGui::InputTextWithHint("", swkbd_config->hint_text.c_str(), swkbd_text,
+                                     swkbd_config->multiline_mode ? ImGuiInputTextFlags_Multiline
+                                                                  : 0);
 
-    while (it != windows.end()) {
-        if (it->second == nullptr || !it->second->function) {
-            it = windows.erase(it);
-        } else {
-            it->second->function();
-            ++it;
+            if (Frontend::SoftwareKeyboard::ValidateInput(*swkbd_text, *swkbd_config) ==
+                Frontend::ValidationError::None) {
+                switch (swkbd_config->button_config) {
+                case Frontend::ButtonConfig::None:
+                case Frontend::ButtonConfig::Single: {
+                    if (ImGui::Button((!swkbd_config->has_custom_button_text ||
+                                               swkbd_config->button_text[0].empty()
+                                           ? Frontend::SWKBD_BUTTON_OKAY
+                                           : swkbd_config->button_text[0])
+                                          .c_str())) {
+                        swkbd_config = nullptr;
+                        swkbd_code = nullptr;
+                        swkbd_text = nullptr;
+                    }
+                    break;
+                }
+
+                case Frontend::ButtonConfig::Dual: {
+                    const std::string cancel = (swkbd_config->button_text.size() < 1 ||
+                                                swkbd_config->button_text[0].empty())
+                                                   ? Frontend::SWKBD_BUTTON_CANCEL
+                                                   : swkbd_config->button_text[0];
+                    const std::string ok = (swkbd_config->button_text.size() < 2 ||
+                                            swkbd_config->button_text[1].empty())
+                                               ? Frontend::SWKBD_BUTTON_OKAY
+                                               : swkbd_config->button_text[1];
+                    if (ImGui::Button(cancel.c_str())) {
+                        swkbd_config = nullptr;
+                        swkbd_code = nullptr;
+                        swkbd_text = nullptr;
+                        break;
+                    }
+                    ImGui::SameLine();
+                    if (ImGui::Button(ok.c_str())) {
+                        *swkbd_code = 1;
+                        swkbd_config = nullptr;
+                        swkbd_code = nullptr;
+                        swkbd_text = nullptr;
+                    }
+                    break;
+                }
+
+                case Frontend::ButtonConfig::Triple: {
+                    const std::string cancel = (swkbd_config->button_text.size() < 1 ||
+                                                swkbd_config->button_text[0].empty())
+                                                   ? Frontend::SWKBD_BUTTON_CANCEL
+                                                   : swkbd_config->button_text[0];
+                    const std::string forgot = (swkbd_config->button_text.size() < 2 ||
+                                                swkbd_config->button_text[1].empty())
+                                                   ? Frontend::SWKBD_BUTTON_FORGOT
+                                                   : swkbd_config->button_text[1];
+                    const std::string ok = (swkbd_config->button_text.size() < 3 ||
+                                            swkbd_config->button_text[2].empty())
+                                               ? Frontend::SWKBD_BUTTON_OKAY
+                                               : swkbd_config->button_text[2];
+                    if (ImGui::Button(cancel.c_str())) {
+                        swkbd_config = nullptr;
+                        swkbd_code = nullptr;
+                        swkbd_text = nullptr;
+                        break;
+                    }
+                    ImGui::SameLine();
+                    if (ImGui::Button(forgot.c_str())) {
+                        *swkbd_code = 1;
+                        swkbd_config = nullptr;
+                        swkbd_code = nullptr;
+                        swkbd_text = nullptr;
+                        break;
+                    }
+                    ImGui::SameLine();
+                    if (ImGui::Button(ok.c_str())) {
+                        *swkbd_code = 2;
+                        swkbd_config = nullptr;
+                        swkbd_code = nullptr;
+                        swkbd_text = nullptr;
+                    }
+                    break;
+                }
+                }
+            }
+
+            ImGui::End();
         }
     }
 

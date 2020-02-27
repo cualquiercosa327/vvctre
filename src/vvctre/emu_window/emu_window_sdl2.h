@@ -4,13 +4,13 @@
 
 #pragma once
 
-#include <condition_variable>
-#include <functional>
+#include <atomic>
 #include <memory>
-#include <mutex>
-#include <unordered_map>
+#include <optional>
 #include <utility>
 #include <imgui.h>
+#include "core/frontend/applets/mii_selector.h"
+#include "core/frontend/applets/swkbd.h"
 #include "core/frontend/emu_window.h"
 
 struct SDL_Window;
@@ -45,11 +45,13 @@ public:
 
     void Close();
 
-    struct WindowCallback {
-        std::function<void()> function;
-    };
-    std::unordered_map<std::string, WindowCallback*>
-        windows; ///< Dear ImGui windows to draw after the screens
+    const Frontend::KeyboardConfig* swkbd_config = nullptr;
+    u8* swkbd_code = nullptr;
+    std::string* swkbd_text = nullptr;
+
+    const Frontend::MiiSelectorConfig* mii_selector_config = nullptr;
+    u32* mii_selector_code = nullptr;
+    HLE::Applets::MiiData* mii_selector_selected_mii = nullptr;
 
 private:
     /// Called by PollEvents when a key is pressed or released.

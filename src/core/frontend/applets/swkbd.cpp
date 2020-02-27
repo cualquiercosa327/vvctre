@@ -13,7 +13,8 @@
 
 namespace Frontend {
 
-ValidationError SoftwareKeyboard::ValidateFilters(const std::string& input) const {
+ValidationError SoftwareKeyboard::ValidateFilters(const std::string& input,
+                                                  const KeyboardConfig& config) {
     if (config.filters.prevent_digit) {
         if (std::count_if(input.begin(), input.end(),
                           [](unsigned char c) { return std::isdigit(c); }) > config.max_digits) {
@@ -42,9 +43,10 @@ ValidationError SoftwareKeyboard::ValidateFilters(const std::string& input) cons
     return ValidationError::None;
 }
 
-ValidationError SoftwareKeyboard::ValidateInput(const std::string& input) const {
+ValidationError SoftwareKeyboard::ValidateInput(const std::string& input,
+                                                const KeyboardConfig& config) {
     ValidationError error;
-    if ((error = ValidateFilters(input)) != ValidationError::None) {
+    if ((error = ValidateFilters(input, config)) != ValidationError::None) {
         return error;
     }
 
@@ -94,7 +96,7 @@ ValidationError SoftwareKeyboard::ValidateInput(const std::string& input) const 
     return ValidationError::None;
 }
 
-ValidationError SoftwareKeyboard::ValidateButton(u8 button) const {
+ValidationError SoftwareKeyboard::ValidateButton(u8 button, const KeyboardConfig& config) {
     switch (config.button_config) {
     case ButtonConfig::None:
         return ValidationError::None;
@@ -121,10 +123,10 @@ ValidationError SoftwareKeyboard::ValidateButton(u8 button) const {
 
 ValidationError SoftwareKeyboard::Finalize(const std::string& text, u8 button) {
     ValidationError error;
-    if ((error = ValidateInput(text)) != ValidationError::None) {
+    if ((error = ValidateInput(text, config)) != ValidationError::None) {
         return error;
     }
-    if ((error = ValidateButton(button)) != ValidationError::None) {
+    if ((error = ValidateButton(button, config)) != ValidationError::None) {
         return error;
     }
     data = {text, button};

@@ -30,7 +30,7 @@ enum class ButtonConfig {
     None,   /// No button (returned by swkbdInputText in special cases)
 };
 
-/// Default English button text mappings. Frontends may need to copy this to internationalize it.
+/// Default English button text mappings.
 constexpr char SWKBD_BUTTON_OKAY[] = "Ok";
 constexpr char SWKBD_BUTTON_CANCEL[] = "Cancel";
 constexpr char SWKBD_BUTTON_FORGOT[] = "I Forgot";
@@ -109,19 +109,19 @@ public:
      * whenever the user input changes to check to see if the new input is valid. Frontends can
      * decide if they want to check the input continuously or once before submission
      */
-    ValidationError ValidateFilters(const std::string& input) const;
+    static ValidationError ValidateFilters(const std::string& input, const KeyboardConfig& config);
 
     /**
      * Validates the the provided string doesn't break any extra rules like "input must not be
      * empty". This will be called by Finalize but can be called earlier if the frontend needs
      */
-    ValidationError ValidateInput(const std::string& input) const;
+    static ValidationError ValidateInput(const std::string& input, const KeyboardConfig& config);
 
     /**
      * Verifies that the selected button is valid. This should be used as the last check before
      * closing.
      */
-    ValidationError ValidateButton(u8 button) const;
+    static ValidationError ValidateButton(u8 button, const KeyboardConfig& config);
 
     /**
      * Runs all validation phases. If successful, stores the data so that the HLE applet in core can
