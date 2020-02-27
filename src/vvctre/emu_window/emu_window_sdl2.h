@@ -48,6 +48,7 @@ public:
     std::string* swkbd_text = nullptr;
 
     const Frontend::MiiSelectorConfig* mii_selector_config = nullptr;
+    const std::vector<HLE::Applets::MiiData>* mii_selector_miis;
     u32* mii_selector_code = nullptr;
     HLE::Applets::MiiData* mii_selector_selected_mii = nullptr;
 

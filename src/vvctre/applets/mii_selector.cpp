@@ -2,10 +2,7 @@
 // Licensed under GPLv2 or any later version
 // Refer to the license.txt file included.
 
-#include <atomic>
-#include <glad/glad.h>
 #include "common/file_util.h"
-#include "common/string_util.h"
 #include "core/file_sys/archive_extsavedata.h"
 #include "core/file_sys/file_backend.h"
 #include "core/hle/service/ptm/ptm.h"
@@ -50,44 +47,21 @@ void SDL2_MiiSelector::Setup(const MiiSelectorConfig& config) {
         }
     }
 
-    const std::string title = config.title.empty() ? "Mii Selector" : config.title;
-    std::atomic<bool> done{false};
-    std::size_t selected_mii = 0;
     u32 code = 1;
+    HLE::Applets::MiiData selected_mii;
 
-    // ImGuiIO& io = ImGui::GetIO();
+    emu_window.mii_selector_config = &config;
+    emu_window.mii_selector_miis = &miis;
+    emu_window.mii_selector_code = &code;
+    emu_window.mii_selector_selected_mii = &selected_mii;
 
-    // EmuWindow_SDL2::WindowCallback cb;
-    // cb.function = [&] {
-    //     ImGui::SetNextWindowPos(ImVec2(io.DisplaySize.x * 0.5f, io.DisplaySize.y * 0.5f),
-    //                             ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
-    //     if (ImGui::Begin(title.c_str(), nullptr,
-    //                      ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_AlwaysAutoResize)) {
-    //         if (ImGui::ListBoxHeader("")) {
-    //             for (std::size_t index = 0; index < miis.size(); ++index) {
-    //                 if (ImGui::Selectable(
-    //                         Common::UTF16BufferToUTF8(miis[index].mii_name).c_str())) {
-    //                     selected_mii = index;
-    //                     code = 0;
-    //                     done = true;
-    //                 }
-    //             }
-    //             ImGui::ListBoxFooter();
-    //         }
-    //         if (config.enable_cancel_button && ImGui::Button("Cancel")) {
-    //             done = true;
-    //         }
-    //         ImGui::End();
-    //     }
-    // };
-
-    // emu_window.windows.emplace("SDL2_MiiSelector", &cb);
-
-    while (emu_window.IsOpen() && !done) {
+    while (emu_window.IsOpen() && emu_window.mii_selector_config != nullptr &&
+           emu_window.mii_selector_miis != nullptr && emu_window.mii_selector_code != nullptr &&
+           emu_window.mii_selector_selected_mii != nullptr) {
         VideoCore::g_renderer->SwapBuffers();
     }
 
-    Finalize(code, miis[selected_mii]);
+    Finalize(code, selected_mii);
 }
 
 } // namespace Frontend

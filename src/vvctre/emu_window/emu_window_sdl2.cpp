@@ -16,6 +16,7 @@
 #include <imgui_impl_sdl.h>
 #include <imgui_stdlib.h>
 #include "common/logging/log.h"
+#include "common/string_util.h"
 #include "common/version.h"
 #include "core/3ds.h"
 #include "core/core.h"
@@ -311,6 +312,41 @@ void EmuWindow_SDL2::SwapBuffers() {
                 }
             }
 
+            ImGui::End();
+        }
+    }
+
+    if (mii_selector_config != nullptr && mii_selector_miis != nullptr &&
+        mii_selector_code != nullptr && mii_selector_selected_mii != nullptr) {
+        ImGui::SetNextWindowPos(ImVec2(io.DisplaySize.x * 0.5f, io.DisplaySize.y * 0.5f),
+                                ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
+        if (ImGui::Begin(
+                (mii_selector_config->title.empty() ? "Mii Selector" : mii_selector_config->title)
+                    .c_str(),
+                nullptr, ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_AlwaysAutoResize)) {
+            if (ImGui::ListBoxHeader("")) {
+                for (std::size_t index = 0; index < mii_selector_miis->size(); ++index) {
+                    if (ImGui::Selectable(
+                            Common::UTF16BufferToUTF8(mii_selector_miis->at(index).mii_name)
+                                .c_str())) {
+                        *mii_selector_code = 0;
+                        *mii_selector_selected_mii = mii_selector_miis->at(index);
+                        mii_selector_config = nullptr;
+                        mii_selector_miis = nullptr;
+                        mii_selector_code = nullptr;
+                        mii_selector_selected_mii = nullptr;
+                        break;
+                    }
+                }
+                ImGui::ListBoxFooter();
+            }
+            if (mii_selector_config && mii_selector_config->enable_cancel_button &&
+                ImGui::Button("Cancel")) {
+                mii_selector_config = nullptr;
+                mii_selector_miis = nullptr;
+                mii_selector_code = nullptr;
+                mii_selector_selected_mii = nullptr;
+            }
             ImGui::End();
         }
     }
