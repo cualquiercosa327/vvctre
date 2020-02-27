@@ -36,7 +36,7 @@ vvctre uses the first existing option.
 Ways to use:
 
 - Open vvctre
-- Drop a file on vvctre
+- Drop a file on the vvctre executable
 
 </details>
 
@@ -47,6 +47,17 @@ Run `vvctre` in a terminal.
 For a list of commands and options, run `vvctre usage`.
 
 </details>
+
+# GUI
+
+## Applets
+
+vvctre has a keyboard and Mii selector GUI.
+
+## FPS
+
+You can move the text when the left mouse button is held.  
+You can change its color when the right mouse button is held.
 
 # Unique Features
 
