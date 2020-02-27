@@ -51,9 +51,6 @@ For a list of commands and options, run `vvctre usage`.
 # Unique Features
 
 - [SemVer](https://semver.org/) versions instead of a simple numbers and random strings
-- Supported apps
-  - Everything Citra supports
-  - [3DSident](https://github.com/joel16/3DSident.git) <= 0.7.9
 - Error messages in vvctre and Citra's GUI, but not Citra's CLI:
   - You are running default Windows drivers for your GPU. You need to install the proper drivers for your graphics card from the manufacturer's website.
   - Your GPU may not support OpenGL 3.3, or you do not have the latest graphics driver.
