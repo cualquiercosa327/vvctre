@@ -51,8 +51,8 @@ For a list of commands and options, run `vvctre usage`.
 # GUI Features
 
 - Disk shader cache loading progress bar
-- FPS
-  - You can move the text while the left mouse button is held.
+- FPS indicator
+  - You can move it while the left mouse button is held.
   - You can change its color while the right mouse button is held.
 - Keyboard applet
 - Mii selector applet
