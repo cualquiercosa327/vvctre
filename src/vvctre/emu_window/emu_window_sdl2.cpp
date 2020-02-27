@@ -1,8 +1,7 @@
 // Copyright 2016 Citra Emulator Project
 // Licensed under GPLv2 or any later version
 // Refer to the license.txt file included.
-#pragma GCC push_options
-#pragma GCC optimize("O0")
+
 #include <algorithm>
 #include <condition_variable>
 #include <cstdlib>
