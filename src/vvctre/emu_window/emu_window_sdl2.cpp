@@ -568,6 +568,13 @@ void EmuWindow_SDL2::SwapBuffers() {
                         Settings::LogSettings();
                     }
 
+                    ImGui::Text("Speed Limit");
+                    ImGui::SameLine();
+                    if (ImGui::InputScalar("##speedlimit", ImGuiDataType_U16,
+                                           &Settings::values.frame_limit)) {
+                        Settings::LogSettings();
+                    }
+
                     ImGui::EndMenu();
                 }
 
@@ -580,11 +587,16 @@ void EmuWindow_SDL2::SwapBuffers() {
 
                     ImGui::Text("Volume");
                     ImGui::SameLine();
-                    ImGui::SliderFloat("##volume", &Settings::values.volume, 0.0f, 1.0f);
+                    if (ImGui::SliderFloat("##volume", &Settings::values.volume, 0.0f, 1.0f)) {
+                        Settings::LogSettings();
+                    }
 
                     ImGui::Text("Speed");
                     ImGui::SameLine();
-                    ImGui::SliderFloat("##speed", &Settings::values.audio_speed, 0.001f, 5.0f);
+                    if (ImGui::SliderFloat("##speed", &Settings::values.audio_speed, 0.001f,
+                                           5.0f)) {
+                        Settings::LogSettings();
+                    }
 
                     ImGui::EndMenu();
                 }
