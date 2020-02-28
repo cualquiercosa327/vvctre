@@ -561,11 +561,22 @@ void EmuWindow_SDL2::SwapBuffers() {
 
         if (ImGui::BeginMenu("Edit")) {
             if (ImGui::BeginMenu("Settings")) {
-                ImGui::MenuItem("Limit Speed", nullptr, &Settings::values.use_frame_limit);
-                ImGui::MenuItem("Use Hardware Renderer", nullptr,
-                                &Settings::values.use_hw_renderer);
-                ImGui::MenuItem("Use Hardware Shader", nullptr, &Settings::values.use_hw_shader);
-                ImGui::MenuItem("Use Shader JIT", nullptr, &Settings::values.use_shader_jit);
+                if (ImGui::MenuItem("Limit Speed", nullptr, &Settings::values.use_frame_limit)) {
+                    Settings::LogSettings();
+                }
+                if (ImGui::MenuItem("Use Hardware Renderer", nullptr,
+                                    &Settings::values.use_hw_renderer)) {
+                    Settings::Apply();
+                    Settings::LogSettings();
+                }
+                if (ImGui::MenuItem("Use Hardware Shader", nullptr,
+                                    &Settings::values.use_hw_shader)) {
+                    Settings::Apply();
+                    Settings::LogSettings();
+                }
+                if (ImGui::MenuItem("Use Shader JIT", nullptr, &Settings::values.use_shader_jit)) {
+                    Settings::LogSettings();
+                }
 
                 ImGui::EndMenu();
             }
