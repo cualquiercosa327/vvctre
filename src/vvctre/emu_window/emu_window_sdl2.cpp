@@ -386,13 +386,13 @@ void EmuWindow_SDL2::SwapBuffers() {
     if (ipc_recorder_enabled) {
         if (ImGui::Begin("IPC Recorder", nullptr, ImGuiWindowFlags_NoSavedSettings)) {
             if (ImGui::Button("Clear")) {
-                ipc_recorder_records.clear();
+                ipc_records.clear();
             }
             ImGui::SameLine();
             static std::string filter;
             ImGui::InputTextWithHint("##filter", "Filter", &filter);
             if (ImGui::ListBoxHeader("##records", ImVec2(-1.0f, -1.0f))) {
-                for (const auto& record : ipc_recorder_records) {
+                for (const auto& record : ipc_records) {
                     std::string service_name;
                     std::string function_name = "Unknown";
                     if (system.IsPoweredOn() && record.second.client_port.id != -1) {
@@ -523,12 +523,13 @@ void EmuWindow_SDL2::SwapBuffers() {
 
             if (ImGui::BeginMenu("Debugging")) {
                 if (ImGui::MenuItem("IPC Recorder", nullptr, &ipc_recorder_enabled)) {
+                    ipc_records.clear();
                     auto& r = Core::System::GetInstance().Kernel().GetIPCRecorder();
                     r.SetEnabled(ipc_recorder_enabled);
                     if (ipc_recorder_enabled) {
                         ipc_recorder_callback =
                             r.BindCallback([&](const IPCDebugger::RequestRecord& record) {
-                                ipc_recorder_records[record.id] = record;
+                                ipc_records[record.id] = record;
                             });
                     } else {
                         r.UnbindCallback(ipc_recorder_callback);
