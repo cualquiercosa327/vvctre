@@ -591,8 +591,10 @@ int main(int argc, char** argv) {
                 }
                 case Core::System::ResultStatus::Paused: {
                     while (system.GetStatus() == Core::System::ResultStatus::Paused) {
-                        std::this_thread::yield();
+                        VideoCore::g_renderer->SwapBuffers();
+                        SDL_GL_SetSwapInterval(1);
                     }
+                    SDL_GL_SetSwapInterval(Settings::values.enable_vsync ? 1 : 0);
                     break;
                 }
                 default: { break; }

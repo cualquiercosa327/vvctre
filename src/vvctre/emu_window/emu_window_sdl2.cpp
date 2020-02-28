@@ -463,6 +463,18 @@ void EmuWindow_SDL2::SwapBuffers() {
             ImGui::EndMenu();
         }
 
+        if (ImGui::BeginMenu("Emulation")) {
+            if (ImGui::MenuItem("Continue/Pause")) {
+                if (system.GetStatus() == Core::System::ResultStatus::Paused) {
+                    system.SetStatus(Core::System::ResultStatus::Success);
+                } else {
+                    system.SetStatus(Core::System::ResultStatus::Paused);
+                }
+            }
+
+            ImGui::EndMenu();
+        }
+
         if (ImGui::BeginMenu("Tools")) {
             if (ImGui::MenuItem("Screenshot")) {
                 const auto& layout = GetFramebufferLayout();
