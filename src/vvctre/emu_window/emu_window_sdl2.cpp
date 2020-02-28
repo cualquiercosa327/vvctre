@@ -430,6 +430,40 @@ void EmuWindow_SDL2::SwapBuffers() {
 
             ImGui::EndMenu();
         }
+
+        if (ImGui::BeginMenu("View")) {
+            if (ImGui::BeginMenu("Layout")) {
+                if (ImGui::MenuItem("Default")) {
+                    Settings::values.layout_option = Settings::LayoutOption::Default;
+                    Settings::Apply();
+                }
+
+                if (ImGui::MenuItem("Single Screen")) {
+                    Settings::values.layout_option = Settings::LayoutOption::SingleScreen;
+                    Settings::Apply();
+                }
+
+                if (ImGui::MenuItem("Large Screen")) {
+                    Settings::values.layout_option = Settings::LayoutOption::LargeScreen;
+                    Settings::Apply();
+                }
+
+                if (ImGui::MenuItem("Side by Side")) {
+                    Settings::values.layout_option = Settings::LayoutOption::SideScreen;
+                    Settings::Apply();
+                }
+
+                if (ImGui::MenuItem("Medium Screen")) {
+                    Settings::values.layout_option = Settings::LayoutOption::MediumScreen;
+                    Settings::Apply();
+                }
+
+                ImGui::EndMenu();
+            }
+
+            ImGui::EndMenu();
+        }
+
         ImGui::EndPopup();
     }
 
