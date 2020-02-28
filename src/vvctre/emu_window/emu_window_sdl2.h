@@ -107,4 +107,6 @@ private:
 
     Core::System& system;
     ImVec4 fps_color{0.0f, 1.0f, 0.0f, 1.0f}; // Green
+
+    bool show_failed_to_read_the_file = false;
 };

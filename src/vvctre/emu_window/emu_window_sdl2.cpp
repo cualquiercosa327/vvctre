@@ -14,12 +14,16 @@
 #include <imgui.h>
 #include <imgui_impl_opengl3.h>
 #include <imgui_impl_sdl.h>
+#include <imgui_internal.h>
 #include <imgui_stdlib.h>
+#include <portable-file-dialogs.h>
+#include "common/file_util.h"
 #include "common/logging/log.h"
 #include "common/string_util.h"
 #include "common/version.h"
 #include "core/3ds.h"
 #include "core/core.h"
+#include "core/hle/service/nfc/nfc.h"
 #include "core/settings.h"
 #include "input_common/keyboard.h"
 #include "input_common/main.h"
@@ -223,8 +227,8 @@ void EmuWindow_SDL2::SwapBuffers() {
         if (ImGui::IsWindowFocused() && ImGui::IsMouseDown(ImGuiMouseButton_Right)) {
             ImGui::ColorPicker4("##picker", (float*)&fps_color);
         }
-        ImGui::End();
     }
+    ImGui::End();
 
     if (swkbd_config != nullptr && swkbd_code != nullptr && swkbd_text != nullptr) {
         ImGui::SetNextWindowPos(ImVec2(io.DisplaySize.x * 0.5f, io.DisplaySize.y * 0.5f),
@@ -315,9 +319,8 @@ void EmuWindow_SDL2::SwapBuffers() {
                 }
                 }
             }
-
-            ImGui::End();
         }
+        ImGui::End();
     }
 
     if (mii_selector_config != nullptr && mii_selector_miis != nullptr &&
@@ -351,16 +354,56 @@ void EmuWindow_SDL2::SwapBuffers() {
                 mii_selector_code = nullptr;
                 mii_selector_selected_mii = nullptr;
             }
-            ImGui::End();
         }
+        ImGui::End();
+    }
+
+    if (show_failed_to_read_the_file) {
+        ImGui::OpenPopup("Error##FailedToReadTheFile");
+    }
+
+    if (ImGui::BeginPopupModal("Error##FailedToReadTheFile", &show_failed_to_read_the_file)) {
+        ImGui::Text("Failed to read the file");
+        ImGui::EndPopup();
     }
 
     if (disk_shader_cache_loading_progress != -1.0f) {
         if (ImGui::Begin("Loading Shaders", nullptr,
                          ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_AlwaysAutoResize)) {
             ImGui::ProgressBar(disk_shader_cache_loading_progress, ImVec2(0.0f, 0.0f));
-            ImGui::End();
         }
+        ImGui::End();
+    } else if (ImGui::BeginPopupContextVoid(nullptr, ImGuiMouseButton_Middle)) {
+        if (ImGui::BeginMenu("File")) {
+            if (ImGui::BeginMenu("Amiibo")) {
+                if (ImGui::MenuItem("Load")) {
+                    const auto result = pfd::open_file("Load Amiibo", ".",
+                                                       {"Amiibo Files", "*.bin", "Anything", "*"})
+                                            .result();
+
+                    if (!result.empty()) {
+                        FileUtil::IOFile file(result[0], "rb");
+                        Service::NFC::AmiiboData data;
+                        if (file.ReadArray(&data, 1) == 1) {
+                            std::shared_ptr<Service::NFC::Module::Interface> nfc =
+                                system.ServiceManager().GetService<Service::NFC::Module::Interface>(
+                                    "nfc:u");
+                            nfc->LoadAmiibo(data);
+                        } else {
+                            show_failed_to_read_the_file = true;
+                        }
+                    }
+                }
+
+                if (ImGui::MenuItem("Remove")) {
+                }
+
+                ImGui::EndMenu();
+            }
+
+            ImGui::EndMenu();
+        }
+        ImGui::EndPopup();
     }
 
     ImGui::Render();
