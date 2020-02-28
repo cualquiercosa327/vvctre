@@ -543,6 +543,19 @@ void EmuWindow_SDL2::SwapBuffers() {
             ImGui::EndMenu();
         }
 
+        if (ImGui::BeginMenu("Help")) {
+            if (ImGui::MenuItem("Discord Server")) {
+#ifdef _WIN32
+                const int code = std::system("start https://discord.gg/RNBCBzT");
+#else
+                const int code = std::system("xdg-open https://discord.gg/RNBCBzT");
+#endif
+                LOG_INFO(Frontend, "Opened Discord invite, exit code: {}", code);
+            }
+
+            ImGui::EndMenu();
+        }
+
         ImGui::EndPopup();
     }
 
