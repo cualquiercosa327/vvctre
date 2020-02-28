@@ -416,8 +416,73 @@ void EmuWindow_SDL2::SwapBuffers() {
                     if (label.find(filter) != std::string::npos) {
                         ImGui::Selectable(label.c_str());
                         if (ImGui::IsItemHovered()) {
-                            ImGui::SetTooltip("ID: %d\nStatus: %d", record.first,
-                                              static_cast<int>(record.second.status));
+                            ImGui::SetTooltip(
+                                "ID: %d\n"
+                                "Status: %d\n"
+                                "client_process.type: %s\n"
+                                "client_process.name: %s\n"
+                                "client_process.id: %d\n"
+                                "client_thread.type: %s\n"
+                                "client_thread.name: %s\n"
+                                "client_thread.id: %d\n"
+                                "client_session.type: %s\n"
+                                "client_session.name: %s\n"
+                                "client_session.id: %d\n"
+                                "client_port.type: %s\n"
+                                "client_port.name: %s\n"
+                                "client_port.id: %d\n"
+                                "server_process.type: %s\n"
+                                "server_process.name: %s\n"
+                                "server_process.id: %d\n"
+                                "server_thread.type: %s\n"
+                                "server_thread.name: %s\n"
+                                "server_thread.id: %d\n"
+                                "server_session.type: %s\n"
+                                "server_session.name: %s\n"
+                                "server_session.id: %d\n"
+                                "function_name: %s\n"
+                                "is_hle: %s\n"
+                                "untranslated_request_cmdbuf: %s\n"
+                                "translated_request_cmdbuf: %s\n"
+                                "untranslated_reply_cmdbuf: %s\n"
+                                "translated_reply_cmdbuf: %s",
+                                record.first, static_cast<int>(record.second.status),
+                                record.second.client_process.type.c_str(),
+                                record.second.client_process.name.c_str(),
+                                record.second.client_process.id,
+                                record.second.client_thread.type.c_str(),
+                                record.second.client_thread.name.c_str(),
+                                record.second.client_thread.id,
+                                record.second.client_session.type.c_str(),
+                                record.second.client_session.name.c_str(),
+                                record.second.client_session.id,
+                                record.second.client_port.type.c_str(),
+                                record.second.client_port.name.c_str(),
+                                record.second.client_port.id,
+                                record.second.server_process.type.c_str(),
+                                record.second.server_process.name.c_str(),
+                                record.second.server_process.id,
+                                record.second.server_thread.type.c_str(),
+                                record.second.server_thread.name.c_str(),
+                                record.second.server_thread.id,
+                                record.second.server_session.type.c_str(),
+                                record.second.server_session.name.c_str(),
+                                record.second.server_session.id,
+                                record.second.function_name.c_str(),
+                                record.second.is_hle ? "HLE" : "LLE",
+                                fmt::format(
+                                    "{}",
+                                    fmt::join(record.second.untranslated_request_cmdbuf, ", "))
+                                    .c_str(),
+                                fmt::format(
+                                    "{}", fmt::join(record.second.translated_request_cmdbuf, ", "))
+                                    .c_str(),
+                                fmt::format(
+                                    "{}", fmt::join(record.second.untranslated_reply_cmdbuf, ", "))
+                                    .c_str(),
+                                fmt::format("{}",
+                                            fmt::join(record.second.translated_reply_cmdbuf, ", "))
+                                    .c_str());
                         }
                     }
                 }
