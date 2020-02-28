@@ -396,6 +396,10 @@ void EmuWindow_SDL2::SwapBuffers() {
                 }
 
                 if (ImGui::MenuItem("Remove")) {
+                    std::shared_ptr<Service::NFC::Module::Interface> nfc =
+                        system.ServiceManager().GetService<Service::NFC::Module::Interface>(
+                            "nfc:u");
+                    nfc->RemoveAmiibo();
                 }
 
                 ImGui::EndMenu();
