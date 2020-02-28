@@ -415,6 +415,10 @@ void EmuWindow_SDL2::SwapBuffers() {
                         IPC_Recorder_GetStatusString(record.second.status));
                     if (label.find(filter) != std::string::npos) {
                         ImGui::Selectable(label.c_str());
+                        if (ImGui::IsItemHovered()) {
+                            ImGui::SetTooltip("ID: %d\nStatus: %d", record.first,
+                                              static_cast<int>(record.second.status));
+                        }
                     }
                 }
                 ImGui::ListBoxFooter();
