@@ -590,7 +590,8 @@ int main(int argc, char** argv) {
                     break;
                 }
                 case Core::System::ResultStatus::Paused: {
-                    while (system.GetStatus() == Core::System::ResultStatus::Paused) {
+                    while (emu_window->IsOpen() &&
+                           system.GetStatus() == Core::System::ResultStatus::Paused) {
                         VideoCore::g_renderer->SwapBuffers();
                         SDL_GL_SetSwapInterval(1);
                     }
