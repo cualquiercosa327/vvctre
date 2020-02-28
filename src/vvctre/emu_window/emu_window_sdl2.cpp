@@ -22,6 +22,7 @@
 #include "common/version.h"
 #include "core/3ds.h"
 #include "core/core.h"
+#include "core/hle/service/am/am.h"
 #include "core/hle/service/nfc/nfc.h"
 #include "core/settings.h"
 #include "input_common/keyboard.h"
@@ -378,12 +379,22 @@ void EmuWindow_SDL2::SwapBuffers() {
                 const std::vector<std::string> result =
                     pfd::open_file(
                         "Load File", ".",
-                        {"3DS Executables", "*.cci *.3ds *.cxi *.3dsx *.app *.elf *.axf *.cia"})
+                        {"3DS Executables", "*.cci *.3ds *.cxi *.3dsx *.app *.elf *.axf"})
                         .result();
 
                 if (!result.empty()) {
                     system.SetResetFilePath(result[0]);
                     system.RequestReset();
+                }
+            }
+
+            if (ImGui::MenuItem("Install CIA (blocking)")) {
+                const std::vector<std::string> result =
+                    pfd::open_file("Install CIA", ".", {"CTR Importable Archive", "*.cia"})
+                        .result();
+
+                if (!result.empty()) {
+                    Service::AM::InstallCIA(result[0]);
                 }
             }
 
