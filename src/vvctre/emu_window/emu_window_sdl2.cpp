@@ -29,6 +29,7 @@
 #include "input_common/motion_emu.h"
 #include "input_common/sdl/sdl.h"
 #include "video_core/renderer_base.h"
+#include "video_core/renderer_opengl/texture_filters/texture_filter_manager.h"
 #include "video_core/video_core.h"
 #include "vvctre/emu_window/emu_window_sdl2.h"
 
@@ -634,6 +635,31 @@ void EmuWindow_SDL2::SwapBuffers() {
                     if (ImGui::ColorEdit3("##backgroundcolor", &Settings::values.bg_red,
                                           ImGuiColorEditFlags_NoInputs)) {
                         VideoCore::g_renderer_bg_color_update_requested = true;
+                        Settings::LogSettings();
+                    }
+
+                    ImGui::Text("Texture Filter Name");
+                    ImGui::SameLine();
+                    if (ImGui::BeginCombo("##texturefiltername",
+                                          Settings::values.texture_filter_name.c_str())) {
+                        const auto& filters = OpenGL::TextureFilterManager::TextureFilterMap();
+
+                        for (const auto& filter : filters) {
+                            if (ImGui::Selectable(filter.first.c_str())) {
+                                Settings::values.texture_filter_name = filter.first;
+                                Settings::Apply();
+                                Settings::LogSettings();
+                            }
+                        }
+
+                        ImGui::EndCombo();
+                    }
+
+                    ImGui::Text("Texture Filter Factor");
+                    ImGui::SameLine();
+                    if (ImGui::InputScalar("##texturefilterfactor", ImGuiDataType_U16,
+                                           &Settings::values.texture_filter_factor)) {
+                        Settings::Apply();
                         Settings::LogSettings();
                     }
 
