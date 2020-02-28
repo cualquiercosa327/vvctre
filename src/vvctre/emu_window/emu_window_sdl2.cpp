@@ -559,6 +559,20 @@ void EmuWindow_SDL2::SwapBuffers() {
             ImGui::EndMenu();
         }
 
+        if (ImGui::BeginMenu("Edit")) {
+            if (ImGui::BeginMenu("Settings")) {
+                ImGui::MenuItem("Limit Speed", nullptr, &Settings::values.use_frame_limit);
+                ImGui::MenuItem("Use Hardware Renderer", nullptr,
+                                &Settings::values.use_hw_renderer);
+                ImGui::MenuItem("Use Hardware Shader", nullptr, &Settings::values.use_hw_shader);
+                ImGui::MenuItem("Use Shader JIT", nullptr, &Settings::values.use_shader_jit);
+
+                ImGui::EndMenu();
+            }
+
+            ImGui::EndMenu();
+        }
+
         if (ImGui::BeginMenu("View")) {
             if (ImGui::BeginMenu("Layout")) {
                 if (ImGui::MenuItem("Default")) {
@@ -585,6 +599,9 @@ void EmuWindow_SDL2::SwapBuffers() {
                     Settings::values.layout_option = Settings::LayoutOption::MediumScreen;
                     Settings::Apply();
                 }
+
+                ImGui::MenuItem("Swap Screens", nullptr, &Settings::values.swap_screen);
+                ImGui::MenuItem("Upright Orientation", nullptr, &Settings::values.upright_screen);
 
                 ImGui::EndMenu();
             }
