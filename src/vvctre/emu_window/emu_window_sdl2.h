@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <map>
 #include <memory>
 #include <utility>
 #include <imgui.h>
@@ -113,5 +114,5 @@ private:
 
     bool ipc_recorder_enabled = false;
     IPCDebugger::CallbackHandle ipc_recorder_callback;
-    std::unordered_map<int, IPCDebugger::RequestRecord> ipc_recorder_records;
+    std::map<int, IPCDebugger::RequestRecord> ipc_recorder_records;
 };
