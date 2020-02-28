@@ -588,6 +588,17 @@ void EmuWindow_SDL2::SwapBuffers() {
                     Settings::LogSettings();
                 }
 
+                ImGui::Text("Resolution");
+                ImGui::SameLine();
+                const u16 min = 0;
+                const u16 max = 10;
+                if (ImGui::SliderScalar("##resolution", ImGuiDataType_U16,
+                                        &Settings::values.resolution_factor, &min, &max,
+                                        Settings::values.resolution_factor == 0 ? "Window Size"
+                                                                                : "%d")) {
+                    Settings::LogSettings();
+                }
+
                 ImGui::EndMenu();
             }
 
