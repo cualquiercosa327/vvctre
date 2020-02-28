@@ -570,12 +570,23 @@ void EmuWindow_SDL2::SwapBuffers() {
                     Settings::Apply();
                     Settings::LogSettings();
                 }
+                ImGui::Indent();
 
                 if (ImGui::MenuItem("Use Hardware Shader", nullptr,
                                     &Settings::values.use_hw_shader)) {
                     Settings::Apply();
                     Settings::LogSettings();
                 }
+                ImGui::Indent();
+
+                if (ImGui::MenuItem("Use Accurate Multiplication", nullptr,
+                                    &Settings::values.shaders_accurate_mul)) {
+                    Settings::Apply();
+                    Settings::LogSettings();
+                }
+
+                ImGui::Unindent();
+                ImGui::Unindent();
 
                 if (ImGui::MenuItem("Use Shader JIT", nullptr, &Settings::values.use_shader_jit)) {
                     Settings::LogSettings();
@@ -601,7 +612,8 @@ void EmuWindow_SDL2::SwapBuffers() {
 
                 ImGui::Text("Background Color");
                 ImGui::SameLine();
-                if (ImGui::ColorEdit3("##backgroundcolor", &Settings::values.bg_red)) {
+                if (ImGui::ColorEdit3("##backgroundcolor", &Settings::values.bg_red,
+                                      ImGuiColorEditFlags_NoInputs)) {
                     VideoCore::g_renderer_bg_color_update_requested = true;
                     Settings::LogSettings();
                 }
