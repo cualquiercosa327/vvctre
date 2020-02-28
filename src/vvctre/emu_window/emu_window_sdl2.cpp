@@ -663,6 +663,10 @@ void EmuWindow_SDL2::SwapBuffers() {
                 }
             }
 
+            if (ImGui::MenuItem("Restart")) {
+                system.RequestReset();
+            }
+
             ImGui::EndMenu();
         }
 
