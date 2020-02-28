@@ -411,7 +411,7 @@ void EmuWindow_SDL2::SwapBuffers() {
                         record.second.untranslated_request_cmdbuf.empty()
                             ? 0xFFFFFFFF
                             : record.second.untranslated_request_cmdbuf[0],
-                        record.second.is_hle ? "true" : "false",
+                        record.second.is_hle ? "HLE" : "LLE",
                         IPC_Recorder_GetStatusString(record.second.status));
                     if (label.find(filter) != std::string::npos) {
                         ImGui::Selectable(label.c_str());
@@ -469,19 +469,22 @@ void EmuWindow_SDL2::SwapBuffers() {
                                 record.second.server_session.name.c_str(),
                                 record.second.server_session.id,
                                 record.second.function_name.c_str(),
-                                record.second.is_hle ? "HLE" : "LLE",
+                                record.second.is_hle ? "true" : "false",
                                 fmt::format(
-                                    "{}",
-                                    fmt::join(record.second.untranslated_request_cmdbuf, ", "))
+                                    "0x{:08X}",
+                                    fmt::join(record.second.untranslated_request_cmdbuf, ", 0x"))
                                     .c_str(),
                                 fmt::format(
-                                    "{}", fmt::join(record.second.translated_request_cmdbuf, ", "))
+                                    "0x{:08X}",
+                                    fmt::join(record.second.translated_request_cmdbuf, ", 0x"))
                                     .c_str(),
                                 fmt::format(
-                                    "{}", fmt::join(record.second.untranslated_reply_cmdbuf, ", "))
+                                    "0x{:08X}",
+                                    fmt::join(record.second.untranslated_reply_cmdbuf, ", 0x"))
                                     .c_str(),
-                                fmt::format("{}",
-                                            fmt::join(record.second.translated_reply_cmdbuf, ", "))
+                                fmt::format(
+                                    "0x{:08X}",
+                                    fmt::join(record.second.translated_reply_cmdbuf, ", 0x"))
                                     .c_str());
                         }
                     }
