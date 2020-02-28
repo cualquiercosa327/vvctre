@@ -36,6 +36,23 @@
 #include "vvctre/discord_rp.h"
 #endif
 
+static std::string IPC_Recorder_GetStatusString(IPCDebugger::RequestStatus status) {
+    switch (status) {
+    case IPCDebugger::RequestStatus::Sent:
+        return "Sent";
+    case IPCDebugger::RequestStatus::Handling:
+        return "Handling";
+    case IPCDebugger::RequestStatus::Handled:
+        return "Handled";
+    case IPCDebugger::RequestStatus::HLEUnimplemented:
+        return "HLEUnimplemented";
+    default:
+        break;
+    }
+
+    return "Invalid";
+}
+
 void EmuWindow_SDL2::OnMouseMotion(s32 x, s32 y) {
     TouchMoved((unsigned)std::max(x, 0), (unsigned)std::max(y, 0));
     InputCommon::GetMotionEmu()->Tilt(x, y);
@@ -366,6 +383,46 @@ void EmuWindow_SDL2::SwapBuffers() {
         ImGui::EndPopup();
     }
 
+    if (ipc_recorder_enabled) {
+        if (ImGui::Begin("IPC Recorder", nullptr, ImGuiWindowFlags_NoSavedSettings)) {
+            if (ImGui::Button("Clear")) {
+                ipc_recorder_records.clear();
+            }
+            ImGui::SameLine();
+            static std::string filter;
+            ImGui::InputTextWithHint("##filter", "Filter", &filter);
+            if (ImGui::ListBoxHeader("##records", ImVec2(-1.0f, -1.0f))) {
+                for (const auto& record : ipc_recorder_records) {
+                    std::string service_name;
+                    std::string function_name = "Unknown";
+                    if (system.IsPoweredOn() && record.second.client_port.id != -1) {
+                        service_name = system.ServiceManager().GetServiceNameByPortId(
+                            static_cast<u32>(record.second.client_port.id));
+                    }
+                    if (service_name.empty()) {
+                        service_name = record.second.server_session.name;
+                        service_name = Common::ReplaceAll(service_name, "_Server", "");
+                        service_name = Common::ReplaceAll(service_name, "_Client", "");
+                    }
+                    const std::string label = fmt::format(
+                        "#{} - {} - {} (0x{:08X}) ({}) ({})", record.first, service_name,
+                        record.second.function_name.empty() ? "Unknown"
+                                                            : record.second.function_name,
+                        record.second.untranslated_request_cmdbuf.empty()
+                            ? 0xFFFFFFFF
+                            : record.second.untranslated_request_cmdbuf[0],
+                        record.second.is_hle ? "HLE" : "LLE",
+                        IPC_Recorder_GetStatusString(record.second.status));
+                    if (label.find(filter) != std::string::npos) {
+                        ImGui::Selectable(label.c_str());
+                    }
+                }
+                ImGui::ListBoxFooter();
+            }
+        }
+        ImGui::End();
+    }
+
     if (disk_shader_cache_loading_progress != -1.0f) {
         if (ImGui::Begin("Loading Shaders", nullptr,
                          ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_AlwaysAutoResize)) {
@@ -455,6 +512,23 @@ void EmuWindow_SDL2::SwapBuffers() {
                 if (ImGui::MenuItem("Medium Screen")) {
                     Settings::values.layout_option = Settings::LayoutOption::MediumScreen;
                     Settings::Apply();
+                }
+
+                ImGui::EndMenu();
+            }
+
+            if (ImGui::BeginMenu("Debugging")) {
+                if (ImGui::MenuItem("IPC Recorder", nullptr, &ipc_recorder_enabled)) {
+                    auto& r = Core::System::GetInstance().Kernel().GetIPCRecorder();
+                    r.SetEnabled(ipc_recorder_enabled);
+                    if (ipc_recorder_enabled) {
+                        ipc_recorder_callback =
+                            r.BindCallback([&](const IPCDebugger::RequestRecord& record) {
+                                ipc_recorder_records[record.id] = record;
+                            });
+                    } else {
+                        r.UnbindCallback(ipc_recorder_callback);
+                    }
                 }
 
                 ImGui::EndMenu();

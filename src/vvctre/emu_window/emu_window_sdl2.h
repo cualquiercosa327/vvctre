@@ -10,6 +10,7 @@
 #include "core/frontend/applets/mii_selector.h"
 #include "core/frontend/applets/swkbd.h"
 #include "core/frontend/emu_window.h"
+#include "core/hle/kernel/ipc_debugger/recorder.h"
 
 struct SDL_Window;
 
@@ -109,4 +110,8 @@ private:
     ImVec4 fps_color{0.0f, 1.0f, 0.0f, 1.0f}; // Green
 
     bool show_failed_to_read_the_file = false;
+
+    bool ipc_recorder_enabled = false;
+    IPCDebugger::CallbackHandle ipc_recorder_callback;
+    std::unordered_map<int, IPCDebugger::RequestRecord> ipc_recorder_records;
 };
