@@ -564,16 +564,19 @@ void EmuWindow_SDL2::SwapBuffers() {
                 if (ImGui::MenuItem("Limit Speed", nullptr, &Settings::values.use_frame_limit)) {
                     Settings::LogSettings();
                 }
+
                 if (ImGui::MenuItem("Use Hardware Renderer", nullptr,
                                     &Settings::values.use_hw_renderer)) {
                     Settings::Apply();
                     Settings::LogSettings();
                 }
+
                 if (ImGui::MenuItem("Use Hardware Shader", nullptr,
                                     &Settings::values.use_hw_shader)) {
                     Settings::Apply();
                     Settings::LogSettings();
                 }
+
                 if (ImGui::MenuItem("Use Shader JIT", nullptr, &Settings::values.use_shader_jit)) {
                     Settings::LogSettings();
                 }
@@ -589,30 +592,43 @@ void EmuWindow_SDL2::SwapBuffers() {
                 if (ImGui::MenuItem("Default")) {
                     Settings::values.layout_option = Settings::LayoutOption::Default;
                     Settings::Apply();
+                    Settings::LogSettings();
                 }
 
                 if (ImGui::MenuItem("Single Screen")) {
                     Settings::values.layout_option = Settings::LayoutOption::SingleScreen;
                     Settings::Apply();
+                    Settings::LogSettings();
                 }
 
                 if (ImGui::MenuItem("Large Screen")) {
                     Settings::values.layout_option = Settings::LayoutOption::LargeScreen;
                     Settings::Apply();
+                    Settings::LogSettings();
                 }
 
                 if (ImGui::MenuItem("Side by Side")) {
                     Settings::values.layout_option = Settings::LayoutOption::SideScreen;
                     Settings::Apply();
+                    Settings::LogSettings();
                 }
 
                 if (ImGui::MenuItem("Medium Screen")) {
                     Settings::values.layout_option = Settings::LayoutOption::MediumScreen;
                     Settings::Apply();
+                    Settings::LogSettings();
                 }
 
-                ImGui::MenuItem("Swap Screens", nullptr, &Settings::values.swap_screen);
-                ImGui::MenuItem("Upright Orientation", nullptr, &Settings::values.upright_screen);
+                if (ImGui::MenuItem("Swap Screens", nullptr, &Settings::values.swap_screen)) {
+                    Settings::Apply();
+                    Settings::LogSettings();
+                }
+
+                if (ImGui::MenuItem("Upright Orientation", nullptr,
+                                    &Settings::values.upright_screen)) {
+                    Settings::Apply();
+                    Settings::LogSettings();
+                }
 
                 ImGui::EndMenu();
             }
