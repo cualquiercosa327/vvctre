@@ -574,6 +574,11 @@ void EmuWindow_SDL2::SwapBuffers() {
                     ImGui::Text("Volume");
                     ImGui::SameLine();
                     ImGui::SliderFloat("##volume", &Settings::values.volume, 0.0f, 1.0f);
+
+                    ImGui::Text("Speed");
+                    ImGui::SameLine();
+                    ImGui::SliderFloat("##speed", &Settings::values.audio_speed, 0.0f, 2.0f);
+
                     ImGui::EndMenu();
                 }
 
