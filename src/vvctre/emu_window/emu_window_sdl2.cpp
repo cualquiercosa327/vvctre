@@ -599,6 +599,13 @@ void EmuWindow_SDL2::SwapBuffers() {
                     Settings::LogSettings();
                 }
 
+                ImGui::Text("Background Color");
+                ImGui::SameLine();
+                if (ImGui::ColorEdit3("##backgroundcolor", &Settings::values.bg_red)) {
+                    Settings::Apply();
+                    Settings::LogSettings();
+                }
+
                 ImGui::EndMenu();
             }
 
