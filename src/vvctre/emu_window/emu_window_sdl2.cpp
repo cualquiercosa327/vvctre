@@ -561,61 +561,78 @@ void EmuWindow_SDL2::SwapBuffers() {
 
         if (ImGui::BeginMenu("Edit")) {
             if (ImGui::BeginMenu("Settings")) {
-                if (ImGui::MenuItem("Limit Speed", nullptr, &Settings::values.use_frame_limit)) {
-                    Settings::LogSettings();
+                if (ImGui::BeginMenu("General")) {
+                    if (ImGui::MenuItem("Limit Speed", nullptr,
+                                        &Settings::values.use_frame_limit)) {
+                        Settings::LogSettings();
+                    }
+
+                    ImGui::EndMenu();
                 }
 
-                if (ImGui::MenuItem("Use Hardware Renderer", nullptr,
-                                    &Settings::values.use_hw_renderer)) {
-                    Settings::Apply();
-                    Settings::LogSettings();
-                }
-                ImGui::Indent();
-
-                if (ImGui::MenuItem("Use Hardware Shader", nullptr,
-                                    &Settings::values.use_hw_shader)) {
-                    Settings::Apply();
-                    Settings::LogSettings();
-                }
-                ImGui::Indent();
-
-                if (ImGui::MenuItem("Use Accurate Multiplication", nullptr,
-                                    &Settings::values.shaders_accurate_mul)) {
-                    Settings::Apply();
-                    Settings::LogSettings();
+                if (ImGui::BeginMenu("Audio")) {
+                    ImGui::Text("Volume");
+                    ImGui::SameLine();
+                    ImGui::SliderFloat("##volume", &Settings::values.volume, 0.0f, 1.0f);
+                    ImGui::EndMenu();
                 }
 
-                ImGui::Unindent();
-                ImGui::Unindent();
+                if (ImGui::BeginMenu("Graphics")) {
+                    if (ImGui::MenuItem("Use Hardware Renderer", nullptr,
+                                        &Settings::values.use_hw_renderer)) {
+                        Settings::Apply();
+                        Settings::LogSettings();
+                    }
+                    ImGui::Indent();
 
-                if (ImGui::MenuItem("Use Shader JIT", nullptr, &Settings::values.use_shader_jit)) {
-                    Settings::LogSettings();
-                }
+                    if (ImGui::MenuItem("Use Hardware Shader", nullptr,
+                                        &Settings::values.use_hw_shader)) {
+                        Settings::Apply();
+                        Settings::LogSettings();
+                    }
+                    ImGui::Indent();
 
-                bool vsync_enabled = SDL_GL_GetSwapInterval() == 1;
-                if (ImGui::MenuItem("Enable VSync", nullptr, &vsync_enabled)) {
-                    SDL_GL_SetSwapInterval(vsync_enabled ? 1 : 0);
-                    Settings::values.enable_vsync = vsync_enabled;
-                    Settings::LogSettings();
-                }
+                    if (ImGui::MenuItem("Use Accurate Multiplication", nullptr,
+                                        &Settings::values.shaders_accurate_mul)) {
+                        Settings::Apply();
+                        Settings::LogSettings();
+                    }
 
-                ImGui::Text("Resolution");
-                ImGui::SameLine();
-                const u16 min = 0;
-                const u16 max = 10;
-                if (ImGui::SliderScalar("##resolution", ImGuiDataType_U16,
-                                        &Settings::values.resolution_factor, &min, &max,
-                                        Settings::values.resolution_factor == 0 ? "Window Size"
-                                                                                : "%d")) {
-                    Settings::LogSettings();
-                }
+                    ImGui::Unindent();
+                    ImGui::Unindent();
 
-                ImGui::Text("Background Color");
-                ImGui::SameLine();
-                if (ImGui::ColorEdit3("##backgroundcolor", &Settings::values.bg_red,
-                                      ImGuiColorEditFlags_NoInputs)) {
-                    VideoCore::g_renderer_bg_color_update_requested = true;
-                    Settings::LogSettings();
+                    if (ImGui::MenuItem("Use Shader JIT", nullptr,
+                                        &Settings::values.use_shader_jit)) {
+                        Settings::LogSettings();
+                    }
+
+                    bool vsync_enabled = SDL_GL_GetSwapInterval() == 1;
+                    if (ImGui::MenuItem("Enable VSync", nullptr, &vsync_enabled)) {
+                        SDL_GL_SetSwapInterval(vsync_enabled ? 1 : 0);
+                        Settings::values.enable_vsync = vsync_enabled;
+                        Settings::LogSettings();
+                    }
+
+                    ImGui::Text("Resolution");
+                    ImGui::SameLine();
+                    const u16 min = 0;
+                    const u16 max = 10;
+                    if (ImGui::SliderScalar("##resolution", ImGuiDataType_U16,
+                                            &Settings::values.resolution_factor, &min, &max,
+                                            Settings::values.resolution_factor == 0 ? "Window Size"
+                                                                                    : "%d")) {
+                        Settings::LogSettings();
+                    }
+
+                    ImGui::Text("Background Color");
+                    ImGui::SameLine();
+                    if (ImGui::ColorEdit3("##backgroundcolor", &Settings::values.bg_red,
+                                          ImGuiColorEditFlags_NoInputs)) {
+                        VideoCore::g_renderer_bg_color_update_requested = true;
+                        Settings::LogSettings();
+                    }
+
+                    ImGui::EndMenu();
                 }
 
                 ImGui::EndMenu();
