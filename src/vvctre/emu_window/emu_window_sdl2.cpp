@@ -602,7 +602,7 @@ void EmuWindow_SDL2::SwapBuffers() {
                 ImGui::Text("Background Color");
                 ImGui::SameLine();
                 if (ImGui::ColorEdit3("##backgroundcolor", &Settings::values.bg_red)) {
-                    Settings::Apply();
+                    VideoCore::g_renderer_bg_color_update_requested = true;
                     Settings::LogSettings();
                 }
 
