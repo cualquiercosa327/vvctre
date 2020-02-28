@@ -374,6 +374,19 @@ void EmuWindow_SDL2::SwapBuffers() {
         ImGui::End();
     } else if (ImGui::BeginPopupContextVoid(nullptr, ImGuiMouseButton_Middle)) {
         if (ImGui::BeginMenu("File")) {
+            if (ImGui::MenuItem("Load File")) {
+                const std::vector<std::string> result =
+                    pfd::open_file(
+                        "Load File", ".",
+                        {"3DS Executables", "*.cci *.3ds *.cxi *.3dsx *.app *.elf *.axf *.cia"})
+                        .result();
+
+                if (!result.empty()) {
+                    system.SetResetFilePath(result[0]);
+                    system.RequestReset();
+                }
+            }
+
             if (ImGui::BeginMenu("Amiibo")) {
                 if (ImGui::MenuItem("Load")) {
                     const auto result = pfd::open_file("Load Amiibo", ".",

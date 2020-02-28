@@ -429,7 +429,7 @@ int main(int argc, char** argv) {
         if (path.empty()) {
             const std::vector<std::string> result =
                 pfd::open_file(
-                    "Open File", ".",
+                    "Load File", ".",
                     {"3DS Executables", "*.cci *.3ds *.cxi *.3dsx *.app *.elf *.axf *.cia"})
                     .result();
 
