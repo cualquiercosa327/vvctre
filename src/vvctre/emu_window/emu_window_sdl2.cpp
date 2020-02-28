@@ -656,6 +656,8 @@ void EmuWindow_SDL2::SwapBuffers() {
                     Settings::LogSettings();
                 }
 
+                ImGui::Separator();
+
                 if (ImGui::MenuItem("Swap Screens", nullptr, &Settings::values.swap_screen)) {
                     Settings::Apply();
                     Settings::LogSettings();
