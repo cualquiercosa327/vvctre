@@ -411,7 +411,7 @@ void EmuWindow_SDL2::SwapBuffers() {
                         record.second.untranslated_request_cmdbuf.empty()
                             ? 0xFFFFFFFF
                             : record.second.untranslated_request_cmdbuf[0],
-                        record.second.is_hle ? "HLE" : "LLE",
+                        record.second.is_hle ? "true" : "false",
                         IPC_Recorder_GetStatusString(record.second.status));
                     if (label.find(filter) != std::string::npos) {
                         ImGui::Selectable(label.c_str());
