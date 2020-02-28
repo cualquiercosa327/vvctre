@@ -380,8 +380,6 @@ Server::Server(Core::System& system, const int port) {
         }
         done.Wait();
 
-        // Rotate the image to put the pixels in correct order
-        // (As OpenGL returns pixel data starting from the lowest position)
         const auto rotate = [](const std::vector<u8>& input,
                                const Layout::FramebufferLayout& layout) {
             std::vector<u8> output(input.size());
