@@ -405,7 +405,7 @@ void EmuWindow_SDL2::SwapBuffers() {
                         service_name = Common::ReplaceAll(service_name, "_Client", "");
                     }
                     const std::string label = fmt::format(
-                        "#{} - {} - {} (0x{:08X}) ({}) ({})", record.first, service_name,
+                        "#{} - {} - {} (0x{:08X}) - {} - {}", record.first, service_name,
                         record.second.function_name.empty() ? "Unknown"
                                                             : record.second.function_name,
                         record.second.untranslated_request_cmdbuf.empty()
@@ -417,8 +417,8 @@ void EmuWindow_SDL2::SwapBuffers() {
                         ImGui::Selectable(label.c_str());
                         if (ImGui::IsItemHovered()) {
                             ImGui::SetTooltip(
-                                "ID: %d\n"
-                                "Status: %d\n"
+                                "id: %d\n"
+                                "status: %d\n"
                                 "client_process.type: %s\n"
                                 "client_process.name: %s\n"
                                 "client_process.id: %d\n"
