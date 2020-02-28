@@ -581,6 +581,13 @@ void EmuWindow_SDL2::SwapBuffers() {
                     Settings::LogSettings();
                 }
 
+                bool vsync_enabled = SDL_GL_GetSwapInterval() == 1;
+                if (ImGui::MenuItem("Enable VSync", nullptr, &vsync_enabled)) {
+                    SDL_GL_SetSwapInterval(vsync_enabled ? 1 : 0);
+                    Settings::values.enable_vsync = vsync_enabled;
+                    Settings::LogSettings();
+                }
+
                 ImGui::EndMenu();
             }
 
