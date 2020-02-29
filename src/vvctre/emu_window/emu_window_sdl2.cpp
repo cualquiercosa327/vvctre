@@ -386,7 +386,7 @@ void EmuWindow_SDL2::SwapBuffers() {
         for (const auto& message : messages) {
             ImGui::Text("%s", message.c_str());
         }
-        if (ImGui::Button("OK", ImVec2(-1.0f, -1.0f))) {
+        if (ImGui::Button("OK")) {
             messages.clear();
             ImGui::CloseCurrentPopup();
         }
