@@ -382,9 +382,10 @@ void EmuWindow_SDL2::SwapBuffers() {
         ImGui::OpenPopup("Messages");
     }
 
-    if (ImGui::BeginPopupModal("Messages", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
+    ImGui::SetNextWindowSize(ImVec2(250.0f, 100.0f), ImGuiCond_Appearing);
+    if (ImGui::BeginPopupModal("Messages")) {
         for (const auto& message : messages) {
-            ImGui::TextWrapped("%s", message.c_str());
+            ImGui::TextWrapped("%s\n\n", message.c_str());
         }
         if (ImGui::Button("OK")) {
             messages.clear();
