@@ -20,6 +20,8 @@
 #include "common/string_util.h"
 #include "common/version.h"
 #include "core/3ds.h"
+#include "core/cheats/cheat_base.h"
+#include "core/cheats/cheats.h"
 #include "core/core.h"
 #include "core/hle/service/am/am.h"
 #include "core/hle/service/nfc/nfc.h"
@@ -348,7 +350,7 @@ void EmuWindow_SDL2::SwapBuffers() {
                 (mii_selector_config->title.empty() ? "Mii Selector" : mii_selector_config->title)
                     .c_str(),
                 nullptr, ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_AlwaysAutoResize)) {
-            if (ImGui::ListBoxHeader("")) {
+            if (ImGui::ListBoxHeader("##miis")) {
                 for (std::size_t index = 0; index < mii_selector_miis->size(); ++index) {
                     if (ImGui::Selectable(
                             Common::UTF16BufferToUTF8(mii_selector_miis->at(index).mii_name)
@@ -493,6 +495,26 @@ void EmuWindow_SDL2::SwapBuffers() {
                 ImGui::ListBoxFooter();
             }
         }
+        ImGui::End();
+    }
+
+    if (show_cheats_window && system.IsPoweredOn()) {
+        if (ImGui::Begin("Cheats", nullptr, ImGuiWindowFlags_NoSavedSettings)) {
+            if (ImGui::Button("Reload File")) {
+                system.CheatEngine().LoadCheatFile();
+            }
+
+            if (ImGui::ListBoxHeader("##cheats", ImVec2(-1.0f, -1.0f))) {
+                for (const auto& cheat : system.CheatEngine().GetCheats()) {
+                    bool enabled = cheat->IsEnabled();
+                    if (ImGui::Checkbox(cheat->GetName().c_str(), &enabled)) {
+                        cheat->SetEnabled(enabled);
+                    }
+                }
+                ImGui::ListBoxFooter();
+            }
+        }
+
         ImGui::End();
     }
 
@@ -693,6 +715,8 @@ void EmuWindow_SDL2::SwapBuffers() {
         }
 
         if (ImGui::BeginMenu("View")) {
+            ImGui::MenuItem("Cheats", nullptr, &show_cheats_window);
+
             if (ImGui::BeginMenu("Layout")) {
                 if (ImGui::MenuItem("Default")) {
                     Settings::values.layout_option = Settings::LayoutOption::Default;

@@ -115,4 +115,6 @@ private:
     bool ipc_recorder_enabled = false;
     IPCDebugger::CallbackHandle ipc_recorder_callback;
     std::map<int, IPCDebugger::RequestRecord> ipc_records;
+
+    bool show_cheats_window = false;
 };
