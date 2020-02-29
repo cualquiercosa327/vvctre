@@ -25,6 +25,7 @@
 #include "core/core.h"
 #include "core/hle/service/am/am.h"
 #include "core/hle/service/nfc/nfc.h"
+#include "core/movie.h"
 #include "core/settings.h"
 #include "input_common/keyboard.h"
 #include "input_common/main.h"
@@ -377,13 +378,19 @@ void EmuWindow_SDL2::SwapBuffers() {
         ImGui::End();
     }
 
-    if (show_failed_to_read_the_file) {
-        ImGui::OpenPopup("Error##FailedToReadTheFile");
-    }
+    if (!messages.empty()) {
+        ImGui::OpenPopup("Messages");
 
-    if (ImGui::BeginPopupModal("Error##FailedToReadTheFile", &show_failed_to_read_the_file)) {
-        ImGui::Text("Failed to read the file");
-        ImGui::EndPopup();
+        bool closed = false;
+        if (ImGui::BeginPopupModal("Messages", &closed)) {
+            for (const auto& message : messages) {
+                ImGui::Text(message.c_str());
+            }
+            ImGui::EndPopup();
+        }
+        if (closed) {
+            messages.clear();
+        }
     }
 
     if (ipc_recorder_enabled) {
@@ -564,7 +571,7 @@ void EmuWindow_SDL2::SwapBuffers() {
                                     "nfc:u");
                             nfc->LoadAmiibo(data);
                         } else {
-                            show_failed_to_read_the_file = true;
+                            messages.push_back("Failed to load the amiibo file");
                         }
                     }
                 }
@@ -864,6 +871,53 @@ void EmuWindow_SDL2::SwapBuffers() {
                         layout)) {
                     delete[] data;
                 }
+            }
+
+            if (ImGui::BeginMenu("Movie")) {
+                auto& movie = Core::Movie::GetInstance();
+
+                if (ImGui::MenuItem("Play", nullptr, nullptr,
+                                    !movie.IsPlayingInput() && !movie.IsRecordingInput())) {
+                    const auto filename =
+                        pfd::open_file("Play Movie", ".", {"VVCTRE Movie", "*.vcm"}).result();
+                    if (!filename.empty()) {
+                        const auto movie_result = movie.ValidateMovie(filename[0]);
+                        if (movie_result == Core::Movie::ValidationResult::OK) {
+                            movie.StartPlayback(filename[0],
+                                                [&] { messages.push_back("Playback finished"); });
+                        } else {
+                            switch (movie_result) {
+                            case Core::Movie::ValidationResult::OK:
+                                break;
+                            case Core::Movie::ValidationResult::GameDismatch:
+                                messages.push_back(
+                                    "Movie was recorded using a ROM with a different program ID");
+                                break;
+                            case Core::Movie::ValidationResult::Invalid:
+                                messages.push_back("Movie file doesn't have a valid header");
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                if (ImGui::MenuItem("Record", nullptr, nullptr,
+                                    !movie.IsPlayingInput() && !movie.IsRecordingInput())) {
+                    const std::string filename =
+                        pfd::save_file("Play Movie", "movie.vcm", {"VVCTRE Movie", "*.vcm"})
+                            .result();
+                    if (!filename.empty()) {
+                        movie.StartRecording(filename);
+                    }
+                }
+
+                if (ImGui::MenuItem("Stop Playback/Recording", nullptr, nullptr,
+                                    movie.IsPlayingInput() || movie.IsRecordingInput())) {
+                    movie.Shutdown();
+                    messages.push_back("Movie saved");
+                }
+
+                ImGui::EndMenu();
             }
 
             ImGui::EndMenu();

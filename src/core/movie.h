@@ -29,10 +29,10 @@ class Movie {
 public:
     enum class ValidationResult {
         OK,
-        RevisionDismatch,
         GameDismatch,
         Invalid,
     };
+
     /**
      * Gets the instance of the Movie singleton class.
      * @returns Reference to the instance of the Movie singleton class.
