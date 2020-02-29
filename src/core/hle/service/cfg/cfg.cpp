@@ -240,13 +240,12 @@ void Module::Interface::GetSystemModel(Kernel::HLERequestContext& ctx) {
          model.model == NINTENDO_2DS) &&
         Settings::values.is_new_3ds) {
         model.model = NEW_NINTENDO_3DS_XL;
-        std::memcpy(&data, &model, 4);
     } else if ((model.model == NEW_NINTENDO_3DS || model.model == NEW_NINTENDO_3DS_XL ||
                 model.model == NEW_NINTENDO_2DS_XL) &&
                !Settings::values.is_new_3ds) {
         model.model = NINTENDO_3DS_XL;
-        std::memcpy(&data, &model, 4);
     }
+    std::memcpy(&data, &model, 4);
     rb.Push<u8>(data & 0xFF);
 }
 
@@ -525,13 +524,8 @@ ResultCode Module::FormatConfig() {
     if (!res.IsSuccess())
         return res;
 
-    if (Settings::values.is_new_3ds) {
-        res = CreateConfigInfoBlk(ConsoleModelBlockID, sizeof(CONSOLE_MODEL_NEW), 0xC,
-                                  &CONSOLE_MODEL_NEW);
-    } else {
-        res = CreateConfigInfoBlk(ConsoleModelBlockID, sizeof(CONSOLE_MODEL_OLD), 0xC,
-                                  &CONSOLE_MODEL_OLD);
-    }
+    res = CreateConfigInfoBlk(ConsoleModelBlockID, sizeof(CONSOLE_MODEL_OLD), 0xC,
+                              &CONSOLE_MODEL_OLD);
     if (!res.IsSuccess())
         return res;
 
@@ -545,7 +539,7 @@ ResultCode Module::FormatConfig() {
     if (!res.IsSuccess())
         return res;
     return RESULT_SUCCESS;
-}
+} // namespace Service::CFG
 
 ResultCode Module::LoadConfigNANDSaveFile() {
     std::string nand_directory = FileUtil::GetUserPath(FileUtil::UserPath::NANDDir);
