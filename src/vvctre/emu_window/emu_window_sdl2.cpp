@@ -380,17 +380,17 @@ void EmuWindow_SDL2::SwapBuffers() {
 
     if (!messages.empty()) {
         ImGui::OpenPopup("Messages");
+    }
 
-        bool closed = false;
-        if (ImGui::BeginPopupModal("Messages", &closed)) {
-            for (const auto& message : messages) {
-                ImGui::Text(message.c_str());
-            }
-            ImGui::EndPopup();
+    bool closed = false;
+    if (ImGui::BeginPopupModal("Messages", &closed)) {
+        for (const auto& message : messages) {
+            ImGui::Text("%s", message.c_str());
         }
-        if (closed) {
-            messages.clear();
-        }
+        ImGui::EndPopup();
+    }
+    if (closed) {
+        messages.clear();
     }
 
     if (ipc_recorder_enabled) {
