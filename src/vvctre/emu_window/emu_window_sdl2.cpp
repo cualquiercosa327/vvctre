@@ -384,7 +384,7 @@ void EmuWindow_SDL2::SwapBuffers() {
 
     if (ImGui::BeginPopupModal("Messages", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
         for (const auto& message : messages) {
-            ImGui::Text("%s", message.c_str());
+            ImGui::TextWrapped("%s", message.c_str());
         }
         if (ImGui::Button("OK")) {
             messages.clear();
