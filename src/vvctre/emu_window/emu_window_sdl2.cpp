@@ -883,21 +883,18 @@ void EmuWindow_SDL2::SwapBuffers() {
                         pfd::open_file("Play Movie", ".", {"VVCTRE Movie", "*.vcm"}).result();
                     if (!filename.empty()) {
                         const auto movie_result = movie.ValidateMovie(filename[0]);
-                        if (movie_result == Core::Movie::ValidationResult::OK) {
+                        switch (movie_result) {
+                        case Core::Movie::ValidationResult::OK:
                             movie.StartPlayback(filename[0],
                                                 [&] { messages.push_back("Playback finished"); });
-                        } else {
-                            switch (movie_result) {
-                            case Core::Movie::ValidationResult::OK:
-                                break;
-                            case Core::Movie::ValidationResult::GameDismatch:
-                                messages.push_back(
-                                    "Movie was recorded using a ROM with a different program ID");
-                                break;
-                            case Core::Movie::ValidationResult::Invalid:
-                                messages.push_back("Movie file doesn't have a valid header");
-                                break;
-                            }
+                            break;
+                        case Core::Movie::ValidationResult::GameDismatch:
+                            messages.push_back(
+                                "Movie was recorded using a ROM with a different program ID");
+                            break;
+                        case Core::Movie::ValidationResult::Invalid:
+                            messages.push_back("Movie file doesn't have a valid header");
+                            break;
                         }
                     }
                 }
