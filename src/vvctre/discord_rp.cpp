@@ -19,9 +19,7 @@ DiscordRP::~DiscordRP() {
 
 void DiscordRP::Update(const std::string& game) {
     DiscordRichPresence presence{};
-    presence.state = fmt::format("Version {} (movie version {}, shader cache version {})",
-                                 version::vvctre.to_string(), version::movie, version::shader_cache)
-                         .c_str();
+    presence.state = fmt::format("v{}", version::vvctre.to_string()).c_str();
     presence.details = game.c_str();
     presence.startTimestamp = std::chrono::duration_cast<std::chrono::seconds>(
                                   std::chrono::system_clock::now().time_since_epoch())
