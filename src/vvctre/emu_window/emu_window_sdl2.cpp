@@ -891,6 +891,8 @@ void EmuWindow_SDL2::SwapBuffers() {
                         case Core::Movie::ValidationResult::GameDismatch:
                             messages.push_back(
                                 "Movie was recorded using a ROM with a different program ID");
+                            movie.StartPlayback(filename[0],
+                                                [&] { messages.push_back("Playback finished"); });
                             break;
                         case Core::Movie::ValidationResult::Invalid:
                             messages.push_back("Movie file doesn't have a valid header");
