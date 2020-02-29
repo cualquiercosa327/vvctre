@@ -382,15 +382,15 @@ void EmuWindow_SDL2::SwapBuffers() {
         ImGui::OpenPopup("Messages");
     }
 
-    bool closed = false;
-    if (ImGui::BeginPopupModal("Messages", &closed)) {
+    if (ImGui::BeginPopupModal("Messages", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
         for (const auto& message : messages) {
             ImGui::Text("%s", message.c_str());
         }
+        if (ImGui::Button("OK", ImVec2(-1.0f, -1.0f))) {
+            messages.clear();
+            ImGui::CloseCurrentPopup();
+        }
         ImGui::EndPopup();
-    }
-    if (closed) {
-        messages.clear();
     }
 
     if (ipc_recorder_enabled) {
