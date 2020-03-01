@@ -716,6 +716,121 @@ void EmuWindow_SDL2::SwapBuffers() {
                     ImGui::EndMenu();
                 }
 
+                if (ImGui::BeginMenu("Camera")) {
+                    ImGui::Text("Inner Camera Engine");
+                    ImGui::SameLine();
+                    if (ImGui::BeginCombo("##innerengine",
+                                          Settings::values
+                                              .camera_name[static_cast<std::size_t>(
+                                                  Service::CAM::CameraIndex::InnerCamera)]
+                                              .c_str())) {
+                        if (ImGui::Selectable("blank")) {
+                            Settings::values.camera_name[static_cast<std::size_t>(
+                                Service::CAM::CameraIndex::InnerCamera)] = "blank";
+                            auto cam = Service::CAM::GetModule(system);
+                            if (cam != nullptr) {
+                                cam->ReloadCameraDevices();
+                            }
+                        }
+                        if (ImGui::Selectable("image")) {
+                            Settings::values.camera_name[static_cast<std::size_t>(
+                                Service::CAM::CameraIndex::InnerCamera)] = "image";
+                            auto cam = Service::CAM::GetModule(system);
+                            if (cam != nullptr) {
+                                cam->ReloadCameraDevices();
+                            }
+                        }
+                        ImGui::EndCombo();
+                    }
+
+                    ImGui::Text("Inner Camera Configuration");
+                    ImGui::SameLine();
+                    if (ImGui::InputText("##innerconfiguration",
+                                         &Settings::values.camera_config[static_cast<std::size_t>(
+                                             Service::CAM::CameraIndex::InnerCamera)])) {
+                        auto cam = Service::CAM::GetModule(system);
+                        if (cam != nullptr) {
+                            cam->ReloadCameraDevices();
+                        }
+                    }
+
+                    ImGui::Text("Outer Left Engine");
+                    ImGui::SameLine();
+                    if (ImGui::BeginCombo("##outerleftengine",
+                                          Settings::values
+                                              .camera_name[static_cast<std::size_t>(
+                                                  Service::CAM::CameraIndex::OuterLeftCamera)]
+                                              .c_str())) {
+                        if (ImGui::Selectable("blank")) {
+                            Settings::values.camera_name[static_cast<std::size_t>(
+                                Service::CAM::CameraIndex::OuterLeftCamera)] = "blank";
+                            auto cam = Service::CAM::GetModule(system);
+                            if (cam != nullptr) {
+                                cam->ReloadCameraDevices();
+                            }
+                        }
+                        if (ImGui::Selectable("image")) {
+                            Settings::values.camera_name[static_cast<std::size_t>(
+                                Service::CAM::CameraIndex::OuterLeftCamera)] = "image";
+                            auto cam = Service::CAM::GetModule(system);
+                            if (cam != nullptr) {
+                                cam->ReloadCameraDevices();
+                            }
+                        }
+                        ImGui::EndCombo();
+                    }
+
+                    ImGui::Text("Outer Left Configuration");
+                    ImGui::SameLine();
+                    if (ImGui::InputText("##outerleftconfiguration",
+                                         &Settings::values.camera_config[static_cast<std::size_t>(
+                                             Service::CAM::CameraIndex::OuterLeftCamera)])) {
+                        auto cam = Service::CAM::GetModule(system);
+                        if (cam != nullptr) {
+                            cam->ReloadCameraDevices();
+                        }
+                    }
+
+                    ImGui::Text("Outer Right Engine");
+                    ImGui::SameLine();
+                    if (ImGui::BeginCombo("##outerrightengine",
+                                          Settings::values
+                                              .camera_name[static_cast<std::size_t>(
+                                                  Service::CAM::CameraIndex::OuterRightCamera)]
+                                              .c_str())) {
+                        if (ImGui::Selectable("blank")) {
+                            Settings::values.camera_name[static_cast<std::size_t>(
+                                Service::CAM::CameraIndex::OuterRightCamera)] = "blank";
+                            auto cam = Service::CAM::GetModule(system);
+                            if (cam != nullptr) {
+                                cam->ReloadCameraDevices();
+                            }
+                        }
+                        if (ImGui::Selectable("image")) {
+                            Settings::values.camera_name[static_cast<std::size_t>(
+                                Service::CAM::CameraIndex::OuterRightCamera)] = "image";
+                            auto cam = Service::CAM::GetModule(system);
+                            if (cam != nullptr) {
+                                cam->ReloadCameraDevices();
+                            }
+                        }
+                        ImGui::EndCombo();
+                    }
+
+                    ImGui::Text("Outer Right Configuration");
+                    ImGui::SameLine();
+                    if (ImGui::InputText("##outerrightconfiguration",
+                                         &Settings::values.camera_config[static_cast<std::size_t>(
+                                             Service::CAM::CameraIndex::OuterRightCamera)])) {
+                        auto cam = Service::CAM::GetModule(system);
+                        if (cam != nullptr) {
+                            cam->ReloadCameraDevices();
+                        }
+                    }
+
+                    ImGui::EndMenu();
+                }
+
                 ImGui::EndMenu();
             }
 
