@@ -86,7 +86,7 @@ APT_S::APT_S(std::shared_ptr<Module> apt)
         {0x004B00C2, &APT_S::AppletUtility, "AppletUtility"},
         {0x004C0000, nullptr, "SetFatalErrDispMode"},
         {0x004D0080, nullptr, "GetAppletProgramInfo"},
-        {0x004E0000, nullptr, "HardwareResetAsync"},
+        {0x004E0000, &APT_S::HardwareResetAsync, "HardwareResetAsync"},
         {0x004F0080, &APT_S::SetAppCpuTimeLimit, "SetAppCpuTimeLimit"},
         {0x00500040, &APT_S::GetAppCpuTimeLimit, "GetAppCpuTimeLimit"},
         {0x00510080, &APT_S::GetStartupArgument, "GetStartupArgument"},

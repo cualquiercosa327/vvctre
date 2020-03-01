@@ -601,6 +601,9 @@ public:
          */
         void CheckNew3DS(Kernel::HLERequestContext& ctx);
 
+        /// https://www.3dbrew.org/wiki/APT:HardwareResetAsync
+        void HardwareResetAsync(Kernel::HLERequestContext& ctx);
+
     private:
         bool application_reset_prepared{};
         std::shared_ptr<Module> apt;
