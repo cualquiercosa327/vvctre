@@ -601,7 +601,7 @@ void EmuWindow_SDL2::SwapBuffers() {
                     ImGui::Text("Speed Limit");
                     ImGui::SameLine();
                     const u16 min = 1;
-                    const u16 max = 9999;
+                    const u16 max = 500;
                     if (ImGui::SliderScalar("##speedlimit", ImGuiDataType_U16,
                                             &Settings::values.frame_limit, &min, &max)) {
                         Settings::LogSettings();
