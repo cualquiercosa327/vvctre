@@ -1114,27 +1114,6 @@ Server::Server(Core::System& system, const int port) {
         }
     });
 
-    server->Get("/audiostretching", [&](const httplib::Request& req, httplib::Response& res) {
-        res.set_content(
-            nlohmann::json{
-                {"enabled", Settings::values.enable_audio_stretching},
-            }
-                .dump(),
-            "application/json");
-    });
-
-    server->Post("/audiostretching", [&](const httplib::Request& req, httplib::Response& res) {
-        try {
-            const nlohmann::json json = nlohmann::json::parse(req.body);
-            Settings::values.enable_audio_stretching = json["enabled"].get<bool>();
-            Settings::Apply();
-            res.status = 204;
-        } catch (nlohmann::json::exception& exception) {
-            res.status = 500;
-            res.set_content(exception.what(), "text/plain");
-        }
-    });
-
     server->Get("/audiodevice", [&](const httplib::Request& req, httplib::Response& res) {
         res.set_content(
             nlohmann::json{

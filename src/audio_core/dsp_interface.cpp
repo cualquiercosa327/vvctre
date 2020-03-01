@@ -8,7 +8,6 @@
 #include "audio_core/sink_details.h"
 #include "common/assert.h"
 #include "core/core.h"
-#include "core/dumping/backend.h"
 #include "core/settings.h"
 
 namespace AudioCore {
@@ -28,52 +27,27 @@ Sink& DspInterface::GetSink() {
     return *sink.get();
 }
 
-void DspInterface::EnableStretching(bool enable) {
-    if (perform_time_stretching == enable)
-        return;
-
-    if (!enable) {
-        flushing_time_stretcher = true;
-    }
-    perform_time_stretching = enable;
-}
-
 void DspInterface::OutputFrame(StereoFrame16& frame) {
-    if (!sink)
+    if (!sink) {
         return;
+    }
 
     fifo.Push(frame.data(), frame.size());
-
-    if (Core::System::GetInstance().VideoDumper().IsDumping()) {
-        Core::System::GetInstance().VideoDumper().AddAudioFrame(frame);
-    }
 }
 
 void DspInterface::OutputSample(std::array<s16, 2> sample) {
-    if (!sink)
+    if (!sink) {
         return;
+    }
 
     fifo.Push(&sample, 1);
-
-    if (Core::System::GetInstance().VideoDumper().IsDumping()) {
-        Core::System::GetInstance().VideoDumper().AddAudioSample(sample);
-    }
 }
 
 void DspInterface::OutputCallback(s16* buffer, std::size_t num_frames) {
-    std::size_t frames_written;
-    if (perform_time_stretching) {
-        const std::vector<s16> in{fifo.Pop()};
-        const std::size_t num_in{in.size() / 2};
-        frames_written = time_stretcher.Process(in.data(), num_in, buffer, num_frames);
-    } else if (flushing_time_stretcher) {
-        time_stretcher.Flush();
-        frames_written = time_stretcher.Process(nullptr, 0, buffer, num_frames);
-        frames_written += fifo.Pop(buffer, num_frames - frames_written);
-        flushing_time_stretcher = false;
-    } else {
-        frames_written = fifo.Pop(buffer, num_frames);
-    }
+    const std::vector<s16> in{fifo.Pop()};
+    const std::size_t num_in{in.size() / 2};
+    const std::size_t frames_written =
+        time_stretcher.Process(in.data(), num_in, buffer, num_frames);
 
     if (frames_written > 0) {
         std::memcpy(&last_frame[0], buffer + 2 * (frames_written - 1), 2 * sizeof(s16));

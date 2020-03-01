@@ -649,18 +649,6 @@ Get or set the audio output engine.
 }
 ```
 
-# GET/POST /audiostretching
-
-Get or set whether audio output stretching is enabled.
-
-## Request/Reply
-
-```json
-{
-  "enabled": Boolean
-}
-```
-
 # GET/POST /audiodevice
 
 Get or set the audio output device.

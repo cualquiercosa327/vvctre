@@ -49,19 +49,6 @@ if(ENABLE_MF)
     # just a static library of GUIDS so include that one directly.
     target_link_libraries(audio_core PRIVATE mfuuid.lib)
     target_compile_definitions(audio_core PUBLIC HAVE_MF)
-elseif(ENABLE_FFMPEG_AUDIO_DECODER)
-    target_sources(audio_core PRIVATE
-        hle/ffmpeg_decoder.cpp
-        hle/ffmpeg_decoder.h
-        hle/ffmpeg_dl.cpp
-        hle/ffmpeg_dl.h
-    )
-    if(UNIX)
-        target_link_libraries(audio_core PRIVATE FFmpeg::avcodec)
-    else()
-        target_include_directories(audio_core PRIVATE ${FFMPEG_DIR}/include)
-    endif()
-    target_compile_definitions(audio_core PUBLIC HAVE_FFMPEG)
 elseif(ENABLE_FDK)
     target_sources(audio_core PRIVATE
         hle/fdk_decoder.cpp

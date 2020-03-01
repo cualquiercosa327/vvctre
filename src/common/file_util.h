@@ -24,7 +24,6 @@ namespace FileUtil {
 // User paths for GetUserPath
 enum class UserPath {
     CheatsDir,
-    DLLDir,
     DumpDir,
     LoadDir,
     LogDir,

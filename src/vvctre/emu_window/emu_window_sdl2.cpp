@@ -611,12 +611,6 @@ void EmuWindow_SDL2::SwapBuffers() {
                 }
 
                 if (ImGui::BeginMenu("Audio")) {
-                    if (ImGui::Checkbox("Enable Stretching",
-                                        &Settings::values.enable_audio_stretching)) {
-                        Settings::Apply();
-                        Settings::LogSettings();
-                    }
-
                     ImGui::Text("Volume");
                     ImGui::SameLine();
                     if (ImGui::SliderFloat("##volume", &Settings::values.volume, 0.0f, 1.0f)) {

@@ -44,7 +44,6 @@ void Apply() {
     if (system.IsPoweredOn()) {
         AudioCore::DspInterface& dsp = system.DSP();
         dsp.SetSink(values.sink_id, values.audio_device_id);
-        dsp.EnableStretching(values.enable_audio_stretching);
 
         auto hid = Service::HID::GetModule(system);
         if (hid) {
@@ -120,7 +119,6 @@ void LogSettings() {
     LogSetting("enable_dsp_lle", values.enable_dsp_lle);
     LogSetting("enable_dsp_lle_multithread", values.enable_dsp_lle_multithread);
     LogSetting("sink_id", values.sink_id);
-    LogSetting("enable_audio_stretching", values.enable_audio_stretching);
     LogSetting("audio_device_id", values.audio_device_id);
     LogSetting("volume", values.volume);
     LogSetting("mic_input_type", static_cast<int>(values.mic_input_type));

@@ -17,10 +17,6 @@
 #include "core/cheats/cheats.h"
 #include "core/core.h"
 #include "core/core_timing.h"
-#include "core/dumping/backend.h"
-#ifdef ENABLE_FFMPEG_VIDEO_DUMPER
-#include "core/dumping/ffmpeg_backend.h"
-#endif
 #include "core/custom_tex_cache.h"
 #include "core/gdbstub/gdbstub.h"
 #include "core/hle/kernel/client_port.h"
@@ -286,7 +282,6 @@ System::ResultStatus System::Init(Frontend::EmuWindow& emu_window, u32 system_mo
     memory->SetDSP(*dsp_core);
 
     dsp_core->SetSink(Settings::values.sink_id, Settings::values.audio_device_id);
-    dsp_core->EnableStretching(Settings::values.enable_audio_stretching);
 
     service_manager = std::make_shared<Service::SM::ServiceManager>(*this);
     archive_manager = std::make_unique<Service::FS::ArchiveManager>(*this);
@@ -306,12 +301,6 @@ System::ResultStatus System::Init(Frontend::EmuWindow& emu_window, u32 system_mo
             return ResultStatus::ErrorVideoCore;
         }
     }
-
-#ifdef ENABLE_FFMPEG_VIDEO_DUMPER
-    video_dumper = std::make_unique<VideoDumper::FFmpegBackend>();
-#else
-    video_dumper = std::make_unique<VideoDumper::NullBackend>();
-#endif
 
     LOG_DEBUG(Core, "Initialized OK");
 
@@ -372,14 +361,6 @@ const Cheats::CheatEngine& System::CheatEngine() const {
     return *cheat_engine;
 }
 
-VideoDumper::Backend& System::VideoDumper() {
-    return *video_dumper;
-}
-
-const VideoDumper::Backend& System::VideoDumper() const {
-    return *video_dumper;
-}
-
 Core::CustomTexCache& System::CustomTexCache() {
     return *custom_tex_cache;
 }
@@ -410,10 +391,6 @@ void System::Shutdown() {
     kernel.reset();
     timing.reset();
     app_loader.reset();
-
-    if (video_dumper->IsDumping()) {
-        video_dumper->StopDumping();
-    }
 
     LOG_DEBUG(Core, "Shutdown OK");
 }

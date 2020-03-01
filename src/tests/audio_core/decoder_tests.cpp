@@ -1,7 +1,8 @@
 // Copyright 2019 Citra Emulator Project
 // Licensed under GPLv2 or any later version
 // Refer to the license.txt file included.
-#if defined(HAVE_MF) || defined(HAVE_FFMPEG)
+
+#if defined(HAVE_MF) || defined(HAVE_FDK)
 
 #include <catch2/catch.hpp>
 #include "core/core.h"
@@ -14,8 +15,8 @@
 #include "audio_core/hle/decoder.h"
 #ifdef HAVE_MF
 #include "audio_core/hle/wmf_decoder.h"
-#elif HAVE_FFMPEG
-#include "audio_core/hle/ffmpeg_decoder.h"
+#elif HAVE_FDK
+#include "audio_core/hle/fdk_decoder.h"
 #endif
 #include "audio_fixures.h"
 
@@ -25,8 +26,8 @@ TEST_CASE("DSP HLE Audio Decoder", "[audio_core]") {
         auto decoder =
 #ifdef HAVE_MF
             std::make_unique<AudioCore::HLE::WMFDecoder>(memory);
-#elif HAVE_FFMPEG
-            std::make_unique<AudioCore::HLE::FFMPEGDecoder>(memory);
+#elif HAVE_FDK
+            std::make_unique<AudioCore::HLE::FDKDecoder>(memory);
 #endif
         AudioCore::HLE::BinaryRequest request;
 

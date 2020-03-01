@@ -31,7 +31,6 @@
 #include "common/string_util.h"
 #include "common/version.h"
 #include "core/core.h"
-#include "core/dumping/backend.h"
 #include "core/file_sys/cia_container.h"
 #include "core/frontend/framebuffer_layout.h"
 #include "core/gdbstub/gdbstub.h"
@@ -94,7 +93,6 @@ int main(int argc, char** argv) {
     // for BootOrInstall
     std::string movie_record;
     std::string movie_play;
-    std::string dump_video;
     bool fullscreen = false;
     bool regenerate_console_id = false;
     int rpc_server_port = 47889;
@@ -173,8 +171,6 @@ int main(int argc, char** argv) {
               clipp::value("path").set(movie_record),
           clipp::option("--movie-play").doc("play inputs from a file") &
               clipp::value("path").set(movie_play),
-          clipp::option("--dump-video").doc("dump audio and video to a file") &
-              clipp::value("path").set(dump_video),
           clipp::option("--speed-limit").doc("set the speed limit\ndefault: 100") &
               clipp::value("limit")
                   .set(Settings::values.use_frame_limit, true)
@@ -192,8 +188,7 @@ int main(int argc, char** argv) {
           clipp::option("--resolution").doc("set resolution\ndefault: 1\n0 means use window size") &
               clipp::value("value").set(Settings::values.resolution_factor),
           clipp::option("--audio-speed")
-                  .doc("set audio speed for DSP HLE\ntype: float\nmust be greater than zero\naudio "
-                       "stretching to be enabled to work properly") &
+                  .doc("set audio speed for DSP HLE\ntype: float\nmust be greater than zero") &
               clipp::value("value").set(Settings::values.audio_speed),
           clipp::option("--audio-volume").doc("set audio volume\ntype: float\ndefault: 1.0") &
               clipp::value("value").set(Settings::values.volume),
@@ -395,9 +390,6 @@ int main(int argc, char** argv) {
           clipp::option("--enable-vsync")
               .doc("enable VSync")
               .set(Settings::values.enable_vsync, true),
-          clipp::option("--disable-audio-stretching")
-              .doc("disable audio stretching")
-              .set(Settings::values.enable_audio_stretching, false),
           clipp::option("--record-frame-times")
               .doc("record frame times")
               .set(Settings::values.record_frame_times, true),
@@ -544,12 +536,6 @@ int main(int argc, char** argv) {
                 Core::Movie::GetInstance().StartRecording(movie_record);
             }
 
-            if (!dump_video.empty()) {
-                const Layout::FramebufferLayout layout =
-                    Layout::FrameLayoutFromResolutionScale(VideoCore::GetResolutionScaleFactor());
-                system.VideoDumper().StartDumping(dump_video, "webm", layout);
-            }
-
             if (Settings::values.use_disk_shader_cache) {
                 std::atomic_bool stop_run{false};
 
@@ -600,10 +586,6 @@ int main(int argc, char** argv) {
             }
 
             Core::Movie::GetInstance().Shutdown();
-
-            if (system.VideoDumper().IsDumping()) {
-                system.VideoDumper().StopDumping();
-            }
 
             system.Shutdown();
         }

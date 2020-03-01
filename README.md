@@ -70,6 +70,9 @@ For a list of commands and options, run `vvctre usage`.
 # Removed Features
 
 - System camera support
+- FFmpeg AAC decoder (WMF and FDK are easier to use)
+- Video dumper (very slow)
+- Audio stretching setting (if disabled, audio will not work properly if audio speed is changed)
 
 # Incompatibilities
 

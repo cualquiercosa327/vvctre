@@ -45,10 +45,6 @@ namespace Cheats {
 class CheatEngine;
 } // namespace Cheats
 
-namespace VideoDumper {
-class Backend;
-} // namespace VideoDumper
-
 class RendererBase;
 
 namespace Core {
@@ -227,12 +223,6 @@ public:
     /// Gets a const reference to the custom texture cache system
     const Core::CustomTexCache& CustomTexCache() const;
 
-    /// Gets a reference to the video dumper backend
-    VideoDumper::Backend& VideoDumper();
-
-    /// Gets a const reference to the video dumper backend
-    const VideoDumper::Backend& VideoDumper() const;
-
     std::unique_ptr<PerfStats> perf_stats;
     FrameLimiter frame_limiter;
 
@@ -301,9 +291,6 @@ private:
 
     /// Cheats manager
     std::unique_ptr<Cheats::CheatEngine> cheat_engine;
-
-    /// Video dumper backend
-    std::unique_ptr<VideoDumper::Backend> video_dumper;
 
     /// Custom texture cache system
     std::unique_ptr<Core::CustomTexCache> custom_tex_cache;

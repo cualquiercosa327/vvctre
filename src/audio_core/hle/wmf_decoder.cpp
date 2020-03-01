@@ -149,7 +149,6 @@ MFOutputState WMFDecoder::Impl::DecodingLoop(ADTSData adts_header,
         if (output_status == MFOutputState::OK || output_status == MFOutputState::HaveMoreData) {
             output_buffer = CopySampleToBuffer(output.get());
 
-            // the following was taken from ffmpeg version of the decoder
             f32 val_f32;
             for (std::size_t i = 0; i < output_buffer->size();) {
                 for (std::size_t channel = 0; channel < adts_header.channels; channel++) {
@@ -202,7 +201,7 @@ std::optional<BinaryResponse> WMFDecoder::Impl::Decode(const BinaryRequest& requ
     }
 
     if (request.src_addr < Memory::FCRAM_PADDR ||
-        request.src_addr + request.size > Memory::FCRAM_PADDR + Memory::FCRAM_SIZE) {
+        request.src_addr + request.size > Memory::FCRAM_PADDR + Memory::FCRAM_N3DS_SIZE) {
         LOG_ERROR(Audio_DSP, "Got out of bounds src_addr {:08x}", request.src_addr);
         return {};
     }
@@ -265,7 +264,7 @@ std::optional<BinaryResponse> WMFDecoder::Impl::Decode(const BinaryRequest& requ
     if (out_streams[0].size() != 0) {
         if (request.dst_addr_ch0 < Memory::FCRAM_PADDR ||
             request.dst_addr_ch0 + out_streams[0].size() >
-                Memory::FCRAM_PADDR + Memory::FCRAM_SIZE) {
+                Memory::FCRAM_PADDR + Memory::FCRAM_N3DS_SIZE) {
             LOG_ERROR(Audio_DSP, "Got out of bounds dst_addr_ch0 {:08x}", request.dst_addr_ch0);
             return {};
         }
@@ -276,7 +275,7 @@ std::optional<BinaryResponse> WMFDecoder::Impl::Decode(const BinaryRequest& requ
     if (out_streams[1].size() != 0) {
         if (request.dst_addr_ch1 < Memory::FCRAM_PADDR ||
             request.dst_addr_ch1 + out_streams[1].size() >
-                Memory::FCRAM_PADDR + Memory::FCRAM_SIZE) {
+                Memory::FCRAM_PADDR + Memory::FCRAM_N3DS_SIZE) {
             LOG_ERROR(Audio_DSP, "Got out of bounds dst_addr_ch1 {:08x}", request.dst_addr_ch1);
             return {};
         }

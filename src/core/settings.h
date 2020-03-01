@@ -222,7 +222,6 @@ struct Values {
     bool enable_dsp_lle = false;
     bool enable_dsp_lle_multithread = false;
     std::string sink_id = "auto";
-    bool enable_audio_stretching = true;
     std::string audio_device_id = "auto";
     float volume = 1.0f;
     MicInputType mic_input_type = MicInputType::None;

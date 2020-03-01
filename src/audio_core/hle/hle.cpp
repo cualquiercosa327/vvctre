@@ -5,8 +5,6 @@
 #include "audio_core/audio_types.h"
 #ifdef HAVE_MF
 #include "audio_core/hle/wmf_decoder.h"
-#elif HAVE_FFMPEG
-#include "audio_core/hle/ffmpeg_decoder.h"
 #elif HAVE_FDK
 #include "audio_core/hle/fdk_decoder.h"
 #endif
@@ -90,22 +88,11 @@ DspHle::Impl::Impl(DspHle& parent_, Memory::MemorySystem& memory) : parent(paren
         source.SetMemory(memory);
     }
 
-#if defined(HAVE_MF) && defined(HAVE_FFMPEG)
+#if defined(HAVE_MF)
     decoder = std::make_unique<HLE::WMFDecoder>(memory);
-    if (!decoder->IsValid()) {
-        LOG_WARNING(Audio_DSP, "Unable to load MediaFoundation. Attempting to load FFMPEG instead");
-        decoder = std::make_unique<HLE::FFMPEGDecoder>(memory);
-    }
-#elif defined(HAVE_MF)
-    decoder = std::make_unique<HLE::WMFDecoder>(memory);
-#elif defined(HAVE_FFMPEG)
-    decoder = std::make_unique<HLE::FFMPEGDecoder>(memory);
 #elif defined(HAVE_FDK)
     decoder = std::make_unique<HLE::FDKDecoder>(memory);
-#else
-    LOG_WARNING(Audio_DSP, "No decoder found, this could lead to missing audio");
-    decoder = std::make_unique<HLE::NullDecoder>();
-#endif // HAVE_MF
+#endif
 
     if (!decoder->IsValid()) {
         LOG_WARNING(Audio_DSP,
