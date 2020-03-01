@@ -189,7 +189,6 @@ struct PackageParameterWithoutContext {
     s8 sharpness;
     bool auto_exposure;
     bool auto_white_balance;
-    FrameRate frame_rate;
     PhotoMode photo_mode;
     Contrast contrast;
     LensCorrection lens_correction;
@@ -761,7 +760,6 @@ private:
         std::unique_ptr<Camera::CameraInterface> impl;
         std::array<ContextConfig, 2> contexts;
         int current_context{0};
-        FrameRate frame_rate{FrameRate::Rate_15};
     };
 
     struct PortConfig {

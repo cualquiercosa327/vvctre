@@ -34,23 +34,6 @@ constexpr std::array<Resolution, 8> PRESET_RESOLUTION{{
     {400, 240, 0, 48, 639, 431}, // CTR_TOP_LCD
 }};
 
-// latency in ms for each frame rate option
-constexpr std::array<int, 13> LATENCY_BY_FRAME_RATE{{
-    67,  // Rate_15
-    67,  // Rate_15_To_5
-    67,  // Rate_15_To_2
-    100, // Rate_10
-    118, // Rate_8_5
-    200, // Rate_5
-    50,  // Rate_20
-    50,  // Rate_20_To_5
-    33,  // Rate_30
-    33,  // Rate_30_To_5
-    67,  // Rate_15_To_10
-    50,  // Rate_20_To_10
-    33,  // Rate_30_To_10
-}};
-
 const ResultCode ERROR_INVALID_ENUM_VALUE(ErrorDescription::InvalidEnumValue, ErrorModule::CAM,
                                           ErrorSummary::InvalidArgument, ErrorLevel::Usage);
 const ResultCode ERROR_OUT_OF_RANGE(ErrorDescription::OutOfRange, ErrorModule::CAM,
@@ -150,9 +133,8 @@ void Module::VsyncInterruptEventCallBack(u64 port_id, s64 cycles_late) {
     }
     port.vsync_interrupt_event->Signal();
 
-    system.CoreTiming().ScheduleEvent(
-        msToCycles(LATENCY_BY_FRAME_RATE[static_cast<int>(camera.frame_rate)]) - cycles_late,
-        vsync_interrupt_event_callback, port_id);
+    system.CoreTiming().ScheduleEvent(msToCycles(33) - cycles_late, vsync_interrupt_event_callback,
+                                      port_id);
 }
 
 void Module::StartReceiving(int port_id) {
@@ -173,9 +155,7 @@ void Module::StartReceiving(int port_id) {
 
     // schedules a completion event according to the frame rate. The event will block on the
     // capture task if it is not finished within the expected time
-    system.CoreTiming().ScheduleEvent(
-        msToCycles(LATENCY_BY_FRAME_RATE[static_cast<int>(camera.frame_rate)]),
-        completion_event_callback, port_id);
+    system.CoreTiming().ScheduleEvent(msToCycles(33), completion_event_callback, port_id);
 }
 
 void Module::CancelReceiving(int port_id) {
@@ -195,9 +175,7 @@ void Module::ActivatePort(int port_id, int camera_id) {
     }
     ports[port_id].is_active = true;
     ports[port_id].camera_id = camera_id;
-    system.CoreTiming().ScheduleEvent(
-        msToCycles(LATENCY_BY_FRAME_RATE[static_cast<int>(cameras[camera_id].frame_rate)]),
-        vsync_interrupt_event_callback, port_id);
+    system.CoreTiming().ScheduleEvent(msToCycles(33), vsync_interrupt_event_callback, port_id);
 }
 
 template <int max_index>
@@ -800,24 +778,8 @@ void Module::Interface::SetSize(Kernel::HLERequestContext& ctx) {
 }
 
 void Module::Interface::SetFrameRate(Kernel::HLERequestContext& ctx) {
-    IPC::RequestParser rp(ctx, 0x20, 2, 0);
-    const CameraSet camera_select(rp.Pop<u8>());
-    const FrameRate frame_rate = static_cast<FrameRate>(rp.Pop<u8>());
-
-    IPC::RequestBuilder rb = rp.MakeBuilder(1, 0);
-    if (camera_select.IsValid()) {
-        for (int camera : camera_select) {
-            cam->cameras[camera].frame_rate = frame_rate;
-            cam->cameras[camera].impl->SetFrameRate(frame_rate);
-        }
-        rb.Push(RESULT_SUCCESS);
-    } else {
-        LOG_ERROR(Service_CAM, "invalid camera_select={}", camera_select.m_val);
-        rb.Push(ERROR_INVALID_ENUM_VALUE);
-    }
-
-    LOG_WARNING(Service_CAM, "(STUBBED) called, camera_select={}, frame_rate={}",
-                camera_select.m_val, static_cast<int>(frame_rate));
+    IPC::RequestBuilder rb(ctx, 0x20, 1, 0);
+    rb.Push(RESULT_SUCCESS);
 }
 
 void Module::Interface::SetEffect(Kernel::HLERequestContext& ctx) {

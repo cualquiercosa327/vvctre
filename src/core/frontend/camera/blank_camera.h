@@ -17,7 +17,6 @@ public:
     void SetFlip(Service::CAM::Flip) override;
     void SetEffect(Service::CAM::Effect) override;
     void SetFormat(Service::CAM::OutputFormat) override;
-    void SetFrameRate(Service::CAM::FrameRate frame_rate) override {}
     std::vector<u16> ReceiveFrame() override;
     bool IsPreviewAvailable() override;
 

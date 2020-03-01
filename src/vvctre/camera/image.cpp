@@ -70,7 +70,6 @@ void ImageCamera::StartCapture() {}
 void ImageCamera::StopCapture() {}
 void ImageCamera::SetFlip(Service::CAM::Flip flip) {}
 void ImageCamera::SetEffect(Service::CAM::Effect effect) {}
-void ImageCamera::SetFrameRate(Service::CAM::FrameRate frame_rate) {}
 
 bool ImageCamera::IsPreviewAvailable() {
     return false;
