@@ -417,10 +417,13 @@ ResultCode Module::FormatConfig() {
     if (!res.IsSuccess() && res != FileSys::ERROR_FILE_NOT_FOUND) {
         return res;
     }
+
     // Delete the old data
     cfg_config_file_buffer.fill(0);
+
     // Create the header
     SaveFileConfig* config = reinterpret_cast<SaveFileConfig*>(cfg_config_file_buffer.data());
+
     // This value is hardcoded, taken from 3dbrew, verified by hardware, it's always the same value
     config->data_entries_offset = 0x455C;
 
@@ -429,18 +432,21 @@ ResultCode Module::FormatConfig() {
 
     // 0x00030001 - Unknown
     res = CreateConfigInfoBlk(0x00030001, 0x8, 0xE, zero_buffer);
-    if (!res.IsSuccess())
+    if (!res.IsSuccess()) {
         return res;
+    }
 
     res = CreateConfigInfoBlk(StereoCameraSettingsBlockID, sizeof(STEREO_CAMERA_SETTINGS), 0xE,
                               STEREO_CAMERA_SETTINGS.data());
-    if (!res.IsSuccess())
+    if (!res.IsSuccess()) {
         return res;
+    }
 
     res = CreateConfigInfoBlk(SoundOutputModeBlockID, sizeof(SOUND_OUTPUT_MODE), 0xE,
                               &SOUND_OUTPUT_MODE);
-    if (!res.IsSuccess())
+    if (!res.IsSuccess()) {
         return res;
+    }
 
     u32 random_number;
     u64 console_id;
@@ -448,35 +454,42 @@ ResultCode Module::FormatConfig() {
 
     u64_le console_id_le = console_id;
     res = CreateConfigInfoBlk(ConsoleUniqueID1BlockID, sizeof(console_id_le), 0xE, &console_id_le);
-    if (!res.IsSuccess())
+    if (!res.IsSuccess()) {
         return res;
+    }
 
     res = CreateConfigInfoBlk(ConsoleUniqueID2BlockID, sizeof(console_id_le), 0xE, &console_id_le);
-    if (!res.IsSuccess())
+    if (!res.IsSuccess()) {
         return res;
+    }
 
     u32_le random_number_le = random_number;
     res = CreateConfigInfoBlk(ConsoleUniqueID3BlockID, sizeof(random_number_le), 0xE,
                               &random_number_le);
-    if (!res.IsSuccess())
+    if (!res.IsSuccess()) {
         return res;
+    }
 
     res = CreateConfigInfoBlk(UsernameBlockID, sizeof(CONSOLE_USERNAME_BLOCK), 0xE,
                               &CONSOLE_USERNAME_BLOCK);
-    if (!res.IsSuccess())
+    if (!res.IsSuccess()) {
         return res;
+    }
 
     res = CreateConfigInfoBlk(BirthdayBlockID, sizeof(PROFILE_BIRTHDAY), 0xE, &PROFILE_BIRTHDAY);
-    if (!res.IsSuccess())
+    if (!res.IsSuccess()) {
         return res;
+    }
 
     res = CreateConfigInfoBlk(LanguageBlockID, sizeof(CONSOLE_LANGUAGE), 0xE, &CONSOLE_LANGUAGE);
-    if (!res.IsSuccess())
+    if (!res.IsSuccess()) {
         return res;
+    }
 
     res = CreateConfigInfoBlk(CountryInfoBlockID, sizeof(COUNTRY_INFO), 0xE, &COUNTRY_INFO);
-    if (!res.IsSuccess())
+    if (!res.IsSuccess()) {
         return res;
+    }
 
     u16_le country_name_buffer[16][0x40] = {};
     std::u16string region_name = Common::UTF8ToUTF16("Gensokyo");
@@ -486,50 +499,61 @@ ResultCode Module::FormatConfig() {
     // 0x000B0001 - Localized names for the profile Country
     res = CreateConfigInfoBlk(CountryNameBlockID, sizeof(country_name_buffer), 0xE,
                               country_name_buffer);
-    if (!res.IsSuccess())
+    if (!res.IsSuccess()) {
         return res;
+    }
+
     // 0x000B0002 - Localized names for the profile State/Province
     res = CreateConfigInfoBlk(StateNameBlockID, sizeof(country_name_buffer), 0xE,
                               country_name_buffer);
-    if (!res.IsSuccess())
+    if (!res.IsSuccess()) {
         return res;
+    }
 
     // 0x000B0003 - Unknown, related to country/address (zip code?)
     res = CreateConfigInfoBlk(0x000B0003, 0x4, 0xE, zero_buffer);
-    if (!res.IsSuccess())
+    if (!res.IsSuccess()) {
         return res;
+    }
 
     // 0x000C0000 - Unknown
     res = CreateConfigInfoBlk(0x000C0000, 0xC0, 0xE, zero_buffer);
-    if (!res.IsSuccess())
+    if (!res.IsSuccess()) {
         return res;
+    }
 
     // 0x000C0001 - Unknown
     res = CreateConfigInfoBlk(0x000C0001, 0x14, 0xE, zero_buffer);
-    if (!res.IsSuccess())
+    if (!res.IsSuccess()) {
         return res;
+    }
 
     // 0x000D0000 - Accepted EULA version
     u32_le data = MAX_EULA_VERSION.minor + (MAX_EULA_VERSION.major << 8);
     res = CreateConfigInfoBlk(EULAVersionBlockID, sizeof(data), 0xE, &data);
-    if (!res.IsSuccess())
+    if (!res.IsSuccess()) {
         return res;
+    }
 
     res = CreateConfigInfoBlk(ConsoleModelBlockID, sizeof(CONSOLE_MODEL), 0xC, &CONSOLE_MODEL);
-    if (!res.IsSuccess())
+    if (!res.IsSuccess()) {
         return res;
+    }
 
     // 0x00170000 - Unknown
     res = CreateConfigInfoBlk(0x00170000, 0x4, 0xE, zero_buffer);
-    if (!res.IsSuccess())
+    if (!res.IsSuccess()) {
         return res;
+    }
 
     // Save the buffer to the file
     res = UpdateConfigNANDSavegame();
-    if (!res.IsSuccess())
+    if (!res.IsSuccess()) {
         return res;
+    }
+
     return RESULT_SUCCESS;
-} // namespace Service::CFG
+}
 
 ResultCode Module::LoadConfigNANDSaveFile() {
     std::string nand_directory = FileUtil::GetUserPath(FileUtil::UserPath::NANDDir);
