@@ -78,7 +78,6 @@ void LogSettings() {
     LogSetting("use_cpu_jit", values.use_cpu_jit);
     LogSetting("multiplayer_url", values.multiplayer_url);
     LogSetting("use_virtual_sd", values.use_virtual_sd);
-    LogSetting("is_new_3ds", values.is_new_3ds);
     LogSetting("region_value", values.region_value);
     LogSetting("init_clock", static_cast<int>(values.init_clock));
     LogSetting("init_time", values.init_time);

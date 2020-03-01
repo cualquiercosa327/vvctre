@@ -172,7 +172,6 @@ struct Values {
     bool use_virtual_sd = true;
 
     // System
-    bool is_new_3ds = false;
     int region_value = REGION_VALUE_AUTO_SELECT;
     InitClock init_clock = InitClock::SystemTime;
     u64 init_time = 0;

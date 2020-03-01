@@ -839,19 +839,16 @@ void Module::APTInterface::CheckNew3DSApp(Kernel::HLERequestContext& ctx) {
         rb.Push(RESULT_SUCCESS);
         rb.Push<u32>(0);
     } else {
-        PTM::CheckNew3DS(rb);
+        rb.Push(RESULT_SUCCESS);
+        rb.Push(true);
     }
-
-    LOG_WARNING(Service_APT, "(STUBBED) called");
 }
 
 void Module::APTInterface::CheckNew3DS(Kernel::HLERequestContext& ctx) {
     IPC::RequestParser rp(ctx, 0x102, 0, 0); // 0x01020000
     IPC::RequestBuilder rb = rp.MakeBuilder(2, 0);
-
-    PTM::CheckNew3DS(rb);
-
-    LOG_WARNING(Service_APT, "(STUBBED) called");
+    rb.Push(RESULT_SUCCESS);
+    rb.Push(true);
 }
 
 Module::APTInterface::APTInterface(std::shared_ptr<Module> apt, const char* name, u32 max_session)

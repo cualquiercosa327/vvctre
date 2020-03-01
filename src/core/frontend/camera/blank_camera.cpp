@@ -2,6 +2,7 @@
 // Licensed under GPLv2 or any later version
 // Refer to the license.txt file included.
 
+#include "common/assert.h"
 #include "core/frontend/camera/blank_camera.h"
 
 namespace Camera {
@@ -19,9 +20,13 @@ void BlankCamera::SetResolution(const Service::CAM::Resolution& resolution) {
     height = resolution.height;
 };
 
-void BlankCamera::SetFlip(Service::CAM::Flip) {}
+void BlankCamera::SetFlip(Service::CAM::Flip) {
+    UNIMPLEMENTED();
+}
 
-void BlankCamera::SetEffect(Service::CAM::Effect) {}
+void BlankCamera::SetEffect(Service::CAM::Effect) {
+    UNIMPLEMENTED();
+}
 
 std::vector<u16> BlankCamera::ReceiveFrame() {
     // Note: 0x80008000 stands for two black pixels in YUV422

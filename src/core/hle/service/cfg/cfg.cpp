@@ -236,15 +236,7 @@ void Module::Interface::GetSystemModel(Kernel::HLERequestContext& ctx) {
     rb.Push(cfg->GetConfigInfoBlock(ConsoleModelBlockID, 4, 0x8, reinterpret_cast<u8*>(&data)));
     ConsoleModelInfo model;
     std::memcpy(&model, &data, 4);
-    if ((model.model == NINTENDO_3DS || model.model == NINTENDO_3DS_XL ||
-         model.model == NINTENDO_2DS) &&
-        Settings::values.is_new_3ds) {
-        model.model = NEW_NINTENDO_3DS_XL;
-    } else if ((model.model == NEW_NINTENDO_3DS || model.model == NEW_NINTENDO_3DS_XL ||
-                model.model == NEW_NINTENDO_2DS_XL) &&
-               !Settings::values.is_new_3ds) {
-        model.model = NINTENDO_3DS_XL;
-    }
+    model.model = NEW_NINTENDO_3DS_XL;
     std::memcpy(&data, &model, 4);
     rb.Push<u8>(data & 0xFF);
 }

@@ -246,33 +246,27 @@ void System::Reschedule() {
 System::ResultStatus System::Init(Frontend::EmuWindow& emu_window, u32 system_mode, u8 n3ds_mode) {
     LOG_DEBUG(HW_Memory, "initialized OK");
 
-    std::size_t num_cores = 2;
-    if (Settings::values.is_new_3ds) {
-        num_cores = 4;
-    }
-
     memory = std::make_unique<Memory::MemorySystem>();
-
-    timing = std::make_unique<Timing>(num_cores);
+    timing = std::make_unique<Timing>(4);
 
     kernel = std::make_unique<Kernel::KernelSystem>(
-        *memory, *timing, [this] { PrepareReschedule(); }, system_mode, num_cores, n3ds_mode);
+        *memory, *timing, [this] { PrepareReschedule(); }, system_mode, 4, n3ds_mode);
 
     if (Settings::values.use_cpu_jit) {
 #ifdef ARCHITECTURE_x86_64
-        for (std::size_t i = 0; i < num_cores; ++i) {
+        for (std::size_t i = 0; i < 4; ++i) {
             cpu_cores.push_back(
                 std::make_shared<ARM_Dynarmic>(this, *memory, USER32MODE, i, timing->GetTimer(i)));
         }
 #else
-        for (std::size_t i = 0; i < num_cores; ++i) {
+        for (std::size_t i = 0; i < 4; ++i) {
             cpu_cores.push_back(
                 std::make_shared<ARM_DynCom>(this, *memory, USER32MODE, i, timing->GetTimer(i)));
         }
         LOG_WARNING(Core, "CPU JIT requested, but Dynarmic not available");
 #endif
     } else {
-        for (std::size_t i = 0; i < num_cores; ++i) {
+        for (std::size_t i = 0; i < 4; ++i) {
             cpu_cores.push_back(
                 std::make_shared<ARM_DynCom>(this, *memory, USER32MODE, i, timing->GetTimer(i)));
         }

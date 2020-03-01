@@ -1219,29 +1219,6 @@ Server::Server(Core::System& system, const int port) {
         }
     });
 
-    server->Get("/isnew3ds", [&](const httplib::Request& req, httplib::Response& res) {
-        res.set_content(
-            nlohmann::json{
-                {"enabled", Settings::values.is_new_3ds},
-            }
-                .dump(),
-            "application/json");
-    });
-
-    server->Post("/isnew3ds", [&](const httplib::Request& req, httplib::Response& res) {
-        try {
-            const nlohmann::json json = nlohmann::json::parse(req.body);
-            Settings::values.is_new_3ds = json["enabled"].get<bool>();
-            if (system.IsPoweredOn()) {
-                system.RequestReset();
-            }
-            res.status = 204;
-        } catch (nlohmann::json::exception& exception) {
-            res.status = 500;
-            res.set_content(exception.what(), "text/plain");
-        }
-    });
-
     server->Get("/region", [&](const httplib::Request& req, httplib::Response& res) {
         res.set_content(
             nlohmann::json{

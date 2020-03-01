@@ -52,19 +52,16 @@ enum N3DSMode : u8 {
 void KernelSystem::MemoryInit(u32 mem_type, u8 n3ds_mode) {
     ASSERT(mem_type != 1);
 
-    const bool is_new_3ds = Settings::values.is_new_3ds;
     u32 reported_mem_type = mem_type;
-    if (is_new_3ds) {
-        if (n3ds_mode == MemoryMode::Mode6 || n3ds_mode == MemoryMode::Mode6_2) {
-            mem_type = 6;
-            reported_mem_type = 6;
-        } else if (n3ds_mode == MemoryMode::Mode7) {
-            mem_type = 7;
-            reported_mem_type = 7;
-        } else {
-            // On the N3ds, all O3ds configurations (<=5) are forced to 6 instead.
-            mem_type = 6;
-        }
+    if (n3ds_mode == MemoryMode::Mode6 || n3ds_mode == MemoryMode::Mode6_2) {
+        mem_type = 6;
+        reported_mem_type = 6;
+    } else if (n3ds_mode == MemoryMode::Mode7) {
+        mem_type = 7;
+        reported_mem_type = 7;
+    } else {
+        // On the New 3DS, all Old 3DS configurations (<=5) are forced to 6 instead.
+        mem_type = 6;
     }
 
     // The kernel allocation regions (APPLICATION, SYSTEM and BASE) are laid out in sequence, with
@@ -77,7 +74,7 @@ void KernelSystem::MemoryInit(u32 mem_type, u8 n3ds_mode) {
     }
 
     // We must've allocated the entire FCRAM by the end
-    ASSERT(base == (is_new_3ds ? Memory::FCRAM_N3DS_SIZE : Memory::FCRAM_SIZE));
+    ASSERT(base == Memory::FCRAM_N3DS_SIZE);
 
     config_mem_handler = std::make_unique<ConfigMem::Handler>();
     auto& config_mem = config_mem_handler->GetConfigMem();

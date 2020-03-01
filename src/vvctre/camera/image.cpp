@@ -68,8 +68,14 @@ std::vector<u16> ImageCamera::ReceiveFrame() {
 
 void ImageCamera::StartCapture() {}
 void ImageCamera::StopCapture() {}
-void ImageCamera::SetFlip(Service::CAM::Flip flip) {}
-void ImageCamera::SetEffect(Service::CAM::Effect effect) {}
+
+void ImageCamera::SetFlip(Service::CAM::Flip flip) {
+    UNIMPLEMENTED();
+}
+
+void ImageCamera::SetEffect(Service::CAM::Effect effect) {
+    UNIMPLEMENTED();
+}
 
 bool ImageCamera::IsPreviewAvailable() {
     return false;

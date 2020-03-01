@@ -780,6 +780,8 @@ void Module::Interface::SetSize(Kernel::HLERequestContext& ctx) {
 void Module::Interface::SetFrameRate(Kernel::HLERequestContext& ctx) {
     IPC::RequestBuilder rb(ctx, 0x20, 1, 0);
     rb.Push(RESULT_SUCCESS);
+
+    UNIMPLEMENTED();
 }
 
 void Module::Interface::SetEffect(Kernel::HLERequestContext& ctx) {

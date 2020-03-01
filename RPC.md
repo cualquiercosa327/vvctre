@@ -710,19 +710,6 @@ If setting and the emulation is running, the emulation will restart.
 }
 ```
 
-# GET/POST /isnew3ds
-
-Get or set whether the console is a New 3DS.  
-If setting and the emulation is running, the emulation will restart.
-
-## Request/Reply
-
-```json
-{
-  "enabled": Boolean
-}
-```
-
 # GET/POST /region
 
 Get or set the console's region.  

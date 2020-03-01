@@ -114,17 +114,12 @@ void Module::Interface::GetSoftwareClosedFlag(Kernel::HLERequestContext& ctx) {
     LOG_WARNING(Service_PTM, "(STUBBED) called");
 }
 
-void CheckNew3DS(IPC::RequestBuilder& rb) {
-    rb.Push(RESULT_SUCCESS);
-    rb.Push(Settings::values.is_new_3ds);
-    LOG_DEBUG(Service_PTM, "is_new_3ds={}", Settings::values.is_new_3ds);
-}
-
 void Module::Interface::CheckNew3DS(Kernel::HLERequestContext& ctx) {
     IPC::RequestParser rp(ctx, 0x40A, 0, 0);
 
     IPC::RequestBuilder rb = rp.MakeBuilder(2, 0);
-    Service::PTM::CheckNew3DS(rb);
+    rb.Push(RESULT_SUCCESS);
+    rb.Push(true);
 }
 
 static void WriteGameCoinData(GameCoin gamecoin_data) {
