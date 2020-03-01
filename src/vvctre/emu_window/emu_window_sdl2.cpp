@@ -552,14 +552,16 @@ void EmuWindow_SDL2::SwapBuffers() {
                     pfd::open_file("Install CIA", ".", {"CTR Importable Archive", "*.cia"}, true)
                         .result();
 
-                for (const auto& file : files) {
-                    Service::AM::InstallCIA(file);
-                }
+                if (!files.empty()) {
+                    for (const auto& file : files) {
+                        Service::AM::InstallCIA(file);
+                    }
 
-                if (system.IsPoweredOn()) {
-                    auto am = Service::AM::GetModule(system);
-                    if (am != nullptr) {
-                        am->ScanForAllTitles();
+                    if (system.IsPoweredOn()) {
+                        auto am = Service::AM::GetModule(system);
+                        if (am != nullptr) {
+                            am->ScanForAllTitles();
+                        }
                     }
                 }
             }
