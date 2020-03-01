@@ -559,6 +559,10 @@ Module::Interface::Interface(std::shared_ptr<Module> am, const char* name, u32 m
 
 Module::Interface::~Interface() = default;
 
+std::shared_ptr<Module> Module::Interface::GetModule() {
+    return am;
+}
+
 void Module::Interface::GetNumPrograms(Kernel::HLERequestContext& ctx) {
     IPC::RequestParser rp(ctx, 0x0001, 1, 0); // 0x00010040
     u32 media_type = rp.Pop<u8>();
@@ -1503,6 +1507,14 @@ Module::Module(Core::System& system) : system(system) {
 }
 
 Module::~Module() = default;
+
+std::shared_ptr<Module> GetModule(Core::System& system) {
+    auto am = system.ServiceManager().GetService<Service::AM::Module::Interface>("am:u");
+    if (am == nullptr) {
+        return nullptr;
+    }
+    return am->GetModule();
+}
 
 void InstallInterfaces(Core::System& system) {
     auto& service_manager = system.ServiceManager();

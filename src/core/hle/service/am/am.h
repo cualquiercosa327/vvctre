@@ -18,11 +18,11 @@
 
 namespace Core {
 class System;
-}
+} // namespace Core
 
 namespace Service::FS {
 enum class MediaType : u32;
-}
+} // namespace Service::FS
 
 namespace Service::AM {
 
@@ -152,10 +152,15 @@ public:
     explicit Module(Core::System& system);
     ~Module();
 
+    /// Scans all storage mediums for titles for listing.
+    void ScanForAllTitles();
+
     class Interface : public ServiceFramework<Interface> {
     public:
         Interface(std::shared_ptr<Module> am, const char* name, u32 max_session);
         ~Interface();
+
+        std::shared_ptr<Module> GetModule();
 
     protected:
         /**
@@ -568,17 +573,13 @@ private:
      */
     void ScanForTitles(Service::FS::MediaType media_type);
 
-    /**
-     * Scans all storage mediums for titles for listing.
-     */
-    void ScanForAllTitles();
-
     Core::System& system;
     bool cia_installing = false;
     std::array<std::vector<u64_le>, 3> am_title_list;
     std::shared_ptr<Kernel::Mutex> system_updater_mutex;
 };
 
+std::shared_ptr<Module> GetModule(Core::System& system);
 void InstallInterfaces(Core::System& system);
 
 } // namespace Service::AM

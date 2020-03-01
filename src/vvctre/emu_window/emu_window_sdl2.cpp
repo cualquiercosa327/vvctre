@@ -554,6 +554,13 @@ void EmuWindow_SDL2::SwapBuffers() {
 
                 if (!result.empty()) {
                     Service::AM::InstallCIA(result[0]);
+
+                    if (system.IsPoweredOn()) {
+                        auto am = Service::AM::GetModule(system);
+                        if (am != nullptr) {
+                            am->ScanForAllTitles();
+                        }
+                    }
                 }
             }
 
