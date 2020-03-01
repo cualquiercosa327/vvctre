@@ -11,21 +11,9 @@ project(vvctre)
 CMAKE_DEPENDENT_OPTION(VVCTRE_USE_BUNDLED_SDL2 "Download bundled SDL2 binaries" ON "MSVC" OFF)
 
 option(ENABLE_CUBEB "Enables the cubeb audio backend" ON)
-
-option(ENABLE_FFMPEG_AUDIO_DECODER "Enable FFmpeg audio (AAC) decoder" OFF)
-option(ENABLE_FFMPEG_VIDEO_DUMPER "Enable FFmpeg video dumper" OFF)
-
-if (ENABLE_FFMPEG_AUDIO_DECODER OR ENABLE_FFMPEG_VIDEO_DUMPER)
-    set(ENABLE_FFMPEG ON)
-endif()
-
-CMAKE_DEPENDENT_OPTION(VVCTRE_USE_BUNDLED_FFMPEG "Download bundled FFmpeg binaries" ON "ENABLE_FFMPEG;MSVC" OFF)
-
 option(USE_DISCORD_PRESENCE "Enables Discord Rich Presence" OFF)
-
-CMAKE_DEPENDENT_OPTION(ENABLE_MF "Use Media Foundation decoder (preferred over FFmpeg)" ON "WIN32" OFF)
-
-CMAKE_DEPENDENT_OPTION(ENABLE_FDK "Use FDK AAC decoder" OFF "NOT ENABLE_FFMPEG_AUDIO_DECODER;NOT ENABLE_MF" OFF)
+CMAKE_DEPENDENT_OPTION(ENABLE_MF "Use Media Foundation AAC decoder" ON "WIN32" OFF)
+CMAKE_DEPENDENT_OPTION(ENABLE_FDK "Use FDK AAC decoder" OFF "NOT ENABLE_MF" OFF)
 
 # Sanity check : Check that all submodules are present
 # =======================================================================
