@@ -548,18 +548,18 @@ void EmuWindow_SDL2::SwapBuffers() {
             }
 
             if (ImGui::MenuItem("Install CIA (blocking)")) {
-                const std::vector<std::string> result =
-                    pfd::open_file("Install CIA", ".", {"CTR Importable Archive", "*.cia"})
+                const std::vector<std::string> files =
+                    pfd::open_file("Install CIA", ".", {"CTR Importable Archive", "*.cia"}, true)
                         .result();
 
-                if (!result.empty()) {
-                    Service::AM::InstallCIA(result[0]);
+                for (const auto& file : files) {
+                    Service::AM::InstallCIA(file);
+                }
 
-                    if (system.IsPoweredOn()) {
-                        auto am = Service::AM::GetModule(system);
-                        if (am != nullptr) {
-                            am->ScanForAllTitles();
-                        }
+                if (system.IsPoweredOn()) {
+                    auto am = Service::AM::GetModule(system);
+                    if (am != nullptr) {
+                        am->ScanForAllTitles();
                     }
                 }
             }
