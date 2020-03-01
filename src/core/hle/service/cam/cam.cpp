@@ -121,7 +121,6 @@ static constexpr std::size_t MaxVsyncTimings = 5;
 
 void Module::VsyncInterruptEventCallBack(u64 port_id, s64 cycles_late) {
     PortConfig& port = ports[port_id];
-    const CameraConfig& camera = cameras[port.camera_id];
 
     if (!port.is_active) {
         return;
