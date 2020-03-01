@@ -90,8 +90,7 @@ static_assert(sizeof(ConsoleCountryInfo) == 4, "ConsoleCountryInfo must be exact
 } // namespace
 
 static const EULAVersion MAX_EULA_VERSION = {0x7F, 0x7F};
-static const ConsoleModelInfo CONSOLE_MODEL_OLD = {NINTENDO_3DS_XL, {0, 0, 0}};
-static const ConsoleModelInfo CONSOLE_MODEL_NEW = {NEW_NINTENDO_3DS_XL, {0, 0, 0}};
+static const ConsoleModelInfo CONSOLE_MODEL = {NEW_NINTENDO_3DS_XL, {0, 0, 0}};
 static const u8 CONSOLE_LANGUAGE = LANGUAGE_EN;
 static const UsernameBlock CONSOLE_USERNAME_BLOCK = {u"vvctre", 0, 0};
 static const BirthdayBlock PROFILE_BIRTHDAY = {3, 25}; // March 25th, 2014
@@ -516,8 +515,7 @@ ResultCode Module::FormatConfig() {
     if (!res.IsSuccess())
         return res;
 
-    res = CreateConfigInfoBlk(ConsoleModelBlockID, sizeof(CONSOLE_MODEL_OLD), 0xC,
-                              &CONSOLE_MODEL_OLD);
+    res = CreateConfigInfoBlk(ConsoleModelBlockID, sizeof(CONSOLE_MODEL), 0xC, &CONSOLE_MODEL);
     if (!res.IsSuccess())
         return res;
 
