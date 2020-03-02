@@ -2,7 +2,6 @@
 // Licensed under GPLv2 or any later version
 // Refer to the license.txt file included.
 
-#include <portable-file-dialogs.h>
 #include "common/common_paths.h"
 #include "common/file_util.h"
 #include "common/logging/log.h"
@@ -850,21 +849,6 @@ void Module::APTInterface::CheckNew3DS(Kernel::HLERequestContext& ctx) {
     IPC::RequestBuilder rb = rp.MakeBuilder(2, 0);
     rb.Push(RESULT_SUCCESS);
     rb.Push(true);
-}
-
-void Module::APTInterface::HardwareResetAsync(Kernel::HLERequestContext& ctx) {
-    const std::vector<std::string> result =
-        pfd::open_file("Load File", ".",
-                       {"3DS Executables", "*.cci *.3ds *.cxi *.3dsx *.app *.elf *.axf"})
-            .result();
-
-    if (!result.empty()) {
-        apt->system.SetResetFilePath(result[0]);
-        apt->system.RequestReset();
-    }
-
-    IPC::RequestBuilder rb(ctx, 0x4E, 0, 0); // 0x004E0000
-    rb.Push(RESULT_SUCCESS);
 }
 
 Module::APTInterface::APTInterface(std::shared_ptr<Module> apt, const char* name, u32 max_session)

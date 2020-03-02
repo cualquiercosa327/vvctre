@@ -452,7 +452,7 @@ get_directory_property(OPENSSL_LIBS
     DEFINITION OPENSSL_LIBS)
 
 target_link_libraries(core PUBLIC common PRIVATE audio_core video_core)
-target_link_libraries(core PUBLIC Boost::boost SDL2 PRIVATE cryptopp fmt open_source_archives easywsclient json ${OPENSSL_LIBS} httplib lurlparser portable-file-dialogs)
+target_link_libraries(core PUBLIC Boost::boost SDL2 PRIVATE cryptopp fmt open_source_archives easywsclient json ${OPENSSL_LIBS} httplib lurlparser)
 target_compile_definitions(core PRIVATE -DCPPHTTPLIB_OPENSSL_SUPPORT)
 
 if (ARCHITECTURE_x86_64)
