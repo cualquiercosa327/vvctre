@@ -50,7 +50,7 @@ For a list of commands and options, run `vvctre usage`.
 
 # GUI Features
 
-- Middle click menu
+- Middle click pause menu
 - Disk shader cache loading progress bar
 - FPS indicator
   - You can move it while the left mouse button is held.

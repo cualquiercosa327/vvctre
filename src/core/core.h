@@ -79,7 +79,6 @@ public:
         ErrorVideoCore_ErrorBelowGL33,      ///< Error in the video core due to the user not having
                                             /// OpenGL 3.3 or higher
         ShutdownRequested,                  ///< Emulated program requested a system shutdown
-        Paused,                             ///< Emulation paused
         ErrorUnknown,                       ///< Any other error
     };
 
@@ -255,6 +254,9 @@ public:
         return registered_swkbd;
     }
 
+    bool frontend_paused = false;
+    bool rpc_paused = false;
+
 private:
     /**
      * Initialize the emulated system.
@@ -301,7 +303,6 @@ private:
     std::unique_ptr<Kernel::KernelSystem> kernel;
     std::unique_ptr<Timing> timing;
 
-private:
     static System s_instance;
 
     bool initalized = false;

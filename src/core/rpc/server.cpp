@@ -1596,7 +1596,7 @@ Server::Server(Core::System& system, const int port) {
             return;
         }
 
-        system.SetStatus(Core::System::ResultStatus::Paused);
+        system.rpc_paused = true;
         res.status = 204;
     });
 
@@ -1607,7 +1607,7 @@ Server::Server(Core::System& system, const int port) {
             return;
         }
 
-        system.SetStatus(Core::System::ResultStatus::Success);
+        system.rpc_paused = false;
         res.status = 204;
     });
 

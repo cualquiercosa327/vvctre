@@ -564,21 +564,20 @@ int main(int argc, char** argv) {
             }
 
             while (emu_window->IsOpen()) {
+                if (system.frontend_paused || system.rpc_paused) {
+                    while (emu_window->IsOpen() && (system.frontend_paused || system.rpc_paused)) {
+                        VideoCore::g_renderer->SwapBuffers();
+                        SDL_GL_SetSwapInterval(1);
+                    }
+                    SDL_GL_SetSwapInterval(Settings::values.enable_vsync ? 1 : 0);
+                }
+
                 switch (system.RunLoop()) {
                 case Core::System::ResultStatus::Success: {
                     break;
                 }
                 case Core::System::ResultStatus::ShutdownRequested: {
                     emu_window->Close();
-                    break;
-                }
-                case Core::System::ResultStatus::Paused: {
-                    while (emu_window->IsOpen() &&
-                           system.GetStatus() == Core::System::ResultStatus::Paused) {
-                        VideoCore::g_renderer->SwapBuffers();
-                        SDL_GL_SetSwapInterval(1);
-                    }
-                    SDL_GL_SetSwapInterval(Settings::values.enable_vsync ? 1 : 0);
                     break;
                 }
                 default: { break; }
