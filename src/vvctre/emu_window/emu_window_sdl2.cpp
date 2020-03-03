@@ -406,7 +406,7 @@ void EmuWindow_SDL2::SwapBuffers() {
                 for (const auto& record : ipc_records) {
                     std::string service_name;
                     std::string function_name = "Unknown";
-                    if (system.IsPoweredOn() && record.second.client_port.id != -1) {
+                    if (record.second.client_port.id != -1) {
                         service_name = system.ServiceManager().GetServiceNameByPortId(
                             static_cast<u32>(record.second.client_port.id));
                     }
@@ -506,7 +506,7 @@ void EmuWindow_SDL2::SwapBuffers() {
         ImGui::End();
     }
 
-    if (show_cheats_window && system.IsPoweredOn()) {
+    if (show_cheats_window) {
         if (ImGui::Begin("Cheats", nullptr, ImGuiWindowFlags_NoSavedSettings)) {
             if (ImGui::Button("Reload File")) {
                 system.CheatEngine().LoadCheatFile();
@@ -557,11 +557,9 @@ void EmuWindow_SDL2::SwapBuffers() {
                         Service::AM::InstallCIA(file);
                     }
 
-                    if (system.IsPoweredOn()) {
-                        auto am = Service::AM::GetModule(system);
-                        if (am != nullptr) {
-                            am->ScanForAllTitles();
-                        }
+                    auto am = Service::AM::GetModule(system);
+                    if (am != nullptr) {
+                        am->ScanForAllTitles();
                     }
                 }
             }
@@ -1151,26 +1149,24 @@ void EmuWindow_SDL2::PollEvents() {
         }
     }
 
-    if (system.IsPoweredOn()) {
-        const u64 current_program_id = system.Kernel().GetCurrentProcess()->codeset->program_id;
-        if (program_id != current_program_id) {
-            system.GetAppLoader().ReadTitle(program_name);
+    const u64 current_program_id = system.Kernel().GetCurrentProcess()->codeset->program_id;
+    if (program_id != current_program_id) {
+        system.GetAppLoader().ReadTitle(program_name);
 
 #ifdef USE_DISCORD_PRESENCE
-            if (discord_rp == nullptr) {
-                discord_rp = std::make_unique<DiscordRP>(program_name);
-            } else {
-                discord_rp->Update(program_name);
-            }
+        if (discord_rp == nullptr) {
+            discord_rp = std::make_unique<DiscordRP>(program_name);
+        } else {
+            discord_rp->Update(program_name);
+        }
 #endif
 
-            const std::string window_title =
-                fmt::format("vvctre {} | {}", version::vvctre.to_string(), program_name);
+        const std::string window_title =
+            fmt::format("vvctre {} | {}", version::vvctre.to_string(), program_name);
 
-            SDL_SetWindowTitle(render_window, window_title.c_str());
+        SDL_SetWindowTitle(render_window, window_title.c_str());
 
-            program_id = current_program_id;
-        }
+        program_id = current_program_id;
     }
 }
 
