@@ -24,7 +24,9 @@
 #include "core/cheats/cheats.h"
 #include "core/core.h"
 #include "core/hle/service/am/am.h"
+#include "core/hle/service/cfg/cfg.h"
 #include "core/hle/service/nfc/nfc.h"
+#include "core/hle/service/ptm/ptm.h"
 #include "core/movie.h"
 #include "core/settings.h"
 #include "input_common/keyboard.h"
@@ -827,6 +829,127 @@ void EmuWindow_SDL2::SwapBuffers() {
                         if (cam != nullptr) {
                             cam->ReloadCameraDevices();
                         }
+                    }
+
+                    ImGui::EndMenu();
+                }
+
+                if (ImGui::BeginMenu("System (persistent)")) {
+                    if (ImGui::BeginMenu("Language (changing will restart emulation)")) {
+                        auto cfg = Service::CFG::GetModule(system);
+                        if (cfg != nullptr) {
+                            const Service::CFG::SystemLanguage language = cfg->GetSystemLanguage();
+
+                            if (ImGui::RadioButton("Japanese",
+                                                   language ==
+                                                       Service::CFG::SystemLanguage::LANGUAGE_JP)) {
+                                cfg->SetSystemLanguage(Service::CFG::SystemLanguage::LANGUAGE_JP);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+
+                            if (ImGui::RadioButton("English",
+                                                   language ==
+                                                       Service::CFG::SystemLanguage::LANGUAGE_EN)) {
+                                cfg->SetSystemLanguage(Service::CFG::SystemLanguage::LANGUAGE_EN);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+
+                            if (ImGui::RadioButton("French",
+                                                   language ==
+                                                       Service::CFG::SystemLanguage::LANGUAGE_FR)) {
+                                cfg->SetSystemLanguage(Service::CFG::SystemLanguage::LANGUAGE_FR);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+
+                            if (ImGui::RadioButton("German",
+                                                   language ==
+                                                       Service::CFG::SystemLanguage::LANGUAGE_DE)) {
+                                cfg->SetSystemLanguage(Service::CFG::SystemLanguage::LANGUAGE_DE);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+
+                            if (ImGui::RadioButton("Italian",
+                                                   language ==
+                                                       Service::CFG::SystemLanguage::LANGUAGE_IT)) {
+                                cfg->SetSystemLanguage(Service::CFG::SystemLanguage::LANGUAGE_IT);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+
+                            if (ImGui::RadioButton("Spanish",
+                                                   language ==
+                                                       Service::CFG::SystemLanguage::LANGUAGE_ES)) {
+                                cfg->SetSystemLanguage(Service::CFG::SystemLanguage::LANGUAGE_ES);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+
+                            if (ImGui::RadioButton("Simplified Chinese",
+                                                   language ==
+                                                       Service::CFG::SystemLanguage::LANGUAGE_ZH)) {
+                                cfg->SetSystemLanguage(Service::CFG::SystemLanguage::LANGUAGE_ZH);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+
+                            if (ImGui::RadioButton("Korean",
+                                                   language ==
+                                                       Service::CFG::SystemLanguage::LANGUAGE_KO)) {
+                                cfg->SetSystemLanguage(Service::CFG::SystemLanguage::LANGUAGE_KO);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+
+                            if (ImGui::RadioButton("Dutch",
+                                                   language ==
+                                                       Service::CFG::SystemLanguage::LANGUAGE_NL)) {
+                                cfg->SetSystemLanguage(Service::CFG::SystemLanguage::LANGUAGE_NL);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+
+                            if (ImGui::RadioButton("Portugese",
+                                                   language ==
+                                                       Service::CFG::SystemLanguage::LANGUAGE_PT)) {
+                                cfg->SetSystemLanguage(Service::CFG::SystemLanguage::LANGUAGE_PT);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+
+                            if (ImGui::RadioButton("Russian",
+                                                   language ==
+                                                       Service::CFG::SystemLanguage::LANGUAGE_RU)) {
+                                cfg->SetSystemLanguage(Service::CFG::SystemLanguage::LANGUAGE_RU);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+
+                            if (ImGui::RadioButton("Traditional Chinese",
+                                                   language ==
+                                                       Service::CFG::SystemLanguage::LANGUAGE_TW)) {
+                                cfg->SetSystemLanguage(Service::CFG::SystemLanguage::LANGUAGE_TW);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+                        }
+
+                        ImGui::EndMenu();
+                    }
+
+                    ImGui::Text("Play Coins (may need to restart emulation)");
+                    ImGui::SameLine();
+
+                    const u16 min = 0;
+                    const u16 max = 300;
+
+                    u16 play_coins = Service::PTM::Module::GetPlayCoins();
+                    if (ImGui::SliderScalar("##playcoins", ImGuiDataType_U16, &play_coins, &min,
+                                            &max)) {
+                        Service::PTM::Module::SetPlayCoins(play_coins);
                     }
 
                     ImGui::EndMenu();
