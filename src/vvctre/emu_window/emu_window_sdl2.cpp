@@ -563,6 +563,8 @@ void EmuWindow_SDL2::SwapBuffers() {
                     if (am != nullptr) {
                         am->ScanForAllTitles();
                     }
+
+                    messages.push_back("CIA installation finished");
                 }
             }
 
