@@ -196,7 +196,8 @@ std::shared_ptr<SDLJoystick> SDLState::GetSDLJoystickBySDLID(SDL_JoystickID sdl_
 void SDLState::InitJoystick(int joystick_index) {
     SDL_Joystick* sdl_joystick = SDL_JoystickOpen(joystick_index);
     if (!sdl_joystick) {
-        LOG_ERROR(Input, "failed to open joystick {}", joystick_index);
+        LOG_ERROR(Input, "failed to open joystick {}, with error: ", joystick_index,
+                  SDL_GetError());
         return;
     }
     const std::string guid = GetGUID(sdl_joystick);
