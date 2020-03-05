@@ -473,6 +473,11 @@ SDLState::SDLState() {
         LOG_ERROR(Input, "Failed to set Hint for background events", SDL_GetError());
     }
 
+// SDL >= 2.0.9
+#if defined(_WIN32)
+    SDL_SetHint(SDL_HINT_JOYSTICK_HIDAPI, "0");
+#endif
+
     SDL_AddEventWatch(&SDLEventWatcher, this);
 
     initialized = true;
