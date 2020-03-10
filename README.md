@@ -1,6 +1,6 @@
 vvctre is a New Nintendo 3DS emulator based on Citra for Windows and Linux.
 
-vvctre is licensed under the GPLv2 (or any later version).
+vvctre is licensed under the GPLv2 (or any later version).  
 Refer to the license.txt file included.
 
 |                                  |       Citra       |                                                                                                                                                                                                                                  vvctre |
