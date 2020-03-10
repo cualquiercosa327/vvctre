@@ -3,6 +3,13 @@ vvctre is a New Nintendo 3DS emulator based on Citra for Windows and Linux.
 vvctre is licensed under the GPLv2 (or any later version).  
 Refer to the license.txt file included.
 
+|  | Citra | vvctre |
+|----------------------------------|:------------------------------------------------------------------------------:|--------------------------------------------------------------------------------------:|
+| Multiplayer works out of the box | No | Yes |
+| Scripting requests | Read/write memory | [Here](https://github.com/vvanelslande/vvctre/blob/master/RPC.md) |
+| Versions | Sequential number | [SemVer](https://semver.org/) |
+| CLI usage | [Here](https://github.com/citra-emu/citra/blob/master/src/citra/citra.cpp#L62) | [Here](https://github.com/vvanelslande/vvctre/blob/master/src/vvctre/vvctre.cpp#L103) |
+
 # Definitions
 
 ## user folder
@@ -59,15 +66,6 @@ For a list of commands and options, run `vvctre usage`.
 - Keyboard applet
 - Mii selector applet
 
-# Unique Features
-
-- [SemVer](https://semver.org/) versions instead of a simple numbers and random strings
-- Error messages in vvctre and Citra's GUI, but not Citra's CLI:
-  - You are running default Windows drivers for your GPU. You need to install the proper drivers for your graphics card from the manufacturer's website.
-  - Your GPU may not support OpenGL 3.3, or you do not have the latest graphics driver.
-- More options
-- [Better RPC](RPC.md)
-
 # Removed Features
 
 - System camera support
@@ -77,8 +75,6 @@ For a list of commands and options, run `vvctre usage`.
 
 # Incompatibilities
 
-- No multiplayer rooms, multiplayer will work out of the box, and [anyone can host the multiplayer server](https://github.com/vvanelslande/vvctre-multiplayer.glitch.me).
-- Movies created with any Citra build can't be played.
-- Movies created with vvctre can't be played on any Citra build.
-- Different folder for mods. put mods (Luma3DS folder structure) in `user folder/sdmc/luma/titles`.
-- Different RPC server.
+- Different movie file format
+- Different folder for mods, put mods (Luma3DS folder structure) in `user folder/sdmc/luma/titles`
+- Different RPC server protocol
