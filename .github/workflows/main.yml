@@ -15,28 +15,15 @@ jobs:
     strategy:
       matrix:
         os: [windows-latest, ubuntu-latest]
-        config: [Release, Debug]
         include:
           - os: windows-latest
             name: Windows (fast)
-            build_type: windows
+            os_lowercase: windows
             options: "-DVVCTRE_USE_BUNDLED_SDL2=ON -DUSE_DISCORD_PRESENCE=ON -DENABLE_MF=ON -DENABLE_FFMPEG_VIDEO_DUMPER=ON"
-            config: Release
           - os: ubuntu-latest
             name: Linux (fast)
-            build_type: linux
+            os_lowercase: linux
             options: "-DUSE_DISCORD_PRESENCE=ON -DENABLE_FFMPEG_VIDEO_DUMPER=ON"
-            config: Release
-          - os: windows-latest
-            name: Windows (debug, slow, minimum CMake options)
-            build_type: windows-debug
-            options: "-DVVCTRE_USE_BUNDLED_SDL2=ON"
-            config: Debug
-          - os: ubuntu-latest
-            name: Linux (debug, slow, no CMake options)
-            build_type: linux-debug
-            options: ""
-            config: Debug
     steps:
       - name: Install Dependencies
         if: matrix.os == 'ubuntu-latest'
@@ -50,14 +37,14 @@ jobs:
         run: |
           cd $GITHUB_WORKSPACE
           mkdir build && cd build
-          cmake .. -DCMAKE_BUILD_TYPE=${{matrix.config}} ${{matrix.options}}
+          cmake .. -DCMAKE_BUILD_TYPE=Release ${{matrix.options}}
       - name: Build
         working-directory: ./build
         shell: bash
-        run: cmake --build . --config ${{matrix.config}}
+        run: cmake --build . --config Release
       - name: Test
         working-directory: ./build
-        run: ctest -C ${{matrix.config}}
+        run: ctest -C Release
       - name: Prepare to upload (tag push)
         if: github.event_name == 'push'
         shell: bash
@@ -77,7 +64,7 @@ jobs:
           fi
           export VERSION=${GITHUB_REF:10}
           echo ::set-env name=VERSION::$VERSION
-          7z a vvctre-$VERSION-${{matrix.build_type}}.7z ./build/bin/*
+          7z a vvctre-$VERSION-${{matrix.os_lowercase}}.7z ./build/bin/*
       - name: Prepare to upload (pull request)
         if: github.event_name == 'pull_request'
         shell: bash
@@ -100,15 +87,15 @@ jobs:
         uses: svenstaro/upload-release-action@v1-release
         with:
           repo_token: ${{secrets.GITHUB_TOKEN}}
-          file: vvctre-${{env.VERSION}}-${{matrix.build_type}}.7z
-          asset_name: vvctre-${{env.VERSION}}-${{matrix.build_type}}.7z
+          file: vvctre-${{env.VERSION}}-${{matrix.os_lowercase}}.7z
+          asset_name: vvctre-${{env.VERSION}}-${{matrix.os_lowercase}}.7z
           tag: ${{github.ref}}
           overwrite: true
       - name: Upload (pull request)
         if: github.event_name == 'pull_request'
         uses: actions/upload-artifact@v1
         with:
-          name: vvctre-${{matrix.build_type}}
+          name: vvctre-${{matrix.os_lowercase}}
           path: build/bin
       - name: Discord Notification
         if: github.event_name == 'push'
