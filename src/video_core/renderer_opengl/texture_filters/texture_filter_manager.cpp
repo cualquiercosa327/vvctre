@@ -3,48 +3,64 @@
 // Refer to the license.txt file included.
 
 #include "common/logging/log.h"
-#include "video_core/renderer_opengl/texture_filters/anime4k_ultrafast.h"
+#include "video_core/renderer_opengl/gl_state.h"
+#include "video_core/renderer_opengl/texture_filters/anime4k/anime4k_ultrafast.h"
 #include "video_core/renderer_opengl/texture_filters/texture_filter_manager.h"
-#include "video_core/renderer_opengl/texture_filters/xbrz_freescale.h"
+#include "video_core/renderer_opengl/texture_filters/xbrz/xbrz_freescale.h"
 
 namespace OpenGL {
 
+Viewport TextureFilterInterface::RectToViewport(const Common::Rectangle<u32>& rect) {
+    return {
+        static_cast<GLint>(rect.left) * scale_factor,
+        static_cast<GLint>(rect.top) * scale_factor,
+        static_cast<GLsizei>(rect.GetWidth()) * scale_factor,
+        static_cast<GLsizei>(rect.GetHeight()) * scale_factor,
+    };
+}
+
+namespace {
 template <typename T>
-static std::pair<std::string, TextureFilterInfo> FilterMapPair = {T::GetInfo().name, T::GetInfo()};
+std::pair<std::string_view, TextureFilterInfo> FilterMapPair() {
+    return {T::GetInfo().name, T::GetInfo()};
+};
 
 struct NoFilter {
     static TextureFilterInfo GetInfo() {
         TextureFilterInfo info;
         info.name = "none";
         info.clamp_scale = {1, 1};
-        info.constructor = [] { return nullptr; };
+        info.constructor = [](u16) { return nullptr; };
         return info;
     }
 };
+} // namespace
 
-const std::map<std::string, TextureFilterInfo>& TextureFilterManager::TextureFilterMap() {
-    static const std::map<std::string, TextureFilterInfo> filter_map{
-        FilterMapPair<NoFilter>,
-        FilterMapPair<Anime4kUltrafast>,
-        FilterMapPair<XbrzFreescale>,
+const std::map<std::string_view, TextureFilterInfo, TextureFilterManager::FilterNameComp>&
+TextureFilterManager::TextureFilterMap() {
+    static const std::map<std::string_view, TextureFilterInfo, FilterNameComp> filter_map{
+        FilterMapPair<NoFilter>(),
+        FilterMapPair<Anime4kUltrafast>(),
+        FilterMapPair<XbrzFreescale>(),
     };
     return filter_map;
 }
 
-void TextureFilterManager::SetTextureFilter(const std::string& filter_name, u16 new_scale_factor) {
-    if (name == filter_name && scale_factor == new_scale_factor)
+void TextureFilterManager::SetTextureFilter(std::string filter_name, u16 new_scale_factor) {
+    if (name == filter_name && scale_factor == new_scale_factor) {
         return;
+    }
     std::lock_guard<std::mutex> lock{mutex};
-    name = filter_name;
+    name = std::move(filter_name);
     scale_factor = new_scale_factor;
     updated = true;
 }
 
-TextureFilterInterface* TextureFilterManager::GetTextureFilter() {
+TextureFilterInterface* TextureFilterManager::GetTextureFilter() const {
     return filter.get();
 }
 
-bool TextureFilterManager::IsUpdated() {
+bool TextureFilterManager::IsUpdated() const {
     return updated;
 }
 
@@ -57,16 +73,14 @@ void TextureFilterManager::Reset() {
         filter = nullptr;
         return;
     }
-
     const auto& filter_info = iter->second;
-    filter = filter_info.constructor();
-    u16 clamped_scale =
+    const u16 clamped_scale =
         std::clamp(scale_factor, filter_info.clamp_scale.min, filter_info.clamp_scale.max);
-    if (clamped_scale != scale_factor)
+    if (clamped_scale != scale_factor) {
         LOG_ERROR(Render_OpenGL, "Invalid scale factor {} for texture filter {}, clamped to {}",
                   scale_factor, filter_info.name, clamped_scale);
-    if (filter)
-        filter->scale_factor = clamped_scale;
+    }
+    filter = filter_info.constructor(clamped_scale);
 }
 
 } // namespace OpenGL

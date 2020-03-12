@@ -5,28 +5,41 @@
 #pragma once
 
 #include <functional>
-#include <string>
+#include <string_view>
 #include "common/common_types.h"
+#include "common/math_util.h"
 
 namespace OpenGL {
 
 struct CachedSurface;
-using Surface = std::shared_ptr<CachedSurface>;
+struct Viewport;
 
 class TextureFilterInterface {
 public:
-    u16 scale_factor{};
-    virtual void scale(const Surface& surface) = 0;
+    const u16 scale_factor{};
+    TextureFilterInterface(u16 scale_factor) : scale_factor{scale_factor} {}
+    virtual void scale(CachedSurface& surface, const Common::Rectangle<u32>& rect,
+                       std::size_t buffer_offset) = 0;
     virtual ~TextureFilterInterface() = default;
+
+protected:
+    Viewport RectToViewport(const Common::Rectangle<u32>& rect);
 };
 
-// every texture filter should have a static GetInfo function
+// Every texture filter should have a static GetInfo function
 struct TextureFilterInfo {
-    std::string name;
+    std::string_view name;
+
     struct {
         u16 min, max;
     } clamp_scale{1, 10};
-    std::function<std::unique_ptr<TextureFilterInterface>()> constructor;
+
+    std::function<std::unique_ptr<TextureFilterInterface>(u16 scale_factor)> constructor;
 };
 
 } // namespace OpenGL
+
+#define SHADER(name, src)                                                                          \
+    namespace OpenGL {                                                                             \
+    constexpr char name[] = #src;                                                                  \
+    }

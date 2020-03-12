@@ -382,8 +382,7 @@ struct CachedSurface : SurfaceParams, std::enable_shared_from_this<CachedSurface
                          : SurfaceParams::GetFormatBpp(format) / 8;
     }
 
-    std::unique_ptr<u8[]> gl_buffer;
-    std::size_t gl_buffer_size = 0;
+    std::vector<u8> gl_buffer;
 
     // Read/Write data in 3DS memory to/from gl_buffer
     void LoadGLBuffer(PAddr load_start, PAddr load_end);
@@ -395,8 +394,7 @@ struct CachedSurface : SurfaceParams, std::enable_shared_from_this<CachedSurface
     void DumpTexture(GLuint target_tex, u64 tex_hash);
 
     // Upload/Download data in gl_buffer in/to this surface's texture
-    void UploadGLTexture(const Common::Rectangle<u32>& rect, GLuint read_fb_handle,
-                         GLuint draw_fb_handle);
+    void UploadGLTexture(Common::Rectangle<u32> rect, GLuint read_fb_handle, GLuint draw_fb_handle);
     void DownloadGLTexture(const Common::Rectangle<u32>& rect, GLuint read_fb_handle,
                            GLuint draw_fb_handle);
 
@@ -536,9 +534,4 @@ constexpr FormatTuple tex_tuple = {GL_RGBA8, GL_RGBA, GL_UNSIGNED_BYTE};
 
 const FormatTuple& GetFormatTuple(SurfaceParams::PixelFormat pixel_format);
 
-void AllocateSurfaceTexture(GLuint texture, const FormatTuple& format_tuple, u32 width, u32 height);
-
-bool BlitTextures(GLuint src_tex, const Common::Rectangle<u32>& src_rect, GLuint dst_tex,
-                  const Common::Rectangle<u32>& dst_rect, SurfaceParams::SurfaceType type,
-                  GLuint read_fb_handle, GLuint draw_fb_handle);
 } // namespace OpenGL

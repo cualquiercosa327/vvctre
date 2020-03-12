@@ -8,7 +8,7 @@
 #include <map>
 #include <memory>
 #include <mutex>
-#include <string>
+#include <string_view>
 #include <tuple>
 #include "video_core/renderer_opengl/texture_filters/texture_filter_interface.h"
 
@@ -16,8 +16,19 @@ namespace OpenGL {
 
 class TextureFilterManager {
 public:
-    // function ensures map is initialized before use
-    static const std::map<std::string, TextureFilterInfo>& TextureFilterMap();
+    struct FilterNameComp {
+        bool operator()(const std::string_view a, const std::string_view b) const {
+            bool na = a == "none";
+            bool nb = b == "none";
+            if (na | nb) {
+                return na & !nb;
+            }
+            return a < b;
+        }
+    };
+
+    // Function ensures map is initialized before use
+    static const std::map<std::string_view, TextureFilterInfo, FilterNameComp>& TextureFilterMap();
 
     static TextureFilterManager& GetInstance() {
         static TextureFilterManager singleton;
@@ -27,18 +38,20 @@ public:
     void Destroy() {
         filter.reset();
     }
-    void SetTextureFilter(const std::string& filter_name, u16 new_scale_factor);
-    // return {filter, scale_factor}
-    TextureFilterInterface* GetTextureFilter();
-    // returns true if filter has been changed and a cache reset is needed
-    bool IsUpdated();
+
+    void SetTextureFilter(std::string filter_name, u16 new_scale_factor);
+    TextureFilterInterface* GetTextureFilter() const;
+
+    // Returns true if filter has been changed and a cache reset is needed
+    bool IsUpdated() const;
+
     void Reset();
 
 private:
     std::atomic<bool> updated{false};
     std::mutex mutex;
-    std::string name{"none"};
-    u16 scale_factor{1};
+    std::string name = "none";
+    u16 scale_factor = 1;
 
     std::unique_ptr<TextureFilterInterface> filter;
 };
