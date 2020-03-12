@@ -831,6 +831,23 @@ void EmuWindow_SDL2::SwapBuffers() {
                     ImGui::EndMenu();
                 }
 
+                if (ImGui::BeginMenu("Hacks")) {
+                    if (ImGui::Checkbox("Ignore Format Reinterpretation",
+                                        &Settings::values.ignore_format_reinterpretation)) {
+                        Settings::LogSettings();
+                    }
+                    if (ImGui::IsItemHovered()) {
+                        ImGui::BeginTooltip();
+                        ImGui::Text("Ignore flushing surfaces from CPU memory if the surface was "
+                                    "created by the GPU and has a different format.");
+                        ImGui::Text("This can speed up many games, potentially break some, but is "
+                                    "rightfully just a hack as a placeholder for GPU texture "
+                                    "encoding/decoding");
+                        ImGui::EndTooltip();
+                    }
+                    ImGui::EndMenu();
+                }
+
                 if (ImGui::BeginMenu("System (persistent)")) {
                     auto cfg = Service::CFG::GetModule(system);
 
@@ -1138,8 +1155,7 @@ void EmuWindow_SDL2::SwapBuffers() {
                         fmt::format("cmd /c \"{}\" controls --generate-launcher", arg0);
 #else
                     const std::string command = fmt::format(
-                        "x-terminal-emulator -e \"\\\"{}\\\" controls --generate-launcher\"",
-                        arg0);
+                        "x-terminal-emulator -e \"\\\"{}\\\" controls --generate-launcher\"", arg0);
 #endif
                     const int code = std::system(command.c_str());
                     LOG_INFO(Frontend, "{} exited with {}", command, code);
