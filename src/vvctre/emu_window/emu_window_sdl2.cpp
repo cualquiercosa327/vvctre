@@ -148,7 +148,8 @@ void EmuWindow_SDL2::Fullscreen() {
     SDL_MaximizeWindow(render_window);
 }
 
-EmuWindow_SDL2::EmuWindow_SDL2(Core::System& system, bool fullscreen) : system(system) {
+EmuWindow_SDL2::EmuWindow_SDL2(Core::System& system, const bool fullscreen, const char* arg0)
+    : system(system), arg0(arg0) {
     // Initialize the window
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_JOYSTICK) < 0) {
         LOG_CRITICAL(Frontend, "Failed to initialize SDL2! Exiting...");
@@ -1117,6 +1118,19 @@ void EmuWindow_SDL2::SwapBuffers() {
                             layout)) {
                         delete[] data;
                     }
+                }
+
+                if (ImGui::MenuItem("Generate Launcher For Custom Controls")) {
+#ifdef _WIN32
+                    const std::string command =
+                        fmt::format("cmd /k \"\\\"{}\\\" controls --generate-launcher\"", arg0);
+#else
+                    const std::string command = fmt::format(
+                        "x-terminal-emulator -e \"\\\"{}\\\" controls --generate-launcher;$SHELL\"",
+                        arg0);
+#endif
+                    const int code = std::system(command.c_str());
+                    LOG_INFO(Frontend, "{} exited with {}", command, code);
                 }
 
                 if (ImGui::BeginMenu("Movie")) {

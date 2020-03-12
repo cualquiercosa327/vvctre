@@ -4,6 +4,9 @@ on:
   push:
     tags:
       - "*"
+  pull_request:
+    branches:
+      - "*"
 
 jobs:
   build:
@@ -75,6 +78,13 @@ jobs:
           echo ::set-env name=VERSION::$VERSION
           7z a vvctre-$VERSION-${{matrix.build_type}}.7z ./build/bin/*
       - name: Upload
+        if: github.event_name == 'pull_request'
+        uses: actions/upload-artifact@v1
+        with:
+          name: vvctre-${{env.VERSION}}-${{matrix.build_type}}
+          path: build/bin
+      - name: Upload
+        if: github.event_name == 'push'
         uses: svenstaro/upload-release-action@v1-release
         with:
           repo_token: ${{secrets.GITHUB_TOKEN}}
@@ -83,6 +93,7 @@ jobs:
           tag: ${{github.ref}}
           overwrite: true
       - name: Discord Notification
+        if: github.event_name == 'push'
         uses: rjstone/discord-webhook-notify@v1
         with:
           severity: info
