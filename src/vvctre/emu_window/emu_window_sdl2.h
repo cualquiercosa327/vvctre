@@ -25,7 +25,7 @@ class System;
 
 class EmuWindow_SDL2 : public Frontend::EmuWindow {
 public:
-    explicit EmuWindow_SDL2(Core::System& system, const bool fullscreen);
+    explicit EmuWindow_SDL2(Core::System& system, const bool fullscreen, const char* arg0);
     ~EmuWindow_SDL2();
 
     /// Swap buffers to display the next frame
@@ -117,4 +117,6 @@ private:
     std::map<int, IPCDebugger::RequestRecord> ipc_records;
 
     bool show_cheats_window = false;
+
+    const char* arg0 = nullptr;
 };

@@ -13,6 +13,8 @@
 #include <windows.h>
 
 #include <shellapi.h>
+#else
+#include <sys/stat.h>
 #endif
 
 #define SDL_MAIN_HANDLED
@@ -96,6 +98,9 @@ int main(int argc, char** argv) {
     bool fullscreen = false;
     bool regenerate_console_id = false;
     int rpc_server_port = 47889;
+
+    // for Controls
+    bool generate_launcher = false;
 
     // for DumpRomFS
     std::string dump_romfs_dir;
@@ -400,7 +405,8 @@ int main(int argc, char** argv) {
           clipp::option("--unlimited")
               .set(Settings::values.use_frame_limit, false)
               .doc("disable the speed limiter")) |
-         clipp::command("controls").set(command, Command::Controls).doc("configure controls") |
+         (clipp::command("controls").set(command, Command::Controls).doc("configure controls"),
+          clipp::option("--generate-launcher").set(generate_launcher).doc("generate launcher")) |
          (clipp::command("dump-romfs").set(command, Command::DumpRomFS).doc("dump RomFS"),
           clipp::opt_value("file").set(path), clipp::opt_value("dir").set(dump_romfs_dir)) |
          clipp::command("version").set(command, Command::Version).doc("prints vvctre's version") |
@@ -472,7 +478,7 @@ int main(int argc, char** argv) {
             Core::System& system = Core::System::GetInstance();
 
             std::unique_ptr<EmuWindow_SDL2> emu_window =
-                std::make_unique<EmuWindow_SDL2>(system, fullscreen);
+                std::make_unique<EmuWindow_SDL2>(system, fullscreen, argv[0]);
 
             // Register frontend applets
             system.RegisterSoftwareKeyboard(
@@ -724,7 +730,20 @@ int main(int argc, char** argv) {
             options += fmt::format("--{} \"{}\" ", mapping, params.Serialize());
         }
 
-        fmt::print("Options: {}\n", options);
+        if (generate_launcher) {
+#ifdef _WIN32
+            const std::string filename =
+                pfd::save_file("Save Launcher", "launcher.cmd", {"Launchers", "*.cmd"}).result();
+            FileUtil::WriteStringToFile(true, filename, fmt::format("\"{}\" {}", argv[0], options));
+#else
+            const std::string filename =
+                pfd::save_file("Save Launcher", "launcher.sh", {"Launchers", "*.sh"}).result();
+            FileUtil::WriteStringToFile(true, filename, fmt::format("\"{}\" {}", argv[0], options));
+            chmod(filename.c_str(), S_IRWXU); // enables owner to rwx file
+#endif
+        } else {
+            fmt::print("Options: {}\n", options);
+        }
 
         break;
     }

@@ -4,6 +4,9 @@ on:
   push:
     tags:
       - "*"
+  pull_request:
+    branches:
+      - "*"
 
 jobs:
   build:
@@ -55,7 +58,8 @@ jobs:
       - name: Test
         working-directory: ./build
         run: ctest -C ${{matrix.config}}
-      - name: Prepare to upload
+      - name: Prepare to upload (tag push)
+        if: github.event_name == 'push'
         shell: bash
         run: |
           cd $GITHUB_WORKSPACE
@@ -74,7 +78,25 @@ jobs:
           export VERSION=${GITHUB_REF:10}
           echo ::set-env name=VERSION::$VERSION
           7z a vvctre-$VERSION-${{matrix.build_type}}.7z ./build/bin/*
-      - name: Upload
+      - name: Prepare to upload (pull request)
+        if: github.event_name == 'pull_request'
+        shell: bash
+        run: |
+          cd $GITHUB_WORKSPACE
+          cp README.md ./build/bin
+          cp DEFAULT_CONTROLS.txt ./build/bin
+          cp RPC.md ./build/bin
+          cp license.txt ./build/bin
+          if [ "${{matrix.config}}" == "Release" ]; then
+            if [ "$RUNNER_OS" == "Linux" ]; then
+              rm ./build/bin/tests
+            elif [ "$RUNNER_OS" == "Windows" ]; then
+              rm ./build/bin/Release/tests.exe
+              rm ./build/bin/Release/*.pdb
+            fi
+          fi
+      - name: Upload (tag push)
+        if: github.event_name == 'push'
         uses: svenstaro/upload-release-action@v1-release
         with:
           repo_token: ${{secrets.GITHUB_TOKEN}}
@@ -82,7 +104,14 @@ jobs:
           asset_name: vvctre-${{env.VERSION}}-${{matrix.build_type}}.7z
           tag: ${{github.ref}}
           overwrite: true
+      - name: Upload (pull request)
+        if: github.event_name == 'pull_request'
+        uses: actions/upload-artifact@v1
+        with:
+          name: vvctre-${{matrix.build_type}}
+          path: build/bin
       - name: Discord Notification
+        if: github.event_name == 'push'
         uses: rjstone/discord-webhook-notify@v1
         with:
           severity: info
