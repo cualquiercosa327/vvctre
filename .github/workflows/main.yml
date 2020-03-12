@@ -81,7 +81,7 @@ jobs:
         if: github.event_name == 'pull_request'
         uses: actions/upload-artifact@v1
         with:
-          name: vvctre-${{env.VERSION}}-${{matrix.build_type}}
+          name: vvctre-${{matrix.build_type}}
           path: build/bin
       - name: Upload
         if: github.event_name == 'push'
