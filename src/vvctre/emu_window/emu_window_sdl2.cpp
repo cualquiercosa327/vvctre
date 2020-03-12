@@ -1123,7 +1123,7 @@ void EmuWindow_SDL2::SwapBuffers() {
                 if (ImGui::MenuItem("Generate Launcher For Custom Controls")) {
 #ifdef _WIN32
                     const std::string command =
-                        fmt::format("cmd /k \"\\\"{}\\\" controls --generate-launcher\"", arg0);
+                        fmt::format("cmd /k \"{}\" controls --generate-launcher\"", arg0);
 #else
                     const std::string command = fmt::format(
                         "x-terminal-emulator -e \"\\\"{}\\\" controls --generate-launcher;$SHELL\"",
