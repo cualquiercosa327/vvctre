@@ -212,6 +212,7 @@ EmuWindow_SDL2::EmuWindow_SDL2(Core::System& system, bool fullscreen) : system(s
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
     ImGui::StyleColorsDark();
+    ImGui::GetIO().IniFilename = nullptr;
     ImGui_ImplSDL2_InitForOpenGL(render_window, gl_context);
     ImGui_ImplOpenGL3_Init("#version 330 core");
 
