@@ -10,18 +10,15 @@ on:
 
 jobs:
   build:
-    name: ${{matrix.name}}
     runs-on: ${{matrix.os}}
     strategy:
       matrix:
         os: [windows-latest, ubuntu-latest]
         include:
           - os: windows-latest
-            name: Windows (fast)
             os_lowercase: windows
             options: "-DVVCTRE_USE_BUNDLED_SDL2=ON -DUSE_DISCORD_PRESENCE=ON -DENABLE_MF=ON -DENABLE_FFMPEG_VIDEO_DUMPER=ON"
           - os: ubuntu-latest
-            name: Linux (fast)
             os_lowercase: linux
             options: "-DUSE_DISCORD_PRESENCE=ON -DENABLE_FFMPEG_VIDEO_DUMPER=ON"
     steps:
@@ -54,13 +51,11 @@ jobs:
           cp DEFAULT_CONTROLS.txt ./build/bin
           cp RPC.md ./build/bin
           cp license.txt ./build/bin
-          if [ "${{matrix.config}}" == "Release" ]; then
-            if [ "$RUNNER_OS" == "Linux" ]; then
-              rm ./build/bin/tests
-            elif [ "$RUNNER_OS" == "Windows" ]; then
-              rm ./build/bin/Release/tests.exe
-              rm ./build/bin/Release/*.pdb
-            fi
+          if [ "$RUNNER_OS" == "Linux" ]; then
+            rm ./build/bin/tests
+          elif [ "$RUNNER_OS" == "Windows" ]; then
+            rm ./build/bin/Release/tests.exe
+            rm ./build/bin/Release/*.pdb
           fi
           export VERSION=${GITHUB_REF:10}
           echo ::set-env name=VERSION::$VERSION
@@ -103,6 +98,6 @@ jobs:
         with:
           severity: info
           description: |
-            vvctre ${{env.VERSION}} for ${{matrix.name}} can now be downloaded from:
+            vvctre ${{env.VERSION}} for ${{runner.os}} can now be downloaded from:
             https://github.com/${{github.repository}}/releases/tag/${{env.VERSION}}
           webhookUrl: ${{secrets.DISCORD_WEBHOOK}}
