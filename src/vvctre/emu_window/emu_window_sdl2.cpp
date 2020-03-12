@@ -835,9 +835,41 @@ void EmuWindow_SDL2::SwapBuffers() {
                     }
 
                     if (ImGui::BeginMenu("System (persistent)")) {
-                        if (ImGui::BeginMenu("Language (changing will restart emulation)")) {
-                            auto cfg = Service::CFG::GetModule(system);
-                            if (cfg != nullptr) {
+                        auto cfg = Service::CFG::GetModule(system);
+
+                        if (cfg != nullptr) {
+                            ImGui::Text("Username (changing will restart emulation)");
+                            ImGui::SameLine();
+
+                            std::string username = Common::UTF16ToUTF8(cfg->GetUsername());
+                            if (ImGui::InputText("##username", &username)) {
+                                cfg->SetUsername(Common::UTF8ToUTF16(username));
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+
+                            ImGui::Text("Birthday (changing will restart emulation)");
+                            ImGui::SameLine();
+
+                            auto [month, day] = cfg->GetBirthday();
+
+                            if (ImGui::InputScalar("##birthday", ImGuiDataType_U8, &day)) {
+                                cfg->SetBirthday(month, day);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+
+                            ImGui::SameLine();
+                            ImGui::Text("/");
+                            ImGui::SameLine();
+
+                            if (ImGui::InputScalar("##birthmonth", ImGuiDataType_U8, &month)) {
+                                cfg->SetBirthday(month, day);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+
+                            if (ImGui::BeginMenu("Language (changing will restart emulation)")) {
                                 const Service::CFG::SystemLanguage language =
                                     cfg->GetSystemLanguage();
 
@@ -948,9 +980,9 @@ void EmuWindow_SDL2::SwapBuffers() {
                                     cfg->UpdateConfigNANDSavegame();
                                     system.RequestReset();
                                 }
-                            }
 
-                            ImGui::EndMenu();
+                                ImGui::EndMenu();
+                            }
                         }
 
                         ImGui::Text("Play Coins (may need to restart emulation)");
