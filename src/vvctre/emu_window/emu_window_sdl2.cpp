@@ -599,406 +599,385 @@ void EmuWindow_SDL2::SwapBuffers() {
                 ImGui::EndMenu();
             }
 
-            if (ImGui::BeginMenu("Edit")) {
-                if (ImGui::BeginMenu("Settings")) {
-                    if (ImGui::BeginMenu("General")) {
-                        if (ImGui::MenuItem("Limit Speed", nullptr,
-                                            &Settings::values.use_frame_limit)) {
-                            Settings::LogSettings();
-                        }
-
-                        ImGui::Text("Speed Limit");
-                        ImGui::SameLine();
-                        const u16 min = 1;
-                        const u16 max = 500;
-                        if (ImGui::SliderScalar("##speedlimit", ImGuiDataType_U16,
-                                                &Settings::values.frame_limit, &min, &max)) {
-                            Settings::LogSettings();
-                        }
-
-                        ImGui::EndMenu();
+            if (ImGui::BeginMenu("Settings")) {
+                if (ImGui::BeginMenu("General")) {
+                    if (ImGui::MenuItem("Limit Speed", nullptr,
+                                        &Settings::values.use_frame_limit)) {
+                        Settings::LogSettings();
                     }
 
-                    if (ImGui::BeginMenu("Audio")) {
-                        ImGui::Text("Volume");
-                        ImGui::SameLine();
-                        if (ImGui::SliderFloat("##volume", &Settings::values.volume, 0.0f, 1.0f)) {
-                            Settings::LogSettings();
-                        }
-
-                        ImGui::Text("Speed");
-                        ImGui::SameLine();
-                        if (ImGui::SliderFloat("##speed", &Settings::values.audio_speed, 0.001f,
-                                               5.0f)) {
-                            Settings::LogSettings();
-                        }
-
-                        ImGui::EndMenu();
+                    ImGui::Text("Speed Limit");
+                    ImGui::SameLine();
+                    const u16 min = 1;
+                    const u16 max = 500;
+                    if (ImGui::SliderScalar("##speedlimit", ImGuiDataType_U16,
+                                            &Settings::values.frame_limit, &min, &max)) {
+                        Settings::LogSettings();
                     }
 
-                    if (ImGui::BeginMenu("Graphics")) {
-                        if (ImGui::MenuItem("Use Hardware Renderer", nullptr,
-                                            &Settings::values.use_hw_renderer)) {
-                            Settings::Apply();
-                            Settings::LogSettings();
-                        }
-                        ImGui::Indent();
+                    ImGui::EndMenu();
+                }
 
-                        if (ImGui::MenuItem("Use Hardware Shader", nullptr,
-                                            &Settings::values.use_hw_shader)) {
-                            Settings::Apply();
-                            Settings::LogSettings();
-                        }
-                        ImGui::Indent();
-
-                        if (ImGui::MenuItem("Use Accurate Multiplication", nullptr,
-                                            &Settings::values.shaders_accurate_mul)) {
-                            Settings::Apply();
-                            Settings::LogSettings();
-                        }
-
-                        ImGui::Unindent();
-                        ImGui::Unindent();
-
-                        if (ImGui::MenuItem("Use Shader JIT", nullptr,
-                                            &Settings::values.use_shader_jit)) {
-                            Settings::LogSettings();
-                        }
-
-                        if (ImGui::MenuItem("Enable VSync", nullptr,
-                                            &Settings::values.enable_vsync)) {
-                            Settings::LogSettings();
-                        }
-
-                        ImGui::Text("Resolution");
-                        ImGui::SameLine();
-                        const u16 min = 0;
-                        const u16 max = 10;
-                        if (ImGui::SliderScalar(
-                                "##resolution", ImGuiDataType_U16,
-                                &Settings::values.resolution_factor, &min, &max,
-                                Settings::values.resolution_factor == 0 ? "Window Size" : "%d")) {
-                            Settings::LogSettings();
-                        }
-
-                        ImGui::Text("Background Color");
-                        ImGui::SameLine();
-                        if (ImGui::ColorEdit3("##backgroundcolor", &Settings::values.bg_red,
-                                              ImGuiColorEditFlags_NoInputs)) {
-                            VideoCore::g_renderer_bg_color_update_requested = true;
-                            Settings::LogSettings();
-                        }
-
-                        ImGui::Text("Texture Filter Name");
-                        ImGui::SameLine();
-                        if (ImGui::BeginCombo("##texturefiltername",
-                                              Settings::values.texture_filter_name.c_str())) {
-                            const auto& filters = OpenGL::TextureFilterManager::TextureFilterMap();
-
-                            for (const auto& filter : filters) {
-                                if (ImGui::Selectable(filter.first.c_str())) {
-                                    Settings::values.texture_filter_name = filter.first;
-                                    Settings::Apply();
-                                    Settings::LogSettings();
-                                }
-                            }
-
-                            ImGui::EndCombo();
-                        }
-
-                        ImGui::Text("Texture Filter Factor");
-                        ImGui::SameLine();
-                        if (ImGui::InputScalar("##texturefilterfactor", ImGuiDataType_U16,
-                                               &Settings::values.texture_filter_factor)) {
-                            Settings::Apply();
-                            Settings::LogSettings();
-                        }
-
-                        ImGui::EndMenu();
+                if (ImGui::BeginMenu("Audio")) {
+                    ImGui::Text("Volume");
+                    ImGui::SameLine();
+                    if (ImGui::SliderFloat("##volume", &Settings::values.volume, 0.0f, 1.0f)) {
+                        Settings::LogSettings();
                     }
 
-                    if (ImGui::BeginMenu("Camera")) {
-                        ImGui::Text("Inner Camera Engine");
-                        ImGui::SameLine();
-                        if (ImGui::BeginCombo("##innerengine",
-                                              Settings::values
-                                                  .camera_name[static_cast<std::size_t>(
-                                                      Service::CAM::CameraIndex::InnerCamera)]
-                                                  .c_str())) {
-                            if (ImGui::Selectable("blank")) {
-                                Settings::values.camera_name[static_cast<std::size_t>(
-                                    Service::CAM::CameraIndex::InnerCamera)] = "blank";
-                                auto cam = Service::CAM::GetModule(system);
-                                if (cam != nullptr) {
-                                    cam->ReloadCameraDevices();
-                                }
+                    ImGui::Text("Speed");
+                    ImGui::SameLine();
+                    if (ImGui::SliderFloat("##speed", &Settings::values.audio_speed, 0.001f,
+                                           5.0f)) {
+                        Settings::LogSettings();
+                    }
+
+                    ImGui::EndMenu();
+                }
+
+                if (ImGui::BeginMenu("Graphics")) {
+                    if (ImGui::MenuItem("Use Hardware Renderer", nullptr,
+                                        &Settings::values.use_hw_renderer)) {
+                        Settings::Apply();
+                        Settings::LogSettings();
+                    }
+                    ImGui::Indent();
+
+                    if (ImGui::MenuItem("Use Hardware Shader", nullptr,
+                                        &Settings::values.use_hw_shader)) {
+                        Settings::Apply();
+                        Settings::LogSettings();
+                    }
+                    ImGui::Indent();
+
+                    if (ImGui::MenuItem("Use Accurate Multiplication", nullptr,
+                                        &Settings::values.shaders_accurate_mul)) {
+                        Settings::Apply();
+                        Settings::LogSettings();
+                    }
+
+                    ImGui::Unindent();
+                    ImGui::Unindent();
+
+                    if (ImGui::MenuItem("Use Shader JIT", nullptr,
+                                        &Settings::values.use_shader_jit)) {
+                        Settings::LogSettings();
+                    }
+
+                    if (ImGui::MenuItem("Enable VSync", nullptr, &Settings::values.enable_vsync)) {
+                        Settings::LogSettings();
+                    }
+
+                    ImGui::Text("Resolution");
+                    ImGui::SameLine();
+                    const u16 min = 0;
+                    const u16 max = 10;
+                    if (ImGui::SliderScalar("##resolution", ImGuiDataType_U16,
+                                            &Settings::values.resolution_factor, &min, &max,
+                                            Settings::values.resolution_factor == 0 ? "Window Size"
+                                                                                    : "%d")) {
+                        Settings::LogSettings();
+                    }
+
+                    ImGui::Text("Background Color");
+                    ImGui::SameLine();
+                    if (ImGui::ColorEdit3("##backgroundcolor", &Settings::values.bg_red,
+                                          ImGuiColorEditFlags_NoInputs)) {
+                        VideoCore::g_renderer_bg_color_update_requested = true;
+                        Settings::LogSettings();
+                    }
+
+                    ImGui::Text("Texture Filter Name");
+                    ImGui::SameLine();
+                    if (ImGui::BeginCombo("##texturefiltername",
+                                          Settings::values.texture_filter_name.c_str())) {
+                        const auto& filters = OpenGL::TextureFilterManager::TextureFilterMap();
+
+                        for (const auto& filter : filters) {
+                            if (ImGui::Selectable(filter.first.c_str())) {
+                                Settings::values.texture_filter_name = filter.first;
+                                Settings::Apply();
+                                Settings::LogSettings();
                             }
-                            if (ImGui::Selectable("image")) {
-                                Settings::values.camera_name[static_cast<std::size_t>(
-                                    Service::CAM::CameraIndex::InnerCamera)] = "image";
-                                auto cam = Service::CAM::GetModule(system);
-                                if (cam != nullptr) {
-                                    cam->ReloadCameraDevices();
-                                }
-                            }
-                            ImGui::EndCombo();
                         }
 
-                        ImGui::Text("Inner Camera Configuration");
-                        ImGui::SameLine();
-                        if (ImGui::InputText(
-                                "##innerconfiguration",
-                                &Settings::values.camera_config[static_cast<std::size_t>(
-                                    Service::CAM::CameraIndex::InnerCamera)])) {
+                        ImGui::EndCombo();
+                    }
+
+                    ImGui::Text("Texture Filter Factor");
+                    ImGui::SameLine();
+                    if (ImGui::InputScalar("##texturefilterfactor", ImGuiDataType_U16,
+                                           &Settings::values.texture_filter_factor)) {
+                        Settings::Apply();
+                        Settings::LogSettings();
+                    }
+
+                    ImGui::EndMenu();
+                }
+
+                if (ImGui::BeginMenu("Camera")) {
+                    ImGui::Text("Inner Camera Engine");
+                    ImGui::SameLine();
+                    if (ImGui::BeginCombo("##innerengine",
+                                          Settings::values
+                                              .camera_name[static_cast<std::size_t>(
+                                                  Service::CAM::CameraIndex::InnerCamera)]
+                                              .c_str())) {
+                        if (ImGui::Selectable("blank")) {
+                            Settings::values.camera_name[static_cast<std::size_t>(
+                                Service::CAM::CameraIndex::InnerCamera)] = "blank";
                             auto cam = Service::CAM::GetModule(system);
                             if (cam != nullptr) {
                                 cam->ReloadCameraDevices();
                             }
                         }
-
-                        ImGui::Text("Outer Left Engine");
-                        ImGui::SameLine();
-                        if (ImGui::BeginCombo("##outerleftengine",
-                                              Settings::values
-                                                  .camera_name[static_cast<std::size_t>(
-                                                      Service::CAM::CameraIndex::OuterLeftCamera)]
-                                                  .c_str())) {
-                            if (ImGui::Selectable("blank")) {
-                                Settings::values.camera_name[static_cast<std::size_t>(
-                                    Service::CAM::CameraIndex::OuterLeftCamera)] = "blank";
-                                auto cam = Service::CAM::GetModule(system);
-                                if (cam != nullptr) {
-                                    cam->ReloadCameraDevices();
-                                }
-                            }
-                            if (ImGui::Selectable("image")) {
-                                Settings::values.camera_name[static_cast<std::size_t>(
-                                    Service::CAM::CameraIndex::OuterLeftCamera)] = "image";
-                                auto cam = Service::CAM::GetModule(system);
-                                if (cam != nullptr) {
-                                    cam->ReloadCameraDevices();
-                                }
-                            }
-                            ImGui::EndCombo();
-                        }
-
-                        ImGui::Text("Outer Left Configuration");
-                        ImGui::SameLine();
-                        if (ImGui::InputText(
-                                "##outerleftconfiguration",
-                                &Settings::values.camera_config[static_cast<std::size_t>(
-                                    Service::CAM::CameraIndex::OuterLeftCamera)])) {
+                        if (ImGui::Selectable("image")) {
+                            Settings::values.camera_name[static_cast<std::size_t>(
+                                Service::CAM::CameraIndex::InnerCamera)] = "image";
                             auto cam = Service::CAM::GetModule(system);
                             if (cam != nullptr) {
                                 cam->ReloadCameraDevices();
                             }
                         }
-
-                        ImGui::Text("Outer Right Engine");
-                        ImGui::SameLine();
-                        if (ImGui::BeginCombo("##outerrightengine",
-                                              Settings::values
-                                                  .camera_name[static_cast<std::size_t>(
-                                                      Service::CAM::CameraIndex::OuterRightCamera)]
-                                                  .c_str())) {
-                            if (ImGui::Selectable("blank")) {
-                                Settings::values.camera_name[static_cast<std::size_t>(
-                                    Service::CAM::CameraIndex::OuterRightCamera)] = "blank";
-                                auto cam = Service::CAM::GetModule(system);
-                                if (cam != nullptr) {
-                                    cam->ReloadCameraDevices();
-                                }
-                            }
-                            if (ImGui::Selectable("image")) {
-                                Settings::values.camera_name[static_cast<std::size_t>(
-                                    Service::CAM::CameraIndex::OuterRightCamera)] = "image";
-                                auto cam = Service::CAM::GetModule(system);
-                                if (cam != nullptr) {
-                                    cam->ReloadCameraDevices();
-                                }
-                            }
-                            ImGui::EndCombo();
-                        }
-
-                        ImGui::Text("Outer Right Configuration");
-                        ImGui::SameLine();
-                        if (ImGui::InputText(
-                                "##outerrightconfiguration",
-                                &Settings::values.camera_config[static_cast<std::size_t>(
-                                    Service::CAM::CameraIndex::OuterRightCamera)])) {
-                            auto cam = Service::CAM::GetModule(system);
-                            if (cam != nullptr) {
-                                cam->ReloadCameraDevices();
-                            }
-                        }
-
-                        ImGui::EndMenu();
+                        ImGui::EndCombo();
                     }
 
-                    if (ImGui::BeginMenu("System (persistent)")) {
-                        auto cfg = Service::CFG::GetModule(system);
+                    ImGui::Text("Inner Camera Configuration");
+                    ImGui::SameLine();
+                    if (ImGui::InputText("##innerconfiguration",
+                                         &Settings::values.camera_config[static_cast<std::size_t>(
+                                             Service::CAM::CameraIndex::InnerCamera)])) {
+                        auto cam = Service::CAM::GetModule(system);
+                        if (cam != nullptr) {
+                            cam->ReloadCameraDevices();
+                        }
+                    }
 
-                        if (cfg != nullptr) {
-                            ImGui::Text("Username (changing will restart emulation)");
-                            ImGui::SameLine();
-
-                            std::string username = Common::UTF16ToUTF8(cfg->GetUsername());
-                            if (ImGui::InputText("##username", &username)) {
-                                cfg->SetUsername(Common::UTF8ToUTF16(username));
-                                cfg->UpdateConfigNANDSavegame();
-                                system.RequestReset();
-                            }
-
-                            ImGui::Text("Birthday (changing will restart emulation)");
-                            ImGui::SameLine();
-
-                            auto [month, day] = cfg->GetBirthday();
-
-                            if (ImGui::InputScalar("##birthday", ImGuiDataType_U8, &day)) {
-                                cfg->SetBirthday(month, day);
-                                cfg->UpdateConfigNANDSavegame();
-                                system.RequestReset();
-                            }
-
-                            ImGui::SameLine();
-                            ImGui::Text("/");
-                            ImGui::SameLine();
-
-                            if (ImGui::InputScalar("##birthmonth", ImGuiDataType_U8, &month)) {
-                                cfg->SetBirthday(month, day);
-                                cfg->UpdateConfigNANDSavegame();
-                                system.RequestReset();
-                            }
-
-                            if (ImGui::BeginMenu("Language (changing will restart emulation)")) {
-                                const Service::CFG::SystemLanguage language =
-                                    cfg->GetSystemLanguage();
-
-                                if (ImGui::RadioButton(
-                                        "Japanese",
-                                        language == Service::CFG::SystemLanguage::LANGUAGE_JP)) {
-                                    cfg->SetSystemLanguage(
-                                        Service::CFG::SystemLanguage::LANGUAGE_JP);
-                                    cfg->UpdateConfigNANDSavegame();
-                                    system.RequestReset();
-                                }
-
-                                if (ImGui::RadioButton(
-                                        "English",
-                                        language == Service::CFG::SystemLanguage::LANGUAGE_EN)) {
-                                    cfg->SetSystemLanguage(
-                                        Service::CFG::SystemLanguage::LANGUAGE_EN);
-                                    cfg->UpdateConfigNANDSavegame();
-                                    system.RequestReset();
-                                }
-
-                                if (ImGui::RadioButton(
-                                        "French",
-                                        language == Service::CFG::SystemLanguage::LANGUAGE_FR)) {
-                                    cfg->SetSystemLanguage(
-                                        Service::CFG::SystemLanguage::LANGUAGE_FR);
-                                    cfg->UpdateConfigNANDSavegame();
-                                    system.RequestReset();
-                                }
-
-                                if (ImGui::RadioButton(
-                                        "German",
-                                        language == Service::CFG::SystemLanguage::LANGUAGE_DE)) {
-                                    cfg->SetSystemLanguage(
-                                        Service::CFG::SystemLanguage::LANGUAGE_DE);
-                                    cfg->UpdateConfigNANDSavegame();
-                                    system.RequestReset();
-                                }
-
-                                if (ImGui::RadioButton(
-                                        "Italian",
-                                        language == Service::CFG::SystemLanguage::LANGUAGE_IT)) {
-                                    cfg->SetSystemLanguage(
-                                        Service::CFG::SystemLanguage::LANGUAGE_IT);
-                                    cfg->UpdateConfigNANDSavegame();
-                                    system.RequestReset();
-                                }
-
-                                if (ImGui::RadioButton(
-                                        "Spanish",
-                                        language == Service::CFG::SystemLanguage::LANGUAGE_ES)) {
-                                    cfg->SetSystemLanguage(
-                                        Service::CFG::SystemLanguage::LANGUAGE_ES);
-                                    cfg->UpdateConfigNANDSavegame();
-                                    system.RequestReset();
-                                }
-
-                                if (ImGui::RadioButton(
-                                        "Simplified Chinese",
-                                        language == Service::CFG::SystemLanguage::LANGUAGE_ZH)) {
-                                    cfg->SetSystemLanguage(
-                                        Service::CFG::SystemLanguage::LANGUAGE_ZH);
-                                    cfg->UpdateConfigNANDSavegame();
-                                    system.RequestReset();
-                                }
-
-                                if (ImGui::RadioButton(
-                                        "Korean",
-                                        language == Service::CFG::SystemLanguage::LANGUAGE_KO)) {
-                                    cfg->SetSystemLanguage(
-                                        Service::CFG::SystemLanguage::LANGUAGE_KO);
-                                    cfg->UpdateConfigNANDSavegame();
-                                    system.RequestReset();
-                                }
-
-                                if (ImGui::RadioButton(
-                                        "Dutch",
-                                        language == Service::CFG::SystemLanguage::LANGUAGE_NL)) {
-                                    cfg->SetSystemLanguage(
-                                        Service::CFG::SystemLanguage::LANGUAGE_NL);
-                                    cfg->UpdateConfigNANDSavegame();
-                                    system.RequestReset();
-                                }
-
-                                if (ImGui::RadioButton(
-                                        "Portugese",
-                                        language == Service::CFG::SystemLanguage::LANGUAGE_PT)) {
-                                    cfg->SetSystemLanguage(
-                                        Service::CFG::SystemLanguage::LANGUAGE_PT);
-                                    cfg->UpdateConfigNANDSavegame();
-                                    system.RequestReset();
-                                }
-
-                                if (ImGui::RadioButton(
-                                        "Russian",
-                                        language == Service::CFG::SystemLanguage::LANGUAGE_RU)) {
-                                    cfg->SetSystemLanguage(
-                                        Service::CFG::SystemLanguage::LANGUAGE_RU);
-                                    cfg->UpdateConfigNANDSavegame();
-                                    system.RequestReset();
-                                }
-
-                                if (ImGui::RadioButton(
-                                        "Traditional Chinese",
-                                        language == Service::CFG::SystemLanguage::LANGUAGE_TW)) {
-                                    cfg->SetSystemLanguage(
-                                        Service::CFG::SystemLanguage::LANGUAGE_TW);
-                                    cfg->UpdateConfigNANDSavegame();
-                                    system.RequestReset();
-                                }
-
-                                ImGui::EndMenu();
+                    ImGui::Text("Outer Left Engine");
+                    ImGui::SameLine();
+                    if (ImGui::BeginCombo("##outerleftengine",
+                                          Settings::values
+                                              .camera_name[static_cast<std::size_t>(
+                                                  Service::CAM::CameraIndex::OuterLeftCamera)]
+                                              .c_str())) {
+                        if (ImGui::Selectable("blank")) {
+                            Settings::values.camera_name[static_cast<std::size_t>(
+                                Service::CAM::CameraIndex::OuterLeftCamera)] = "blank";
+                            auto cam = Service::CAM::GetModule(system);
+                            if (cam != nullptr) {
+                                cam->ReloadCameraDevices();
                             }
                         }
+                        if (ImGui::Selectable("image")) {
+                            Settings::values.camera_name[static_cast<std::size_t>(
+                                Service::CAM::CameraIndex::OuterLeftCamera)] = "image";
+                            auto cam = Service::CAM::GetModule(system);
+                            if (cam != nullptr) {
+                                cam->ReloadCameraDevices();
+                            }
+                        }
+                        ImGui::EndCombo();
+                    }
 
-                        ImGui::Text("Play Coins (may need to restart emulation)");
+                    ImGui::Text("Outer Left Configuration");
+                    ImGui::SameLine();
+                    if (ImGui::InputText("##outerleftconfiguration",
+                                         &Settings::values.camera_config[static_cast<std::size_t>(
+                                             Service::CAM::CameraIndex::OuterLeftCamera)])) {
+                        auto cam = Service::CAM::GetModule(system);
+                        if (cam != nullptr) {
+                            cam->ReloadCameraDevices();
+                        }
+                    }
+
+                    ImGui::Text("Outer Right Engine");
+                    ImGui::SameLine();
+                    if (ImGui::BeginCombo("##outerrightengine",
+                                          Settings::values
+                                              .camera_name[static_cast<std::size_t>(
+                                                  Service::CAM::CameraIndex::OuterRightCamera)]
+                                              .c_str())) {
+                        if (ImGui::Selectable("blank")) {
+                            Settings::values.camera_name[static_cast<std::size_t>(
+                                Service::CAM::CameraIndex::OuterRightCamera)] = "blank";
+                            auto cam = Service::CAM::GetModule(system);
+                            if (cam != nullptr) {
+                                cam->ReloadCameraDevices();
+                            }
+                        }
+                        if (ImGui::Selectable("image")) {
+                            Settings::values.camera_name[static_cast<std::size_t>(
+                                Service::CAM::CameraIndex::OuterRightCamera)] = "image";
+                            auto cam = Service::CAM::GetModule(system);
+                            if (cam != nullptr) {
+                                cam->ReloadCameraDevices();
+                            }
+                        }
+                        ImGui::EndCombo();
+                    }
+
+                    ImGui::Text("Outer Right Configuration");
+                    ImGui::SameLine();
+                    if (ImGui::InputText("##outerrightconfiguration",
+                                         &Settings::values.camera_config[static_cast<std::size_t>(
+                                             Service::CAM::CameraIndex::OuterRightCamera)])) {
+                        auto cam = Service::CAM::GetModule(system);
+                        if (cam != nullptr) {
+                            cam->ReloadCameraDevices();
+                        }
+                    }
+
+                    ImGui::EndMenu();
+                }
+
+                if (ImGui::BeginMenu("System (persistent)")) {
+                    auto cfg = Service::CFG::GetModule(system);
+
+                    if (cfg != nullptr) {
+                        ImGui::Text("Username (changing will restart emulation)");
                         ImGui::SameLine();
 
-                        const u16 min = 0;
-                        const u16 max = 300;
-
-                        u16 play_coins = Service::PTM::Module::GetPlayCoins();
-                        if (ImGui::SliderScalar("##playcoins", ImGuiDataType_U16, &play_coins, &min,
-                                                &max)) {
-                            Service::PTM::Module::SetPlayCoins(play_coins);
+                        std::string username = Common::UTF16ToUTF8(cfg->GetUsername());
+                        if (ImGui::InputText("##username", &username)) {
+                            cfg->SetUsername(Common::UTF8ToUTF16(username));
+                            cfg->UpdateConfigNANDSavegame();
+                            system.RequestReset();
                         }
 
-                        ImGui::EndMenu();
+                        ImGui::Text("Birthday (changing will restart emulation)");
+                        ImGui::SameLine();
+
+                        auto [month, day] = cfg->GetBirthday();
+
+                        if (ImGui::InputScalar("##birthday", ImGuiDataType_U8, &day)) {
+                            cfg->SetBirthday(month, day);
+                            cfg->UpdateConfigNANDSavegame();
+                            system.RequestReset();
+                        }
+
+                        ImGui::SameLine();
+                        ImGui::Text("/");
+                        ImGui::SameLine();
+
+                        if (ImGui::InputScalar("##birthmonth", ImGuiDataType_U8, &month)) {
+                            cfg->SetBirthday(month, day);
+                            cfg->UpdateConfigNANDSavegame();
+                            system.RequestReset();
+                        }
+
+                        if (ImGui::BeginMenu("Language (changing will restart emulation)")) {
+                            const Service::CFG::SystemLanguage language = cfg->GetSystemLanguage();
+
+                            if (ImGui::RadioButton("Japanese",
+                                                   language ==
+                                                       Service::CFG::SystemLanguage::LANGUAGE_JP)) {
+                                cfg->SetSystemLanguage(Service::CFG::SystemLanguage::LANGUAGE_JP);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+
+                            if (ImGui::RadioButton("English",
+                                                   language ==
+                                                       Service::CFG::SystemLanguage::LANGUAGE_EN)) {
+                                cfg->SetSystemLanguage(Service::CFG::SystemLanguage::LANGUAGE_EN);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+
+                            if (ImGui::RadioButton("French",
+                                                   language ==
+                                                       Service::CFG::SystemLanguage::LANGUAGE_FR)) {
+                                cfg->SetSystemLanguage(Service::CFG::SystemLanguage::LANGUAGE_FR);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+
+                            if (ImGui::RadioButton("German",
+                                                   language ==
+                                                       Service::CFG::SystemLanguage::LANGUAGE_DE)) {
+                                cfg->SetSystemLanguage(Service::CFG::SystemLanguage::LANGUAGE_DE);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+
+                            if (ImGui::RadioButton("Italian",
+                                                   language ==
+                                                       Service::CFG::SystemLanguage::LANGUAGE_IT)) {
+                                cfg->SetSystemLanguage(Service::CFG::SystemLanguage::LANGUAGE_IT);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+
+                            if (ImGui::RadioButton("Spanish",
+                                                   language ==
+                                                       Service::CFG::SystemLanguage::LANGUAGE_ES)) {
+                                cfg->SetSystemLanguage(Service::CFG::SystemLanguage::LANGUAGE_ES);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+
+                            if (ImGui::RadioButton("Simplified Chinese",
+                                                   language ==
+                                                       Service::CFG::SystemLanguage::LANGUAGE_ZH)) {
+                                cfg->SetSystemLanguage(Service::CFG::SystemLanguage::LANGUAGE_ZH);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+
+                            if (ImGui::RadioButton("Korean",
+                                                   language ==
+                                                       Service::CFG::SystemLanguage::LANGUAGE_KO)) {
+                                cfg->SetSystemLanguage(Service::CFG::SystemLanguage::LANGUAGE_KO);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+
+                            if (ImGui::RadioButton("Dutch",
+                                                   language ==
+                                                       Service::CFG::SystemLanguage::LANGUAGE_NL)) {
+                                cfg->SetSystemLanguage(Service::CFG::SystemLanguage::LANGUAGE_NL);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+
+                            if (ImGui::RadioButton("Portugese",
+                                                   language ==
+                                                       Service::CFG::SystemLanguage::LANGUAGE_PT)) {
+                                cfg->SetSystemLanguage(Service::CFG::SystemLanguage::LANGUAGE_PT);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+
+                            if (ImGui::RadioButton("Russian",
+                                                   language ==
+                                                       Service::CFG::SystemLanguage::LANGUAGE_RU)) {
+                                cfg->SetSystemLanguage(Service::CFG::SystemLanguage::LANGUAGE_RU);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+
+                            if (ImGui::RadioButton("Traditional Chinese",
+                                                   language ==
+                                                       Service::CFG::SystemLanguage::LANGUAGE_TW)) {
+                                cfg->SetSystemLanguage(Service::CFG::SystemLanguage::LANGUAGE_TW);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+
+                            ImGui::EndMenu();
+                        }
+                    }
+
+                    ImGui::Text("Play Coins (may need to restart emulation)");
+                    ImGui::SameLine();
+
+                    const u16 min = 0;
+                    const u16 max = 300;
+
+                    u16 play_coins = Service::PTM::Module::GetPlayCoins();
+                    if (ImGui::SliderScalar("##playcoins", ImGuiDataType_U16, &play_coins, &min,
+                                            &max)) {
+                        Service::PTM::Module::SetPlayCoins(play_coins);
                     }
 
                     ImGui::EndMenu();
