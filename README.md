@@ -3,12 +3,12 @@ vvctre is a New Nintendo 3DS emulator based on Citra for Windows and Linux.
 vvctre is licensed under the GPLv2 (or any later version).  
 Refer to the license.txt file included.
 
-|  | Citra | vvctre |
-|----------------------------------|:------------------------------------------------------------------------------:|--------------------------------------------------------------------------------------:|
-| Multiplayer works out of the box | No | Yes |
-| Scripting requests | Read/write memory | [Here](https://github.com/vvanelslande/vvctre/blob/master/RPC.md) |
-| Versions | Sequential number | [SemVer](https://semver.org/) |
-| CLI usage | [Here](https://github.com/citra-emu/citra/blob/master/src/citra/citra.cpp#L62) | [Here](https://github.com/vvanelslande/vvctre/blob/master/src/vvctre/vvctre.cpp#L103) |
+|                                  |                                     Citra                                      |                                                                                vvctre |
+| -------------------------------- | :----------------------------------------------------------------------------: | ------------------------------------------------------------------------------------: |
+| Multiplayer works out of the box |                                       No                                       |                                                                                   Yes |
+| Scripting requests               |                               Read/write memory                                |                     [Here](https://github.com/vvanelslande/vvctre/blob/master/RPC.md) |
+| Versions                         |                               Sequential number                                |                                                         [SemVer](https://semver.org/) |
+| CLI usage                        | [Here](https://github.com/citra-emu/citra/blob/master/src/citra/citra.cpp#L62) | [Here](https://github.com/vvanelslande/vvctre/blob/master/src/vvctre/vvctre.cpp#L103) |
 
 # Definitions
 
@@ -35,26 +35,6 @@ vvctre uses the first existing option.
     - `libavformat-dev`
     - `libavcodec-dev`
     - `libavdevice-dev`
-
-# Usage
-
-<details>
-  <summary>Easy</summary>
-
-Ways to use:
-
-- Open vvctre
-- Drop a file on the vvctre executable
-
-</details>
-
-<details>
-  <summary>Advanced</summary>
-
-Run `vvctre` in a terminal.  
-For a list of commands and options, run `vvctre usage`.
-
-</details>
 
 # GUI Features
 
