@@ -14,18 +14,12 @@ add_executable(${PROJECT_NAME}
     camera/image.h
     camera/util.cpp
     camera/util.h
-    $<$<BOOL:${USE_DISCORD_PRESENCE}>:discord_rp.cpp discord_rp.h>
 )
 
 create_target_directory_groups(${PROJECT_NAME})
 
 target_link_libraries(${PROJECT_NAME} PRIVATE common core input_common)
 target_link_libraries(${PROJECT_NAME} PRIVATE glad clipp portable-file-dialogs indicators imgui ${PLATFORM_LIBRARIES} Threads::Threads)
-
-if(USE_DISCORD_PRESENCE)
-    target_compile_definitions(${PROJECT_NAME} PRIVATE -DUSE_DISCORD_PRESENCE)
-    target_link_libraries(${PROJECT_NAME} PRIVATE discord-rpc)
-endif()
 
 if(UNIX)
     install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION "${CMAKE_INSTALL_PREFIX}/bin")

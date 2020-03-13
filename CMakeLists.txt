@@ -11,7 +11,6 @@ project(vvctre)
 CMAKE_DEPENDENT_OPTION(VVCTRE_USE_BUNDLED_SDL2 "Download bundled SDL2 binaries" ON "MSVC" OFF)
 
 option(ENABLE_CUBEB "Enables the cubeb audio backend" ON)
-option(USE_DISCORD_PRESENCE "Enables Discord Rich Presence" OFF)
 CMAKE_DEPENDENT_OPTION(ENABLE_MF "Use Media Foundation AAC decoder" ON "WIN32" OFF)
 CMAKE_DEPENDENT_OPTION(ENABLE_FDK "Use FDK AAC decoder" OFF "NOT ENABLE_MF" OFF)
 

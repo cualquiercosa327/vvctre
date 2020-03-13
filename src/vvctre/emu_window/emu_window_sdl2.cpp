@@ -38,10 +38,6 @@
 #include "video_core/video_core.h"
 #include "vvctre/emu_window/emu_window_sdl2.h"
 
-#ifdef USE_DISCORD_PRESENCE
-#include "vvctre/discord_rp.h"
-#endif
-
 static std::string IPC_Recorder_GetStatusString(IPCDebugger::RequestStatus status) {
     switch (status) {
     case IPCDebugger::RequestStatus::Sent:
@@ -1326,14 +1322,6 @@ void EmuWindow_SDL2::PollEvents() {
     const u64 current_program_id = system.Kernel().GetCurrentProcess()->codeset->program_id;
     if (program_id != current_program_id) {
         system.GetAppLoader().ReadTitle(program_name);
-
-#ifdef USE_DISCORD_PRESENCE
-        if (discord_rp == nullptr) {
-            discord_rp = std::make_unique<DiscordRP>(program_name);
-        } else {
-            discord_rp->Update(program_name);
-        }
-#endif
 
         const std::string window_title =
             fmt::format("vvctre {} | {}", version::vvctre.to_string(), program_name);

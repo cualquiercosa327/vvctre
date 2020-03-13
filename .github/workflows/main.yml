@@ -17,10 +17,10 @@ jobs:
         include:
           - os: windows-latest
             os_lowercase: windows
-            options: "-DVVCTRE_USE_BUNDLED_SDL2=ON -DUSE_DISCORD_PRESENCE=ON -DENABLE_MF=ON"
+            options: "-DVVCTRE_USE_BUNDLED_SDL2=ON -DENABLE_MF=ON"
           - os: ubuntu-latest
             os_lowercase: linux
-            options: "-DUSE_DISCORD_PRESENCE=ON"
+            options: ""
     steps:
       - name: Install Dependencies
         if: matrix.os == 'ubuntu-latest'

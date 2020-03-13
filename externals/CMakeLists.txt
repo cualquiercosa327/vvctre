@@ -59,12 +59,6 @@ if (ENABLE_CUBEB)
     add_subdirectory(cubeb EXCLUDE_FROM_ALL)
 endif()
 
-# Discord RPC
-if (USE_DISCORD_PRESENCE)
-    add_subdirectory(discord-rpc EXCLUDE_FROM_ALL)
-    target_include_directories(discord-rpc INTERFACE ./discord-rpc/include)
-endif()
-
 # LibreSSL
 set(LIBRESSL_SKIP_INSTALL ON CACHE BOOL "")
 add_subdirectory(libressl EXCLUDE_FROM_ALL)

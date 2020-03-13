@@ -15,10 +15,6 @@
 
 struct SDL_Window;
 
-#ifdef USE_DISCORD_PRESENCE
-class DiscordRP;
-#endif
-
 namespace Core {
 class System;
 } // namespace Core
@@ -102,10 +98,6 @@ private:
     u64 program_id = 0;
 
     float disk_shader_cache_loading_progress = -1.0f;
-
-#ifdef USE_DISCORD_PRESENCE
-    std::unique_ptr<DiscordRP> discord_rp;
-#endif
 
     Core::System& system;
     ImVec4 fps_color{0.0f, 1.0f, 0.0f, 1.0f}; // Green
