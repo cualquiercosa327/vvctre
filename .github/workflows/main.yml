@@ -17,10 +17,10 @@ jobs:
         include:
           - os: windows-latest
             os_lowercase: windows
-            options: "-DVVCTRE_USE_BUNDLED_SDL2=ON -DUSE_DISCORD_PRESENCE=ON -DENABLE_MF=ON -DENABLE_FFMPEG_VIDEO_DUMPER=ON"
+            options: "-DVVCTRE_USE_BUNDLED_SDL2=ON -DUSE_DISCORD_PRESENCE=ON -DENABLE_MF=ON"
           - os: ubuntu-latest
             os_lowercase: linux
-            options: "-DUSE_DISCORD_PRESENCE=ON -DENABLE_FFMPEG_VIDEO_DUMPER=ON"
+            options: "-DUSE_DISCORD_PRESENCE=ON"
     steps:
       - name: Install Dependencies
         if: matrix.os == 'ubuntu-latest'
