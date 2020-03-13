@@ -50,8 +50,6 @@ public:
 private:
     class Worker {
     public:
-        Worker() : exit_loop(false), spinlock_enabled(false), thread([this] { Loop(); }) {}
-
         ~Worker() {
             exit_loop = true;
             std::unique_lock<std::mutex> lock(mutex);
@@ -76,31 +74,34 @@ private:
             return task->get_future();
         }
 
-        std::atomic<bool> spinlock_enabled;
+        std::atomic<bool> spinlock_enabled{false};
         std::mutex mutex;
         std::condition_variable cv;
 
     private:
         void Loop() {
-            while (true) {
-                std::function<void()> task;
-                while (queue.Pop(task))
+            std::function<void()> task;
+            for (;;) {
+                while (queue.Pop(task)) {
                     task();
-                if (spinlock_enabled)
+                }
+                if (spinlock_enabled) {
                     continue;
-
+                }
                 std::unique_lock<std::mutex> lock(mutex);
-                if (!queue.Empty())
+                if (!queue.Empty()) {
                     continue;
-                if (exit_loop)
+                }
+                if (exit_loop) {
                     break;
+                }
                 cv.wait(lock);
             }
         }
 
-        bool exit_loop;
+        bool exit_loop = false;
         SPSCQueue<std::function<void()>> queue;
-        std::thread thread;
+        std::thread thread{[this] { Loop(); }};
     };
 
     const std::size_t num_threads;
