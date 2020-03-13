@@ -22,8 +22,6 @@ std::string ToUpper(std::string str);
 std::string StripSpaces(const std::string& s);
 std::string StripQuotes(const std::string& s);
 
-std::string StringFromBool(bool value);
-
 std::string TabsToSpaces(int tab_size, std::string in);
 
 void SplitString(const std::string& str, char delim, std::vector<std::string>& output);

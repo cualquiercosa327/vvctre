@@ -52,10 +52,6 @@ std::string StripQuotes(const std::string& s) {
         return s;
 }
 
-std::string StringFromBool(bool value) {
-    return value ? "True" : "False";
-}
-
 bool SplitPath(const std::string& full_path, std::string* _pPath, std::string* _pFilename,
                std::string* _pExtension) {
     if (full_path.empty())
