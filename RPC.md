@@ -1243,7 +1243,7 @@ Get or set texture filtering settings.
 
 ```json
 {
-  "name": String"can be none, xBRZ freescale, or Anime4K Ultrafast",
+  "name": String"can be none, xBRZ freescale, Anime4K Ultrafast, or Bicubic",
   "factor": Number
 }
 ```

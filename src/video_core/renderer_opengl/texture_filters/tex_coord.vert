@@ -1,4 +1,5 @@
-//? #version 330
+#version 330 core
+
 out vec2 tex_coord;
 
 const vec2 vertices[4] =

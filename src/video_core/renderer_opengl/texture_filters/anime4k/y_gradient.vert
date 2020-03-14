@@ -1,4 +1,5 @@
-//? #version 330
+#version 330 core
+
 out vec2 input_max;
 
 uniform sampler2D tex_size;

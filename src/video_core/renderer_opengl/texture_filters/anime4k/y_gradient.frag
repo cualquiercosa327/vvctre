@@ -1,4 +1,5 @@
-//? #version 330
+#version 330 core
+
 in vec2 input_max;
 
 out float frag_color;

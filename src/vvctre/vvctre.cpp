@@ -255,7 +255,7 @@ int main(int argc, char** argv) {
               clipp::value("parameters").set(Settings::values.current_input_profile.touch_device),
           clipp::option("--texture-filter-name")
                   .doc("set texture filter name\ndefault: none\nvalid values:\n- none\n- \"xBRZ "
-                       "freescale\"\n- \"Anime4K Ultrafast\"") &
+                       "freescale\"\n- \"Anime4K Ultrafast\"\n - \"Bicubic\"") &
               clipp::value("name").set(Settings::values.texture_filter_name),
           clipp::option("--texture-filter-factor").doc("set texture filter factor\ndefault: 1") &
               clipp::value("factor").set(Settings::values.texture_filter_factor),

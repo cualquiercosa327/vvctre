@@ -691,7 +691,7 @@ void EmuWindow_SDL2::SwapBuffers() {
                         const auto& filters = OpenGL::TextureFilterManager::TextureFilterMap();
 
                         for (const auto& filter : filters) {
-                            if (ImGui::Selectable(filter.first.c_str())) {
+                            if (ImGui::Selectable(std::string(filter.first).c_str())) {
                                 Settings::values.texture_filter_name = filter.first;
                                 Settings::Apply();
                                 Settings::LogSettings();

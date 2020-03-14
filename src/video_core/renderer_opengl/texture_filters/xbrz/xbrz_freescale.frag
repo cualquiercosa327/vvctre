@@ -1,4 +1,5 @@
-//? #version 330
+#version 330 core
+
 in vec2 tex_coord;
 in vec2 source_size;
 in vec2 output_size;

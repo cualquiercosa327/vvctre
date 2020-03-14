@@ -1,4 +1,5 @@
-//? #version 330
+#version 330 core
+
 out vec2 tex_coord;
 out vec2 input_max;
 

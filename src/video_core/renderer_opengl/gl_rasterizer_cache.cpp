@@ -34,7 +34,6 @@
 #include "video_core/renderer_base.h"
 #include "video_core/renderer_opengl/gl_rasterizer_cache.h"
 #include "video_core/renderer_opengl/gl_state.h"
-#include "video_core/renderer_opengl/gl_vars.h"
 #include "video_core/renderer_opengl/texture_filters/texture_filter_manager.h"
 #include "video_core/utils.h"
 #include "video_core/video_core.h"
@@ -1558,12 +1557,6 @@ Surface RasterizerCacheOpenGL::GetTextureSurface(const Pica::Texture::TextureInf
         }
     }
 
-    TextureFilterInterface* texture_filter;
-    if ((!surface->is_custom & !surface->is_filtered) &&
-        (texture_filter = TextureFilterManager::GetInstance().GetTextureFilter())) {
-        texture_filter->scale(surface);
-        surface->is_filtered = true;
-    }
     return surface;
 }
 
