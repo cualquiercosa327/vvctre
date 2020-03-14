@@ -19,6 +19,7 @@ public:
     }
 
     Bicubic(u16 scale_factor);
+
     void scale(CachedSurface& surface, const Common::Rectangle<u32>& rect,
                std::size_t buffer_offset) override;
 
