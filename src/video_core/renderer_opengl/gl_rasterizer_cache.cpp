@@ -790,8 +790,7 @@ void CachedSurface::FlushGLBuffer(PAddr flush_start, PAddr flush_end) {
     }
 }
 
-bool CachedSurface::LoadCustomTexture(u64 tex_hash, Core::CustomTexInfo& tex_info,
-                                      Common::Rectangle<u32>& custom_rect) {
+bool CachedSurface::LoadCustomTexture(u64 tex_hash, Core::CustomTexInfo& tex_info) {
     bool result = false;
     Core::CustomTexCache& custom_tex_cache = Core::System::GetInstance().CustomTexCache();
 
@@ -823,13 +822,6 @@ bool CachedSurface::LoadCustomTexture(u64 tex_hash, Core::CustomTexInfo& tex_inf
         } else {
             LOG_ERROR(Render_OpenGL, "Failed to load custom texture {}", path_info.path);
         }
-    }
-
-    if (result) {
-        custom_rect.left = (custom_rect.left / width) * tex_info.width;
-        custom_rect.top = (custom_rect.top / height) * tex_info.height;
-        custom_rect.right = (custom_rect.right / width) * tex_info.width;
-        custom_rect.bottom = (custom_rect.bottom / height) * tex_info.height;
     }
 
     return result;
@@ -893,7 +885,7 @@ void CachedSurface::UploadGLTexture(Common::Rectangle<u32> rect, GLuint read_fb_
     }
 
     if (Settings::values.custom_textures) {
-        is_custom = LoadCustomTexture(tex_hash, custom_tex_info, rect);
+        is_custom = LoadCustomTexture(tex_hash, custom_tex_info);
     }
 
     TextureFilterInterface* const texture_filter =
@@ -969,7 +961,7 @@ void CachedSurface::UploadGLTexture(Common::Rectangle<u32> rect, GLuint read_fb_
     }
 
     glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
-    if (Settings::values.dump_textures && !is_custom) {
+    if (Settings::values.dump_textures && !is_custom && !texture_filter) {
         DumpTexture(target_tex, tex_hash);
     }
 
@@ -982,9 +974,11 @@ void CachedSurface::UploadGLTexture(Common::Rectangle<u32> rect, GLuint read_fb_
         scaled_rect.top *= res_scale;
         scaled_rect.right *= res_scale;
         scaled_rect.bottom *= res_scale;
-
-        BlitTextures(unscaled_tex.handle, {0, rect.GetHeight(), rect.GetWidth(), 0}, texture.handle,
-                     scaled_rect, type, read_fb_handle, draw_fb_handle);
+        auto from_rect =
+            is_custom ? Common::Rectangle<u32>{0, custom_tex_info.height, custom_tex_info.width, 0}
+                      : Common::Rectangle<u32>{0, rect.GetHeight(), rect.GetWidth(), 0};
+        BlitTextures(unscaled_tex.handle, from_rect, texture.handle, scaled_rect, type,
+                     read_fb_handle, draw_fb_handle);
     }
 
     InvalidateAllWatcher();
