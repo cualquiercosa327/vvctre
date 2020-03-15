@@ -3,6 +3,7 @@
 // Refer to the license.txt file included.
 
 #include <array>
+#include <limits>
 #include <memory>
 #include <sstream>
 #include <unordered_map>
@@ -883,7 +884,7 @@ u64 IOFile::Tell() const {
     if (IsOpen())
         return ftello(m_file);
 
-    return UINT64_MAX;
+    return std::numeric_limits<u64>::max();
 }
 
 bool IOFile::Flush() {
