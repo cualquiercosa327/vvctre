@@ -94,7 +94,7 @@ DspHle::Impl::Impl(DspHle& parent_, Memory::MemorySystem& memory) : parent(paren
     decoder = std::make_unique<HLE::FDKDecoder>(memory);
 #endif
 
-    if (!decoder->IsValid()) {
+    if (decoder == nullptr || !decoder->IsValid()) {
         LOG_WARNING(Audio_DSP,
                     "Unable to load any decoders, this could cause missing audio in some games");
         decoder = std::make_unique<HLE::NullDecoder>();
