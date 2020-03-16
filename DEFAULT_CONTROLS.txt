@@ -28,6 +28,7 @@ Hotkeys
 Load File: CTRL + L
 Restart Emulation: CTRL + R
 Toggle Limit Speed: CTRL + Z
+Toggle Dump Textures: CTRL + D
 Speed Limit - 5: -
 Speed Limit + 5: +
 Load Amiibo: F1
