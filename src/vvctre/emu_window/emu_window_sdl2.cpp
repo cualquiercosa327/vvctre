@@ -235,6 +235,14 @@ void EmuWindow_SDL2::SwapBuffers() {
         Settings::values.use_frame_limit = !Settings::values.use_frame_limit;
     }
 
+    if (ImGui::IsKeyPressed(SDL_SCANCODE_KP_PLUS)) {
+        ++Settings::values.frame_limit;
+    }
+
+    if (ImGui::IsKeyPressed(SDL_SCANCODE_KP_MINUS)) {
+        --Settings::values.frame_limit;
+    }
+
     if (ImGui::Begin("FPS", nullptr,
                      ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoSavedSettings |
                          ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_AlwaysAutoResize)) {
