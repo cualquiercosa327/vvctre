@@ -231,16 +231,127 @@ void EmuWindow_SDL2::SwapBuffers() {
     ImGui::NewFrame();
     ImGuiIO& io = ImGui::GetIO();
 
-    if (io.KeyCtrl && ImGui::IsKeyReleased(SDL_SCANCODE_Z)) {
-        Settings::values.use_frame_limit = !Settings::values.use_frame_limit;
-    }
+    if (!ImGui::IsWindowFocused(ImGuiFocusedFlags_AnyWindow)) {
+        if (io.KeyCtrl && ImGui::IsKeyReleased(SDL_SCANCODE_L)) {
+            const std::vector<std::string> result =
+                pfd::open_file("Load File", ".",
+                               {"3DS Executables", "*.cci *.3ds *.cxi *.3dsx *.app *.elf *.axf"})
+                    .result();
 
-    if (ImGui::IsKeyPressed(SDL_SCANCODE_KP_PLUS)) {
-        ++Settings::values.frame_limit;
-    }
+            if (!result.empty()) {
+                system.SetResetFilePath(result[0]);
+                system.RequestReset();
+            }
+        }
 
-    if (ImGui::IsKeyPressed(SDL_SCANCODE_KP_MINUS)) {
-        --Settings::values.frame_limit;
+        if (io.KeyCtrl && ImGui::IsKeyReleased(SDL_SCANCODE_R)) {
+            system.RequestReset();
+        }
+
+        if (io.KeyCtrl && ImGui::IsKeyReleased(SDL_SCANCODE_Z)) {
+            Settings::values.use_frame_limit = !Settings::values.use_frame_limit;
+            Settings::LogSettings();
+        }
+
+        if (io.KeyCtrl && ImGui::IsKeyReleased(SDL_SCANCODE_D)) {
+            Settings::values.dump_textures = !Settings::values.dump_textures;
+            messages.push_back(fmt::format(
+                "Dump Textures {}", Settings::values.dump_textures ? "enabled" : "disabled"));
+        }
+
+        if (ImGui::IsKeyPressed(SDL_SCANCODE_KP_MINUS)) {
+            Settings::values.frame_limit = std::clamp(Settings::values.frame_limit - 5, 1, 65535);
+            Settings::LogSettings();
+        }
+
+        if (ImGui::IsKeyPressed(SDL_SCANCODE_KP_PLUS)) {
+            Settings::values.frame_limit = std::clamp(Settings::values.frame_limit + 5, 1, 65535);
+            Settings::LogSettings();
+        }
+
+        if (ImGui::IsKeyReleased(SDL_SCANCODE_F1)) {
+            const auto result =
+                pfd::open_file("Load Amiibo", ".", {"Amiibo Files", "*.bin", "Anything", "*"})
+                    .result();
+
+            if (!result.empty()) {
+                FileUtil::IOFile file(result[0], "rb");
+                Service::NFC::AmiiboData data;
+                if (file.ReadArray(&data, 1) == 1) {
+                    std::shared_ptr<Service::NFC::Module::Interface> nfc =
+                        system.ServiceManager().GetService<Service::NFC::Module::Interface>(
+                            "nfc:u");
+                    if (nfc != nullptr) {
+                        nfc->LoadAmiibo(data);
+                    }
+                } else {
+                    messages.push_back("Failed to load the amiibo file");
+                }
+            }
+        }
+
+        if (ImGui::IsKeyReleased(SDL_SCANCODE_F2)) {
+            std::shared_ptr<Service::NFC::Module::Interface> nfc =
+                system.ServiceManager().GetService<Service::NFC::Module::Interface>("nfc:u");
+            if (nfc != nullptr) {
+                nfc->RemoveAmiibo();
+            }
+        }
+
+        if (io.KeyCtrl && ImGui::IsKeyReleased(SDL_SCANCODE_A)) {
+            Settings::values.resolution_factor = 0;
+            Settings::LogSettings();
+        }
+
+        if (io.KeyCtrl && ImGui::IsKeyReleased(SDL_SCANCODE_1)) {
+            Settings::values.resolution_factor = 1;
+            Settings::LogSettings();
+        }
+
+        if (io.KeyCtrl && ImGui::IsKeyReleased(SDL_SCANCODE_2)) {
+            Settings::values.resolution_factor = 2;
+            Settings::LogSettings();
+        }
+
+        if (io.KeyCtrl && ImGui::IsKeyReleased(SDL_SCANCODE_3)) {
+            Settings::values.resolution_factor = 3;
+            Settings::LogSettings();
+        }
+
+        if (io.KeyCtrl && ImGui::IsKeyReleased(SDL_SCANCODE_4)) {
+            Settings::values.resolution_factor = 4;
+            Settings::LogSettings();
+        }
+
+        if (io.KeyCtrl && ImGui::IsKeyReleased(SDL_SCANCODE_5)) {
+            Settings::values.resolution_factor = 5;
+            Settings::LogSettings();
+        }
+
+        if (io.KeyCtrl && ImGui::IsKeyReleased(SDL_SCANCODE_6)) {
+            Settings::values.resolution_factor = 6;
+            Settings::LogSettings();
+        }
+
+        if (io.KeyCtrl && ImGui::IsKeyReleased(SDL_SCANCODE_7)) {
+            Settings::values.resolution_factor = 7;
+            Settings::LogSettings();
+        }
+
+        if (io.KeyCtrl && ImGui::IsKeyReleased(SDL_SCANCODE_8)) {
+            Settings::values.resolution_factor = 8;
+            Settings::LogSettings();
+        }
+
+        if (io.KeyCtrl && ImGui::IsKeyReleased(SDL_SCANCODE_9)) {
+            Settings::values.resolution_factor = 9;
+            Settings::LogSettings();
+        }
+
+        if (io.KeyCtrl && ImGui::IsKeyReleased(SDL_SCANCODE_0)) {
+            Settings::values.resolution_factor = 10;
+            Settings::LogSettings();
+        }
     }
 
     if (ImGui::Begin("FPS", nullptr,
@@ -588,7 +699,9 @@ void EmuWindow_SDL2::SwapBuffers() {
                                 std::shared_ptr<Service::NFC::Module::Interface> nfc =
                                     system.ServiceManager()
                                         .GetService<Service::NFC::Module::Interface>("nfc:u");
-                                nfc->LoadAmiibo(data);
+                                if (nfc != nullptr) {
+                                    nfc->LoadAmiibo(data);
+                                }
                             } else {
                                 messages.push_back("Failed to load the amiibo file");
                             }
@@ -599,7 +712,9 @@ void EmuWindow_SDL2::SwapBuffers() {
                         std::shared_ptr<Service::NFC::Module::Interface> nfc =
                             system.ServiceManager().GetService<Service::NFC::Module::Interface>(
                                 "nfc:u");
-                        nfc->RemoveAmiibo();
+                        if (nfc != nullptr) {
+                            nfc->RemoveAmiibo();
+                        }
                     }
 
                     ImGui::EndMenu();
@@ -718,6 +833,10 @@ void EmuWindow_SDL2::SwapBuffers() {
                     if (ImGui::InputScalar("##texturefilterfactor", ImGuiDataType_U16,
                                            &Settings::values.texture_filter_factor)) {
                         Settings::Apply();
+                        Settings::LogSettings();
+                    }
+
+                    if (ImGui::Checkbox("Dump Textures", &Settings::values.dump_textures)) {
                         Settings::LogSettings();
                     }
 
@@ -1226,6 +1345,20 @@ void EmuWindow_SDL2::SwapBuffers() {
                     const int code = std::system("xdg-open https://discord.gg/RNBCBzT");
 #endif
                     LOG_INFO(Frontend, "Opened Discord invite, exit code: {}", code);
+                }
+
+                if (ImGui::MenuItem("Open Data Folder")) {
+#ifdef _WIN32
+                    const int code = std::system(
+                        fmt::format("start {}", FileUtil::GetUserPath(FileUtil::UserPath::UserDir))
+                            .c_str());
+#else
+                    const int code =
+                        std::system(fmt::format("xdg-open {}",
+                                                FileUtil::GetUserPath(FileUtil::UserPath::UserDir))
+                                        .c_str());
+#endif
+                    LOG_INFO(Frontend, "Opened data folder, exit code: {}", code);
                 }
 
                 ImGui::EndMenu();

@@ -10,18 +10,9 @@ Refer to the license.txt file included.
 | Versions                   |                               Sequential number                                |                                     [SemVer](https://semver.org/) |
 | CLI usage                  | [Here](https://github.com/citra-emu/citra/blob/master/src/citra/citra.cpp#L62) |          [Here](https://github.com/vvanelslande/vvctre/issues/11) |
 
-# Definitions
+# Portable Mode
 
-## user folder
-
-vvctre uses the first existing option.
-
-- On Windows:
-  - `vvctre folder\user`
-  - `%AppData%\vvctre`
-- On Linux:
-  - `vvctre folder/user`
-  - `~/.local/share/vvctre`
+Create a `user` folder where vvctre is.
 
 # Requirements
 
@@ -56,5 +47,5 @@ vvctre uses the first existing option.
 # Incompatibilities
 
 - Different movie file format
-- Different folder for mods, put mods (Luma3DS folder structure) in `user folder/sdmc/luma/titles`
+- Different folder for mods, put mods (Luma3DS folder structure) in `sdmc/luma/titles` in vvctre's data folder (you can open it from the GUI with Help -> Open Data Folder)
 - Different RPC server protocol

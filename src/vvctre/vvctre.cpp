@@ -570,8 +570,9 @@ int main(int argc, char** argv) {
             }
 
             while (emu_window->IsOpen()) {
-                if (system.frontend_paused || system.rpc_paused) {
-                    while (emu_window->IsOpen() && (system.frontend_paused || system.rpc_paused)) {
+                if (system.frontend_paused || system.rpc_paused || !emu_window->messages.empty()) {
+                    while (emu_window->IsOpen() && (system.frontend_paused || system.rpc_paused ||
+                                                    !emu_window->messages.empty())) {
                         VideoCore::g_renderer->SwapBuffers();
                         SDL_GL_SetSwapInterval(1);
                     }

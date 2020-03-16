@@ -55,6 +55,8 @@ public:
     u32* mii_selector_code = nullptr;
     HLE::Applets::MiiData* mii_selector_selected_mii = nullptr;
 
+    std::vector<std::string> messages;
+
 private:
     /// Called by PollEvents when a key is pressed or released.
     void OnKeyEvent(int key, u8 state);
@@ -101,8 +103,6 @@ private:
 
     Core::System& system;
     ImVec4 fps_color{0.0f, 1.0f, 0.0f, 1.0f}; // Green
-
-    std::vector<std::string> messages;
 
     bool ipc_recorder_enabled = false;
     IPCDebugger::CallbackHandle ipc_recorder_callback;
