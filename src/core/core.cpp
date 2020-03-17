@@ -196,7 +196,7 @@ System::ResultStatus System::Load(Frontend::EmuWindow& emu_window, const std::st
         LOG_ERROR(Core, "Failed to find title id for ROM (Error {})",
                   static_cast<u32>(load_result));
     }
-    perf_stats = std::make_unique<PerfStats>(title_id);
+    perf_stats = std::make_unique<PerfStats>();
     custom_tex_cache = std::make_unique<Core::CustomTexCache>();
     if (Settings::values.custom_textures) {
         FileUtil::CreateFullPath(fmt::format("{}textures/{:016X}/",
@@ -212,7 +212,6 @@ System::ResultStatus System::Load(Frontend::EmuWindow& emu_window, const std::st
     m_filepath = filepath;
 
     // Reset counters and set time origin to current frame
-    GetAndResetPerfStats();
     perf_stats->BeginSystemFrame();
 
     return status;
@@ -221,10 +220,6 @@ System::ResultStatus System::Load(Frontend::EmuWindow& emu_window, const std::st
 void System::PrepareReschedule() {
     running_core->PrepareReschedule();
     reschedule_pending = true;
-}
-
-PerfStats::Results System::GetAndResetPerfStats() {
-    return perf_stats->GetAndResetStats(timing->GetGlobalTimeUs());
 }
 
 void System::Reschedule() {

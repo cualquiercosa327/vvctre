@@ -11,6 +11,7 @@
 #include <fmt/chrono.h>
 #include <fmt/format.h>
 #include "common/file_util.h"
+#include "core/core.h"
 #include "core/hw/gpu.h"
 #include "core/perf_stats.h"
 #include "core/settings.h"
@@ -26,10 +27,15 @@ constexpr std::size_t IgnoreFrames = 5;
 
 namespace Core {
 
-PerfStats::PerfStats(u64 title_id) : title_id(title_id) {}
-
 PerfStats::~PerfStats() {
-    if (!Settings::values.record_frame_times || title_id == 0) {
+    if (!Settings::values.record_frame_times) {
+        return;
+    }
+
+    const u64 title_id =
+        Core::System::GetInstance().Kernel().GetCurrentProcess()->codeset->program_id;
+
+    if (title_id == 0) {
         return;
     }
 
@@ -61,54 +67,9 @@ void PerfStats::EndSystemFrame() {
         perf_history[current_index++] =
             std::chrono::duration<double, std::milli>(frame_time).count();
     }
-    accumulated_frametime += frame_time;
-    system_frames += 1;
 
     previous_frame_length = frame_end - previous_frame_end;
     previous_frame_end = frame_end;
-}
-
-void PerfStats::EndGameFrame() {
-    std::lock_guard lock{object_mutex};
-
-    game_frames += 1;
-}
-
-double PerfStats::GetMeanFrametime() {
-    std::lock_guard lock{object_mutex};
-
-    if (current_index <= IgnoreFrames) {
-        return 0;
-    }
-    const double sum = std::accumulate(perf_history.begin() + IgnoreFrames,
-                                       perf_history.begin() + current_index, 0);
-    return sum / (current_index - IgnoreFrames);
-}
-
-PerfStats::Results PerfStats::GetAndResetStats(microseconds current_system_time_us) {
-    std::lock_guard lock(object_mutex);
-
-    const auto now = Clock::now();
-    // Walltime elapsed since stats were reset
-    const auto interval = duration_cast<DoubleSecs>(now - reset_point).count();
-
-    const auto system_us_per_second = (current_system_time_us - reset_point_system_us) / interval;
-
-    Results results{};
-    results.system_fps = static_cast<double>(system_frames) / interval;
-    results.game_fps = static_cast<double>(game_frames) / interval;
-    results.frametime = duration_cast<DoubleSecs>(accumulated_frametime).count() /
-                        static_cast<double>(system_frames);
-    results.emulation_speed = system_us_per_second.count() / 1'000'000.0;
-
-    // Reset counters
-    reset_point = now;
-    reset_point_system_us = current_system_time_us;
-    accumulated_frametime = Clock::duration::zero();
-    system_frames = 0;
-    game_frames = 0;
-
-    return results;
 }
 
 double PerfStats::GetLastFrameTimeScale() {

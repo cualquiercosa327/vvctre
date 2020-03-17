@@ -135,8 +135,6 @@ public:
     /// Prepare the core emulation for a reschedule
     void PrepareReschedule();
 
-    PerfStats::Results GetAndResetPerfStats();
-
     /**
      * Gets a reference to the running core.
      * @returns A reference to the running core.
