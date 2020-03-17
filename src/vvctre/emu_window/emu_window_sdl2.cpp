@@ -720,6 +720,20 @@ void EmuWindow_SDL2::SwapBuffers() {
                     ImGui::EndMenu();
                 }
 
+                if (ImGui::MenuItem("Open Data Folder")) {
+#ifdef _WIN32
+                    const int code = std::system(
+                        fmt::format("start {}", FileUtil::GetUserPath(FileUtil::UserPath::UserDir))
+                            .c_str());
+#else
+                    const int code =
+                        std::system(fmt::format("xdg-open {}",
+                                                FileUtil::GetUserPath(FileUtil::UserPath::UserDir))
+                                        .c_str());
+#endif
+                    LOG_INFO(Frontend, "Opened data folder, exit code: {}", code);
+                }
+
                 ImGui::EndMenu();
             }
 
@@ -1346,20 +1360,6 @@ void EmuWindow_SDL2::SwapBuffers() {
                     const int code = std::system("xdg-open https://discord.gg/RNBCBzT");
 #endif
                     LOG_INFO(Frontend, "Opened Discord invite, exit code: {}", code);
-                }
-
-                if (ImGui::MenuItem("Open Data Folder")) {
-#ifdef _WIN32
-                    const int code = std::system(
-                        fmt::format("start {}", FileUtil::GetUserPath(FileUtil::UserPath::UserDir))
-                            .c_str());
-#else
-                    const int code =
-                        std::system(fmt::format("xdg-open {}",
-                                                FileUtil::GetUserPath(FileUtil::UserPath::UserDir))
-                                        .c_str());
-#endif
-                    LOG_INFO(Frontend, "Opened data folder, exit code: {}", code);
                 }
 
                 ImGui::EndMenu();
