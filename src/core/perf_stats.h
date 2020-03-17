@@ -24,8 +24,6 @@ public:
 
     using Clock = std::chrono::high_resolution_clock;
 
-    struct Results {};
-
     void BeginSystemFrame();
     void EndSystemFrame();
 
