@@ -154,7 +154,7 @@ void ERR_F::ThrowFatalError(Kernel::HLERequestContext& ctx) {
     LOG_CRITICAL(Service_ERR, "Fatal error");
     const ErrInfo errinfo = rp.PopRaw<ErrInfo>();
     LOG_CRITICAL(Service_ERR, "Fatal error type: {}", GetErrType(errinfo.errinfo_common.specifier));
-    system.SetStatus(Core::System::ResultStatus::ErrorUnknown);
+    system.SetStatus(Core::System::ResultStatus::FatalError);
 
     // Generic Info
     LogGenericInfo(errinfo.errinfo_common);

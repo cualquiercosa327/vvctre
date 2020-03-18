@@ -583,6 +583,11 @@ int main(int argc, char** argv) {
                 case Core::System::ResultStatus::Success: {
                     break;
                 }
+                case Core::System::ResultStatus::FatalError: {
+                    emu_window->messages.push_back("Fatal error\nCheck the log for more details");
+                    system.SetStatus(Core::System::ResultStatus::Success);
+                    break;
+                }
                 case Core::System::ResultStatus::ShutdownRequested: {
                     emu_window->Close();
                     break;
