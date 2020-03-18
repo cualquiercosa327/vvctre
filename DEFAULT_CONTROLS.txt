@@ -33,6 +33,7 @@ Speed Limit - 5: -
 Speed Limit + 5: +
 Load Amiibo: F1
 Remove Amiibo: F2
+Toggle Fullscreen: F11
 Window Size Resolution: CTRL + A
 1x Resolution: CTRL + 1
 2x Resolution: CTRL + 2

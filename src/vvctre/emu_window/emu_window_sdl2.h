@@ -83,7 +83,7 @@ private:
     void OnResize();
 
     /// Called when user passes the fullscreen parameter flag
-    void Fullscreen();
+    void ToggleFullscreen();
 
     /// Is the window still open?
     bool is_open = true;

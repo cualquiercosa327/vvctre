@@ -131,17 +131,12 @@ void EmuWindow_SDL2::OnResize() {
     UpdateCurrentFramebufferLayout(width, height);
 }
 
-void EmuWindow_SDL2::Fullscreen() {
-    if (SDL_SetWindowFullscreen(render_window, SDL_WINDOW_FULLSCREEN_DESKTOP) == 0) {
-        return;
+void EmuWindow_SDL2::ToggleFullscreen() {
+    if (SDL_GetWindowFlags(render_window) & SDL_WINDOW_FULLSCREEN_DESKTOP) {
+        SDL_SetWindowFullscreen(render_window, 0);
+    } else {
+        SDL_SetWindowFullscreen(render_window, SDL_WINDOW_FULLSCREEN_DESKTOP);
     }
-
-    LOG_ERROR(Frontend, "Fullscreening failed: {}", SDL_GetError());
-
-    // Fallback algorithm: Maximise window.
-    // Works on all systems (unless something is seriously wrong)
-    LOG_INFO(Frontend, "Falling back on a maximised window...");
-    SDL_MaximizeWindow(render_window);
 }
 
 EmuWindow_SDL2::EmuWindow_SDL2(Core::System& system, const bool fullscreen, const char* arg0)
@@ -180,7 +175,7 @@ EmuWindow_SDL2::EmuWindow_SDL2(Core::System& system, const bool fullscreen, cons
     }
 
     if (fullscreen) {
-        Fullscreen();
+        ToggleFullscreen();
     } else {
         SDL_SetWindowMinimumSize(render_window, Core::kScreenTopWidth,
                                  Core::kScreenTopHeight + Core::kScreenBottomHeight);
@@ -231,6 +226,7 @@ void EmuWindow_SDL2::SwapBuffers() {
     ImGui::NewFrame();
     ImGuiIO& io = ImGui::GetIO();
 
+    // Hotkeys
     if (!ImGui::IsWindowFocused(ImGuiFocusedFlags_AnyWindow)) {
         if (io.KeyCtrl && ImGui::IsKeyReleased(SDL_SCANCODE_L)) {
             const std::vector<std::string> result =
@@ -296,6 +292,10 @@ void EmuWindow_SDL2::SwapBuffers() {
             if (nfc != nullptr) {
                 nfc->RemoveAmiibo();
             }
+        }
+
+        if (ImGui::IsKeyReleased(SDL_SCANCODE_F11)) {
+            ToggleFullscreen();
         }
 
         if (io.KeyCtrl && ImGui::IsKeyReleased(SDL_SCANCODE_A)) {
@@ -1149,6 +1149,15 @@ void EmuWindow_SDL2::SwapBuffers() {
             if (ImGui::BeginMenu("View")) {
                 ImGui::MenuItem("Cheats", nullptr, &show_cheats_window);
 
+                ImGui::Separator();
+
+                if (ImGui::MenuItem("Fullscreen", nullptr,
+                                    SDL_GetWindowFlags(render_window) &
+                                        SDL_WINDOW_FULLSCREEN_DESKTOP)) {
+                    ToggleFullscreen();
+                }
+
+                ImGui::Separator();
                 if (ImGui::BeginMenu("Layout")) {
                     if (ImGui::MenuItem("Default")) {
                         Settings::values.layout_option = Settings::LayoutOption::Default;
