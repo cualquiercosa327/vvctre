@@ -101,7 +101,7 @@ find_package(Threads REQUIRED)
 if (VVCTRE_USE_BUNDLED_SDL2)
     # Detect toolchain and platform
     if ((MSVC_VERSION GREATER_EQUAL 1910 AND MSVC_VERSION LESS 1930) AND ARCHITECTURE_x86_64)
-        set(SDL2_VER "SDL2-2.0.10")
+        set(SDL2_VER "SDL2-2.0.12")
     else()
         message(FATAL_ERROR "No bundled SDL2 binaries for your toolchain. Disable VVCTRE_USE_BUNDLED_SDL2 and provide your own.")
     endif()
