@@ -855,6 +855,16 @@ void EmuWindow_SDL2::SwapBuffers() {
                         Settings::LogSettings();
                     }
 
+                    if (ImGui::MenuItem("Use Custom Textures", nullptr,
+                                        &Settings::values.custom_textures)) {
+                        Settings::LogSettings();
+                    }
+
+                    if (ImGui::MenuItem("Preload Custom Textures", nullptr,
+                                        &Settings::values.preload_textures)) {
+                        Settings::LogSettings();
+                    }
+
                     ImGui::EndMenu();
                 }
 
@@ -1300,7 +1310,8 @@ void EmuWindow_SDL2::SwapBuffers() {
                     }
                 }
 
-                if (ImGui::MenuItem("Generate Launcher For Custom Controls")) {
+                if (ImGui::MenuItem("Generate Launcher For Custom Controls (check console window, "
+                                    "don't change the active window while waiting for input)")) {
 #ifdef _WIN32
                     const std::string command =
                         fmt::format("cmd /c \"{}\" controls --generate-launcher", arg0);
