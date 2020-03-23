@@ -533,10 +533,12 @@ boost::optional<MacAddress> NWM_UDS::GetNodeMacAddress(u16 dest_node_id, u8 flag
 void NWM_UDS::Shutdown(Kernel::HLERequestContext& ctx) {
     IPC::RequestParser rp(ctx, 0x03, 0, 0);
 
-    initialized = false;
-    loop_thread->join();
-    loop_thread.reset();
-    client.reset();
+    if (initialized) {
+        initialized = false;
+        loop_thread->join();
+        loop_thread.reset();
+        client.reset();
+    }
 
     for (auto bind_node : channel_data) {
         bind_node.second.event->Signal();
@@ -623,78 +625,80 @@ ResultVal<std::shared_ptr<Kernel::Event>> NWM_UDS::Initialize(
 
     client.reset(easywsclient::WebSocket::from_url(Settings::values.multiplayer_url));
 
-    initialized = true;
+    initialized = client != nullptr;
 
-    loop_thread = std::make_unique<std::thread>([&] {
-        while (initialized) {
-            client->poll();
+    if (initialized) {
+        loop_thread = std::make_unique<std::thread>([&] {
+            while (initialized) {
+                client->poll();
 
-            client->dispatchBinary([&](const std::vector<u8>& data) {
-                WifiPacket packet;
-                std::size_t offset = 0;
-
-                std::memcpy(&packet.type, &data[offset], sizeof(packet.type));
-                offset += sizeof(packet.type);
-
-                u32 data_size;
-                std::memcpy(&data_size, &data[offset], sizeof(data_size));
-                offset += sizeof(data_size);
-
-                packet.data.resize(data_size);
-                std::memcpy(&packet.data[0], &data[offset], data_size);
-                offset += data_size;
-
-                std::memcpy(&packet.transmitter_address[0], &data[offset],
-                            sizeof(packet.transmitter_address));
-                offset += sizeof(packet.transmitter_address);
-
-                std::memcpy(&packet.destination_address[0], &data[offset],
-                            sizeof(packet.destination_address));
-                offset += sizeof(packet.destination_address);
-
-                std::memcpy(&packet.channel, &data[offset], sizeof(packet.channel));
-
-                OnWifiPacketReceived(std::move(packet));
-            });
-
-            {
-                std::lock_guard<std::mutex> lock(send_list_mutex);
-                for (const WifiPacket& packet : send_list) {
-                    std::vector<u8> data(sizeof(packet.type) + sizeof(u32) + packet.data.size() +
-                                         sizeof(packet.transmitter_address) +
-                                         sizeof(packet.destination_address) +
-                                         sizeof(packet.channel));
+                client->dispatchBinary([&](const std::vector<u8>& data) {
+                    WifiPacket packet;
                     std::size_t offset = 0;
 
-                    std::memcpy(&data[offset], &packet.type, sizeof(packet.type));
+                    std::memcpy(&packet.type, &data[offset], sizeof(packet.type));
                     offset += sizeof(packet.type);
 
-                    u32 data_size = static_cast<u32>(packet.data.size());
-                    std::memcpy(&data[offset], &data_size, sizeof(data_size));
+                    u32 data_size;
+                    std::memcpy(&data_size, &data[offset], sizeof(data_size));
                     offset += sizeof(data_size);
 
-                    std::memcpy(&data[offset], &packet.data[0], data_size);
+                    packet.data.resize(data_size);
+                    std::memcpy(&packet.data[0], &data[offset], data_size);
                     offset += data_size;
 
-                    std::memcpy(&data[offset], &packet.transmitter_address[0],
+                    std::memcpy(&packet.transmitter_address[0], &data[offset],
                                 sizeof(packet.transmitter_address));
                     offset += sizeof(packet.transmitter_address);
 
-                    std::memcpy(&data[offset], &packet.destination_address[0],
+                    std::memcpy(&packet.destination_address[0], &data[offset],
                                 sizeof(packet.destination_address));
                     offset += sizeof(packet.destination_address);
 
-                    std::memcpy(&data[offset], &packet.channel, sizeof(packet.channel));
+                    std::memcpy(&packet.channel, &data[offset], sizeof(packet.channel));
 
-                    client->sendBinary(data);
+                    OnWifiPacketReceived(std::move(packet));
+                });
+
+                {
+                    std::lock_guard<std::mutex> lock(send_list_mutex);
+                    for (const WifiPacket& packet : send_list) {
+                        std::vector<u8> data(
+                            sizeof(packet.type) + sizeof(u32) + packet.data.size() +
+                            sizeof(packet.transmitter_address) +
+                            sizeof(packet.destination_address) + sizeof(packet.channel));
+                        std::size_t offset = 0;
+
+                        std::memcpy(&data[offset], &packet.type, sizeof(packet.type));
+                        offset += sizeof(packet.type);
+
+                        u32 data_size = static_cast<u32>(packet.data.size());
+                        std::memcpy(&data[offset], &data_size, sizeof(data_size));
+                        offset += sizeof(data_size);
+
+                        std::memcpy(&data[offset], &packet.data[0], data_size);
+                        offset += data_size;
+
+                        std::memcpy(&data[offset], &packet.transmitter_address[0],
+                                    sizeof(packet.transmitter_address));
+                        offset += sizeof(packet.transmitter_address);
+
+                        std::memcpy(&data[offset], &packet.destination_address[0],
+                                    sizeof(packet.destination_address));
+                        offset += sizeof(packet.destination_address);
+
+                        std::memcpy(&data[offset], &packet.channel, sizeof(packet.channel));
+
+                        client->sendBinary(data);
+                    }
+                    send_list.clear();
                 }
-                send_list.clear();
             }
-        }
 
-        client->close();
-        client->poll();
-    });
+            client->close();
+            client->poll();
+        });
+    }
 
     current_node = node;
 
