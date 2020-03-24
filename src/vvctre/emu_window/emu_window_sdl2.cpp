@@ -229,6 +229,10 @@ void EmuWindow_SDL2::SwapBuffers() {
 
     // Hotkeys
     if (!ImGui::IsWindowFocused(ImGuiFocusedFlags_AnyWindow)) {
+        if (io.KeyCtrl && ImGui::IsKeyReleased(SDL_SCANCODE_C)) {
+            CopyScreenshot();
+        }
+
         if (io.KeyCtrl && ImGui::IsKeyReleased(SDL_SCANCODE_L)) {
             const std::vector<std::string> result =
                 pfd::open_file("Load File", ".",
@@ -1312,74 +1316,7 @@ void EmuWindow_SDL2::SwapBuffers() {
                 }
 
                 if (ImGui::MenuItem("Copy Screenshot")) {
-                    const auto& layout = GetFramebufferLayout();
-                    u8* data = new u8[layout.width * layout.height * 4];
-                    if (VideoCore::RequestScreenshot(
-                            data,
-                            [=] {
-                                std::vector<u8> v(layout.width * layout.height * 4);
-                                std::memcpy(v.data(), data, v.size());
-                                delete[] data;
-
-                                const auto rotate = [](const std::vector<u8>& input,
-                                                       const Layout::FramebufferLayout& layout) {
-                                    std::vector<u8> output(input.size());
-
-                                    for (std::size_t i = 0; i < layout.height; i++) {
-                                        for (std::size_t j = 0; j < layout.width; j++) {
-                                            for (std::size_t k = 0; k < 4; k++) {
-                                                output[i * (layout.width * 4) + j * 4 + k] =
-                                                    input[(layout.height - i - 1) *
-                                                              (layout.width * 4) +
-                                                          j * 4 + k];
-                                            }
-                                        }
-                                    }
-
-                                    return output;
-                                };
-
-                                const auto convert_bgra_to_rgba =
-                                    [](const std::vector<u8>& input,
-                                       const Layout::FramebufferLayout& layout) {
-                                        int offset = 0;
-                                        std::vector<u8> output(input.size());
-
-                                        for (u32 y = 0; y < layout.height; ++y) {
-                                            for (u32 x = 0; x < layout.width; ++x) {
-                                                output[offset] = input[offset + 2];
-                                                output[offset + 1] = input[offset + 1];
-                                                output[offset + 2] = input[offset];
-                                                output[offset + 3] = input[offset + 3];
-
-                                                offset += 4;
-                                            }
-                                        }
-
-                                        return output;
-                                    };
-
-                                v = convert_bgra_to_rgba(rotate(v, layout), layout);
-
-                                clip::image_spec spec;
-                                spec.width = layout.width;
-                                spec.height = layout.height;
-                                spec.bits_per_pixel = 32;
-                                spec.bytes_per_row = spec.width * 4;
-                                spec.red_mask = 0xff;
-                                spec.green_mask = 0xff00;
-                                spec.blue_mask = 0xff0000;
-                                spec.alpha_mask = 0xff000000;
-                                spec.red_shift = 0;
-                                spec.green_shift = 8;
-                                spec.blue_shift = 16;
-                                spec.alpha_shift = 24;
-
-                                clip::set_image(clip::image(v.data(), spec));
-                            },
-                            layout)) {
-                        delete[] data;
-                    }
+                    CopyScreenshot();
                 }
 
                 if (ImGui::MenuItem("Generate Launcher For Custom Controls (check console window, "
@@ -1576,4 +1513,73 @@ void EmuWindow_SDL2::MakeCurrent() {
 
 void EmuWindow_SDL2::DoneCurrent() {
     SDL_GL_MakeCurrent(render_window, nullptr);
+}
+
+void EmuWindow_SDL2::CopyScreenshot() {
+    const auto& layout = GetFramebufferLayout();
+    u8* data = new u8[layout.width * layout.height * 4];
+
+    if (VideoCore::RequestScreenshot(
+            data,
+            [=] {
+                std::vector<u8> v(layout.width * layout.height * 4);
+                std::memcpy(v.data(), data, v.size());
+                delete[] data;
+
+                const auto rotate = [](const std::vector<u8>& input,
+                                       const Layout::FramebufferLayout& layout) {
+                    std::vector<u8> output(input.size());
+
+                    for (std::size_t i = 0; i < layout.height; i++) {
+                        for (std::size_t j = 0; j < layout.width; j++) {
+                            for (std::size_t k = 0; k < 4; k++) {
+                                output[i * (layout.width * 4) + j * 4 + k] =
+                                    input[(layout.height - i - 1) * (layout.width * 4) + j * 4 + k];
+                            }
+                        }
+                    }
+
+                    return output;
+                };
+
+                const auto convert_bgra_to_rgba = [](const std::vector<u8>& input,
+                                                     const Layout::FramebufferLayout& layout) {
+                    int offset = 0;
+                    std::vector<u8> output(input.size());
+
+                    for (u32 y = 0; y < layout.height; ++y) {
+                        for (u32 x = 0; x < layout.width; ++x) {
+                            output[offset] = input[offset + 2];
+                            output[offset + 1] = input[offset + 1];
+                            output[offset + 2] = input[offset];
+                            output[offset + 3] = input[offset + 3];
+
+                            offset += 4;
+                        }
+                    }
+
+                    return output;
+                };
+
+                v = convert_bgra_to_rgba(rotate(v, layout), layout);
+
+                clip::image_spec spec;
+                spec.width = layout.width;
+                spec.height = layout.height;
+                spec.bits_per_pixel = 32;
+                spec.bytes_per_row = spec.width * 4;
+                spec.red_mask = 0xff;
+                spec.green_mask = 0xff00;
+                spec.blue_mask = 0xff0000;
+                spec.alpha_mask = 0xff000000;
+                spec.red_shift = 0;
+                spec.green_shift = 8;
+                spec.blue_shift = 16;
+                spec.alpha_shift = 24;
+
+                clip::set_image(clip::image(v.data(), spec));
+            },
+            layout)) {
+        delete[] data;
+    }
 }

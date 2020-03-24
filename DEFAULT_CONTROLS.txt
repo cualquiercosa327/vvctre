@@ -25,6 +25,7 @@ C-Stick: Up: I, Down: K, Left: J, Right: L, Modifier: D
 
 Hotkeys
 ------------
+Copy Screenshot: CTRL + C
 Load File: CTRL + L
 Restart Emulation: CTRL + R
 Toggle Limit Speed: CTRL + Z
