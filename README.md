@@ -26,6 +26,7 @@ Create a `user` folder where vvctre is.
     - `libavformat-dev`
     - `libavcodec-dev`
     - `libavdevice-dev`
+    - `libpng-dev`
 
 # GUI Features
 

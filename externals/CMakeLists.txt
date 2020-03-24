@@ -102,6 +102,15 @@ target_link_libraries(imgui PRIVATE glad SDL2)
 target_include_directories(imgui INTERFACE ./imgui ./imgui/examples ./imgui/misc/cpp)
 target_include_directories(imgui PRIVATE ./imgui ./imgui/examples ./imgui/misc/cpp)
 
+# clip
+set(CLIP_EXAMPLES OFF CACHE BOOL "")
+set(CLIP_TESTS OFF CACHE BOOL "")
+if(UNIX)
+    set(CLIP_X11_WITH_PNG ON)
+endif()
+add_subdirectory(clip EXCLUDE_FROM_ALL)
+target_include_directories(clip INTERFACE ./clip)
+
 add_subdirectory(semver)
 add_subdirectory(clipp)
 add_subdirectory(easywsclient)
