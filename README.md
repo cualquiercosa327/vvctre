@@ -8,7 +8,7 @@ Refer to the license.txt file included.
 | Out of the box multiplayer |                                       No                                       |                                                               Yes |
 | Scripting requests         |                               Read/write memory                                | [Here](https://github.com/vvanelslande/vvctre/blob/master/RPC.md) |
 | Versions                   |                               Sequential number                                |                                     [SemVer](https://semver.org/) |
-| CLI usage                  | [Here](https://github.com/citra-emu/citra/blob/master/src/citra/citra.cpp#L62) |          [Here](https://github.com/vvanelslande/vvctre/issues/11) |
+| CLI usage                  | [Here](https://github.com/citra-emu/citra/blob/master/src/citra/citra.cpp#L62) |          [Here](https://github.com/vvanelslande/vvctre/issues/1) |
 
 # Portable Mode
 
