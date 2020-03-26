@@ -607,10 +607,12 @@ int main(int argc, char** argv) {
         SDL_Event event;
         SDL_Window* window;
 
+        fmt::print("Don't change the active window while this is waiting for input\n\n");
+
         const auto GetInput = [&](const char* mapping, InputCommon::Polling::DeviceType type) {
             switch (type) {
             case InputCommon::Polling::DeviceType::Button: {
-                fmt::print("Current button: {}. After pressing the enter key, press "
+                fmt::print("Current button: {}\nAfter pressing the enter key, press "
                            "a key or button\n",
                            Common::ToUpper(mapping));
                 std::cin.get();
@@ -659,7 +661,7 @@ int main(int argc, char** argv) {
                 break;
             }
             case InputCommon::Polling::DeviceType::Analog: {
-                fmt::print("Current stick: {}. After pressing the enter key,\nFor a keyboard, "
+                fmt::print("Current stick: {}\nAfter pressing the enter key,\nFor a keyboard, "
                            "press the keys for up, down, left, right, and modifier.\nFor a "
                            "gamepad, first move "
                            "a stick to the right, and then to the bottom.\n",
