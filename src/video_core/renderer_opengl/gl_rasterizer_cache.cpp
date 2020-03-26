@@ -1487,7 +1487,7 @@ Surface RasterizerCacheOpenGL::GetTextureSurface(const Pica::Texture::TextureInf
         auto format_tuple = GetFormatTuple(params.pixel_format);
 
         // Allocate more mipmap level if necessary
-        if (!Settings::values.sharper_distant_objects && (surface->max_level < max_level)) {
+        if (surface->max_level < max_level) {
             state.texture_units[0].texture_2d = surface->texture.handle;
             state.Apply();
             glActiveTexture(GL_TEXTURE0);

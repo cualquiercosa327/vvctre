@@ -350,9 +350,6 @@ int main(int argc, char** argv) {
           clipp::option("--upright-orientation")
               .doc("use upright orientation, for book style games")
               .set(Settings::values.upright_screen, true),
-          clipp::option("--enable-sharper-distant-objects")
-              .doc("enable sharper distant objects")
-              .set(Settings::values.sharper_distant_objects, true),
           clipp::option("--3d-side-by-side")
               .doc("use Side by Side 3D")
               .set(Settings::values.render_3d, Settings::StereoRenderOption::SideBySide),
