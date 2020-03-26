@@ -793,11 +793,10 @@ void Module::Interface::DeleteUserProgram(Kernel::HLERequestContext& ctx) {
                            ErrorSummary::InvalidArgument, ErrorLevel::Usage));
         return;
     }
-    u64 current_program_id = title_id;
+    u64 current_program_id = 0;
     am->system.GetAppLoader().ReadProgramId(current_program_id);
     if (current_program_id == title_id) {
-        LOG_ERROR(Service_AM, "Can't delete running program or reading the running program's "
-                              "ID failed");
+        LOG_ERROR(Service_AM, "Can't delete running program");
         rb.Push(ResultCode(ErrorDescription::NotAuthorized, ErrorModule::FS,
                            ErrorSummary::InvalidState, ErrorLevel::Permanent));
         return;
@@ -1401,11 +1400,10 @@ void Module::Interface::DeleteProgram(Kernel::HLERequestContext& ctx) {
     const Service::FS::MediaType media_type = rp.PopEnum<FS::MediaType>();
     const u64 title_id = rp.Pop<u64>();
     IPC::RequestBuilder rb = rp.MakeBuilder(1, 0);
-    u64 current_program_id = title_id;
+    u64 current_program_id = 0;
     am->system.GetAppLoader().ReadProgramId(current_program_id);
     if (current_program_id == title_id) {
-        LOG_ERROR(Service_AM, "Can't delete running program or reading the running program's "
-                              "ID failed");
+        LOG_ERROR(Service_AM, "Can't delete running program");
         rb.Push(ResultCode(ErrorDescription::NotAuthorized, ErrorModule::FS,
                            ErrorSummary::InvalidState, ErrorLevel::Permanent));
         return;
