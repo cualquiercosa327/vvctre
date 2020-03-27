@@ -112,6 +112,7 @@ private:
     std::map<int, IPCDebugger::RequestRecord> ipc_records;
 
     bool show_cheats_window = false;
+    bool show_ipc_recorder_window = false;
 
     const char* arg0 = nullptr;
 };

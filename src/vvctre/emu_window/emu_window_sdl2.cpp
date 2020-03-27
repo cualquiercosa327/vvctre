@@ -514,8 +514,24 @@ void EmuWindow_SDL2::SwapBuffers() {
         ImGui::EndPopup();
     }
 
-    if (ipc_recorder_enabled) {
+    if (show_ipc_recorder_window) {
         if (ImGui::Begin("IPC Recorder", nullptr, ImGuiWindowFlags_NoSavedSettings)) {
+            if (ImGui::Checkbox("Enabled", &ipc_recorder_enabled)) {
+                IPCDebugger::Recorder& r = Core::System::GetInstance().Kernel().GetIPCRecorder();
+
+                r.SetEnabled(ipc_recorder_enabled);
+
+                if (ipc_recorder_enabled) {
+                    ipc_recorder_callback =
+                        r.BindCallback([&](const IPCDebugger::RequestRecord& record) {
+                            ipc_records[record.id] = record;
+                        });
+                } else {
+                    r.UnbindCallback(ipc_recorder_callback);
+                    ipc_recorder_callback = nullptr;
+                }
+            }
+            ImGui::SameLine();
             if (ImGui::Button("Clear")) {
                 ipc_records.clear();
             }
@@ -1242,17 +1258,18 @@ void EmuWindow_SDL2::SwapBuffers() {
                 }
 
                 if (ImGui::BeginMenu("Debugging")) {
-                    if (ImGui::MenuItem("IPC Recorder", nullptr, &ipc_recorder_enabled)) {
+                    if (ImGui::MenuItem("IPC Recorder", nullptr, &show_ipc_recorder_window)) {
                         ipc_records.clear();
-                        auto& r = Core::System::GetInstance().Kernel().GetIPCRecorder();
-                        r.SetEnabled(ipc_recorder_enabled);
-                        if (ipc_recorder_enabled) {
-                            ipc_recorder_callback =
-                                r.BindCallback([&](const IPCDebugger::RequestRecord& record) {
-                                    ipc_records[record.id] = record;
-                                });
-                        } else {
+
+                        if (!show_ipc_recorder_window) {
+                            ipc_recorder_enabled = false;
+
+                            IPCDebugger::Recorder& r =
+                                Core::System::GetInstance().Kernel().GetIPCRecorder();
+
+                            r.SetEnabled(ipc_recorder_enabled);
                             r.UnbindCallback(ipc_recorder_callback);
+                            ipc_recorder_callback = nullptr;
                         }
                     }
 
