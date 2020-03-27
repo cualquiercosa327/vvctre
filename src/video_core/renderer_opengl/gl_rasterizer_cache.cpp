@@ -840,44 +840,53 @@ bool CachedSurface::LoadCustomTexture(u64 tex_hash, Core::CustomTexInfo& tex_inf
 }
 
 void CachedSurface::DumpTexture(GLuint target_tex, u64 tex_hash) {
-    // Dump texture to RGBA8 and encode as PNG
-    auto& custom_tex_cache = Core::System::GetInstance().CustomTexCache();
-    std::string dump_path =
-        fmt::format("{}textures/{:016X}/", FileUtil::GetUserPath(FileUtil::UserPath::DumpDir),
-                    Core::System::GetInstance().Kernel().GetCurrentProcess()->codeset->program_id);
-    if (!FileUtil::CreateFullPath(dump_path)) {
-        LOG_ERROR(Render, "Unable to create {}", dump_path);
-        return;
-    }
+    // Make sure the texture size is a power of 2
+    std::bitset<32> width_bits(width);
+    std::bitset<32> height_bits(height);
 
-    dump_path += fmt::format("tex1_{}x{}_{:016X}_{}.png", width, height, tex_hash,
-                             static_cast<u32>(pixel_format));
-    if (!custom_tex_cache.IsTextureDumped(tex_hash) && !FileUtil::Exists(dump_path)) {
-        custom_tex_cache.SetTextureDumped(tex_hash);
-
-        LOG_INFO(Render_OpenGL, "Dumping texture to {}", dump_path);
-        std::vector<u8> decoded_texture;
-        decoded_texture.resize(width * height * 4);
-        glBindTexture(GL_TEXTURE_2D, target_tex);
-        /*
-           GetTexImage is used to work around a small issue that
-           happens if using custom textures with texture dumping at the same.
-           Let's say there's 2 textures that are both 32x32 and one of them gets replaced with a
-           higher quality 256x256 texture. If the 256x256 texture is displayed first and the 32x32
-           texture gets uploaded to the same underlying OpenGL texture, the 32x32 texture will
-           appear in the corner of the 256x256 texture.
-           If texture dumping is enabled and the 32x32 is undumped, vvctre will attempt to dump it.
-           Since the underlying OpenGL texture is still 256x256, vvctre crashes because it thinks
-           the texture is only 32x32. GetTexImage conveniently only dumps the specified region.
-        */
-        GetTexImage(GL_TEXTURE_2D, 0, GL_RGBA, GL_UNSIGNED_BYTE, height, width, 0,
-                    &decoded_texture[0], decoded_texture.size());
-        glBindTexture(GL_TEXTURE_2D, 0);
-        Common::FlipRGBA8Texture(decoded_texture, width, height);
-        if (stbi_write_png(dump_path.c_str(), static_cast<int>(width), static_cast<int>(height), 4,
-                           decoded_texture.data(), static_cast<int>(width) * 4) == 0) {
-            LOG_ERROR(Render_OpenGL, "Failed to save decoded texture");
+    if (width_bits.count() == 1 && height_bits.count() == 1) {
+        // Dump texture to RGBA8 and encode as PNG
+        auto& custom_tex_cache = Core::System::GetInstance().CustomTexCache();
+        std::string dump_path = fmt::format(
+            "{}textures/{:016X}/", FileUtil::GetUserPath(FileUtil::UserPath::DumpDir),
+            Core::System::GetInstance().Kernel().GetCurrentProcess()->codeset->program_id);
+        if (!FileUtil::CreateFullPath(dump_path)) {
+            LOG_ERROR(Render, "Unable to create {}", dump_path);
+            return;
         }
+
+        dump_path += fmt::format("tex1_{}x{}_{:016X}_{}.png", width, height, tex_hash,
+                                 static_cast<u32>(pixel_format));
+        if (!custom_tex_cache.IsTextureDumped(tex_hash) && !FileUtil::Exists(dump_path)) {
+            custom_tex_cache.SetTextureDumped(tex_hash);
+
+            LOG_INFO(Render_OpenGL, "Dumping texture to {}", dump_path);
+            std::vector<u8> decoded_texture;
+            decoded_texture.resize(width * height * 4);
+            glBindTexture(GL_TEXTURE_2D, target_tex);
+            /*
+               GetTexImage is used to work around a small issue that
+               happens if using custom textures with texture dumping at the same.
+               Let's say there's 2 textures that are both 32x32 and one of them gets replaced with a
+               higher quality 256x256 texture. If the 256x256 texture is displayed first and the
+               32x32 texture gets uploaded to the same underlying OpenGL texture, the 32x32 texture
+               will appear in the corner of the 256x256 texture. If texture dumping is enabled and
+               the 32x32 is undumped, vvctre will attempt to dump it. Since the underlying OpenGL
+               texture is still 256x256, vvctre crashes because it thinks the texture is only 32x32.
+               GetTexImage conveniently only dumps the specified region.
+            */
+            GetTexImage(GL_TEXTURE_2D, 0, GL_RGBA, GL_UNSIGNED_BYTE, height, width, 0,
+                        &decoded_texture[0], decoded_texture.size());
+            glBindTexture(GL_TEXTURE_2D, 0);
+            Common::FlipRGBA8Texture(decoded_texture, width, height);
+            if (stbi_write_png(dump_path.c_str(), static_cast<int>(width), static_cast<int>(height),
+                               4, decoded_texture.data(), static_cast<int>(width) * 4) == 0) {
+                LOG_ERROR(Render_OpenGL, "Failed to save decoded texture");
+            }
+        }
+    } else {
+        LOG_WARNING(Render_OpenGL, "Not dumping {:016X} because size isn't a power of 2 ({}x{})",
+                    tex_hash, width, height);
     }
 }
 
