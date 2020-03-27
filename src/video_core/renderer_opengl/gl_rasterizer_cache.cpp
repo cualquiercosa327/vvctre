@@ -5,7 +5,6 @@
 #include <algorithm>
 #include <array>
 #include <atomic>
-#include <cmath>
 #include <cstring>
 #include <iterator>
 #include <memory>
@@ -285,14 +284,8 @@ void AllocateSurfaceTexture(GLuint texture, const FormatTuple& format_tuple, u32
     cur_state.Apply();
     glActiveTexture(GL_TEXTURE0);
 
-    if (GL_ARB_texture_storage) {
-        // Allocate all possible mipmap levels upfront
-        auto levels = std::log2(std::max(width, height)) + 1;
-        glTexStorage2D(GL_TEXTURE_2D, levels, format_tuple.internal_format, width, height);
-    } else {
-        glTexImage2D(GL_TEXTURE_2D, 0, format_tuple.internal_format, width, height, 0,
-                     format_tuple.format, format_tuple.type, nullptr);
-    }
+    glTexImage2D(GL_TEXTURE_2D, 0, format_tuple.internal_format, width, height, 0,
+                 format_tuple.format, format_tuple.type, nullptr);
 
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -312,22 +305,17 @@ static void AllocateTextureCube(GLuint texture, const FormatTuple& format_tuple,
     cur_state.texture_cube_unit.texture_cube = texture;
     cur_state.Apply();
     glActiveTexture(TextureUnits::TextureCube.Enum());
-    if (GL_ARB_texture_storage) {
-        // Allocate all possible mipmap levels in case the game uses them later
-        auto levels = std::log2(width) + 1;
-        glTexStorage2D(GL_TEXTURE_CUBE_MAP, levels, format_tuple.internal_format, width, width);
-    } else {
-        for (auto faces : {
-                 GL_TEXTURE_CUBE_MAP_POSITIVE_X,
-                 GL_TEXTURE_CUBE_MAP_POSITIVE_Y,
-                 GL_TEXTURE_CUBE_MAP_POSITIVE_Z,
-                 GL_TEXTURE_CUBE_MAP_NEGATIVE_X,
-                 GL_TEXTURE_CUBE_MAP_NEGATIVE_Y,
-                 GL_TEXTURE_CUBE_MAP_NEGATIVE_Z,
-             }) {
-            glTexImage2D(faces, 0, format_tuple.internal_format, width, width, 0,
-                         format_tuple.format, format_tuple.type, nullptr);
-        }
+
+    for (auto faces : {
+             GL_TEXTURE_CUBE_MAP_POSITIVE_X,
+             GL_TEXTURE_CUBE_MAP_POSITIVE_Y,
+             GL_TEXTURE_CUBE_MAP_POSITIVE_Z,
+             GL_TEXTURE_CUBE_MAP_NEGATIVE_X,
+             GL_TEXTURE_CUBE_MAP_NEGATIVE_Y,
+             GL_TEXTURE_CUBE_MAP_NEGATIVE_Z,
+         }) {
+        glTexImage2D(faces, 0, format_tuple.internal_format, width, width, 0, format_tuple.format,
+                     format_tuple.type, nullptr);
     }
 
     // Restore previous texture bindings
@@ -1510,14 +1498,9 @@ Surface RasterizerCacheOpenGL::GetTextureSurface(const Pica::Texture::TextureInf
                 width = surface->GetScaledWidth();
                 height = surface->GetScaledHeight();
             }
-            // If we are using ARB_texture_storage then we've already allocated all of the mipmap
-            // levels
-            if (!GL_ARB_texture_storage) {
-                for (u32 level = surface->max_level + 1; level <= max_level; ++level) {
-                    glTexImage2D(GL_TEXTURE_2D, level, format_tuple.internal_format, width >> level,
-                                 height >> level, 0, format_tuple.format, format_tuple.type,
-                                 nullptr);
-                }
+            for (u32 level = surface->max_level + 1; level <= max_level; ++level) {
+                glTexImage2D(GL_TEXTURE_2D, level, format_tuple.internal_format, width >> level,
+                             height >> level, 0, format_tuple.format, format_tuple.type, nullptr);
             }
             if (surface->is_custom) {
                 // TODO: proper mipmap support for custom textures
