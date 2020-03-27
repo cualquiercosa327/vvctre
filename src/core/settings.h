@@ -195,6 +195,7 @@ struct Values {
     bool filter_mode = true;
     std::string pp_shader_name = "none (builtin)";
     bool enable_vsync = false;
+    bool sharper_distant_objects = false;
     bool ignore_format_reinterpretation = false;
     int min_vertices_per_thread = 10;
 
