@@ -628,6 +628,27 @@ void EmuWindow_SDL2::SwapBuffers() {
 
     if (show_cheats_window) {
         if (ImGui::Begin("Cheats", nullptr, ImGuiWindowFlags_NoSavedSettings)) {
+            if (ImGui::Button("Edit File")) {
+                const std::string filepath = fmt::format(
+                    "{}{:016X}.txt", FileUtil::GetUserPath(FileUtil::UserPath::CheatsDir),
+                    system.Kernel().GetCurrentProcess()->codeset->program_id);
+
+                FileUtil::CreateFullPath(filepath);
+
+                if (!FileUtil::Exists(filepath)) {
+                    FileUtil::CreateEmptyFile(filepath);
+                }
+
+#ifdef _WIN32
+                const int code = std::system(fmt::format("start {}", filepath).c_str());
+#else
+                const int code = std::system(fmt::format("xdg-open {}", filepath).c_str());
+#endif
+                LOG_INFO(Frontend, "Opened cheats file in text editor, exit code: {}", code);
+            }
+
+            ImGui::SameLine();
+
             if (ImGui::Button("Reload File")) {
                 system.CheatEngine().LoadCheatFile();
             }
