@@ -1,11 +1,8 @@
 add_library(video_core STATIC
     command_processor.cpp
     command_processor.h
-    debug_utils/debug_utils.cpp
-    debug_utils/debug_utils.h
     geometry_pipeline.cpp
     geometry_pipeline.h
-    gpu_debugger.h
     pica.cpp
     pica.h
     pica_state.h
@@ -57,7 +54,6 @@ add_library(video_core STATIC
     renderer_opengl/texture_filters/texture_filter_manager.h
     renderer_opengl/texture_filters/xbrz/xbrz_freescale.cpp
     renderer_opengl/texture_filters/xbrz/xbrz_freescale.h
-    shader/debug_data.h
     shader/shader.cpp
     shader/shader.h
     shader/shader_interpreter.cpp

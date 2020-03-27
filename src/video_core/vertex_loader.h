@@ -1,3 +1,7 @@
+// Copyright 2016 Citra Emulator Project
+// Licensed under GPLv2 or any later version
+// Refer to the license.txt file included.
+
 #pragma once
 
 #include <array>
@@ -6,13 +10,9 @@
 
 namespace Pica {
 
-namespace DebugUtils {
-class MemoryAccessTracker;
-}
-
 namespace Shader {
 struct AttributeBuffer;
-}
+} // namespace Shader
 
 class VertexLoader {
 public:

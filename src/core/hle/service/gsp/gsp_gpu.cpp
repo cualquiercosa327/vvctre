@@ -12,16 +12,11 @@
 #include "core/hle/kernel/shared_memory.h"
 #include "core/hle/kernel/shared_page.h"
 #include "core/hle/result.h"
-#include "core/hle/service/gsp/gsp_gpu.h"
+#include "core/hle/service/gsp/gsp.h"
 #include "core/hw/gpu.h"
 #include "core/hw/hw.h"
 #include "core/hw/lcd.h"
 #include "core/memory.h"
-#include "video_core/debug_utils/debug_utils.h"
-#include "video_core/gpu_debugger.h"
-
-// Main graphics debugger object - TODO: Here is probably not the best place for this
-GraphicsDebugger g_debugger;
 
 namespace Service::GSP {
 
@@ -300,10 +295,6 @@ ResultCode SetBufferSwap(u32 screen_id, const FrameBufferInfo& info) {
     WriteSingleHWReg(
         base_address + 4 * static_cast<u32>(GPU_REG_INDEX(framebuffer_config[screen_id].active_fb)),
         info.shown_fb);
-
-    if (Pica::g_debug_context) {
-        Pica::g_debug_context->OnEvent(Pica::DebugContext::Event::BufferSwapped, nullptr);
-    }
 
     return RESULT_SUCCESS;
 }
@@ -592,10 +583,6 @@ static void ExecuteCommand(const Command& command, u32 thread_id) {
     default:
         LOG_ERROR(Service_GSP, "unknown command 0x{:08X}", (int)command.id.Value());
     }
-
-    if (Pica::g_debug_context)
-        Pica::g_debug_context->OnEvent(Pica::DebugContext::Event::GSPCommandProcessed,
-                                       (void*)&command);
 }
 
 void GSP_GPU::SetLcdForceBlack(Kernel::HLERequestContext& ctx) {
@@ -624,8 +611,6 @@ void GSP_GPU::TriggerCmdReqQueue(Kernel::HLERequestContext& ctx) {
 
         // Iterate through each command...
         for (unsigned i = 0; i < command_buffer->number_commands; ++i) {
-            g_debugger.GXCommandProcessed((u8*)&command_buffer->commands[i]);
-
             // Decode and execute command
             ExecuteCommand(command_buffer->commands[i], thread_id);
 

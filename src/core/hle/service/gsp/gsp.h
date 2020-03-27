@@ -13,7 +13,7 @@
 
 namespace Core {
 class System;
-}
+} // namespace Core
 
 namespace Service::GSP {
 /**

@@ -7,7 +7,6 @@
 #include "common/logging/log.h"
 #include "core/hw/hw.h"
 #include "core/hw/lcd.h"
-#include "video_core/debug_utils/debug_utils.h"
 
 namespace LCD {
 

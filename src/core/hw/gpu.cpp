@@ -18,7 +18,6 @@
 #include "core/memory.h"
 #include "core/settings.h"
 #include "video_core/command_processor.h"
-#include "video_core/debug_utils/debug_utils.h"
 #include "video_core/rasterizer_interface.h"
 #include "video_core/renderer_base.h"
 #include "video_core/utils.h"
@@ -430,11 +429,6 @@ inline void Write(u32 addr, const T data) {
     case GPU_REG_INDEX(display_transfer_config.trigger): {
         const auto& config = g_regs.display_transfer_config;
         if (config.trigger & 1) {
-
-            if (Pica::g_debug_context)
-                Pica::g_debug_context->OnEvent(Pica::DebugContext::Event::IncomingDisplayTransfer,
-                                               nullptr);
-
             if (config.is_texture_copy) {
                 TextureCopy(config);
                 LOG_TRACE(HW_GPU,

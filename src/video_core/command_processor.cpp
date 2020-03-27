@@ -16,7 +16,6 @@
 #include "core/memory.h"
 #include "core/settings.h"
 #include "video_core/command_processor.h"
-#include "video_core/debug_utils/debug_utils.h"
 #include "video_core/pica_state.h"
 #include "video_core/pica_types.h"
 #include "video_core/primitive_assembly.h"
@@ -125,15 +124,6 @@ static void WritePicaReg(u32 id, u32 value, u32 mask) {
 
     regs.reg_array[id] = (old_value & ~write_mask) | (value & write_mask);
 
-    // Double check for is_pica_tracing to avoid call overhead
-    if (DebugUtils::IsPicaTracing()) {
-        DebugUtils::OnPicaRegWrite({(u16)id, (u16)mask, regs.reg_array[id]});
-    }
-
-    if (g_debug_context)
-        g_debug_context->OnEvent(DebugContext::Event::PicaCommandLoaded,
-                                 reinterpret_cast<void*>(&id));
-
     switch (id) {
     // Trigger IRQ
     case PICA_REG_INDEX(trigger_irq):
@@ -215,9 +205,6 @@ static void WritePicaReg(u32 id, u32 value, u32 mask) {
                     shader_engine->SetupBatch(g_state.vs, regs.vs.main_offset);
 
                     // Send to vertex shader
-                    if (g_debug_context)
-                        g_debug_context->OnEvent(DebugContext::Event::VertexShaderInvocation,
-                                                 static_cast<void*>(&immediate_input));
                     Shader::UnitState shader_unit;
                     Shader::AttributeBuffer output{};
 
@@ -238,10 +225,6 @@ static void WritePicaReg(u32 id, u32 value, u32 mask) {
                     // change it to flush triangles whenever a drawing config register changes
                     // See: https://github.com/citra-emu/citra/pull/2866#issuecomment-327011550
                     VideoCore::g_renderer->Rasterizer()->DrawTriangles();
-                    if (g_debug_context) {
-                        g_debug_context->OnEvent(DebugContext::Event::FinishedPrimitiveBatch,
-                                                 nullptr);
-                    }
                 }
             }
         }
@@ -266,12 +249,6 @@ static void WritePicaReg(u32 id, u32 value, u32 mask) {
     // It seems like these trigger vertex rendering
     case PICA_REG_INDEX(pipeline.trigger_draw):
     case PICA_REG_INDEX(pipeline.trigger_draw_indexed): {
-#if PICA_LOG_TEV
-        DebugUtils::DumpTevStageConfig(regs.GetTevStages());
-#endif
-        if (g_debug_context)
-            g_debug_context->OnEvent(DebugContext::Event::IncomingPrimitiveBatch, nullptr);
-
         PrimitiveAssembler<Shader::OutputVertex>& primitive_assembler = g_state.primitive_assembler;
 
         bool accelerate_draw = VideoCore::g_hw_shader_enabled && primitive_assembler.IsEmpty();
@@ -296,9 +273,6 @@ static void WritePicaReg(u32 id, u32 value, u32 mask) {
 
         if (accelerate_draw &&
             VideoCore::g_renderer->Rasterizer()->AccelerateDrawBatch(is_indexed)) {
-            if (g_debug_context) {
-                g_debug_context->OnEvent(DebugContext::Event::FinishedPrimitiveBatch, nullptr);
-            }
             break;
         }
 
@@ -391,10 +365,6 @@ static void WritePicaReg(u32 id, u32 value, u32 mask) {
                 loader.LoadVertex(base_address, index, vertex, attribute_buffer);
 
                 // Send to vertex shader
-                if (g_debug_context) {
-                    g_debug_context->OnEvent(DebugContext::Event::VertexShaderInvocation,
-                                             &attribute_buffer);
-                }
                 shader_unit.LoadInput(regs.vs, attribute_buffer);
                 shader_engine->Run(g_state.vs, shader_unit);
                 shader_unit.WriteOutput(regs.vs, output_attr);
@@ -469,9 +439,6 @@ static void WritePicaReg(u32 id, u32 value, u32 mask) {
         }
 
         VideoCore::g_renderer->Rasterizer()->DrawTriangles();
-        if (g_debug_context) {
-            g_debug_context->OnEvent(DebugContext::Event::FinishedPrimitiveBatch, nullptr);
-        }
 
         break;
     }
@@ -685,11 +652,7 @@ static void WritePicaReg(u32 id, u32 value, u32 mask) {
     }
 
     VideoCore::g_renderer->Rasterizer()->NotifyPicaRegisterChanged(id);
-
-    if (g_debug_context)
-        g_debug_context->OnEvent(DebugContext::Event::PicaCommandProcessed,
-                                 reinterpret_cast<void*>(&id));
-} // namespace CommandProcessor
+}
 
 void ProcessCommandList(const u32* list, u32 size) {
     g_state.cmd_list.head_ptr = g_state.cmd_list.current_ptr = list;

@@ -1,3 +1,7 @@
+// Copyright 2016 Citra Emulator Project
+// Licensed under GPLv2 or any later version
+// Refer to the license.txt file included.
+
 #include <memory>
 #include <boost/range/algorithm/fill.hpp>
 #include "common/alignment.h"
@@ -7,7 +11,6 @@
 #include "common/logging/log.h"
 #include "common/vector_math.h"
 #include "core/memory.h"
-#include "video_core/debug_utils/debug_utils.h"
 #include "video_core/pica_state.h"
 #include "video_core/pica_types.h"
 #include "video_core/regs_pipeline.h"
