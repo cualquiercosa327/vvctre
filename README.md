@@ -20,7 +20,7 @@ Create a `user` folder where vvctre is.
 - OS:
   - 64-bit Windows >= 7
     - [Visual C++ 2019 Redistributable](https://aka.ms/vs/16/release/vc_redist.x64.exe)
-    - [Media Feature Pack](https://www.microsoft.com/en-us/software-download/mediafeaturepack) (for playing AAC audio on Windows 10 N, optional)
+    - Windows N and KN only: Media Feature Pack for your Windows version (for playing AAC audio, optional)
   - 64-bit Ubuntu 18.04 with packages:
     - For running releases
       - `libsdl2-2.0-0`
