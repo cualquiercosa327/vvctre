@@ -496,9 +496,6 @@ ResultCode AppletManager::PrepareToDoApplicationJump(u64 title_id, FS::MediaType
     app_jump_parameters.next_title_id = title_id;
     app_jump_parameters.next_media_type = media_type;
 
-    // Note: The real console uses the Home Menu to perform the application jump, therefore the menu
-    // needs to be running. The real APT module starts the Home Menu here if it's not already
-    // running, we don't have to do this. See `EnsureHomeMenuLoaded` for launching the Home Menu.
     return RESULT_SUCCESS;
 }
 
@@ -521,29 +518,6 @@ ResultCode AppletManager::DoApplicationJump() {
     system.RequestReset();
 
     return RESULT_SUCCESS;
-}
-
-void AppletManager::EnsureHomeMenuLoaded() {
-    const auto& system_slot = applet_slots[static_cast<size_t>(AppletSlot::SystemApplet)];
-    // TODO(Subv): The real APT service sends signal 12 (WakeupByCancel) to the currently running
-    // System applet, waits for it to finish, and then launches the Home Menu.
-    ASSERT_MSG(!system_slot.registered, "A system applet is already running");
-
-    const auto& menu_slot = applet_slots[static_cast<size_t>(AppletSlot::HomeMenu)];
-
-    if (menu_slot.registered) {
-        // The Home Menu is already running.
-        return;
-    }
-
-    auto cfg = Service::CFG::GetModule(system);
-    ASSERT_MSG(cfg, "CFG Module missing!");
-    u32 region_value = cfg->GetRegionValue();
-    u64 menu_title_id = GetTitleIdForApplet(AppletId::HomeMenu, region_value);
-    auto process = NS::LaunchTitle(FS::MediaType::NAND, menu_title_id);
-    if (!process) {
-        LOG_ERROR(Service_APT, "The Home Menu failed to launch");
-    }
 }
 
 AppletManager::AppletManager(Core::System& system) : system(system) {

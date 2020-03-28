@@ -210,8 +210,6 @@ private:
     AppletSlotData* GetAppletSlotData(AppletId id);
     AppletSlotData* GetAppletSlotData(AppletAttributes attributes);
 
-    void EnsureHomeMenuLoaded();
-
     // Command that will be sent to the application when a library applet calls CloseLibraryApplet.
     SignalType library_applet_closing_command;
 
