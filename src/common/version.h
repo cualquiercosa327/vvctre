@@ -4,7 +4,6 @@
 
 #pragma once
 
-#include <ostream>
 #include <semver.hpp>
 #include "common/common_types.h"
 
