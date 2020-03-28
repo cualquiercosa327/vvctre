@@ -542,8 +542,7 @@ void AppletManager::EnsureHomeMenuLoaded() {
     u64 menu_title_id = GetTitleIdForApplet(AppletId::HomeMenu, region_value);
     auto process = NS::LaunchTitle(FS::MediaType::NAND, menu_title_id);
     if (!process) {
-        LOG_WARNING(Service_APT,
-                    "The Home Menu failed to launch, application jumping will not work.");
+        LOG_ERROR(Service_APT, "The Home Menu failed to launch");
     }
 }
 
