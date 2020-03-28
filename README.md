@@ -46,6 +46,7 @@ Create a `user` folder where vvctre is.
 - FFmpeg AAC decoder (WMF and FDK are easier to use)
 - Video dumper (very slow)
 - Audio stretching setting (if disabled, audio will not work properly if audio speed is changed)
+- CPU Clock Speed setting (https://github.com/citra-emu/citra/pull/5025#issuecomment-590103178)
 
 # Incompatibilities
 
