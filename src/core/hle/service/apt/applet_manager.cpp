@@ -488,12 +488,11 @@ ResultCode AppletManager::PrepareToDoApplicationJump(u64 title_id, FS::MediaType
 
     if (flags == ApplicationJumpFlags::UseCurrentParameters) {
         title_id = application_slot.title_id;
+        media_type = Service::AM::GetTitleMediaType(title_id);
     }
 
     app_jump_parameters.current_title_id = application_slot.title_id;
-    // TODO(Subv): Retrieve the correct media type of the currently-running application. For now
-    // just assume NAND.
-    app_jump_parameters.current_media_type = FS::MediaType::NAND;
+    app_jump_parameters.current_media_type = media_type;
     app_jump_parameters.next_title_id = title_id;
     app_jump_parameters.next_media_type = media_type;
 
