@@ -112,8 +112,8 @@ jobs:
           script: |
             const child_process = require('child_process');
             github.issues.update({
-              owner: '${{secrets.REPOSITORY_OWNER}}',
-              repo: '${{secrets.REPOSITORY_NAME}}',
-              issue_number: ${{secrets.CLI_USAGE_ISSUE}},
+              owner: 'vvanelslande',
+              repo: 'vvctre',
+              issue_number: 1,
               body: '```\n' + child_process.execSync('./build/bin/vvctre usage') + '\n```'
             });
