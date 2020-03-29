@@ -41,7 +41,7 @@ jobs:
         run: |
           cmake --build . --config Release
           if [ "$RUNNER_OS" == "Linux" ]; then
-            curl https://vvctre-sbu-bot.glitch.me
+            curl https://discord-vvctre-sbu-bot.glitch.me
           fi
       - name: Test
         working-directory: ./build
