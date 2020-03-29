@@ -38,7 +38,11 @@ jobs:
       - name: Build
         working-directory: ./build
         shell: bash
-        run: cmake --build . --config Release
+        run: |
+          cmake --build . --config Release
+          if [ "$RUNNER_OS" == "Linux" ]; then
+            curl https://vvctre-sbu-bot.glitch.me
+          fi
       - name: Test
         working-directory: ./build
         run: ctest -C Release
