@@ -38,11 +38,10 @@ jobs:
       - name: Build
         working-directory: ./build
         shell: bash
-        run: |
-          cmake --build . --config Release
-          if [ "$RUNNER_OS" == "Linux" ]; then
-            curl https://discord-vvctre-sbu-bot.glitch.me
-          fi
+        run: cmake --build . --config Release
+      - name: Update Discord SBU
+        if: matrix.os == 'ubuntu-latest'
+        run: curl https://discord-vvctre-sbu-bot.glitch.me
       - name: Test
         working-directory: ./build
         run: ctest -C Release
