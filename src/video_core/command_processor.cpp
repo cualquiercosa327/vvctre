@@ -323,12 +323,6 @@ static void WritePicaReg(u32 id, u32 value, u32 mask) {
                     continue;
                 }
 
-                if (g_debug_context && Pica::g_debug_context->recorder) {
-                    int size = index_u16 ? 2 : 1;
-                    memory_accesses.AddAccess(base_address + index_info.offset + size * index,
-                                              size);
-                }
-
                 for (unsigned int i = 0; i < VERTEX_CACHE_SIZE; ++i) {
                     if (vertex_cache_valid[i] && vertex == vertex_cache_ids[i]) {
                         vs_output = vertex_cache[i];
