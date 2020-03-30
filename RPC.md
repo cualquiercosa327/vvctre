@@ -550,18 +550,6 @@ Builtin shaders:
 }
 ```
 
-# GET/POST /minverticesperthread
-
-Get or set the minimum vertices per thread (software shader only).
-
-## Request/Reply
-
-```json
-{
-  "value": Number
-}
-```
-
 # GET/POST /dumptextures
 
 Get or set whether texture dumping is enabled.

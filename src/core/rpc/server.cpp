@@ -939,26 +939,6 @@ Server::Server(Core::System& system, const int port) {
         }
     });
 
-    server->Get("/minverticesperthread", [&](const httplib::Request& req, httplib::Response& res) {
-        res.set_content(
-            nlohmann::json{
-                {"value", Settings::values.min_vertices_per_thread},
-            }
-                .dump(),
-            "application/json");
-    });
-
-    server->Post("/minverticesperthread", [&](const httplib::Request& req, httplib::Response& res) {
-        try {
-            const nlohmann::json json = nlohmann::json::parse(req.body);
-            Settings::values.min_vertices_per_thread = json["value"].get<int>();
-            res.status = 204;
-        } catch (nlohmann::json::exception& exception) {
-            res.status = 500;
-            res.set_content(exception.what(), "text/plain");
-        }
-    });
-
     server->Get("/dumptextures", [&](const httplib::Request& req, httplib::Response& res) {
         res.set_content(
             nlohmann::json{
