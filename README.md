@@ -4,8 +4,9 @@ vvctre is licensed under the GPLv2 (or any later version).
 Refer to the license.txt file included.
 
 |  | Citra | vvctre |
-|----------------------------|:------------------------------------------------------------------------------:|------------------------------------------------------------------:|
-| Can use menu in fullscreen | No | Yes |
+|---------------------------------------|:------------------------------------------------------------------------------:|------------------------------------------------------------------:|
+| Can use the menu in fullscreen | No | Yes |
+| Can copy screenshots to the clipboard | No | Yes |
 | Out of the box multiplayer | No | Yes |
 | Scripting requests | Read/write memory | [Here](https://github.com/vvanelslande/vvctre/blob/master/RPC.md) |
 | Versions | Sequential number | [SemVer](https://semver.org/) |
