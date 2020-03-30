@@ -39,6 +39,9 @@ jobs:
         working-directory: ./build
         shell: bash
         run: cmake --build . --config Release
+      - name: Update Discord SBU
+        if: matrix.os == 'ubuntu-latest'
+        run: curl https://discord-vvctre-sbu-bot.glitch.me
       - name: Test
         working-directory: ./build
         run: ctest -C Release
@@ -109,8 +112,8 @@ jobs:
           script: |
             const child_process = require('child_process');
             github.issues.update({
-              owner: '${{secrets.REPOSITORY_OWNER}}',
-              repo: '${{secrets.REPOSITORY_NAME}}',
-              issue_number: ${{secrets.CLI_USAGE_ISSUE}},
+              owner: 'vvanelslande',
+              repo: 'vvctre',
+              issue_number: 1,
               body: '```\n' + child_process.execSync('./build/bin/vvctre usage') + '\n```'
             });
