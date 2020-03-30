@@ -35,7 +35,6 @@ add_library(common STATIC
     texture.h
     thread.cpp
     thread.h
-    thread_pool.h
     thread_queue_list.h
     threadsafe_queue.h
     timer.cpp
