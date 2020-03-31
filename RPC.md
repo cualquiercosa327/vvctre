@@ -651,7 +651,7 @@ Get or set the audio output device.
 
 # GET/POST /audiovolume
 
-Get or set the audio output volume.
+Get or set the HLE audio output volume.
 
 ## Request/Reply
 
@@ -663,7 +663,7 @@ Get or set the audio output volume.
 
 # GET/POST /audiospeed
 
-Get or set the audio output speed.
+Get or set the HLE audio output speed.
 
 ## Request/Reply
 

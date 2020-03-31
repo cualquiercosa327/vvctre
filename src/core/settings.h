@@ -191,7 +191,7 @@ struct Values {
     float bg_green = 0.0f;
     float bg_blue = 0.0f;
     StereoRenderOption render_3d = StereoRenderOption::Off;
-    std::atomic<u8> factor_3d{100};
+    std::atomic<u8> factor_3d{0};
     bool filter_mode = true;
     std::string pp_shader_name = "none (builtin)";
     bool enable_vsync = false;

@@ -907,6 +907,71 @@ void EmuWindow_SDL2::SwapBuffers() {
                         Settings::LogSettings();
                     }
 
+                    ImGui::Text("3D");
+                    ImGui::SameLine();
+
+                    if (ImGui::BeginCombo("##render_3d", [] {
+                            switch (Settings::values.render_3d) {
+                            case Settings::StereoRenderOption::Off:
+                                return "Off";
+                            case Settings::StereoRenderOption::SideBySide:
+                                return "Side by Side";
+                            case Settings::StereoRenderOption::Anaglyph:
+                                return "Anaglyph";
+                            case Settings::StereoRenderOption::Interlaced:
+                                return "Interlaced";
+                            default:
+                                break;
+                            }
+
+                            return "Invalid value";
+                        }())) {
+
+                        if (ImGui::Selectable("Off", Settings::values.render_3d ==
+                                                         Settings::StereoRenderOption::Off)) {
+                            Settings::values.render_3d = Settings::StereoRenderOption::Off;
+                            Settings::Apply();
+                            Settings::LogSettings();
+                        }
+
+                        if (ImGui::Selectable("Side by Side",
+                                              Settings::values.render_3d ==
+                                                  Settings::StereoRenderOption::SideBySide)) {
+                            Settings::values.render_3d = Settings::StereoRenderOption::SideBySide;
+                            Settings::Apply();
+                            Settings::LogSettings();
+                        }
+
+                        if (ImGui::Selectable("Anaglyph",
+                                              Settings::values.render_3d ==
+                                                  Settings::StereoRenderOption::Anaglyph)) {
+                            Settings::values.render_3d = Settings::StereoRenderOption::Anaglyph;
+                            Settings::Apply();
+                            Settings::LogSettings();
+                        }
+
+                        if (ImGui::Selectable("Interlaced",
+                                              Settings::values.render_3d ==
+                                                  Settings::StereoRenderOption::Interlaced)) {
+                            Settings::values.render_3d = Settings::StereoRenderOption::Interlaced;
+                            Settings::Apply();
+                            Settings::LogSettings();
+                        }
+
+                        ImGui::EndCombo();
+                    }
+
+                    ImGui::SameLine();
+
+                    u8 factor_3d = Settings::values.factor_3d;
+                    const u8 factor_3d_min = 0;
+                    const u8 factor_3d_max = 100;
+                    if (ImGui::SliderScalar("##factor_3d", ImGuiDataType_U8, &factor_3d,
+                                            &factor_3d_min, &factor_3d_max, "%d%%")) {
+                        Settings::values.factor_3d = factor_3d;
+                        Settings::LogSettings();
+                    }
+
                     ImGui::EndMenu();
                 }
 
