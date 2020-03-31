@@ -41,7 +41,7 @@ jobs:
         run: cmake --build . --config Release
       - name: Update Discord SBU
         if: matrix.os == 'ubuntu-latest'
-        run: curl https://discord-vvctre-sbu-bot.glitch.me/update
+        run: curl https://discord-vvctre-sbu-bot-1585620067.glitch.me/update
       - name: Test
         working-directory: ./build
         run: ctest -C Release
