@@ -20,7 +20,7 @@ add_executable(${PROJECT_NAME}
 
 create_target_directory_groups(${PROJECT_NAME})
 
-target_link_libraries(${PROJECT_NAME} PRIVATE common core input_common)
+target_link_libraries(${PROJECT_NAME} PRIVATE common core input_common audio_core)
 target_link_libraries(${PROJECT_NAME} PRIVATE glad clip portable-file-dialogs indicators imgui ${PLATFORM_LIBRARIES} Threads::Threads)
 
 if(UNIX)

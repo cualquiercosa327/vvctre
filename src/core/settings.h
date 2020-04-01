@@ -119,8 +119,8 @@ static const std::array<const char*, NumAnalogs> mapping = {{
 // region value to fit the region lockout info of the game
 static constexpr int REGION_VALUE_AUTO_SELECT = -1;
 
-struct InputProfile {
-    std::string name = "Default";
+struct Values {
+    // Controls
     std::array<std::string, NativeButton::NumButtons> buttons = {
         InputCommon::GenerateKeyboardParam(SDL_SCANCODE_A), // A
         InputCommon::GenerateKeyboardParam(SDL_SCANCODE_S), // B
@@ -156,13 +156,6 @@ struct InputProfile {
     std::string udp_input_address = InputCommon::CemuhookUDP::DEFAULT_ADDR;
     u16 udp_input_port = InputCommon::CemuhookUDP::DEFAULT_PORT;
     u8 udp_pad_index = 0;
-};
-
-struct Values {
-    // Controls
-    InputProfile current_input_profile{}; ///< The current input profile
-    int current_input_profile_index = 0;  ///< The current input profile index
-    std::vector<InputProfile> input_profiles = {InputProfile{}}; ///< The list of input profiles
 
     // Core
     bool use_cpu_jit = true;
@@ -293,12 +286,5 @@ struct Values {
 
 void Apply();
 void LogSettings();
-
-// Input profiles
-void LoadProfile(int index);
-void SaveProfile(int index);
-void CreateProfile(std::string name);
-void DeleteProfile(int index);
-void RenameCurrentProfile(std::string new_name);
 
 } // namespace Settings

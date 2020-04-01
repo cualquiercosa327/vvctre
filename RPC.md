@@ -396,8 +396,6 @@ Get or set input settings.
 
 ## Request/Reply
 
-Profile:
-
 ```json
 {
   "analogs": [
@@ -424,20 +422,11 @@ Profile:
     String"Home"
   ],
   "motion_device": String,
-  "name": String,
   "touch_device": String,
   "udp_input_address": String,
   "udp_input_port": Number,
   "udp_pad_index": Number
 },
-```
-
-```json
-{
-  "current_profile": Profile,
-  "current_profile_index": Number,
-  "profiles": Array<Profile>
-}
 ```
 
 # GET/POST /multiplayerurl

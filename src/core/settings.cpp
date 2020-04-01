@@ -137,31 +137,4 @@ void LogSettings() {
     }
 }
 
-void LoadProfile(int index) {
-    Settings::values.current_input_profile = Settings::values.input_profiles[index];
-    Settings::values.current_input_profile_index = index;
-}
-
-void SaveProfile(int index) {
-    Settings::values.input_profiles[index] = Settings::values.current_input_profile;
-}
-
-void CreateProfile(std::string name) {
-    Settings::InputProfile profile = values.current_input_profile;
-    profile.name = std::move(name);
-    Settings::values.input_profiles.push_back(std::move(profile));
-    Settings::values.current_input_profile_index =
-        static_cast<int>(Settings::values.input_profiles.size()) - 1;
-    Settings::LoadProfile(Settings::values.current_input_profile_index);
-}
-
-void DeleteProfile(int index) {
-    Settings::values.input_profiles.erase(Settings::values.input_profiles.begin() + index);
-    Settings::LoadProfile(0);
-}
-
-void RenameCurrentProfile(std::string new_name) {
-    Settings::values.current_input_profile.name = std::move(new_name);
-}
-
 } // namespace Settings

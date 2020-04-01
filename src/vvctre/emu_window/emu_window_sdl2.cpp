@@ -15,6 +15,11 @@
 #include <imgui_impl_sdl.h>
 #include <imgui_stdlib.h>
 #include <portable-file-dialogs.h>
+#ifdef HAVE_CUBEB
+#include "audio_core/cubeb_input.h"
+#endif
+#include "audio_core/sink.h"
+#include "audio_core/sink_details.h"
 #include "common/file_util.h"
 #include "common/logging/log.h"
 #include "common/stb_image_write.h"
@@ -35,6 +40,7 @@
 #include "input_common/motion_emu.h"
 #include "input_common/sdl/sdl.h"
 #include "video_core/renderer_base.h"
+#include "video_core/renderer_opengl/post_processing_opengl.h"
 #include "video_core/renderer_opengl/texture_filters/texture_filter_manager.h"
 #include "video_core/video_core.h"
 #include "vvctre/emu_window/emu_window_sdl2.h"
@@ -142,8 +148,6 @@ void EmuWindow_SDL2::ToggleFullscreen() {
 
 EmuWindow_SDL2::EmuWindow_SDL2(Core::System& system, const char* arg0)
     : system(system), arg0(arg0) {
-    InputCommon::Init();
-
     const std::string window_title = fmt::format("vvctre {}", version::vvctre.to_string());
 
     render_window =
@@ -239,8 +243,10 @@ void EmuWindow_SDL2::SwapBuffers() {
 
         if (io.KeyCtrl && ImGui::IsKeyReleased(SDL_SCANCODE_D)) {
             Settings::values.dump_textures = !Settings::values.dump_textures;
-            messages.push_back(fmt::format(
-                "Dump Textures {}", Settings::values.dump_textures ? "enabled" : "disabled"));
+            pfd::message("vvctre",
+                         fmt::format("Dump Textures {}",
+                                     Settings::values.dump_textures ? "enabled" : "disabled"),
+                         pfd::choice::ok, pfd::icon::info);
         }
 
         if (ImGui::IsKeyPressed(SDL_SCANCODE_KP_MINUS)) {
@@ -269,7 +275,8 @@ void EmuWindow_SDL2::SwapBuffers() {
                         nfc->LoadAmiibo(data);
                     }
                 } else {
-                    messages.push_back("Failed to load the amiibo file");
+                    pfd::message("vvctre", "Failed to load the amiibo file", pfd::choice::ok,
+                                 pfd::icon::error);
                 }
             }
         }
@@ -481,22 +488,6 @@ void EmuWindow_SDL2::SwapBuffers() {
         ImGui::End();
     }
 
-    if (!messages.empty()) {
-        ImGui::OpenPopup("Messages");
-    }
-
-    ImGui::SetNextWindowSize(ImVec2(250.0f, 100.0f), ImGuiCond_Appearing);
-    if (ImGui::BeginPopupModal("Messages")) {
-        for (const auto& message : messages) {
-            ImGui::TextWrapped("%s\n\n", message.c_str());
-        }
-        if (ImGui::Button("OK")) {
-            messages.clear();
-            ImGui::CloseCurrentPopup();
-        }
-        ImGui::EndPopup();
-    }
-
     if (show_ipc_recorder_window) {
         if (ImGui::Begin("IPC Recorder", nullptr, ImGuiWindowFlags_NoSavedSettings)) {
             if (ImGui::Checkbox("Enabled", &ipc_recorder_enabled)) {
@@ -697,16 +688,46 @@ void EmuWindow_SDL2::SwapBuffers() {
                             .result();
 
                     if (!files.empty()) {
-                        for (const auto& file : files) {
-                            Service::AM::InstallCIA(file);
-                        }
+                        const std::vector<std::string> files =
+                            pfd::open_file("Install CIA", ".", {"CTR Importable Archive", "*.cia"},
+                                           true)
+                                .result();
 
                         auto am = Service::AM::GetModule(system);
-                        if (am != nullptr) {
-                            am->ScanForAllTitles();
-                        }
 
-                        messages.push_back("CIA installation finished");
+                        for (const auto& file : files) {
+                            const Service::AM::InstallStatus status = Service::AM::InstallCIA(file);
+
+                            switch (status) {
+                            case Service::AM::InstallStatus::Success:
+                                if (am != nullptr) {
+                                    am->ScanForAllTitles();
+                                }
+                                pfd::message("vvctre", fmt::format("{} installed", file),
+                                             pfd::choice::ok);
+                                break;
+                            case Service::AM::InstallStatus::ErrorFailedToOpenFile:
+                                pfd::message("vvctre", fmt::format("Failed to open {}", file),
+                                             pfd::choice::ok, pfd::icon::error);
+                                break;
+                            case Service::AM::InstallStatus::ErrorFileNotFound:
+                                pfd::message("vvctre", fmt::format("{} not found", file),
+                                             pfd::choice::ok, pfd::icon::error);
+                                break;
+                            case Service::AM::InstallStatus::ErrorAborted:
+                                pfd::message("vvctre", fmt::format("{} installation aborted", file),
+                                             pfd::choice::ok, pfd::icon::error);
+                                break;
+                            case Service::AM::InstallStatus::ErrorInvalid:
+                                pfd::message("vvctre", fmt::format("{} is invalid", file),
+                                             pfd::choice::ok, pfd::icon::error);
+                                break;
+                            case Service::AM::InstallStatus::ErrorEncrypted:
+                                pfd::message("vvctre", fmt::format("{} is encrypted", file),
+                                             pfd::choice::ok, pfd::icon::error);
+                                break;
+                            }
+                        }
                     }
                 }
 
@@ -728,7 +749,8 @@ void EmuWindow_SDL2::SwapBuffers() {
                                     nfc->LoadAmiibo(data);
                                 }
                             } else {
-                                messages.push_back("Failed to load the amiibo file");
+                                pfd::message("vvctre", "Failed to load the amiibo file",
+                                             pfd::choice::ok, pfd::icon::error);
                             }
                         }
                     }
@@ -795,6 +817,102 @@ void EmuWindow_SDL2::SwapBuffers() {
                         Settings::LogSettings();
                     }
 
+                    ImGui::Text("Sink");
+                    ImGui::SameLine();
+                    if (ImGui::BeginCombo("##sink", Settings::values.sink_id.c_str())) {
+                        if (ImGui::Selectable("auto")) {
+                            Settings::values.sink_id = "auto";
+                            Settings::Apply();
+                            Settings::LogSettings();
+                        }
+#ifdef HAVE_CUBEB
+                        if (ImGui::Selectable("cubeb")) {
+                            Settings::values.sink_id = "cubeb";
+                            Settings::Apply();
+                            Settings::LogSettings();
+                        }
+#endif
+                        if (ImGui::Selectable("sdl2")) {
+                            Settings::values.sink_id = "sdl2";
+                            Settings::Apply();
+                            Settings::LogSettings();
+                        }
+                        ImGui::EndCombo();
+                    }
+
+                    ImGui::Text("Device");
+                    ImGui::SameLine();
+                    if (ImGui::BeginCombo("##device", Settings::values.audio_device_id.c_str())) {
+                        if (ImGui::Selectable(AudioCore::auto_device_name)) {
+                            Settings::values.audio_device_id = AudioCore::auto_device_name;
+                        }
+
+                        for (const auto& device :
+                             AudioCore::GetDeviceListForSink(Settings::values.sink_id)) {
+                            if (ImGui::Selectable(device.c_str())) {
+                                Settings::values.audio_device_id = device;
+                                Settings::Apply();
+                                Settings::LogSettings();
+                            }
+                        }
+
+                        ImGui::EndCombo();
+                    }
+
+                    ImGui::Text("Microphone Input Type");
+                    ImGui::SameLine();
+                    if (ImGui::BeginCombo("##mic_input_type", [] {
+                            switch (Settings::values.mic_input_type) {
+                            case Settings::MicInputType::None:
+                                return "Disabled";
+                            case Settings::MicInputType::Real:
+                                return "Real Device";
+                            case Settings::MicInputType::Static:
+                                return "Static Noise";
+                            default:
+                                break;
+                            }
+
+                            return "Invalid";
+                        }())) {
+                        if (ImGui::Selectable("Disabled")) {
+                            Settings::values.mic_input_type = Settings::MicInputType::None;
+                            Settings::Apply();
+                            Settings::LogSettings();
+                        }
+                        if (ImGui::Selectable("Real Device")) {
+                            Settings::values.mic_input_type = Settings::MicInputType::Real;
+                            Settings::Apply();
+                            Settings::LogSettings();
+                        }
+                        if (ImGui::Selectable("Static Noise")) {
+                            Settings::values.mic_input_type = Settings::MicInputType::Static;
+                            Settings::Apply();
+                            Settings::LogSettings();
+                        }
+                        ImGui::EndCombo();
+                    }
+
+                    if (Settings::values.mic_input_type == Settings::MicInputType::Real) {
+                        ImGui::Text("Microphone Device");
+                        ImGui::SameLine();
+
+                        if (ImGui::BeginCombo("##microphonedevice",
+                                              Settings::values.mic_input_device.c_str())) {
+#ifdef HAVE_CUBEB
+                            for (const auto& device : AudioCore::ListCubebInputDevices()) {
+                                if (ImGui::Selectable(device.c_str())) {
+                                    Settings::values.mic_input_device = device;
+                                    Settings::Apply();
+                                    Settings::LogSettings();
+                                }
+                            }
+#endif
+
+                            ImGui::EndCombo();
+                        }
+                    }
+
                     ImGui::EndMenu();
                 }
 
@@ -848,6 +966,37 @@ void EmuWindow_SDL2::SwapBuffers() {
                                           ImGuiColorEditFlags_NoInputs)) {
                         VideoCore::g_renderer_bg_color_update_requested = true;
                         Settings::LogSettings();
+                    }
+
+                    ImGui::Text("Post Processing Shader");
+                    ImGui::SameLine();
+                    if (ImGui::BeginCombo("##postprocessingshader",
+                                          Settings::values.pp_shader_name.c_str())) {
+                        const auto shaders = OpenGL::GetPostProcessingShaderList(
+                            Settings::values.render_3d == Settings::StereoRenderOption::Anaglyph);
+
+                        if (Settings::values.render_3d == Settings::StereoRenderOption::Anaglyph &&
+                            ImGui::Selectable("dubois (builtin)")) {
+                            Settings::values.pp_shader_name = "dubois (builtin)";
+                        } else if (Settings::values.render_3d ==
+                                       Settings::StereoRenderOption::Interlaced &&
+                                   ImGui::Selectable("horizontal (builtin)")) {
+                            Settings::values.pp_shader_name = "horizontal (builtin)";
+                        } else if ((Settings::values.render_3d ==
+                                        Settings::StereoRenderOption::Off ||
+                                    Settings::values.render_3d ==
+                                        Settings::StereoRenderOption::SideBySide) &&
+                                   ImGui::Selectable("none (builtin)")) {
+                            Settings::values.pp_shader_name = "none (builtin)";
+                        }
+
+                        for (const auto& shader : shaders) {
+                            if (ImGui::Selectable(shader.c_str())) {
+                                Settings::values.pp_shader_name = shader;
+                            }
+                        }
+
+                        ImGui::EndCombo();
                     }
 
                     ImGui::Text("Texture Filter Name");
@@ -973,6 +1122,7 @@ void EmuWindow_SDL2::SwapBuffers() {
                             if (cam != nullptr) {
                                 cam->ReloadCameraDevices();
                             }
+                            Settings::LogSettings();
                         }
                         if (ImGui::Selectable("image")) {
                             Settings::values.camera_name[static_cast<std::size_t>(
@@ -981,6 +1131,7 @@ void EmuWindow_SDL2::SwapBuffers() {
                             if (cam != nullptr) {
                                 cam->ReloadCameraDevices();
                             }
+                            Settings::LogSettings();
                         }
                         ImGui::EndCombo();
                     }
@@ -994,6 +1145,7 @@ void EmuWindow_SDL2::SwapBuffers() {
                         if (cam != nullptr) {
                             cam->ReloadCameraDevices();
                         }
+                        Settings::LogSettings();
                     }
 
                     ImGui::Text("Outer Left Engine");
@@ -1010,6 +1162,7 @@ void EmuWindow_SDL2::SwapBuffers() {
                             if (cam != nullptr) {
                                 cam->ReloadCameraDevices();
                             }
+                            Settings::LogSettings();
                         }
                         if (ImGui::Selectable("image")) {
                             Settings::values.camera_name[static_cast<std::size_t>(
@@ -1018,6 +1171,7 @@ void EmuWindow_SDL2::SwapBuffers() {
                             if (cam != nullptr) {
                                 cam->ReloadCameraDevices();
                             }
+                            Settings::LogSettings();
                         }
                         ImGui::EndCombo();
                     }
@@ -1031,6 +1185,7 @@ void EmuWindow_SDL2::SwapBuffers() {
                         if (cam != nullptr) {
                             cam->ReloadCameraDevices();
                         }
+                        Settings::LogSettings();
                     }
 
                     ImGui::Text("Outer Right Engine");
@@ -1047,6 +1202,7 @@ void EmuWindow_SDL2::SwapBuffers() {
                             if (cam != nullptr) {
                                 cam->ReloadCameraDevices();
                             }
+                            Settings::LogSettings();
                         }
                         if (ImGui::Selectable("image")) {
                             Settings::values.camera_name[static_cast<std::size_t>(
@@ -1055,6 +1211,7 @@ void EmuWindow_SDL2::SwapBuffers() {
                             if (cam != nullptr) {
                                 cam->ReloadCameraDevices();
                             }
+                            Settings::LogSettings();
                         }
                         ImGui::EndCombo();
                     }
@@ -1068,6 +1225,7 @@ void EmuWindow_SDL2::SwapBuffers() {
                         if (cam != nullptr) {
                             cam->ReloadCameraDevices();
                         }
+                        Settings::LogSettings();
                     }
 
                     ImGui::EndMenu();
@@ -1259,37 +1417,102 @@ void EmuWindow_SDL2::SwapBuffers() {
 
                 ImGui::Separator();
                 if (ImGui::BeginMenu("Layout")) {
-                    if (ImGui::MenuItem("Default")) {
-                        Settings::values.layout_option = Settings::LayoutOption::Default;
-                        Settings::Apply();
-                        Settings::LogSettings();
-                    }
+                    if (!Settings::values.custom_layout) {
+                        if (ImGui::MenuItem("Default")) {
+                            Settings::values.layout_option = Settings::LayoutOption::Default;
+                            Settings::Apply();
+                            Settings::LogSettings();
+                        }
 
-                    if (ImGui::MenuItem("Single Screen")) {
-                        Settings::values.layout_option = Settings::LayoutOption::SingleScreen;
-                        Settings::Apply();
-                        Settings::LogSettings();
-                    }
+                        if (ImGui::MenuItem("Single Screen")) {
+                            Settings::values.layout_option = Settings::LayoutOption::SingleScreen;
+                            Settings::Apply();
+                            Settings::LogSettings();
+                        }
 
-                    if (ImGui::MenuItem("Large Screen")) {
-                        Settings::values.layout_option = Settings::LayoutOption::LargeScreen;
-                        Settings::Apply();
-                        Settings::LogSettings();
-                    }
+                        if (ImGui::MenuItem("Large Screen")) {
+                            Settings::values.layout_option = Settings::LayoutOption::LargeScreen;
+                            Settings::Apply();
+                            Settings::LogSettings();
+                        }
 
-                    if (ImGui::MenuItem("Side by Side")) {
-                        Settings::values.layout_option = Settings::LayoutOption::SideScreen;
-                        Settings::Apply();
-                        Settings::LogSettings();
-                    }
+                        if (ImGui::MenuItem("Side by Side")) {
+                            Settings::values.layout_option = Settings::LayoutOption::SideScreen;
+                            Settings::Apply();
+                            Settings::LogSettings();
+                        }
 
-                    if (ImGui::MenuItem("Medium Screen")) {
-                        Settings::values.layout_option = Settings::LayoutOption::MediumScreen;
-                        Settings::Apply();
-                        Settings::LogSettings();
+                        if (ImGui::MenuItem("Medium Screen")) {
+                            Settings::values.layout_option = Settings::LayoutOption::MediumScreen;
+                            Settings::Apply();
+                            Settings::LogSettings();
+                        }
+                    } else {
+                        ImGui::Text("Top Left");
+                        ImGui::SameLine();
+                        if (ImGui::InputScalar("##topleft", ImGuiDataType_U16,
+                                               &Settings::values.custom_top_left)) {
+                            Settings::Apply();
+                            Settings::LogSettings();
+                        }
+                        ImGui::Text("Top Top");
+                        ImGui::SameLine();
+                        if (ImGui::InputScalar("##toptop", ImGuiDataType_U16,
+                                               &Settings::values.custom_top_top)) {
+                            Settings::Apply();
+                            Settings::LogSettings();
+                        }
+                        ImGui::Text("Top Right");
+                        ImGui::SameLine();
+                        if (ImGui::InputScalar("##topright", ImGuiDataType_U16,
+                                               &Settings::values.custom_top_right)) {
+                            Settings::Apply();
+                            Settings::LogSettings();
+                        }
+                        ImGui::Text("Top Bottom");
+                        ImGui::SameLine();
+                        if (ImGui::InputScalar("##topbottom", ImGuiDataType_U16,
+                                               &Settings::values.custom_top_bottom)) {
+                            Settings::Apply();
+                            Settings::LogSettings();
+                        }
+                        ImGui::Text("Bottom Left");
+                        ImGui::SameLine();
+                        if (ImGui::InputScalar("##bottomleft", ImGuiDataType_U16,
+                                               &Settings::values.custom_bottom_left)) {
+                            Settings::Apply();
+                            Settings::LogSettings();
+                        }
+                        ImGui::Text("Bottom Top");
+                        ImGui::SameLine();
+                        if (ImGui::InputScalar("##bottomtop", ImGuiDataType_U16,
+                                               &Settings::values.custom_bottom_top)) {
+                            Settings::Apply();
+                            Settings::LogSettings();
+                        }
+                        ImGui::Text("Bottom Right");
+                        ImGui::SameLine();
+                        if (ImGui::InputScalar("##bottomright", ImGuiDataType_U16,
+                                               &Settings::values.custom_bottom_right)) {
+                            Settings::Apply();
+                            Settings::LogSettings();
+                        }
+                        ImGui::Text("Bottom Bottom");
+                        ImGui::SameLine();
+                        if (ImGui::InputScalar("##bottombottom", ImGuiDataType_U16,
+                                               &Settings::values.custom_bottom_bottom)) {
+                            Settings::Apply();
+                            Settings::LogSettings();
+                        }
                     }
 
                     ImGui::Separator();
+
+                    if (ImGui::MenuItem("Use Custom Layout", nullptr,
+                                        &Settings::values.custom_layout)) {
+                        Settings::Apply();
+                        Settings::LogSettings();
+                    }
 
                     if (ImGui::MenuItem("Swap Screens", nullptr, &Settings::values.swap_screen)) {
                         Settings::Apply();
@@ -1428,17 +1651,23 @@ void EmuWindow_SDL2::SwapBuffers() {
                             const auto movie_result = movie.ValidateMovie(filename[0]);
                             switch (movie_result) {
                             case Core::Movie::ValidationResult::OK:
-                                movie.StartPlayback(
-                                    filename[0], [&] { messages.push_back("Playback finished"); });
+                                movie.StartPlayback(filename[0], [&] {
+                                    pfd::message("vvctre", "Playback finished", pfd::choice::ok);
+                                });
                                 break;
                             case Core::Movie::ValidationResult::GameDismatch:
-                                messages.push_back(
-                                    "Movie was recorded using a ROM with a different program ID");
-                                movie.StartPlayback(
-                                    filename[0], [&] { messages.push_back("Playback finished"); });
+                                pfd::message(
+                                    "vvctre",
+                                    "Movie was recorded using a ROM with a different program ID",
+                                    pfd::choice::ok, pfd::icon::warning);
+                                movie.StartPlayback(filename[0], [&] {
+                                    pfd::message("vvctre", "Playback finished", pfd::choice::ok,
+                                                 pfd::icon::info);
+                                });
                                 break;
                             case Core::Movie::ValidationResult::Invalid:
-                                messages.push_back("Movie file doesn't have a valid header");
+                                pfd::message("vvctre", "Movie file doesn't have a valid header",
+                                             pfd::choice::ok, pfd::icon::info);
                                 break;
                             }
                         }
@@ -1457,7 +1686,7 @@ void EmuWindow_SDL2::SwapBuffers() {
                     if (ImGui::MenuItem("Stop Playback/Recording", nullptr, nullptr,
                                         movie.IsPlayingInput() || movie.IsRecordingInput())) {
                         movie.Shutdown();
-                        messages.push_back("Movie saved");
+                        pfd::message("vvctre", "Movie saved");
                     }
 
                     ImGui::EndMenu();

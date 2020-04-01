@@ -31,9 +31,6 @@
 #include "common/string_util.h"
 #include "common/version.h"
 #include "core/core.h"
-#include "core/file_sys/cia_container.h"
-#include "core/frontend/framebuffer_layout.h"
-#include "core/gdbstub/gdbstub.h"
 #include "core/hle/service/am/am.h"
 #include "core/hle/service/cfg/cfg.h"
 #include "core/loader/loader.h"
@@ -73,18 +70,14 @@ static void InitializeLogging() {
 }
 
 int main(int argc, char** argv) {
-    InitializeLogging();
-
-    LOG_INFO(Frontend, "Version: {}", version::vvctre.to_string());
-    LOG_INFO(Frontend, "Movie version: {}", version::movie);
-    LOG_INFO(Frontend, "Shader cache version: {}", version::shader_cache);
-    Settings::LogSettings();
+    InputCommon::Init();
 
     // Initialize SDL
-    if (SDL_Init(SDL_INIT_VIDEO) < 0) {
-        LOG_CRITICAL(Frontend, "Failed to initialize SDL2! Exiting...");
+    if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_JOYSTICK) < 0) {
+        std::cerr << "Failed to initialize SDL2! Exiting..." << std::endl;
         std::exit(1);
     }
+
     SDL_SetMainReady();
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
@@ -100,6 +93,12 @@ int main(int argc, char** argv) {
     if (Settings::values.file_path.empty()) {
         return 1;
     }
+
+    InitializeLogging();
+    LOG_INFO(Frontend, "Version: {}", version::vvctre.to_string());
+    LOG_INFO(Frontend, "Movie version: {}", version::movie);
+    LOG_INFO(Frontend, "Shader cache version: {}", version::shader_cache);
+    Settings::LogSettings();
 
     Common::DetachedTasks detached_tasks;
 
@@ -176,9 +175,8 @@ int main(int argc, char** argv) {
     }
 
     while (emu_window->IsOpen()) {
-        if (system.frontend_paused || system.rpc_paused || !emu_window->messages.empty()) {
-            while (emu_window->IsOpen() &&
-                   (system.frontend_paused || system.rpc_paused || !emu_window->messages.empty())) {
+        if (system.frontend_paused || system.rpc_paused) {
+            while (emu_window->IsOpen() && (system.frontend_paused || system.rpc_paused)) {
                 VideoCore::g_renderer->SwapBuffers();
                 SDL_GL_SetSwapInterval(1);
             }
@@ -190,7 +188,8 @@ int main(int argc, char** argv) {
             break;
         }
         case Core::System::ResultStatus::FatalError: {
-            emu_window->messages.push_back("Fatal error\nCheck the log for more details.");
+            pfd::message("vvctre", "Fatal error.\nCheck the log for more details.", pfd::choice::ok,
+                         pfd::icon::error);
             system.SetStatus(Core::System::ResultStatus::Success);
             break;
         }

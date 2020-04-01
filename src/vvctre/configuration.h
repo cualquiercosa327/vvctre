@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <string>
+#include <vector>
 #include <imgui.h>
 
 struct SDL_Window;
@@ -20,4 +22,6 @@ private:
 
     SDL_Window* render_window = nullptr;
     SDL_GLContext gl_context;
+
+    bool update_config_savegame = false;
 };

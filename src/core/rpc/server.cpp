@@ -25,34 +25,6 @@
 #include "video_core/renderer_base.h"
 #include "video_core/video_core.h"
 
-namespace Settings {
-
-void to_json(nlohmann::json& json, const InputProfile& profile) {
-    json = nlohmann::json{
-        {"name", profile.name},
-        {"buttons", profile.buttons},
-        {"analogs", profile.analogs},
-        {"motion_device", profile.motion_device},
-        {"touch_device", profile.touch_device},
-        {"udp_input_address", profile.udp_input_address},
-        {"udp_input_port", profile.udp_input_port},
-        {"udp_pad_index", profile.udp_pad_index},
-    };
-}
-
-void from_json(const nlohmann::json& json, InputProfile& profile) {
-    json.at("name").get_to(profile.name);
-    json.at("buttons").get_to(profile.buttons);
-    json.at("analogs").get_to(profile.analogs);
-    json.at("motion_device").get_to(profile.motion_device);
-    json.at("touch_device").get_to(profile.touch_device);
-    json.at("udp_input_address").get_to(profile.udp_input_address);
-    json.at("udp_input_port").get_to(profile.udp_input_port);
-    json.at("udp_pad_index").get_to(profile.udp_pad_index);
-}
-
-} // namespace Settings
-
 namespace Common {
 
 void to_json(nlohmann::json& json, const Vec3<float>& v) {
@@ -373,7 +345,8 @@ Server::Server(Core::System& system, const int port) {
 
         Common::Event done;
         std::vector<u8> data(layout.width * layout.height * 4);
-        if (VideoCore::RequestScreenshot(data.data(), [&] { done.Set(); }, layout)) {
+        if (VideoCore::RequestScreenshot(
+                data.data(), [&] { done.Set(); }, layout)) {
             res.status = 503;
             res.set_content("another screenshot is pending", "text/plain");
             return;
@@ -749,9 +722,13 @@ Server::Server(Core::System& system, const int port) {
     server->Get("/controls", [&](const httplib::Request& req, httplib::Response& res) {
         res.set_content(
             nlohmann::json{
-                {"current_profile_index", Settings::values.current_input_profile_index},
-                {"current_profile", Settings::values.current_input_profile},
-                {"profiles", Settings::values.input_profiles},
+                {"buttons", Settings::values.buttons},
+                {"analogs", Settings::values.analogs},
+                {"motion_device", Settings::values.motion_device},
+                {"touch_device", Settings::values.touch_device},
+                {"udp_input_address", Settings::values.udp_input_address},
+                {"udp_input_port", Settings::values.udp_input_port},
+                {"udp_pad_index", Settings::values.udp_pad_index},
             }
                 .dump(),
             "application/json");
@@ -760,23 +737,17 @@ Server::Server(Core::System& system, const int port) {
     server->Post("/controls", [&](const httplib::Request& req, httplib::Response& res) {
         try {
             const nlohmann::json json = nlohmann::json::parse(req.body);
-            const int current_profile_index = json["current_profile_index"].get<int>();
-            const std::vector<Settings::InputProfile> profiles =
-                json["profiles"].get<std::vector<Settings::InputProfile>>();
-            if ((current_profile_index < 0) ||
-                (current_profile_index > 0 &&
-                 (current_profile_index > static_cast<int>(profiles.size() - 1)))) {
-                res.status = 400;
-                res.set_content("current_profile_index out of range", "text/plain");
-            } else {
-                Settings::values.current_input_profile_index = current_profile_index;
-                Settings::values.current_input_profile =
-                    json["current_profile"].get<Settings::InputProfile>();
-                Settings::values.input_profiles = profiles;
-                Settings::Apply();
-
-                res.status = 204;
-            }
+            Settings::values.buttons =
+                json["buttons"].get<std::array<std::string, Settings::NativeButton::NumButtons>>();
+            Settings::values.analogs =
+                json["analogs"].get<std::array<std::string, Settings::NativeAnalog::NumAnalogs>>();
+            Settings::values.motion_device = json["motion_device"].get<std::string>();
+            Settings::values.touch_device = json["touch_device"].get<std::string>();
+            Settings::values.udp_input_address = json["udp_input_address"].get<std::string>();
+            Settings::values.udp_input_port = json["udp_input_port"].get<u16>();
+            Settings::values.udp_pad_index = json["udp_pad_index"].get<u8>();
+            Settings::Apply();
+            res.status = 204;
         } catch (nlohmann::json::exception& exception) {
             res.status = 500;
             res.set_content(exception.what(), "text/plain");
@@ -1114,7 +1085,8 @@ Server::Server(Core::System& system, const int port) {
         try {
             const nlohmann::json json = nlohmann::json::parse(req.body);
             Settings::values.sink_id = json["name"].get<std::string>();
-            Settings::Apply();Settings::LogSettings();
+            Settings::Apply();
+            Settings::LogSettings();
             res.status = 204;
         } catch (nlohmann::json::exception& exception) {
             res.status = 500;
@@ -1135,7 +1107,8 @@ Server::Server(Core::System& system, const int port) {
         try {
             const nlohmann::json json = nlohmann::json::parse(req.body);
             Settings::values.audio_device_id = json["value"].get<bool>();
-            Settings::Apply();Settings::LogSettings();
+            Settings::Apply();
+            Settings::LogSettings();
             res.status = 204;
         } catch (nlohmann::json::exception& exception) {
             res.status = 500;
@@ -1155,7 +1128,8 @@ Server::Server(Core::System& system, const int port) {
     server->Post("/audiovolume", [&](const httplib::Request& req, httplib::Response& res) {
         try {
             const nlohmann::json json = nlohmann::json::parse(req.body);
-            Settings::values.volume = json["value"].get<float>();Settings::LogSettings();
+            Settings::values.volume = json["value"].get<float>();
+            Settings::LogSettings();
             res.status = 204;
         } catch (nlohmann::json::exception& exception) {
             res.status = 500;
@@ -1175,7 +1149,8 @@ Server::Server(Core::System& system, const int port) {
     server->Post("/audiospeed", [&](const httplib::Request& req, httplib::Response& res) {
         try {
             const nlohmann::json json = nlohmann::json::parse(req.body);
-            Settings::values.audio_speed = json["value"].get<float>();Settings::LogSettings();
+            Settings::values.audio_speed = json["value"].get<float>();
+            Settings::LogSettings();
             res.status = 204;
         } catch (nlohmann::json::exception& exception) {
             res.status = 500;
@@ -1195,7 +1170,8 @@ Server::Server(Core::System& system, const int port) {
     server->Post("/usevirtualsdcard", [&](const httplib::Request& req, httplib::Response& res) {
         try {
             const nlohmann::json json = nlohmann::json::parse(req.body);
-            Settings::values.use_virtual_sd = json["enabled"].get<bool>();Settings::LogSettings();
+            Settings::values.use_virtual_sd = json["enabled"].get<bool>();
+            Settings::LogSettings();
             if (system.IsPoweredOn()) {
                 system.RequestReset();
             }
@@ -1218,7 +1194,8 @@ Server::Server(Core::System& system, const int port) {
     server->Post("/region", [&](const httplib::Request& req, httplib::Response& res) {
         try {
             const nlohmann::json json = nlohmann::json::parse(req.body);
-            Settings::values.region_value = json["value"].get<int>();Settings::LogSettings();
+            Settings::values.region_value = json["value"].get<int>();
+            Settings::LogSettings();
             if (system.IsPoweredOn()) {
                 system.RequestReset();
             }
@@ -1253,7 +1230,8 @@ Server::Server(Core::System& system, const int port) {
                                               : Settings::InitClock::FixedTime;
             if (Settings::values.init_clock == Settings::InitClock::FixedTime) {
                 Settings::values.init_time = json["unix_timestamp"].get<u64>();
-            }Settings::LogSettings();
+            }
+            Settings::LogSettings();
             if (system.IsPoweredOn()) {
                 system.RequestReset();
             }
@@ -1285,7 +1263,8 @@ Server::Server(Core::System& system, const int port) {
     server->Post("/logfilter", [&](const httplib::Request& req, httplib::Response& res) {
         try {
             const nlohmann::json json = nlohmann::json::parse(req.body);
-            Settings::values.log_filter = json["value"].get<std::string>();Settings::LogSettings();
+            Settings::values.log_filter = json["value"].get<std::string>();
+            Settings::LogSettings();
             Log::Filter log_filter(Log::Level::Debug);
             log_filter.ParseFilterString(Settings::values.log_filter);
             Log::SetGlobalFilter(log_filter);
@@ -1308,7 +1287,8 @@ Server::Server(Core::System& system, const int port) {
     server->Post("/recordframetimes", [&](const httplib::Request& req, httplib::Response& res) {
         try {
             const nlohmann::json json = nlohmann::json::parse(req.body);
-            Settings::values.record_frame_times = json["enabled"].get<bool>();Settings::LogSettings();
+            Settings::values.record_frame_times = json["enabled"].get<bool>();
+            Settings::LogSettings();
             res.status = 204;
         } catch (nlohmann::json::exception& exception) {
             res.status = 500;
@@ -1336,7 +1316,8 @@ Server::Server(Core::System& system, const int port) {
                 json["config"].get<std::array<std::string, Service::CAM::NumCameras>>();
             Settings::values.camera_flip =
                 json["flip"].get<std::array<int, Service::CAM::NumCameras>>();
-            Settings::Apply();Settings::LogSettings();
+            Settings::Apply();
+            Settings::LogSettings();
             res.status = 204;
         } catch (nlohmann::json::exception& exception) {
             res.status = 500;
@@ -1359,7 +1340,8 @@ Server::Server(Core::System& system, const int port) {
             const nlohmann::json json = nlohmann::json::parse(req.body);
             Settings::values.use_gdbstub = json["enabled"].get<bool>();
             Settings::values.gdbstub_port = json["port"].get<u16>();
-            Settings::Apply();Settings::LogSettings();
+            Settings::Apply();
+            Settings::LogSettings();
             res.status = 204;
         } catch (nlohmann::json::exception& exception) {
             res.status = 500;
@@ -1374,7 +1356,8 @@ Server::Server(Core::System& system, const int port) {
     server->Post("/llemodules", [&](const httplib::Request& req, httplib::Response& res) {
         try {
             const nlohmann::json json = nlohmann::json::parse(req.body);
-            Settings::values.lle_modules = json.get<std::unordered_map<std::string, bool>>();Settings::LogSettings();
+            Settings::values.lle_modules = json.get<std::unordered_map<std::string, bool>>();
+            Settings::LogSettings();
             if (system.IsPoweredOn()) {
                 system.RequestReset();
             }
@@ -1941,7 +1924,8 @@ Server::Server(Core::System& system, const int port) {
             const nlohmann::json json = nlohmann::json::parse(req.body);
             Settings::values.texture_filter_name = json["name"].get<std::string>();
             Settings::values.texture_filter_factor = json["factor"].get<u16>();
-            Settings::Apply();Settings::LogSettings();
+            Settings::Apply();
+            Settings::LogSettings();
             res.status = 204;
         } catch (nlohmann::json::exception& exception) {
             res.status = 500;
