@@ -10,7 +10,6 @@ Refer to the license.txt file included.
 | Out of the box multiplayer | No | Yes |
 | Scripting requests | Read/write memory | [Here](https://github.com/vvanelslande/vvctre/blob/master/RPC.md) |
 | Versions | Sequential number | [SemVer](https://semver.org/) |
-| CLI usage | [Here](https://github.com/citra-emu/citra/blob/master/src/citra/citra.cpp#L62) | [Here](https://github.com/vvanelslande/vvctre/issues/1) |
 
 # Portable Mode
 
@@ -44,6 +43,7 @@ Create a `user` folder where vvctre is.
 
 # Removed Features
 
+- Dump RomFS
 - System camera support
 - FFmpeg AAC decoder (WMF and FDK are easier to use)
 - Video dumper (very slow)

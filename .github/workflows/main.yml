@@ -103,16 +103,3 @@ jobs:
             vvctre ${{env.VERSION}} for ${{runner.os}} can now be downloaded from:
             https://github.com/${{github.repository}}/releases/tag/${{env.VERSION}}
           webhookUrl: ${{secrets.DISCORD_WEBHOOK}}
-      - name: Update CLI Usage issue
-        uses: actions/github-script@0.8.0
-        if: github.event_name == 'push' && runner.os == 'Linux'
-        with:
-          github-token: ${{secrets.GITHUB_TOKEN}}
-          script: |
-            const child_process = require('child_process');
-            github.issues.update({
-              owner: 'vvanelslande',
-              repo: 'vvctre',
-              issue_number: 1,
-              body: '```\n' + child_process.execSync('./build/bin/vvctre usage') + '\n```'
-            });
