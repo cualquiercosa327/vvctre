@@ -621,6 +621,9 @@ void Configuration::Run() {
                     ImGui::Checkbox("Use Custom Textures", &Settings::values.custom_textures);
                     ImGui::Checkbox("Preload Custom Textures", &Settings::values.preload_textures);
                     ImGui::Checkbox("Enable Linear Filtering", &Settings::values.filter_mode);
+                    if (ImGui::IsItemHovered()) {
+                        ImGui::SetTooltip("This is required for some shaders to work correctly");
+                    }
                     ImGui::Checkbox("Sharper Distant Objects",
                                     &Settings::values.sharper_distant_objects);
 
