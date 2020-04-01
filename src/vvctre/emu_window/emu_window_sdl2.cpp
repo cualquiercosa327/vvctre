@@ -140,26 +140,9 @@ void EmuWindow_SDL2::ToggleFullscreen() {
     }
 }
 
-EmuWindow_SDL2::EmuWindow_SDL2(Core::System& system, const bool fullscreen, const char* arg0)
+EmuWindow_SDL2::EmuWindow_SDL2(Core::System& system, const char* arg0)
     : system(system), arg0(arg0) {
-    // Initialize the window
-    if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_JOYSTICK) < 0) {
-        LOG_CRITICAL(Frontend, "Failed to initialize SDL2! Exiting...");
-        std::exit(1);
-    }
-
     InputCommon::Init();
-
-    SDL_SetMainReady();
-
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
-    SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
-    SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 8);
-    SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 8);
-    SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 8);
-    SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, 0);
 
     const std::string window_title = fmt::format("vvctre {}", version::vvctre.to_string());
 
@@ -175,7 +158,7 @@ EmuWindow_SDL2::EmuWindow_SDL2(Core::System& system, const bool fullscreen, cons
         std::exit(1);
     }
 
-    if (fullscreen) {
+    if (Settings::values.start_in_fullscreen_mode) {
         ToggleFullscreen();
     } else {
         SDL_SetWindowMinimumSize(render_window, Core::kScreenTopWidth,

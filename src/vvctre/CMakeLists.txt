@@ -14,12 +14,14 @@ add_executable(${PROJECT_NAME}
     camera/image.h
     camera/util.cpp
     camera/util.h
+    configuration.cpp
+    configuration.h
 )
 
 create_target_directory_groups(${PROJECT_NAME})
 
 target_link_libraries(${PROJECT_NAME} PRIVATE common core input_common)
-target_link_libraries(${PROJECT_NAME} PRIVATE glad clip clipp portable-file-dialogs indicators imgui ${PLATFORM_LIBRARIES} Threads::Threads)
+target_link_libraries(${PROJECT_NAME} PRIVATE glad clip portable-file-dialogs indicators imgui ${PLATFORM_LIBRARIES} Threads::Threads)
 
 if(UNIX)
     install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION "${CMAKE_INSTALL_PREFIX}/bin")

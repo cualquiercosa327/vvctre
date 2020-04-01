@@ -112,6 +112,5 @@ add_subdirectory(clip EXCLUDE_FROM_ALL)
 target_include_directories(clip INTERFACE ./clip)
 
 add_subdirectory(semver)
-add_subdirectory(clipp)
 add_subdirectory(easywsclient)
 add_subdirectory(indicators)

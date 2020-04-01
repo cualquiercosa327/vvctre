@@ -274,7 +274,7 @@ struct Values {
         {"SSL", false},
         {"PS", false},
         {"MCU", false},
-        // no HLE implementation
+        // No HLE implementation
         {"CDC", false},
         {"GPIO", false},
         {"I2C", false},
@@ -282,6 +282,13 @@ struct Values {
         {"PDN", false},
         {"SPI", false},
     };
+
+    // Used by the frontend
+    std::string file_path;
+    bool start_in_fullscreen_mode = false;
+    int rpc_server_port = 47889;
+    std::string play_movie;
+    std::string record_movie;
 } extern values;
 
 void Apply();
@@ -293,4 +300,5 @@ void SaveProfile(int index);
 void CreateProfile(std::string name);
 void DeleteProfile(int index);
 void RenameCurrentProfile(std::string new_name);
+
 } // namespace Settings

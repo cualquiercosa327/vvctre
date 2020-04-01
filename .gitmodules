@@ -37,9 +37,6 @@
 [submodule "zstd"]
     path = externals/zstd
     url = https://github.com/facebook/zstd.git
-[submodule "clipp"]
-    path = externals/clipp
-    url = https://github.com/muellan/clipp.git
 [submodule "indicators"]
     path = externals/indicators
     url = https://github.com/p-ranav/indicators.git
@@ -49,6 +46,3 @@
 [submodule "clip"]
     path = externals/clip
     url = https://github.com/dacap/clip.git
-[submodule "externals/clip"]
-	path = externals/clip
-	url = https://github.com/dacap/clip.git
