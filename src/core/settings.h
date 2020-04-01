@@ -221,7 +221,11 @@ struct Values {
     float audio_speed = 1.0f;
 
     // Camera
-    std::array<std::string, Service::CAM::NumCameras> camera_name;
+    std::array<std::string, Service::CAM::NumCameras> camera_name{
+        "blank",
+        "blank",
+        "blank",
+    };
     std::array<std::string, Service::CAM::NumCameras> camera_config;
     std::array<int, Service::CAM::NumCameras> camera_flip;
 
