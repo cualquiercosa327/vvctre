@@ -614,6 +614,8 @@ void Configuration::Run() {
                     } else {
                         ImGui::Checkbox("Use Shader JIT", &Settings::values.use_shader_jit);
                     }
+                    ImGui::Checkbox("Use Disk Shader Cache",
+                                    &Settings::values.use_disk_shader_cache);
                     ImGui::Checkbox("Enable VSync", &Settings::values.enable_vsync);
                     ImGui::Checkbox("Dump Textures", &Settings::values.dump_textures);
                     ImGui::Checkbox("Use Custom Textures", &Settings::values.custom_textures);
