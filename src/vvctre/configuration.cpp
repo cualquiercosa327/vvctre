@@ -1326,6 +1326,9 @@ void Configuration::Run() {
                 }
 
                 if (ImGui::BeginTabItem("Layout")) {
+                    ImGui::Text("Layout settings are not persistent.");
+                    ImGui::NewLine();
+
                     if (!Settings::values.custom_layout) {
                         ImGui::Text("Layout:");
                         ImGui::SameLine();
