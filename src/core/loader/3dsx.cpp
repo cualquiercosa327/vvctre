@@ -357,22 +357,4 @@ ResultStatus AppLoader_THREEDSX::ReadIcon(std::vector<u8>& buffer) {
     return ResultStatus::ErrorNotUsed;
 }
 
-ResultStatus AppLoader_THREEDSX::DumpRomFS(const std::string& target_path) {
-    std::shared_ptr<FileSys::RomFSReader> direct_romfs;
-    ResultStatus result = ReadRomFS(direct_romfs);
-
-    if (result != Loader::ResultStatus::Success) {
-        return result;
-    }
-
-    std::shared_ptr<FileSys::LayeredFS> layered_fs =
-        std::make_shared<FileSys::LayeredFS>(std::move(direct_romfs), "", "", false);
-
-    if (!layered_fs->DumpRomFS(target_path)) {
-        return ResultStatus::Error;
-    }
-
-    return ResultStatus::Success;
-}
-
 } // namespace Loader
