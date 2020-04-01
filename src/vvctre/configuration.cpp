@@ -611,9 +611,8 @@ void Configuration::Run() {
                     if (Settings::values.use_hw_shader) {
                         ImGui::Checkbox("Accurate Multiplication",
                                         &Settings::values.shaders_accurate_mul);
-                    } else {
-                        ImGui::Checkbox("Use Shader JIT", &Settings::values.use_shader_jit);
                     }
+                    ImGui::Checkbox("Use Shader JIT", &Settings::values.use_shader_jit);
                     ImGui::Checkbox("Use Disk Shader Cache",
                                     &Settings::values.use_disk_shader_cache);
                     ImGui::Checkbox("Enable VSync", &Settings::values.enable_vsync);
