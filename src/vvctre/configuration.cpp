@@ -978,6 +978,10 @@ void Configuration::Run() {
                         SetMapping(Settings::NativeButton::ZL,
                                    InputCommon::Polling::DeviceType::Button);
                     }
+                    if (ImGui::IsItemHovered()) {
+                        ImGui::SetTooltip(
+                            "If you're using a XInput controller, make sure it says Axis 2+.");
+                    }
 
                     ImGui::Text("ZR:");
                     ImGui::SameLine();
@@ -987,6 +991,10 @@ void Configuration::Run() {
                                 .c_str())) {
                         SetMapping(Settings::NativeButton::ZR,
                                    InputCommon::Polling::DeviceType::Button);
+                    }
+                    if (ImGui::IsItemHovered()) {
+                        ImGui::SetTooltip(
+                            "If you're using a XInput controller, make sure it says Axis 5+.");
                     }
 
                     ImGui::Text("Start:");
