@@ -610,7 +610,7 @@ void Configuration::Run() {
 
                     ImGui::Text("Sound output mode:");
                     ImGui::SameLine();
-                    if (ImGui::BeginCombo("##soundoutputmode", [] {
+                    if (ImGui::BeginCombo("##soundoutputmode", [&] {
                             switch (cfg->GetSoundOutputMode()) {
                             case Service::CFG::SoundOutputMode::SOUND_MONO:
                                 return "Mono";
@@ -641,7 +641,7 @@ void Configuration::Run() {
 
                     ImGui::Text("Country:");
                     ImGui::SameLine();
-                    if (ImGui::BeginCombo("##country", [] {
+                    if (ImGui::BeginCombo("##country", [&] {
                             switch (cfg->GetCountryCode()) {
                             case 1:
                                 return "Japan";

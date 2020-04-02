@@ -1431,7 +1431,7 @@ void EmuWindow_SDL2::SwapBuffers() {
 
                         ImGui::Text("Country:");
                         ImGui::SameLine();
-                        if (ImGui::BeginCombo("##country", [] {
+                        if (ImGui::BeginCombo("##country", [&] {
                                 switch (cfg->GetCountryCode()) {
                                 case 1:
                                     return "Japan";
