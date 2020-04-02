@@ -480,7 +480,7 @@ void Configuration::Run() {
                     ImGui::Text("System settings are persistent.");
                     ImGui::NewLine();
 
-                    ImGui::Text("Username");
+                    ImGui::Text("Username:");
                     ImGui::SameLine();
 
                     std::string username = Common::UTF16ToUTF8(cfg->GetUsername());
@@ -489,7 +489,7 @@ void Configuration::Run() {
                         cfg->UpdateConfigNANDSavegame();
                     }
 
-                    ImGui::Text("Birthday");
+                    ImGui::Text("Birthday:");
                     ImGui::SameLine();
 
                     auto [month, day] = cfg->GetBirthday();
@@ -508,13 +508,11 @@ void Configuration::Run() {
                         update_config_savegame = true;
                     }
 
-                    ImGui::Text("Language");
+                    ImGui::Text("Language:");
                     ImGui::SameLine();
 
-                    const Service::CFG::SystemLanguage language = cfg->GetSystemLanguage();
-
-                    if (ImGui::BeginCombo("##language", [&language] {
-                            switch (language) {
+                    if (ImGui::BeginCombo("##language", [&] {
+                            switch (cfg->GetSystemLanguage()) {
                             case Service::CFG::SystemLanguage::LANGUAGE_JP:
                                 return "Japanese";
                             case Service::CFG::SystemLanguage::LANGUAGE_EN:
