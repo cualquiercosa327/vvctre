@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <array>
 #include <atomic>
+#include <bitset>
 #include <cstring>
 #include <iterator>
 #include <memory>
@@ -670,6 +671,7 @@ bool CachedSurface::LoadCustomTexture(u64 tex_hash, Core::CustomTexInfo& tex_inf
 
 void CachedSurface::DumpTexture(GLuint target_tex, u64 tex_hash) {
     // Make sure the texture size is a power of 2
+    // If not, the surface is actually a framebuffer
     std::bitset<32> width_bits(width);
     std::bitset<32> height_bits(height);
 
