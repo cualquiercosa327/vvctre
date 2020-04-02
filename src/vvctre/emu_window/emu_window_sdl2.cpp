@@ -41,7 +41,7 @@
 #include "input_common/sdl/sdl.h"
 #include "video_core/renderer_base.h"
 #include "video_core/renderer_opengl/post_processing_opengl.h"
-#include "video_core/renderer_opengl/texture_filters/texture_filter_manager.h"
+#include "video_core/renderer_opengl/texture_filters/texture_filterer.h"
 #include "video_core/video_core.h"
 #include "vvctre/emu_window/emu_window_sdl2.h"
 
