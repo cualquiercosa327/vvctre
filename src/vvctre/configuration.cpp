@@ -221,7 +221,7 @@ void Configuration::Run() {
                                 return "Taiwan";
                             }
 
-                            return "Unknown";
+                            return "Invalid";
                         }()) {
                         if (ImGui::Selectable("Auto-select")) {
                             Settings::values.region_value = Settings::REGION_VALUE_AUTO_SELECT;
@@ -608,7 +608,38 @@ void Configuration::Run() {
                         ImGui::EndCombo();
                     }
 
-                    ImGui::Text("Play Coins");
+                    ImGui::Text("Sound output mode:");
+                    ImGui::SameLine();
+                    if (ImGui::BeginCombo("##soundoutputmode", [] {
+                            switch (cfg->GetSoundOutputMode()) {
+                            case Service::CFG::SoundOutputMode::SOUND_MONO:
+                                return "Mono";
+                            case Service::CFG::SoundOutputMode::SOUND_STEREO:
+                                return "Stereo";
+                            case Service::CFG::SoundOutputMode::SOUND_SURROUND:
+                                return "Surround";
+                            default:
+                                break;
+                            }
+
+                            return "Invalid";
+                        }())) {
+                        if (ImGui::Selectable("Mono")) {
+                            cfg->SetSoundOutputMode(Service::CFG::SoundOutputMode::SOUND_MONO);
+                            update_config_savegame = true;
+                        }
+                        if (ImGui::Selectable("Stereo")) {
+                            cfg->SetSoundOutputMode(Service::CFG::SoundOutputMode::SOUND_STEREO);
+                            update_config_savegame = true;
+                        }
+                        if (ImGui::Selectable("Surround")) {
+                            cfg->SetSoundOutputMode(Service::CFG::SoundOutputMode::SOUND_SURROUND);
+                            update_config_savegame = true;
+                        }
+                        ImGui::EndCombo();
+                    }
+
+                    ImGui::Text("Play Coins:");
                     ImGui::SameLine();
 
                     const u16 min = 0;

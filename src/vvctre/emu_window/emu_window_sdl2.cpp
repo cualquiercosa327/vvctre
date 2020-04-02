@@ -791,7 +791,7 @@ void EmuWindow_SDL2::SwapBuffers() {
                         Settings::LogSettings();
                     }
 
-                    ImGui::Text("Speed Limit");
+                    ImGui::Text("Speed Limit:");
                     ImGui::SameLine();
                     const u16 min = 1;
                     const u16 max = 500;
@@ -804,20 +804,20 @@ void EmuWindow_SDL2::SwapBuffers() {
                 }
 
                 if (ImGui::BeginMenu("Audio")) {
-                    ImGui::Text("Volume");
+                    ImGui::Text("Volume:");
                     ImGui::SameLine();
                     if (ImGui::SliderFloat("##volume", &Settings::values.volume, 0.0f, 1.0f)) {
                         Settings::LogSettings();
                     }
 
-                    ImGui::Text("Speed");
+                    ImGui::Text("Speed:");
                     ImGui::SameLine();
                     if (ImGui::SliderFloat("##speed", &Settings::values.audio_speed, 0.001f,
                                            5.0f)) {
                         Settings::LogSettings();
                     }
 
-                    ImGui::Text("Sink");
+                    ImGui::Text("Sink:");
                     ImGui::SameLine();
                     if (ImGui::BeginCombo("##sink", Settings::values.sink_id.c_str())) {
                         if (ImGui::Selectable("auto")) {
@@ -840,7 +840,7 @@ void EmuWindow_SDL2::SwapBuffers() {
                         ImGui::EndCombo();
                     }
 
-                    ImGui::Text("Device");
+                    ImGui::Text("Device:");
                     ImGui::SameLine();
                     if (ImGui::BeginCombo("##device", Settings::values.audio_device_id.c_str())) {
                         if (ImGui::Selectable(AudioCore::auto_device_name)) {
@@ -859,7 +859,7 @@ void EmuWindow_SDL2::SwapBuffers() {
                         ImGui::EndCombo();
                     }
 
-                    ImGui::Text("Microphone Input Type");
+                    ImGui::Text("Microphone Input Type:");
                     ImGui::SameLine();
                     if (ImGui::BeginCombo("##mic_input_type", [] {
                             switch (Settings::values.mic_input_type) {
@@ -894,7 +894,7 @@ void EmuWindow_SDL2::SwapBuffers() {
                     }
 
                     if (Settings::values.mic_input_type == Settings::MicInputType::Real) {
-                        ImGui::Text("Microphone Device");
+                        ImGui::Text("Microphone Device:");
                         ImGui::SameLine();
 
                         if (ImGui::BeginCombo("##microphonedevice",
@@ -949,7 +949,7 @@ void EmuWindow_SDL2::SwapBuffers() {
                         Settings::LogSettings();
                     }
 
-                    ImGui::Text("Resolution");
+                    ImGui::Text("Resolution:");
                     ImGui::SameLine();
                     const u16 min = 0;
                     const u16 max = 10;
@@ -960,7 +960,7 @@ void EmuWindow_SDL2::SwapBuffers() {
                         Settings::LogSettings();
                     }
 
-                    ImGui::Text("Background Color");
+                    ImGui::Text("Background Color:");
                     ImGui::SameLine();
                     if (ImGui::ColorEdit3("##backgroundcolor", &Settings::values.bg_red,
                                           ImGuiColorEditFlags_NoInputs)) {
@@ -968,7 +968,7 @@ void EmuWindow_SDL2::SwapBuffers() {
                         Settings::LogSettings();
                     }
 
-                    ImGui::Text("Post Processing Shader");
+                    ImGui::Text("Post Processing Shader:");
                     ImGui::SameLine();
                     if (ImGui::BeginCombo("##postprocessingshader",
                                           Settings::values.pp_shader_name.c_str())) {
@@ -978,28 +978,36 @@ void EmuWindow_SDL2::SwapBuffers() {
                         if (Settings::values.render_3d == Settings::StereoRenderOption::Anaglyph &&
                             ImGui::Selectable("dubois (builtin)")) {
                             Settings::values.pp_shader_name = "dubois (builtin)";
+                            Settings::Apply();
+                            Settings::LogSettings();
                         } else if (Settings::values.render_3d ==
                                        Settings::StereoRenderOption::Interlaced &&
                                    ImGui::Selectable("horizontal (builtin)")) {
                             Settings::values.pp_shader_name = "horizontal (builtin)";
+                            Settings::Apply();
+                            Settings::LogSettings();
                         } else if ((Settings::values.render_3d ==
                                         Settings::StereoRenderOption::Off ||
                                     Settings::values.render_3d ==
                                         Settings::StereoRenderOption::SideBySide) &&
                                    ImGui::Selectable("none (builtin)")) {
                             Settings::values.pp_shader_name = "none (builtin)";
+                            Settings::Apply();
+                            Settings::LogSettings();
                         }
 
                         for (const auto& shader : shaders) {
                             if (ImGui::Selectable(shader.c_str())) {
                                 Settings::values.pp_shader_name = shader;
+                                Settings::Apply();
+                                Settings::LogSettings();
                             }
                         }
 
                         ImGui::EndCombo();
                     }
 
-                    ImGui::Text("Texture Filter Name");
+                    ImGui::Text("Texture Filter Name:");
                     ImGui::SameLine();
                     if (ImGui::BeginCombo("##texturefiltername",
                                           Settings::values.texture_filter_name.c_str())) {
@@ -1016,7 +1024,7 @@ void EmuWindow_SDL2::SwapBuffers() {
                         ImGui::EndCombo();
                     }
 
-                    ImGui::Text("Texture Filter Factor");
+                    ImGui::Text("Texture Filter Factor:");
                     ImGui::SameLine();
                     if (ImGui::InputScalar("##texturefilterfactor", ImGuiDataType_U16,
                                            &Settings::values.texture_filter_factor)) {
@@ -1039,7 +1047,7 @@ void EmuWindow_SDL2::SwapBuffers() {
                         Settings::LogSettings();
                     }
 
-                    ImGui::Text("3D");
+                    ImGui::Text("3D:");
                     ImGui::SameLine();
 
                     if (ImGui::BeginCombo("##render_3d", [] {
@@ -1108,7 +1116,7 @@ void EmuWindow_SDL2::SwapBuffers() {
                 }
 
                 if (ImGui::BeginMenu("Camera")) {
-                    ImGui::Text("Inner Camera Engine");
+                    ImGui::Text("Inner Camera Engine:");
                     ImGui::SameLine();
                     if (ImGui::BeginCombo("##innerengine",
                                           Settings::values
@@ -1136,7 +1144,7 @@ void EmuWindow_SDL2::SwapBuffers() {
                         ImGui::EndCombo();
                     }
 
-                    ImGui::Text("Inner Camera Configuration");
+                    ImGui::Text("Inner Camera Configuration:");
                     ImGui::SameLine();
                     if (ImGui::InputText("##innerconfiguration",
                                          &Settings::values.camera_config[static_cast<std::size_t>(
@@ -1148,7 +1156,7 @@ void EmuWindow_SDL2::SwapBuffers() {
                         Settings::LogSettings();
                     }
 
-                    ImGui::Text("Outer Left Engine");
+                    ImGui::Text("Outer Left Engine:");
                     ImGui::SameLine();
                     if (ImGui::BeginCombo("##outerleftengine",
                                           Settings::values
@@ -1176,7 +1184,7 @@ void EmuWindow_SDL2::SwapBuffers() {
                         ImGui::EndCombo();
                     }
 
-                    ImGui::Text("Outer Left Configuration");
+                    ImGui::Text("Outer Left Configuration:");
                     ImGui::SameLine();
                     if (ImGui::InputText("##outerleftconfiguration",
                                          &Settings::values.camera_config[static_cast<std::size_t>(
@@ -1188,7 +1196,7 @@ void EmuWindow_SDL2::SwapBuffers() {
                         Settings::LogSettings();
                     }
 
-                    ImGui::Text("Outer Right Engine");
+                    ImGui::Text("Outer Right Engine:");
                     ImGui::SameLine();
                     if (ImGui::BeginCombo("##outerrightengine",
                                           Settings::values
@@ -1216,7 +1224,7 @@ void EmuWindow_SDL2::SwapBuffers() {
                         ImGui::EndCombo();
                     }
 
-                    ImGui::Text("Outer Right Configuration");
+                    ImGui::Text("Outer Right Configuration:");
                     ImGui::SameLine();
                     if (ImGui::InputText("##outerrightconfiguration",
                                          &Settings::values.camera_config[static_cast<std::size_t>(
@@ -1248,11 +1256,11 @@ void EmuWindow_SDL2::SwapBuffers() {
                     ImGui::EndMenu();
                 }
 
-                if (ImGui::BeginMenu("System (persistent)")) {
+                if (ImGui::BeginMenu("System")) {
                     auto cfg = Service::CFG::GetModule(system);
 
                     if (cfg != nullptr) {
-                        ImGui::Text("Username (changing will restart emulation)");
+                        ImGui::Text("Username (changing will restart emulation):");
                         ImGui::SameLine();
 
                         std::string username = Common::UTF16ToUTF8(cfg->GetUsername());
@@ -1262,7 +1270,7 @@ void EmuWindow_SDL2::SwapBuffers() {
                             system.RequestReset();
                         }
 
-                        ImGui::Text("Birthday (changing will restart emulation)");
+                        ImGui::Text("Birthday (changing will restart emulation):");
                         ImGui::SameLine();
 
                         auto [month, day] = cfg->GetBirthday();
@@ -1283,7 +1291,7 @@ void EmuWindow_SDL2::SwapBuffers() {
                             system.RequestReset();
                         }
 
-                        if (ImGui::BeginMenu("Language (changing will restart emulation)")) {
+                        if (ImGui::BeginMenu("Language (changing will restart emulation):")) {
                             const Service::CFG::SystemLanguage language = cfg->GetSystemLanguage();
 
                             if (ImGui::RadioButton("Japanese",
@@ -1384,9 +1392,45 @@ void EmuWindow_SDL2::SwapBuffers() {
 
                             ImGui::EndMenu();
                         }
+
+                        ImGui::Text("Sound output mode (changing will restart emulation):");
+                        ImGui::SameLine();
+                        if (ImGui::BeginCombo("##soundoutputmode", [] {
+                                switch (cfg->GetSoundOutputMode()) {
+                                case Service::CFG::SoundOutputMode::SOUND_MONO:
+                                    return "Mono";
+                                case Service::CFG::SoundOutputMode::SOUND_STEREO:
+                                    return "Stereo";
+                                case Service::CFG::SoundOutputMode::SOUND_SURROUND:
+                                    return "Surround";
+                                default:
+                                    break;
+                                }
+
+                                return "Invalid";
+                            }())) {
+                            if (ImGui::Selectable("Mono")) {
+                                cfg->SetSoundOutputMode(Service::CFG::SoundOutputMode::SOUND_MONO);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+                            if (ImGui::Selectable("Stereo")) {
+                                cfg->SetSoundOutputMode(
+                                    Service::CFG::SoundOutputMode::SOUND_STEREO);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+                            if (ImGui::Selectable("Surround")) {
+                                cfg->SetSoundOutputMode(
+                                    Service::CFG::SoundOutputMode::SOUND_SURROUND);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+                            ImGui::EndCombo();
+                        }
                     }
 
-                    ImGui::Text("Play Coins (may need to restart emulation)");
+                    ImGui::Text("Play Coins (may need to restart emulation):");
                     ImGui::SameLine();
 
                     const u16 min = 0;
