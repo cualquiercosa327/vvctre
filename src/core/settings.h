@@ -178,7 +178,6 @@ struct Values {
     u16 resolution_factor = 1;
     bool use_frame_limit = true;
     u16 frame_limit = 100;
-    u16 texture_filter_factor = 1;
     std::string texture_filter_name = "none";
     float bg_red = 0.0f;
     float bg_green = 0.0f;

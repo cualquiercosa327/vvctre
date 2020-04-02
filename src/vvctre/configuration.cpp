@@ -1588,11 +1588,6 @@ void Configuration::Run() {
                         ImGui::EndCombo();
                     }
 
-                    ImGui::Text("Texture Filter Factor");
-                    ImGui::SameLine();
-                    ImGui::InputScalar("##texturefilterfactor", ImGuiDataType_U16,
-                                       &Settings::values.texture_filter_factor);
-
                     ImGui::Text("3D");
                     ImGui::SameLine();
 

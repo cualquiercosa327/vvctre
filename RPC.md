@@ -1214,13 +1214,8 @@ Reloads cameras.
 
 # GET/POST /texturefilter
 
-Get or set texture filtering settings.
+Get or set the texture filter.
 
 ## Request/Reply
 
-```json
-{
-  "name": String"can be none, xBRZ freescale, Anime4K Ultrafast, or Bicubic",
-  "factor": Number
-}
-```
+can be none, xBRZ freescale, Anime4K Ultrafast, or Bicubic

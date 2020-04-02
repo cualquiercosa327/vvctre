@@ -1007,9 +1007,9 @@ void EmuWindow_SDL2::SwapBuffers() {
                         ImGui::EndCombo();
                     }
 
-                    ImGui::Text("Texture Filter Name:");
+                    ImGui::Text("Texture Filter:");
                     ImGui::SameLine();
-                    if (ImGui::BeginCombo("##texturefiltername",
+                    if (ImGui::BeginCombo("##texturefilter",
                                           Settings::values.texture_filter_name.c_str())) {
                         const auto& filters = OpenGL::TextureFilterManager::TextureFilterMap();
 
@@ -1022,14 +1022,6 @@ void EmuWindow_SDL2::SwapBuffers() {
                         }
 
                         ImGui::EndCombo();
-                    }
-
-                    ImGui::Text("Texture Filter Factor:");
-                    ImGui::SameLine();
-                    if (ImGui::InputScalar("##texturefilterfactor", ImGuiDataType_U16,
-                                           &Settings::values.texture_filter_factor)) {
-                        Settings::Apply();
-                        Settings::LogSettings();
                     }
 
                     if (ImGui::MenuItem("Dump Textures", nullptr,
