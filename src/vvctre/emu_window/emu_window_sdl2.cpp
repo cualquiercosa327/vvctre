@@ -767,7 +767,7 @@ void EmuWindow_SDL2::SwapBuffers() {
                     ImGui::EndMenu();
                 }
 
-                if (ImGui::MenuItem("Open Data Folder")) {
+                if (ImGui::MenuItem("Open User Folder")) {
 #ifdef _WIN32
                     const int code = std::system(
                         fmt::format("start {}", FileUtil::GetUserPath(FileUtil::UserPath::UserDir))
@@ -778,7 +778,7 @@ void EmuWindow_SDL2::SwapBuffers() {
                                                 FileUtil::GetUserPath(FileUtil::UserPath::UserDir))
                                         .c_str());
 #endif
-                    LOG_INFO(Frontend, "Opened data folder, exit code: {}", code);
+                    LOG_INFO(Frontend, "Opened user folder, exit code: {}", code);
                 }
 
                 ImGui::EndMenu();

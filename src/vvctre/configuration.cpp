@@ -83,7 +83,7 @@ Configuration::Configuration() {
 
 void Configuration::Run() {
     SDL_Event event;
-    auto cfg = std::make_shared<Service::CFG::Module>();
+    std::shared_ptr<Service::CFG::Module> cfg = std::make_shared<Service::CFG::Module>();
 
     for (;;) {
         // Poll events
@@ -197,6 +197,17 @@ void Configuration::Run() {
                             if (!record_movie.empty()) {
                                 Settings::values.record_movie = record_movie;
                             }
+                        }
+                    }
+
+                    ImGui::Text("User Folder: %s",
+                                FileUtil::GetUserPath(FileUtil::UserPath::UserDir).c_str());
+                    ImGui::SameLine();
+                    if (ImGui::Button("Browse...##userfolder")) {
+                        const std::string folder = pfd::select_folder("Select a folder").result();
+                        if (!folder.empty()) {
+                            FileUtil::SetUserPath(folder + '/');
+                            cfg = std::make_shared<Service::CFG::Module>();
                         }
                     }
 

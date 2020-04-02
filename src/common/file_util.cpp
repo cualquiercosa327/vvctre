@@ -653,14 +653,15 @@ void SetUserPath(const std::string& path) {
         }
 #endif
     }
-    g_paths.emplace(UserPath::SDMCDir, user_path + SDMC_DIR "/");
-    g_paths.emplace(UserPath::NANDDir, user_path + NAND_DIR "/");
-    g_paths.emplace(UserPath::SysDataDir, user_path + SYSDATA_DIR "/");
-    g_paths.emplace(UserPath::LogDir, user_path + LOG_DIR "/");
-    g_paths.emplace(UserPath::CheatsDir, user_path + CHEATS_DIR "/");
-    g_paths.emplace(UserPath::ShaderDir, user_path + SHADER_DIR "/");
-    g_paths.emplace(UserPath::DumpDir, user_path + DUMP_DIR "/");
-    g_paths.emplace(UserPath::LoadDir, user_path + LOAD_DIR "/");
+
+    g_paths[UserPath::SDMCDir] = user_path + SDMC_DIR "/";
+    g_paths[UserPath::NANDDir] = user_path + NAND_DIR "/";
+    g_paths[UserPath::SysDataDir] = user_path + SYSDATA_DIR "/";
+    g_paths[UserPath::LogDir] = user_path + LOG_DIR "/";
+    g_paths[UserPath::CheatsDir] = user_path + CHEATS_DIR "/";
+    g_paths[UserPath::ShaderDir] = user_path + SHADER_DIR "/";
+    g_paths[UserPath::DumpDir] = user_path + DUMP_DIR "/";
+    g_paths[UserPath::LoadDir] = user_path + LOAD_DIR "/";
 }
 
 const std::string& GetUserPath(UserPath path) {
