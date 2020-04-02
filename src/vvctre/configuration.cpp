@@ -17,6 +17,7 @@
 #ifdef HAVE_CUBEB
 #include "audio_core/cubeb_input.h"
 #endif
+#include <json.hpp>
 #include "audio_core/sink.h"
 #include "audio_core/sink_details.h"
 #include "common/file_util.h"
@@ -1654,8 +1655,58 @@ void Configuration::Run() {
                 }
 
                 if (ImGui::BeginTabItem("Controls")) {
-                    ImGui::Text("Controls settings are not persistent.");
-                    ImGui::NewLine();
+                    if (ImGui::Button("Load File")) {
+                        const std::vector<std::string> path =
+                            pfd::open_file("Load File", ".", {"JSON Files", "*.json"}).result();
+                        if (!path.empty()) {
+                            std::string contents;
+                            FileUtil::ReadFileToString(true, path[0], contents);
+
+                            try {
+                                const nlohmann::json json = nlohmann::json::parse(contents);
+                                Settings::values.buttons =
+                                    json["buttons"]
+                                        .get<std::array<std::string,
+                                                        Settings::NativeButton::NumButtons>>();
+                                Settings::values.analogs =
+                                    json["analogs"]
+                                        .get<std::array<std::string,
+                                                        Settings::NativeAnalog::NumAnalogs>>();
+                                Settings::values.motion_device =
+                                    json["motion_device"].get<std::string>();
+                                Settings::values.touch_device =
+                                    json["touch_device"].get<std::string>();
+                                Settings::values.udp_input_address =
+                                    json["udp_input_address"].get<std::string>();
+                                Settings::values.udp_input_port = json["udp_input_port"].get<u16>();
+                                Settings::values.udp_pad_index = json["udp_pad_index"].get<u8>();
+                            } catch (nlohmann::json::exception& exception) {
+                                pfd::message("JSON Exception", exception.what());
+                            }
+                        }
+                    }
+                    ImGui::SameLine();
+                    if (ImGui::Button("Save File")) {
+                        const std::string path =
+                            pfd::save_file("Save File", "controls.json", {"JSON Files", "*.json"})
+                                .result();
+
+                        if (!path.empty()) {
+                            const std::string json =
+                                nlohmann::json{
+                                    {"buttons", Settings::values.buttons},
+                                    {"analogs", Settings::values.analogs},
+                                    {"motion_device", Settings::values.motion_device},
+                                    {"touch_device", Settings::values.touch_device},
+                                    {"udp_input_address", Settings::values.udp_input_address},
+                                    {"udp_input_port", Settings::values.udp_input_port},
+                                    {"udp_pad_index", Settings::values.udp_pad_index},
+                                }
+                                    .dump();
+
+                            FileUtil::WriteStringToFile(true, path, json);
+                        }
+                    }
 
                     const auto SetMapping = [&](const auto native_id,
                                                 InputCommon::Polling::DeviceType device_type) {
