@@ -201,7 +201,7 @@ void Configuration::Run() {
 
                     ImGui::Text("Region:");
                     ImGui::SameLine();
-                    if (ImGui::BeginCombo("##region"), [] {
+                    if (ImGui::BeginCombo("##region"), [&] {
                             switch (Settings::values.region_value) {
                             case -1:
                                 return "Auto-select";

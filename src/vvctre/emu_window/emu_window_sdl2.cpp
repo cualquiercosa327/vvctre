@@ -1395,7 +1395,7 @@ void EmuWindow_SDL2::SwapBuffers() {
 
                         ImGui::Text("Sound output mode (changing will restart emulation):");
                         ImGui::SameLine();
-                        if (ImGui::BeginCombo("##soundoutputmode", [] {
+                        if (ImGui::BeginCombo("##soundoutputmode", [&] {
                                 switch (cfg->GetSoundOutputMode()) {
                                 case Service::CFG::SoundOutputMode::SOUND_MONO:
                                     return "Mono";
