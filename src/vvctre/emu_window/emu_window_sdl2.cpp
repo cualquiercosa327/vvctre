@@ -1428,6 +1428,950 @@ void EmuWindow_SDL2::SwapBuffers() {
                             }
                             ImGui::EndCombo();
                         }
+
+                        ImGui::Text("Country:");
+                        ImGui::SameLine();
+                        if (ImGui::BeginCombo("##country", [] {
+                                switch (cfg->GetCountryCode()) {
+                                case 1:
+                                    return "Japan";
+                                case 8:
+                                    return "Anguilla";
+                                case 9:
+                                    return "Antigua and Barbuda";
+                                case 10:
+                                    return "Argentina";
+                                case 11:
+                                    return "Aruba";
+                                case 12:
+                                    return "Bahamas";
+                                case 13:
+                                    return "Barbados";
+                                case 14:
+                                    return "Belize";
+                                case 15:
+                                    return "Bolivia";
+                                case 16:
+                                    return "Brazil";
+                                case 17:
+                                    return "British Virgin Islands";
+                                case 18:
+                                    return "Canada";
+                                case 19:
+                                    return "Cayman Islands";
+                                case 20:
+                                    return "Chile";
+                                case 21:
+                                    return "Colombia";
+                                case 22:
+                                    return "Costa Rica";
+                                case 23:
+                                    return "Dominica";
+                                case 24:
+                                    return "Dominican Republic";
+                                case 25:
+                                    return "Ecuador";
+                                case 26:
+                                    return "El Salvador";
+                                case 27:
+                                    return "French Guiana";
+                                case 28:
+                                    return "Grenada";
+                                case 29:
+                                    return "Guadeloupe";
+                                case 30:
+                                    return "Guatemala";
+                                case 31:
+                                    return "Guyana";
+                                case 32:
+                                    return "Haiti";
+                                case 33:
+                                    return "Honduras";
+                                case 34:
+                                    return "Jamaica";
+                                case 35:
+                                    return "Martinique";
+                                case 36:
+                                    return "Mexico";
+                                case 37:
+                                    return "Montserrat";
+                                case 38:
+                                    return "Netherlands Antilles";
+                                case 39:
+                                    return "Nicaragua";
+                                case 40:
+                                    return "Panama";
+                                case 41:
+                                    return "Paraguay";
+                                case 42:
+                                    return "Peru";
+                                case 43:
+                                    return "Saint Kitts and Nevis";
+                                case 44:
+                                    return "Saint Lucia";
+                                case 45:
+                                    return "Saint Vincent and the Grenadines";
+                                case 46:
+                                    return "Suriname";
+                                case 47:
+                                    return "Trinidad and Tobago";
+                                case 48:
+                                    return "Turks and Caicos Islands";
+                                case 49:
+                                    return "United States";
+                                case 50:
+                                    return "Uruguay";
+                                case 51:
+                                    return "US Virgin Islands";
+                                case 52:
+                                    return "Venezuela";
+                                case 64:
+                                    return "Albania";
+                                case 65:
+                                    return "Australia";
+                                case 66:
+                                    return "Austria";
+                                case 67:
+                                    return "Belgium";
+                                case 68:
+                                    return "Bosnia and Herzegovina";
+                                case 69:
+                                    return "Botswana";
+                                case 70:
+                                    return "Bulgaria";
+                                case 71:
+                                    return "Croatia";
+                                case 72:
+                                    return "Cyprus";
+                                case 73:
+                                    return "Czech Republic";
+                                case 74:
+                                    return "Denmark";
+                                case 75:
+                                    return "Estonia";
+                                case 76:
+                                    return "Finland";
+                                case 77:
+                                    return "France";
+                                case 78:
+                                    return "Germany";
+                                case 79:
+                                    return "Greece";
+                                case 80:
+                                    return "Hungary";
+                                case 81:
+                                    return "Iceland";
+                                case 82:
+                                    return "Ireland";
+                                case 83:
+                                    return "Italy";
+                                case 84:
+                                    return "Latvia";
+                                case 85:
+                                    return "Lesotho";
+                                case 86:
+                                    return "Liechtenstein";
+                                case 87:
+                                    return "Lithuania";
+                                case 88:
+                                    return "Luxembourg";
+                                case 89:
+                                    return "Macedonia";
+                                case 90:
+                                    return "Malta";
+                                case 91:
+                                    return "Montenegro";
+                                case 92:
+                                    return "Mozambique";
+                                case 93:
+                                    return "Namibia";
+                                case 94:
+                                    return "Netherlands";
+                                case 95:
+                                    return "New Zealand";
+                                case 96:
+                                    return "Norway";
+                                case 97:
+                                    return "Poland";
+                                case 98:
+                                    return "Portugal";
+                                case 99:
+                                    return "Romania";
+                                case 100:
+                                    return "Russia";
+                                case 101:
+                                    return "Serbia";
+                                case 102:
+                                    return "Slovakia";
+                                case 103:
+                                    return "Slovenia";
+                                case 104:
+                                    return "South Africa";
+                                case 105:
+                                    return "Spain";
+                                case 106:
+                                    return "Swaziland";
+                                case 107:
+                                    return "Sweden";
+                                case 108:
+                                    return "Switzerland";
+                                case 109:
+                                    return "Turkey";
+                                case 110:
+                                    return "United Kingdom";
+                                case 111:
+                                    return "Zambia";
+                                case 112:
+                                    return "Zimbabwe";
+                                case 113:
+                                    return "Azerbaijan";
+                                case 114:
+                                    return "Mauritania";
+                                case 115:
+                                    return "Mali";
+                                case 116:
+                                    return "Niger";
+                                case 117:
+                                    return "Chad";
+                                case 118:
+                                    return "Sudan";
+                                case 119:
+                                    return "Eritrea";
+                                case 120:
+                                    return "Djibouti";
+                                case 121:
+                                    return "Somalia";
+                                case 122:
+                                    return "Andorra";
+                                case 123:
+                                    return "Gibraltar";
+                                case 124:
+                                    return "Guernsey";
+                                case 125:
+                                    return "Isle of Man";
+                                case 126:
+                                    return "Jersey";
+                                case 127:
+                                    return "Monaco";
+                                case 128:
+                                    return "Taiwan";
+                                case 136:
+                                    return "South Korea";
+                                case 144:
+                                    return "Hong Kong";
+                                case 145:
+                                    return "Macau";
+                                case 152:
+                                    return "Indonesia";
+                                case 153:
+                                    return "Singapore";
+                                case 154:
+                                    return "Thailand";
+                                case 155:
+                                    return "Philippines";
+                                case 156:
+                                    return "Malaysia";
+                                case 160:
+                                    return "China";
+                                case 168:
+                                    return "United Arab Emirates";
+                                case 169:
+                                    return "India";
+                                case 170:
+                                    return "Egypt";
+                                case 171:
+                                    return "Oman";
+                                case 172:
+                                    return "Qatar";
+                                case 173:
+                                    return "Kuwait";
+                                case 174:
+                                    return "Saudi Arabia";
+                                case 175:
+                                    return "Syria";
+                                case 176:
+                                    return "Bahrain";
+                                case 177:
+                                    return "Jordan";
+                                case 184:
+                                    return "San Marino";
+                                case 185:
+                                    return "Vatican City";
+                                case 186:
+                                    return "Bermuda";
+                                default:
+                                    break;
+                                }
+
+                                return "Invalid";
+                            }())) {
+                            if (ImGui::Selectable("Japan")) {
+                                cfg->SetCountryCode(1);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+                            if (ImGui::Selectable("Anguilla")) {
+                                cfg->SetCountryCode(8);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+                            if (ImGui::Selectable("Antigua and Barbuda")) {
+                                cfg->SetCountryCode(9);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+                            if (ImGui::Selectable("Argentina")) {
+                                cfg->SetCountryCode(10);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+                            if (ImGui::Selectable("Aruba")) {
+                                cfg->SetCountryCode(11);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+                            if (ImGui::Selectable("Bahamas")) {
+                                cfg->SetCountryCode(12);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+                            if (ImGui::Selectable("Barbados")) {
+                                cfg->SetCountryCode(13);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+                            if (ImGui::Selectable("Belize")) {
+                                cfg->SetCountryCode(14);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+                            if (ImGui::Selectable("Bolivia")) {
+                                cfg->SetCountryCode(15);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+                            if (ImGui::Selectable("Brazil")) {
+                                cfg->SetCountryCode(16);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+                            if (ImGui::Selectable("British Virgin Islands")) {
+                                cfg->SetCountryCode(17);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+                            if (ImGui::Selectable("Canada")) {
+                                cfg->SetCountryCode(18);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+                            if (ImGui::Selectable("Cayman Islands")) {
+                                cfg->SetCountryCode(19);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+                            if (ImGui::Selectable("Chile")) {
+                                cfg->SetCountryCode(20);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+                            if (ImGui::Selectable("Colombia")) {
+                                cfg->SetCountryCode(21);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+                            if (ImGui::Selectable("Costa Rica")) {
+                                cfg->SetCountryCode(22);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+                            if (ImGui::Selectable("Dominica")) {
+                                cfg->SetCountryCode(23);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+                            if (ImGui::Selectable("Dominican Republic")) {
+                                cfg->SetCountryCode(24);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+                            if (ImGui::Selectable("Ecuador")) {
+                                cfg->SetCountryCode(25);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+                            if (ImGui::Selectable("El Salvador")) {
+                                cfg->SetCountryCode(26);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+                            if (ImGui::Selectable("French Guiana")) {
+                                cfg->SetCountryCode(27);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+                            if (ImGui::Selectable("Grenada")) {
+                                cfg->SetCountryCode(28);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+                            if (ImGui::Selectable("Guadeloupe")) {
+                                cfg->SetCountryCode(29);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+                            if (ImGui::Selectable("Guatemala")) {
+                                cfg->SetCountryCode(30);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+                            if (ImGui::Selectable("Guyana")) {
+                                cfg->SetCountryCode(31);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+                            if (ImGui::Selectable("Haiti")) {
+                                cfg->SetCountryCode(32);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+                            if (ImGui::Selectable("Honduras")) {
+                                cfg->SetCountryCode(33);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+                            if (ImGui::Selectable("Jamaica")) {
+                                cfg->SetCountryCode(34);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+                            if (ImGui::Selectable("Martinique")) {
+                                cfg->SetCountryCode(35);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+                            if (ImGui::Selectable("Mexico")) {
+                                cfg->SetCountryCode(36);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+                            if (ImGui::Selectable("Montserrat")) {
+                                cfg->SetCountryCode(37);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+                            if (ImGui::Selectable("Netherlands Antilles")) {
+                                cfg->SetCountryCode(38);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+                            if (ImGui::Selectable("Nicaragua")) {
+                                cfg->SetCountryCode(39);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+                            if (ImGui::Selectable("Panama")) {
+                                cfg->SetCountryCode(40);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+                            if (ImGui::Selectable("Paraguay")) {
+                                cfg->SetCountryCode(41);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+                            if (ImGui::Selectable("Peru")) {
+                                cfg->SetCountryCode(42);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+                            if (ImGui::Selectable("Saint Kitts and Nevis")) {
+                                cfg->SetCountryCode(43);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+                            if (ImGui::Selectable("Saint Lucia")) {
+                                cfg->SetCountryCode(44);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+                            if (ImGui::Selectable("Saint Vincent and the Grenadines")) {
+                                cfg->SetCountryCode(45);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+                            if (ImGui::Selectable("Suriname")) {
+                                cfg->SetCountryCode(46);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+                            if (ImGui::Selectable("Trinidad and Tobago")) {
+                                cfg->SetCountryCode(47);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+                            if (ImGui::Selectable("Turks and Caicos Islands")) {
+                                cfg->SetCountryCode(48);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+                            if (ImGui::Selectable("United States")) {
+                                cfg->SetCountryCode(49);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+                            if (ImGui::Selectable("Uruguay")) {
+                                cfg->SetCountryCode(50);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+                            if (ImGui::Selectable("US Virgin Islands")) {
+                                cfg->SetCountryCode(51);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+                            if (ImGui::Selectable("Venezuela")) {
+                                cfg->SetCountryCode(52);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+                            if (ImGui::Selectable("Albania")) {
+                                cfg->SetCountryCode(64);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+                            if (ImGui::Selectable("Australia")) {
+                                cfg->SetCountryCode(65);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+                            if (ImGui::Selectable("Austria")) {
+                                cfg->SetCountryCode(66);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+                            if (ImGui::Selectable("Belgium")) {
+                                cfg->SetCountryCode(67);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+                            if (ImGui::Selectable("Bosnia and Herzegovina")) {
+                                cfg->SetCountryCode(68);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+                            if (ImGui::Selectable("Botswana")) {
+                                cfg->SetCountryCode(69);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+                            if (ImGui::Selectable("Bulgaria")) {
+                                cfg->SetCountryCode(70);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+                            if (ImGui::Selectable("Croatia")) {
+                                cfg->SetCountryCode(71);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+                            if (ImGui::Selectable("Cyprus")) {
+                                cfg->SetCountryCode(72);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+                            if (ImGui::Selectable("Czech Republic")) {
+                                cfg->SetCountryCode(73);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+                            if (ImGui::Selectable("Denmark")) {
+                                cfg->SetCountryCode(74);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+                            if (ImGui::Selectable("Estonia")) {
+                                cfg->SetCountryCode(75);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+                            if (ImGui::Selectable("Finland")) {
+                                cfg->SetCountryCode(76);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+                            if (ImGui::Selectable("France")) {
+                                cfg->SetCountryCode(77);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+                            if (ImGui::Selectable("Germany")) {
+                                cfg->SetCountryCode(78);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+                            if (ImGui::Selectable("Greece")) {
+                                cfg->SetCountryCode(79);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+                            if (ImGui::Selectable("Hungary")) {
+                                cfg->SetCountryCode(80);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+                            if (ImGui::Selectable("Iceland")) {
+                                cfg->SetCountryCode(81);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+                            if (ImGui::Selectable("Ireland")) {
+                                cfg->SetCountryCode(82);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+                            if (ImGui::Selectable("Italy")) {
+                                cfg->SetCountryCode(83);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+                            if (ImGui::Selectable("Latvia")) {
+                                cfg->SetCountryCode(84);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+                            if (ImGui::Selectable("Lesotho")) {
+                                cfg->SetCountryCode(85);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+                            if (ImGui::Selectable("Liechtenstein")) {
+                                cfg->SetCountryCode(86);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+                            if (ImGui::Selectable("Lithuania")) {
+                                cfg->SetCountryCode(87);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+                            if (ImGui::Selectable("Luxembourg")) {
+                                cfg->SetCountryCode(88);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+                            if (ImGui::Selectable("Macedonia")) {
+                                cfg->SetCountryCode(89);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+                            if (ImGui::Selectable("Malta")) {
+                                cfg->SetCountryCode(90);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+                            if (ImGui::Selectable("Montenegro")) {
+                                cfg->SetCountryCode(91);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+                            if (ImGui::Selectable("Mozambique")) {
+                                cfg->SetCountryCode(92);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+                            if (ImGui::Selectable("Namibia")) {
+                                cfg->SetCountryCode(93);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+                            if (ImGui::Selectable("Netherlands")) {
+                                cfg->SetCountryCode(94);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+                            if (ImGui::Selectable("New Zealand")) {
+                                cfg->SetCountryCode(95);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+                            if (ImGui::Selectable("Norway")) {
+                                cfg->SetCountryCode(96);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+                            if (ImGui::Selectable("Poland")) {
+                                cfg->SetCountryCode(97);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+                            if (ImGui::Selectable("Portugal")) {
+                                cfg->SetCountryCode(98);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+                            if (ImGui::Selectable("Romania")) {
+                                cfg->SetCountryCode(99);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+                            if (ImGui::Selectable("Russia")) {
+                                cfg->SetCountryCode(100);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+                            if (ImGui::Selectable("Serbia")) {
+                                cfg->SetCountryCode(101);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+                            if (ImGui::Selectable("Slovakia")) {
+                                cfg->SetCountryCode(102);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+                            if (ImGui::Selectable("Slovenia")) {
+                                cfg->SetCountryCode(103);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+                            if (ImGui::Selectable("South Africa")) {
+                                cfg->SetCountryCode(104);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+                            if (ImGui::Selectable("Spain")) {
+                                cfg->SetCountryCode(105);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+                            if (ImGui::Selectable("Swaziland")) {
+                                cfg->SetCountryCode(106);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+                            if (ImGui::Selectable("Sweden")) {
+                                cfg->SetCountryCode(107);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+                            if (ImGui::Selectable("Switzerland")) {
+                                cfg->SetCountryCode(108);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+                            if (ImGui::Selectable("Turkey")) {
+                                cfg->SetCountryCode(109);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+                            if (ImGui::Selectable("United Kingdom")) {
+                                cfg->SetCountryCode(110);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+                            if (ImGui::Selectable("Zambia")) {
+                                cfg->SetCountryCode(111);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+                            if (ImGui::Selectable("Zimbabwe")) {
+                                cfg->SetCountryCode(112);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+                            if (ImGui::Selectable("Azerbaijan")) {
+                                cfg->SetCountryCode(113);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+                            if (ImGui::Selectable("Mauritania")) {
+                                cfg->SetCountryCode(114);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+                            if (ImGui::Selectable("Mali")) {
+                                cfg->SetCountryCode(115);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+                            if (ImGui::Selectable("Niger")) {
+                                cfg->SetCountryCode(116);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+                            if (ImGui::Selectable("Chad")) {
+                                cfg->SetCountryCode(117);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+                            if (ImGui::Selectable("Sudan")) {
+                                cfg->SetCountryCode(118);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+                            if (ImGui::Selectable("Eritrea")) {
+                                cfg->SetCountryCode(119);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+                            if (ImGui::Selectable("Djibouti")) {
+                                cfg->SetCountryCode(120);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+                            if (ImGui::Selectable("Somalia")) {
+                                cfg->SetCountryCode(121);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+                            if (ImGui::Selectable("Andorra")) {
+                                cfg->SetCountryCode(122);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+                            if (ImGui::Selectable("Gibraltar")) {
+                                cfg->SetCountryCode(123);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+                            if (ImGui::Selectable("Guernsey")) {
+                                cfg->SetCountryCode(124);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+                            if (ImGui::Selectable("Isle of Man")) {
+                                cfg->SetCountryCode(125);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+                            if (ImGui::Selectable("Jersey")) {
+                                cfg->SetCountryCode(126);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+                            if (ImGui::Selectable("Monaco")) {
+                                cfg->SetCountryCode(127);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+                            if (ImGui::Selectable("Taiwan")) {
+                                cfg->SetCountryCode(128);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+                            if (ImGui::Selectable("South Korea")) {
+                                cfg->SetCountryCode(136);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+                            if (ImGui::Selectable("Hong Kong")) {
+                                cfg->SetCountryCode(144);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+                            if (ImGui::Selectable("Macau")) {
+                                cfg->SetCountryCode(145);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+                            if (ImGui::Selectable("Indonesia")) {
+                                cfg->SetCountryCode(152);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+                            if (ImGui::Selectable("Singapore")) {
+                                cfg->SetCountryCode(153);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+                            if (ImGui::Selectable("Thailand")) {
+                                cfg->SetCountryCode(154);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+                            if (ImGui::Selectable("Philippines")) {
+                                cfg->SetCountryCode(155);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+                            if (ImGui::Selectable("Malaysia")) {
+                                cfg->SetCountryCode(156);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+                            if (ImGui::Selectable("China")) {
+                                cfg->SetCountryCode(160);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+                            if (ImGui::Selectable("United Arab Emirates")) {
+                                cfg->SetCountryCode(168);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+                            if (ImGui::Selectable("India")) {
+                                cfg->SetCountryCode(169);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+                            if (ImGui::Selectable("Egypt")) {
+                                cfg->SetCountryCode(170);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+                            if (ImGui::Selectable("Oman")) {
+                                cfg->SetCountryCode(171);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+                            if (ImGui::Selectable("Qatar")) {
+                                cfg->SetCountryCode(172);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+                            if (ImGui::Selectable("Kuwait")) {
+                                cfg->SetCountryCode(173);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+                            if (ImGui::Selectable("Saudi Arabia")) {
+                                cfg->SetCountryCode(174);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+                            if (ImGui::Selectable("Syria")) {
+                                cfg->SetCountryCode(175);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+                            if (ImGui::Selectable("Bahrain")) {
+                                cfg->SetCountryCode(176);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+                            if (ImGui::Selectable("Jordan")) {
+                                cfg->SetCountryCode(177);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+                            if (ImGui::Selectable("San Marino")) {
+                                cfg->SetCountryCode(184);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+                            if (ImGui::Selectable("Vatican City")) {
+                                cfg->SetCountryCode(185);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+                            if (ImGui::Selectable("Bermuda")) {
+                                cfg->SetCountryCode(186);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+                            ImGui::EndCombo();
+                        }
                     }
 
                     ImGui::Text("Play Coins (may need to restart emulation):");
