@@ -1573,15 +1573,15 @@ void Configuration::Run() {
                         ImGui::EndCombo();
                     }
 
-                    ImGui::Text("Texture Filter Name");
+                    ImGui::Text("Texture Filter");
                     ImGui::SameLine();
-                    if (ImGui::BeginCombo("##texturefiltername",
+                    if (ImGui::BeginCombo("##texturefilter",
                                           Settings::values.texture_filter_name.c_str())) {
-                        const auto& filters = OpenGL::TextureFilterManager::TextureFilterMap();
+                        const auto& filters = OpenGL::TextureFilterer::GetFilterNames();
 
                         for (const auto& filter : filters) {
-                            if (ImGui::Selectable(std::string(filter.first).c_str())) {
-                                Settings::values.texture_filter_name = filter.first;
+                            if (ImGui::Selectable(std::string(filter).c_str())) {
+                                Settings::values.texture_filter_name = filter;
                             }
                         }
 
