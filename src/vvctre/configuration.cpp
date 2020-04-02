@@ -1707,6 +1707,7 @@ void Configuration::Run() {
                             FileUtil::WriteStringToFile(true, path, json);
                         }
                     }
+                    ImGui::NewLine();
 
                     const auto SetMapping = [&](const auto native_id,
                                                 InputCommon::Polling::DeviceType device_type) {
