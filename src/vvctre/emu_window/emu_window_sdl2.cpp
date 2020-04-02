@@ -1628,18 +1628,6 @@ void EmuWindow_SDL2::SwapBuffers() {
                     CopyScreenshot();
                 }
 
-                if (ImGui::MenuItem("Generate Launcher For Custom Controls")) {
-#ifdef _WIN32
-                    const std::string command =
-                        fmt::format("start cmd /c \"{}\" controls --generate-launcher", arg0);
-#else
-                    const std::string command = fmt::format(
-                        "x-terminal-emulator -e \"\\\"{}\\\" controls --generate-launcher\"", arg0);
-#endif
-                    const int code = std::system(command.c_str());
-                    LOG_INFO(Frontend, "{} exited with {}", command, code);
-                }
-
                 if (ImGui::BeginMenu("Movie")) {
                     auto& movie = Core::Movie::GetInstance();
 

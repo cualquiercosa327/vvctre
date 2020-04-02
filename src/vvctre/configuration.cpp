@@ -199,11 +199,62 @@ void Configuration::Run() {
                         }
                     }
 
-                    ImGui::Text("Log Filter");
+                    ImGui::Text("Region:");
+                    ImGui::SameLine();
+                    if (ImGui::BeginCombo("##region"), [] {
+                            switch (Settings::values.region_value) {
+                            case -1:
+                                return "Auto-select";
+                            case 0:
+                                return "Japan";
+                            case 1:
+                                return "USA";
+                            case 2:
+                                return "Europe";
+                            case 3:
+                                return "Australia";
+                            case 4:
+                                return "China";
+                            case 5:
+                                return "Korea";
+                            case 6:
+                                return "Taiwan";
+                            }
+
+                            return "Unknown";
+                        }()) {
+                        if (ImGui::Selectable("Auto-select")) {
+                            Settings::values.region_value = Settings::REGION_VALUE_AUTO_SELECT;
+                        }
+                        if (ImGui::Selectable("Japan")) {
+                            Settings::values.region_value = 0;
+                        }
+                        if (ImGui::Selectable("USA")) {
+                            Settings::values.region_value = 1;
+                        }
+                        if (ImGui::Selectable("Europe")) {
+                            Settings::values.region_value = 2;
+                        }
+                        if (ImGui::Selectable("Australia")) {
+                            Settings::values.region_value = 3;
+                        }
+                        if (ImGui::Selectable("China")) {
+                            Settings::values.region_value = 4;
+                        }
+                        if (ImGui::Selectable("Korea")) {
+                            Settings::values.region_value = 5;
+                        }
+                        if (ImGui::Selectable("Taiwan")) {
+                            Settings::values.region_value = 6;
+                        }
+                        ImGui::EndCombo();
+                    }
+
+                    ImGui::Text("Log Filter:");
                     ImGui::SameLine();
                     ImGui::InputText("##logfilter", &Settings::values.log_filter);
 
-                    ImGui::Text("RPC Server Port");
+                    ImGui::Text("RPC Server Port:");
                     ImGui::SameLine();
                     ImGui::InputInt("##rpcserverport", &Settings::values.rpc_server_port);
 
