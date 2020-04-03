@@ -98,7 +98,6 @@ void LogSettings() {
     LogSetting("pp_shader_name", values.pp_shader_name);
     LogSetting("enable_vsync", values.enable_vsync);
     LogSetting("sharper_distant_objects", values.sharper_distant_objects);
-    LogSetting("ignore_format_reinterpretation", values.ignore_format_reinterpretation);
     LogSetting("layout_option", static_cast<int>(values.layout_option));
     LogSetting("swap_screen", values.swap_screen);
     LogSetting("upright_screen", values.upright_screen);

@@ -1020,29 +1020,6 @@ Server::Server(Core::System& system, const int port) {
         }
     });
 
-    server->Get("/ignoreformatreinterpretation",
-                [&](const httplib::Request& req, httplib::Response& res) {
-                    res.set_content(
-                        nlohmann::json{
-                            {"enabled", Settings::values.ignore_format_reinterpretation},
-                        }
-                            .dump(),
-                        "application/json");
-                });
-
-    server->Post(
-        "/ignoreformatreinterpretation", [&](const httplib::Request& req, httplib::Response& res) {
-            try {
-                const nlohmann::json json = nlohmann::json::parse(req.body);
-                Settings::values.ignore_format_reinterpretation = json["enabled"].get<bool>();
-                Settings::LogSettings();
-                res.status = 204;
-            } catch (nlohmann::json::exception& exception) {
-                res.status = 500;
-                res.set_content(exception.what(), "text/plain");
-            }
-        });
-
     server->Get("/dspemulation", [&](const httplib::Request& req, httplib::Response& res) {
         res.set_content(
             nlohmann::json{

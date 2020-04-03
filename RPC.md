@@ -588,18 +588,6 @@ If setting and the emulation is running, the emulation will restart.
 }
 ```
 
-# GET/POST /ignoreformatreinterpretation
-
-Get or set whether ignore format reinterpretation is enabled.
-
-## Request/Reply
-
-```json
-{
-  "enabled": Boolean
-}
-```
-
 # GET/POST /dspemulation
 
 Get or set DSP emulation settings.  

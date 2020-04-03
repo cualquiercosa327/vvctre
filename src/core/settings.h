@@ -188,7 +188,6 @@ struct Values {
     std::string pp_shader_name = "none (builtin)";
     bool enable_vsync = false;
     bool sharper_distant_objects = false;
-    bool ignore_format_reinterpretation = false;
 
     // Layout
     LayoutOption layout_option = LayoutOption::Default;

@@ -1680,19 +1680,6 @@ void RasterizerCacheOpenGL::ValidateSurface(const Surface& surface, PAddr addr, 
             continue;
         }
 
-        if (Settings::values.ignore_format_reinterpretation) {
-            bool retry = false;
-
-            for (const auto& pair : RangeFromInterval(dirty_regions, interval)) {
-                surface->invalid_regions.erase(pair.first & interval);
-                retry = true;
-            }
-
-            if (retry) {
-                continue;
-            }
-        }
-
         // D24S8 to RGBA8
         if (surface->pixel_format == PixelFormat::RGBA8) {
             params.pixel_format = PixelFormat::D24S8;

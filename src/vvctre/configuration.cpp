@@ -1529,18 +1529,6 @@ void Configuration::Run() {
                     ImGui::Checkbox("Sharper Distant Objects",
                                     &Settings::values.sharper_distant_objects);
 
-                    ImGui::Checkbox("Ignore Format Reinterpretation",
-                                    &Settings::values.ignore_format_reinterpretation);
-                    if (ImGui::IsItemHovered()) {
-                        ImGui::BeginTooltip();
-                        ImGui::Text("Ignore flushing surfaces from CPU memory if the surface was "
-                                    "created by the GPU and has a different format.");
-                        ImGui::Text("This can speed up many games, potentially break some, but is "
-                                    "rightfully just a hack as a placeholder for GPU texture "
-                                    "encoding/decoding");
-                        ImGui::EndTooltip();
-                    }
-
                     ImGui::Text("Resolution");
                     ImGui::SameLine();
                     const u16 min = 0;
