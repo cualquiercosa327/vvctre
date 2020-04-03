@@ -22,6 +22,7 @@ Values values = {};
 void Apply() {
     GDBStub::SetServerPort(values.gdbstub_port);
     GDBStub::ToggleServer(values.use_gdbstub);
+    InputCommon::ReloadInputDevices();
 
     VideoCore::g_hw_renderer_enabled = values.use_hw_renderer;
     VideoCore::g_shader_jit_enabled = values.use_shader_jit;
@@ -49,11 +50,13 @@ void Apply() {
 
         auto sm = system.ServiceManager();
         auto ir_user = sm.GetService<Service::IR::IR_USER>("ir:USER");
-        if (ir_user)
+        if (ir_user) {
             ir_user->ReloadInputDevices();
+        }
         auto ir_rst = sm.GetService<Service::IR::IR_RST>("ir:rst");
-        if (ir_rst)
+        if (ir_rst) {
             ir_rst->ReloadInputDevices();
+        }
 
         auto cam = Service::CAM::GetModule(system);
         if (cam) {

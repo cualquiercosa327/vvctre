@@ -95,10 +95,6 @@ int main(int argc, char** argv) {
     }
 
     InitializeLogging();
-    LOG_INFO(Frontend, "Version: {}", version::vvctre.to_string());
-    LOG_INFO(Frontend, "Movie version: {}", version::movie);
-    LOG_INFO(Frontend, "Shader cache version: {}", version::shader_cache);
-    Settings::LogSettings();
 
     Common::DetachedTasks detached_tasks;
 
