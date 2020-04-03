@@ -1649,8 +1649,9 @@ void RasterizerCacheOpenGL::DuplicateSurface(const Surface& src_surface,
 }
 
 void RasterizerCacheOpenGL::ValidateSurface(const Surface& surface, PAddr addr, u32 size) {
-    if (size == 0)
+    if (size == 0) {
         return;
+    }
 
     const SurfaceInterval validate_interval(addr, addr + size);
 
@@ -1660,10 +1661,11 @@ void RasterizerCacheOpenGL::ValidateSurface(const Surface& surface, PAddr addr, 
         return;
     }
 
-    while (true) {
+    for (;;) {
         const auto it = surface->invalid_regions.find(validate_interval);
-        if (it == surface->invalid_regions.end())
+        if (it == surface->invalid_regions.end()) {
             break;
+        }
 
         const auto interval = *it & validate_interval;
         // Look for a valid surface to copy from

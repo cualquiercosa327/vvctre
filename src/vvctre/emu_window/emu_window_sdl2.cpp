@@ -146,8 +146,7 @@ void EmuWindow_SDL2::ToggleFullscreen() {
     }
 }
 
-EmuWindow_SDL2::EmuWindow_SDL2(Core::System& system, const char* arg0)
-    : system(system), arg0(arg0) {
+EmuWindow_SDL2::EmuWindow_SDL2(Core::System& system) : system(system) {
     const std::string window_title = fmt::format("vvctre {}", version::vvctre.to_string());
 
     render_window =
@@ -2719,7 +2718,7 @@ void EmuWindow_SDL2::PollEvents() {
             break;
         case SDL_KEYDOWN:
         case SDL_KEYUP:
-            // ignore it if a Dear ImGui window is focused
+            // Ignore it if a Dear ImGui window is focused
             if (ImGui::IsWindowFocused(ImGuiFocusedFlags_AnyWindow)) {
                 return;
             }
@@ -2727,12 +2726,12 @@ void EmuWindow_SDL2::PollEvents() {
             OnKeyEvent(static_cast<int>(event.key.keysym.scancode), event.key.state);
             break;
         case SDL_MOUSEMOTION:
-            // ignore it if a Dear ImGui window is focused
+            // Ignore it if a Dear ImGui window is focused
             if (ImGui::IsWindowFocused(ImGuiFocusedFlags_AnyWindow)) {
                 return;
             }
 
-            // ignore if it came from touch
+            // Ignore if it came from touch
             if (event.button.which != SDL_TOUCH_MOUSEID) {
                 OnMouseMotion(event.motion.x, event.motion.y);
             }
@@ -2740,12 +2739,12 @@ void EmuWindow_SDL2::PollEvents() {
             break;
         case SDL_MOUSEBUTTONDOWN:
         case SDL_MOUSEBUTTONUP:
-            // ignore it if a Dear ImGui window is focused
+            // Ignore it if a Dear ImGui window is focused
             if (ImGui::IsWindowFocused(ImGuiFocusedFlags_AnyWindow)) {
                 return;
             }
 
-            // ignore if it came from touch
+            // Ignore if it came from touch
             if (event.button.which != SDL_TOUCH_MOUSEID) {
                 OnMouseButton(event.button.button, event.button.state, event.button.x,
                               event.button.y);
@@ -2753,7 +2752,7 @@ void EmuWindow_SDL2::PollEvents() {
 
             break;
         case SDL_FINGERDOWN:
-            // ignore it if a Dear ImGui window is focused
+            // Ignore it if a Dear ImGui window is focused
             if (ImGui::IsWindowFocused(ImGuiFocusedFlags_AnyWindow)) {
                 return;
             }
@@ -2761,7 +2760,7 @@ void EmuWindow_SDL2::PollEvents() {
             OnFingerDown(event.tfinger.x, event.tfinger.y);
             break;
         case SDL_FINGERMOTION:
-            // ignore it if a Dear ImGui window is focused
+            // Ignore it if a Dear ImGui window is focused
             if (ImGui::IsWindowFocused(ImGuiFocusedFlags_AnyWindow)) {
                 return;
             }
@@ -2769,7 +2768,7 @@ void EmuWindow_SDL2::PollEvents() {
             OnFingerMotion(event.tfinger.x, event.tfinger.y);
             break;
         case SDL_FINGERUP:
-            // ignore it if a Dear ImGui window is focused
+            // Ignore it if a Dear ImGui window is focused
             if (ImGui::IsWindowFocused(ImGuiFocusedFlags_AnyWindow)) {
                 return;
             }
@@ -2782,18 +2781,6 @@ void EmuWindow_SDL2::PollEvents() {
         default:
             break;
         }
-    }
-
-    const u64 current_program_id = system.Kernel().GetCurrentProcess()->codeset->program_id;
-    if (program_id != current_program_id) {
-        system.GetAppLoader().ReadTitle(program_name);
-
-        const std::string window_title =
-            fmt::format("vvctre {} | {}", version::vvctre.to_string(), program_name);
-
-        SDL_SetWindowTitle(render_window, window_title.c_str());
-
-        program_id = current_program_id;
     }
 }
 

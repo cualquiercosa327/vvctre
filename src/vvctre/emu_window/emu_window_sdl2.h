@@ -21,7 +21,7 @@ class System;
 
 class EmuWindow_SDL2 : public Frontend::EmuWindow {
 public:
-    explicit EmuWindow_SDL2(Core::System& system, const char* arg0);
+    explicit EmuWindow_SDL2(Core::System& system);
     ~EmuWindow_SDL2();
 
     /// Swap buffers to display the next frame
@@ -97,9 +97,6 @@ private:
     /// The OpenGL context associated with the window
     SDL_GLContext gl_context;
 
-    std::string program_name;
-    u64 program_id = 0;
-
     float disk_shader_cache_loading_progress = -1.0f;
 
     Core::System& system;
@@ -111,6 +108,4 @@ private:
 
     bool show_cheats_window = false;
     bool show_ipc_recorder_window = false;
-
-    const char* arg0 = nullptr;
 };

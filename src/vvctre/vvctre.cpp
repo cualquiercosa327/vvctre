@@ -69,7 +69,7 @@ static void InitializeLogging() {
 #endif
 }
 
-int main(int argc, char** argv) {
+int main(int, char**) {
     InputCommon::Init();
 
     // Initialize SDL
@@ -108,7 +108,7 @@ int main(int argc, char** argv) {
 
     Core::System& system = Core::System::GetInstance();
 
-    std::unique_ptr<EmuWindow_SDL2> emu_window = std::make_unique<EmuWindow_SDL2>(system, argv[0]);
+    std::unique_ptr<EmuWindow_SDL2> emu_window = std::make_unique<EmuWindow_SDL2>(system);
 
     // Register frontend applets
     system.RegisterSoftwareKeyboard(std::make_shared<Frontend::SDL2_SoftwareKeyboard>(*emu_window));
