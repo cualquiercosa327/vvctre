@@ -2001,6 +2001,22 @@ void Configuration::Run() {
                         AnalogToText(Settings::values.analogs[Settings::NativeAnalog::CirclePad],
                                      "modifier")
                             .c_str());
+                    {
+                        Common::ParamPackage params(
+                            Settings::values.analogs[Settings::NativeAnalog::CirclePad]);
+                        if (params.Get("engine", "") == "sdl") {
+                            float deadzone = params.Get("deadzone", 0.0f);
+                            ImGui::Text("Deadzone:");
+                            ImGui::SameLine();
+                            ImGui::PushItemWidth(100);
+                            if (ImGui::SliderFloat("##deadzoneCirclePad", &deadzone, 0.0f, 1.0f)) {
+                                params.Set("deadzone", deadzone);
+                                Settings::values.analogs[Settings::NativeAnalog::CirclePad] =
+                                    params.Serialize();
+                            }
+                            ImGui::PopItemWidth();
+                        }
+                    }
                     if (ImGui::Button("Set All##circlepad")) {
                         SetMapping(Settings::NativeAnalog::CirclePad,
                                    InputCommon::Polling::DeviceType::Analog);
@@ -2042,6 +2058,22 @@ void Configuration::Run() {
                         AnalogToText(Settings::values.analogs[Settings::NativeAnalog::CStick],
                                      "modifier")
                             .c_str());
+                    {
+                        Common::ParamPackage params(
+                            Settings::values.analogs[Settings::NativeAnalog::CStick]);
+                        if (params.Get("engine", "") == "sdl") {
+                            float deadzone = params.Get("deadzone", 0.0f);
+                            ImGui::Text("Deadzone:");
+                            ImGui::SameLine();
+                            ImGui::PushItemWidth(100);
+                            if (ImGui::SliderFloat("##deadzoneCStick", &deadzone, 0.0f, 1.0f)) {
+                                params.Set("deadzone", deadzone);
+                                Settings::values.analogs[Settings::NativeAnalog::CStick] =
+                                    params.Serialize();
+                            }
+                            ImGui::PopItemWidth();
+                        }
+                    }
                     if (ImGui::Button("Set All##cstick")) {
                         SetMapping(Settings::NativeAnalog::CStick,
                                    InputCommon::Polling::DeviceType::Analog);
