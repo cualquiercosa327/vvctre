@@ -194,7 +194,6 @@ EmuWindow_SDL2::EmuWindow_SDL2(Core::System& system) : system(system) {
     ImGui::GetIO().IniFilename = nullptr;
     ImGui_ImplSDL2_InitForOpenGL(render_window, gl_context);
     ImGui_ImplOpenGL3_Init("#version 330 core");
-    ImGui::SetWindowFocus(nullptr);
 
     DoneCurrent();
 }
