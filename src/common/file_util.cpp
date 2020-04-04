@@ -564,95 +564,20 @@ const std::string& GetExeDirectory() {
     }
     return exe_path;
 }
-
-std::string AppDataRoamingDirectory() {
-    PWSTR pw_local_path = nullptr;
-    // Only supported by Windows Vista or later
-    SHGetKnownFolderPath(FOLDERID_RoamingAppData, 0, nullptr, &pw_local_path);
-    std::string local_path = Common::UTF16ToUTF8(pw_local_path);
-    CoTaskMemFree(pw_local_path);
-    return local_path;
-}
-#else
-/**
- * @return The user’s home directory on POSIX systems
- */
-static const std::string& GetHomeDirectory() {
-    static std::string home_path;
-    if (home_path.empty()) {
-        const char* envvar = getenv("HOME");
-        if (envvar) {
-            home_path = envvar;
-        } else {
-            auto pw = getpwuid(getuid());
-            ASSERT_MSG(pw,
-                       "$HOME isn’t defined, and the current user can’t be found in /etc/passwd.");
-            home_path = pw->pw_dir;
-        }
-    }
-    return home_path;
-}
-
-/**
- * Follows the XDG Base Directory Specification to get a directory path
- * @param envvar The XDG environment variable to get the value from
- * @return The directory path
- * @sa http://standards.freedesktop.org/basedir-spec/basedir-spec-latest.html
- */
-static const std::string GetUserDirectory(const std::string& envvar) {
-    const char* directory = getenv(envvar.c_str());
-
-    std::string user_dir;
-    if (directory) {
-        user_dir = directory;
-    } else {
-        std::string subdirectory;
-
-        if (envvar == "XDG_DATA_HOME") {
-            subdirectory = "/.local/share";
-        } else {
-            UNIMPLEMENTED_MSG("XDG variable {}", envvar);
-        }
-
-        user_dir = GetHomeDirectory() + subdirectory;
-    }
-
-    ASSERT_MSG(!user_dir.empty(), "User directory {} musn’t be empty.", envvar);
-    ASSERT_MSG(user_dir[0] == '/', "User directory {} must be absolute.", envvar);
-
-    return user_dir;
-}
 #endif
 
 namespace {
 std::unordered_map<UserPath, std::string> g_paths;
 }
 
-void SetUserPath(const std::string& path) {
+static void InitUserPaths() {
     std::string& user_path = g_paths[UserPath::UserDir];
 
-    if (!path.empty() && CreateFullPath(path)) {
-        LOG_INFO(Common_Filesystem, "Using {} as the user directory", path);
-        user_path = path;
-    } else {
 #ifdef _WIN32
-        user_path = GetExeDirectory() + "/" USERDATA_DIR "/";
-        if (!FileUtil::IsDirectory(user_path)) {
-            user_path = AppDataRoamingDirectory() + "/" EMU_DATA_DIR "/";
-        } else {
-            LOG_INFO(Common_Filesystem, "Using the local user directory");
-        }
-
+    user_path = GetExeDirectory() + "/" USERDATA_DIR "/";
 #else
-        if (FileUtil::Exists(ROOT_DIR "/" USERDATA_DIR)) {
-            user_path = ROOT_DIR "/" USERDATA_DIR "/";
-        } else {
-            std::string data_dir = GetUserDirectory("XDG_DATA_HOME");
-
-            user_path = data_dir + "/" EMU_DATA_DIR "/";
-        }
+    user_path = ROOT_DIR "/" USERDATA_DIR "/";
 #endif
-    }
 
     g_paths[UserPath::SDMCDir] = user_path + SDMC_DIR "/";
     g_paths[UserPath::NANDDir] = user_path + NAND_DIR "/";
@@ -666,10 +591,12 @@ void SetUserPath(const std::string& path) {
 
 const std::string& GetUserPath(UserPath path) {
     // Set up all paths and files on the first run
-    if (g_paths.empty())
-        SetUserPath();
+    if (g_paths.empty()) {
+        InitUserPaths();
+    }
     return g_paths[path];
 }
+
 std::size_t WriteStringToFile(bool text_file, const std::string& filename, std::string_view str) {
     return IOFile(filename, text_file ? "w" : "wb").WriteString(str);
 }

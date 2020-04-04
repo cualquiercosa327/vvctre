@@ -58,6 +58,8 @@ jobs:
           elif [ "$RUNNER_OS" == "Windows" ]; then
             rm ./build/bin/Release/tests.exe
             rm ./build/bin/Release/*.pdb
+            mv ./build/bin/Release/* ./build/bin
+            rm -rf ./build/bin/Release
           fi
           export VERSION=${GITHUB_REF:10}
           echo ::set-env name=VERSION::$VERSION
@@ -77,6 +79,8 @@ jobs:
             elif [ "$RUNNER_OS" == "Windows" ]; then
               rm ./build/bin/Release/tests.exe
               rm ./build/bin/Release/*.pdb
+              mv ./build/bin/Release/* ./build/bin
+              rm -rf ./build/bin/Release
             fi
           fi
       - name: Upload (tag push)

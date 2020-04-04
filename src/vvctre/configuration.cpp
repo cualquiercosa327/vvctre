@@ -200,17 +200,6 @@ void Configuration::Run() {
                         }
                     }
 
-                    ImGui::Text("User Folder: %s",
-                                FileUtil::GetUserPath(FileUtil::UserPath::UserDir).c_str());
-                    ImGui::SameLine();
-                    if (ImGui::Button("Browse...##userfolder")) {
-                        const std::string folder = pfd::select_folder("Select a folder").result();
-                        if (!folder.empty()) {
-                            FileUtil::SetUserPath(folder + '/');
-                            cfg = std::make_shared<Service::CFG::Module>();
-                        }
-                    }
-
                     ImGui::Text("Region:");
                     ImGui::SameLine();
                     if (ImGui::BeginCombo("##region", [&] {

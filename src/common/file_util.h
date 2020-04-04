@@ -132,15 +132,12 @@ void CopyDir(const std::string& source_path, const std::string& dest_path);
 // Set the current directory to given directory
 bool SetCurrentDir(const std::string& directory);
 
-void SetUserPath(const std::string& path = "");
-
 // Returns a pointer to a string with a vvctre data dir in the user's home
 // directory. To be used in "multi-user" mode (that is, installed).
 const std::string& GetUserPath(UserPath path);
 
 #ifdef _WIN32
 const std::string& GetExeDirectory();
-std::string AppDataRoamingDirectory();
 #endif
 
 std::size_t WriteStringToFile(bool text_file, const std::string& filename, std::string_view str);

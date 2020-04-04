@@ -52,5 +52,5 @@ Create a `user` folder where vvctre is.
 # Incompatibilities
 
 - Different movie file format
-- Different folder for mods, put mods (Luma3DS folder structure) in `sdmc/luma/titles` in vvctre's user folder (you can open it from the GUI with File -> Open User Folder)
+- Different folder for mods, put mods (Luma3DS folder structure) in `user/sdmc/luma/titles`
 - Different RPC server protocol
