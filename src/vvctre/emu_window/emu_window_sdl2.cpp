@@ -194,6 +194,7 @@ EmuWindow_SDL2::EmuWindow_SDL2(Core::System& system) : system(system) {
     ImGui::GetIO().IniFilename = nullptr;
     ImGui_ImplSDL2_InitForOpenGL(render_window, gl_context);
     ImGui_ImplOpenGL3_Init("#version 330 core");
+    ImGui::SetWindowFocus(nullptr);
 
     DoneCurrent();
 }
@@ -348,322 +349,15 @@ void EmuWindow_SDL2::SwapBuffers() {
         }
     }
 
-    if (ImGui::Begin("FPS", nullptr,
+    if (ImGui::Begin("FPS and Menu", nullptr,
                      ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoSavedSettings |
                          ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_AlwaysAutoResize)) {
+        if (ImGui::IsWindowAppearing()) {
+            ImGui::SetWindowFocus(nullptr);
+        }
         ImGui::SetWindowPos(ImVec2(), ImGuiCond_Once);
         ImGui::TextColored(fps_color, "%d FPS", static_cast<int>(ImGui::GetIO().Framerate));
-        if (ImGui::IsWindowFocused() && ImGui::IsMouseDown(ImGuiMouseButton_Right)) {
-            ImGui::ColorPicker4("##picker", (float*)&fps_color);
-        }
-    }
-    ImGui::End();
-
-    if (swkbd_config != nullptr && swkbd_code != nullptr && swkbd_text != nullptr) {
-        ImGui::SetNextWindowPos(ImVec2(io.DisplaySize.x * 0.5f, io.DisplaySize.y * 0.5f),
-                                ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
-        if (ImGui::Begin("Keyboard", nullptr,
-                         ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_AlwaysAutoResize)) {
-            ImGui::InputTextWithHint("", swkbd_config->hint_text.c_str(), swkbd_text,
-                                     swkbd_config->multiline_mode ? ImGuiInputTextFlags_Multiline
-                                                                  : 0);
-
-            if (Frontend::SoftwareKeyboard::ValidateInput(*swkbd_text, *swkbd_config) ==
-                Frontend::ValidationError::None) {
-                switch (swkbd_config->button_config) {
-                case Frontend::ButtonConfig::None:
-                case Frontend::ButtonConfig::Single: {
-                    if (ImGui::Button((!swkbd_config->has_custom_button_text ||
-                                               swkbd_config->button_text[0].empty()
-                                           ? Frontend::SWKBD_BUTTON_OKAY
-                                           : swkbd_config->button_text[0])
-                                          .c_str())) {
-                        swkbd_config = nullptr;
-                        swkbd_code = nullptr;
-                        swkbd_text = nullptr;
-                    }
-                    break;
-                }
-
-                case Frontend::ButtonConfig::Dual: {
-                    const std::string cancel = (swkbd_config->button_text.size() < 1 ||
-                                                swkbd_config->button_text[0].empty())
-                                                   ? Frontend::SWKBD_BUTTON_CANCEL
-                                                   : swkbd_config->button_text[0];
-                    const std::string ok = (swkbd_config->button_text.size() < 2 ||
-                                            swkbd_config->button_text[1].empty())
-                                               ? Frontend::SWKBD_BUTTON_OKAY
-                                               : swkbd_config->button_text[1];
-                    if (ImGui::Button(cancel.c_str())) {
-                        swkbd_config = nullptr;
-                        swkbd_code = nullptr;
-                        swkbd_text = nullptr;
-                        break;
-                    }
-                    ImGui::SameLine();
-                    if (ImGui::Button(ok.c_str())) {
-                        *swkbd_code = 1;
-                        swkbd_config = nullptr;
-                        swkbd_code = nullptr;
-                        swkbd_text = nullptr;
-                    }
-                    break;
-                }
-
-                case Frontend::ButtonConfig::Triple: {
-                    const std::string cancel = (swkbd_config->button_text.size() < 1 ||
-                                                swkbd_config->button_text[0].empty())
-                                                   ? Frontend::SWKBD_BUTTON_CANCEL
-                                                   : swkbd_config->button_text[0];
-                    const std::string forgot = (swkbd_config->button_text.size() < 2 ||
-                                                swkbd_config->button_text[1].empty())
-                                                   ? Frontend::SWKBD_BUTTON_FORGOT
-                                                   : swkbd_config->button_text[1];
-                    const std::string ok = (swkbd_config->button_text.size() < 3 ||
-                                            swkbd_config->button_text[2].empty())
-                                               ? Frontend::SWKBD_BUTTON_OKAY
-                                               : swkbd_config->button_text[2];
-                    if (ImGui::Button(cancel.c_str())) {
-                        swkbd_config = nullptr;
-                        swkbd_code = nullptr;
-                        swkbd_text = nullptr;
-                        break;
-                    }
-                    ImGui::SameLine();
-                    if (ImGui::Button(forgot.c_str())) {
-                        *swkbd_code = 1;
-                        swkbd_config = nullptr;
-                        swkbd_code = nullptr;
-                        swkbd_text = nullptr;
-                        break;
-                    }
-                    ImGui::SameLine();
-                    if (ImGui::Button(ok.c_str())) {
-                        *swkbd_code = 2;
-                        swkbd_config = nullptr;
-                        swkbd_code = nullptr;
-                        swkbd_text = nullptr;
-                    }
-                    break;
-                }
-                }
-            }
-        }
-        ImGui::End();
-    }
-
-    if (mii_selector_config != nullptr && mii_selector_miis != nullptr &&
-        mii_selector_code != nullptr && mii_selector_selected_mii != nullptr) {
-        ImGui::SetNextWindowPos(ImVec2(io.DisplaySize.x * 0.5f, io.DisplaySize.y * 0.5f),
-                                ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
-        if (ImGui::Begin(
-                (mii_selector_config->title.empty() ? "Mii Selector" : mii_selector_config->title)
-                    .c_str(),
-                nullptr, ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_AlwaysAutoResize)) {
-            if (ImGui::ListBoxHeader("##miis")) {
-                for (std::size_t index = 0; index < mii_selector_miis->size(); ++index) {
-                    if (ImGui::Selectable(
-                            Common::UTF16BufferToUTF8(mii_selector_miis->at(index).mii_name)
-                                .c_str())) {
-                        *mii_selector_code = 0;
-                        *mii_selector_selected_mii = mii_selector_miis->at(index);
-                        mii_selector_config = nullptr;
-                        mii_selector_miis = nullptr;
-                        mii_selector_code = nullptr;
-                        mii_selector_selected_mii = nullptr;
-                        break;
-                    }
-                }
-                ImGui::ListBoxFooter();
-            }
-            if (mii_selector_config && mii_selector_config->enable_cancel_button &&
-                ImGui::Button("Cancel")) {
-                mii_selector_config = nullptr;
-                mii_selector_miis = nullptr;
-                mii_selector_code = nullptr;
-                mii_selector_selected_mii = nullptr;
-            }
-        }
-        ImGui::End();
-    }
-
-    if (show_ipc_recorder_window) {
-        if (ImGui::Begin("IPC Recorder", nullptr, ImGuiWindowFlags_NoSavedSettings)) {
-            if (ImGui::Checkbox("Enabled", &ipc_recorder_enabled)) {
-                IPCDebugger::Recorder& r = Core::System::GetInstance().Kernel().GetIPCRecorder();
-
-                r.SetEnabled(ipc_recorder_enabled);
-
-                if (ipc_recorder_enabled) {
-                    ipc_recorder_callback =
-                        r.BindCallback([&](const IPCDebugger::RequestRecord& record) {
-                            ipc_records[record.id] = record;
-                        });
-                } else {
-                    r.UnbindCallback(ipc_recorder_callback);
-                    ipc_recorder_callback = nullptr;
-                }
-            }
-            ImGui::SameLine();
-            if (ImGui::Button("Clear")) {
-                ipc_records.clear();
-            }
-            ImGui::SameLine();
-            static std::string filter;
-            ImGui::InputTextWithHint("##filter", "Filter", &filter);
-            if (ImGui::ListBoxHeader("##records", ImVec2(-1.0f, -1.0f))) {
-                for (const auto& record : ipc_records) {
-                    std::string service_name;
-                    std::string function_name = "Unknown";
-                    if (record.second.client_port.id != -1) {
-                        service_name = system.ServiceManager().GetServiceNameByPortId(
-                            static_cast<u32>(record.second.client_port.id));
-                    }
-                    if (service_name.empty()) {
-                        service_name = record.second.server_session.name;
-                        service_name = Common::ReplaceAll(service_name, "_Server", "");
-                        service_name = Common::ReplaceAll(service_name, "_Client", "");
-                    }
-                    const std::string label = fmt::format(
-                        "#{} - {} - {} (0x{:08X}) - {} - {}", record.first, service_name,
-                        record.second.function_name.empty() ? "Unknown"
-                                                            : record.second.function_name,
-                        record.second.untranslated_request_cmdbuf.empty()
-                            ? 0xFFFFFFFF
-                            : record.second.untranslated_request_cmdbuf[0],
-                        record.second.is_hle ? "HLE" : "LLE",
-                        IPC_Recorder_GetStatusString(record.second.status));
-                    if (label.find(filter) != std::string::npos) {
-                        ImGui::Selectable(label.c_str());
-                        if (ImGui::IsItemHovered()) {
-                            ImGui::SetTooltip(
-                                "id: %d\n"
-                                "status: %d\n"
-                                "client_process.type: %s\n"
-                                "client_process.name: %s\n"
-                                "client_process.id: %d\n"
-                                "client_thread.type: %s\n"
-                                "client_thread.name: %s\n"
-                                "client_thread.id: %d\n"
-                                "client_session.type: %s\n"
-                                "client_session.name: %s\n"
-                                "client_session.id: %d\n"
-                                "client_port.type: %s\n"
-                                "client_port.name: %s\n"
-                                "client_port.id: %d\n"
-                                "server_process.type: %s\n"
-                                "server_process.name: %s\n"
-                                "server_process.id: %d\n"
-                                "server_thread.type: %s\n"
-                                "server_thread.name: %s\n"
-                                "server_thread.id: %d\n"
-                                "server_session.type: %s\n"
-                                "server_session.name: %s\n"
-                                "server_session.id: %d\n"
-                                "function_name: %s\n"
-                                "is_hle: %s\n"
-                                "untranslated_request_cmdbuf: %s\n"
-                                "translated_request_cmdbuf: %s\n"
-                                "untranslated_reply_cmdbuf: %s\n"
-                                "translated_reply_cmdbuf: %s",
-                                record.first, static_cast<int>(record.second.status),
-                                record.second.client_process.type.c_str(),
-                                record.second.client_process.name.c_str(),
-                                record.second.client_process.id,
-                                record.second.client_thread.type.c_str(),
-                                record.second.client_thread.name.c_str(),
-                                record.second.client_thread.id,
-                                record.second.client_session.type.c_str(),
-                                record.second.client_session.name.c_str(),
-                                record.second.client_session.id,
-                                record.second.client_port.type.c_str(),
-                                record.second.client_port.name.c_str(),
-                                record.second.client_port.id,
-                                record.second.server_process.type.c_str(),
-                                record.second.server_process.name.c_str(),
-                                record.second.server_process.id,
-                                record.second.server_thread.type.c_str(),
-                                record.second.server_thread.name.c_str(),
-                                record.second.server_thread.id,
-                                record.second.server_session.type.c_str(),
-                                record.second.server_session.name.c_str(),
-                                record.second.server_session.id,
-                                record.second.function_name.c_str(),
-                                record.second.is_hle ? "true" : "false",
-                                fmt::format(
-                                    "0x{:08X}",
-                                    fmt::join(record.second.untranslated_request_cmdbuf, ", 0x"))
-                                    .c_str(),
-                                fmt::format(
-                                    "0x{:08X}",
-                                    fmt::join(record.second.translated_request_cmdbuf, ", 0x"))
-                                    .c_str(),
-                                fmt::format(
-                                    "0x{:08X}",
-                                    fmt::join(record.second.untranslated_reply_cmdbuf, ", 0x"))
-                                    .c_str(),
-                                fmt::format(
-                                    "0x{:08X}",
-                                    fmt::join(record.second.translated_reply_cmdbuf, ", 0x"))
-                                    .c_str());
-                        }
-                    }
-                }
-                ImGui::ListBoxFooter();
-            }
-        }
-        ImGui::End();
-    }
-
-    if (show_cheats_window) {
-        if (ImGui::Begin("Cheats", nullptr, ImGuiWindowFlags_NoSavedSettings)) {
-            if (ImGui::Button("Edit File")) {
-                const std::string filepath = fmt::format(
-                    "{}{:016X}.txt", FileUtil::GetUserPath(FileUtil::UserPath::CheatsDir),
-                    system.Kernel().GetCurrentProcess()->codeset->program_id);
-
-                FileUtil::CreateFullPath(filepath);
-
-                if (!FileUtil::Exists(filepath)) {
-                    FileUtil::CreateEmptyFile(filepath);
-                }
-
-#ifdef _WIN32
-                const int code = std::system(fmt::format("start {}", filepath).c_str());
-#else
-                const int code = std::system(fmt::format("xdg-open {}", filepath).c_str());
-#endif
-                LOG_INFO(Frontend, "Opened cheats file in text editor, exit code: {}", code);
-            }
-
-            ImGui::SameLine();
-
-            if (ImGui::Button("Reload File")) {
-                system.CheatEngine().LoadCheatFile();
-            }
-
-            if (ImGui::ListBoxHeader("##cheats", ImVec2(-1.0f, -1.0f))) {
-                for (const auto& cheat : system.CheatEngine().GetCheats()) {
-                    bool enabled = cheat->IsEnabled();
-                    if (ImGui::Checkbox(cheat->GetName().c_str(), &enabled)) {
-                        cheat->SetEnabled(enabled);
-                    }
-                }
-                ImGui::ListBoxFooter();
-            }
-        }
-
-        ImGui::End();
-    }
-
-    if (disk_shader_cache_loading_progress != -1.0f) {
-        if (ImGui::Begin("Loading Shaders", nullptr,
-                         ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_AlwaysAutoResize)) {
-            ImGui::ProgressBar(disk_shader_cache_loading_progress, ImVec2(0.0f, 0.0f));
-        }
-        ImGui::End();
-    } else {
-        if (ImGui::BeginPopupContextVoid(nullptr, ImGuiMouseButton_Middle)) {
+        if (ImGui::BeginPopupContextItem(nullptr, ImGuiMouseButton_Right)) {
             system.frontend_paused = true;
 
             if (ImGui::BeginMenu("File")) {
@@ -1265,7 +959,7 @@ void EmuWindow_SDL2::SwapBuffers() {
                             system.RequestReset();
                         }
 
-                        ImGui::Text("Language:");
+                        ImGui::Text("Language (changing will restart emulation):");
                         ImGui::SameLine();
 
                         if (ImGui::BeginCombo("##language", [&] {
@@ -1411,7 +1105,7 @@ void EmuWindow_SDL2::SwapBuffers() {
                             ImGui::EndCombo();
                         }
 
-                        ImGui::Text("Country:");
+                        ImGui::Text("Country (changing will restart emulation):");
                         ImGui::SameLine();
                         if (ImGui::BeginCombo("##country", [&] {
                                 switch (cfg->GetCountryCode()) {
@@ -2371,6 +2065,14 @@ void EmuWindow_SDL2::SwapBuffers() {
                     ImGui::EndMenu();
                 }
 
+                if (ImGui::BeginMenu("GUI")) {
+                    ImGui::Text("FPS Color:");
+                    ImGui::SameLine();
+                    ImGui::ColorPicker4("##fps_color", (float*)&fps_color);
+
+                    ImGui::EndMenu();
+                }
+
                 ImGui::EndMenu();
             }
 
@@ -2670,6 +2372,312 @@ void EmuWindow_SDL2::SwapBuffers() {
         } else {
             system.frontend_paused = false;
         }
+    }
+    ImGui::End();
+
+    if (swkbd_config != nullptr && swkbd_code != nullptr && swkbd_text != nullptr) {
+        ImGui::SetNextWindowPos(ImVec2(io.DisplaySize.x * 0.5f, io.DisplaySize.y * 0.5f),
+                                ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
+        if (ImGui::Begin("Keyboard", nullptr,
+                         ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_AlwaysAutoResize)) {
+            ImGui::InputTextWithHint("", swkbd_config->hint_text.c_str(), swkbd_text,
+                                     swkbd_config->multiline_mode ? ImGuiInputTextFlags_Multiline
+                                                                  : 0);
+
+            if (Frontend::SoftwareKeyboard::ValidateInput(*swkbd_text, *swkbd_config) ==
+                Frontend::ValidationError::None) {
+                switch (swkbd_config->button_config) {
+                case Frontend::ButtonConfig::None:
+                case Frontend::ButtonConfig::Single: {
+                    if (ImGui::Button((!swkbd_config->has_custom_button_text ||
+                                               swkbd_config->button_text[0].empty()
+                                           ? Frontend::SWKBD_BUTTON_OKAY
+                                           : swkbd_config->button_text[0])
+                                          .c_str())) {
+                        swkbd_config = nullptr;
+                        swkbd_code = nullptr;
+                        swkbd_text = nullptr;
+                    }
+                    break;
+                }
+
+                case Frontend::ButtonConfig::Dual: {
+                    const std::string cancel = (swkbd_config->button_text.size() < 1 ||
+                                                swkbd_config->button_text[0].empty())
+                                                   ? Frontend::SWKBD_BUTTON_CANCEL
+                                                   : swkbd_config->button_text[0];
+                    const std::string ok = (swkbd_config->button_text.size() < 2 ||
+                                            swkbd_config->button_text[1].empty())
+                                               ? Frontend::SWKBD_BUTTON_OKAY
+                                               : swkbd_config->button_text[1];
+                    if (ImGui::Button(cancel.c_str())) {
+                        swkbd_config = nullptr;
+                        swkbd_code = nullptr;
+                        swkbd_text = nullptr;
+                        break;
+                    }
+                    ImGui::SameLine();
+                    if (ImGui::Button(ok.c_str())) {
+                        *swkbd_code = 1;
+                        swkbd_config = nullptr;
+                        swkbd_code = nullptr;
+                        swkbd_text = nullptr;
+                    }
+                    break;
+                }
+
+                case Frontend::ButtonConfig::Triple: {
+                    const std::string cancel = (swkbd_config->button_text.size() < 1 ||
+                                                swkbd_config->button_text[0].empty())
+                                                   ? Frontend::SWKBD_BUTTON_CANCEL
+                                                   : swkbd_config->button_text[0];
+                    const std::string forgot = (swkbd_config->button_text.size() < 2 ||
+                                                swkbd_config->button_text[1].empty())
+                                                   ? Frontend::SWKBD_BUTTON_FORGOT
+                                                   : swkbd_config->button_text[1];
+                    const std::string ok = (swkbd_config->button_text.size() < 3 ||
+                                            swkbd_config->button_text[2].empty())
+                                               ? Frontend::SWKBD_BUTTON_OKAY
+                                               : swkbd_config->button_text[2];
+                    if (ImGui::Button(cancel.c_str())) {
+                        swkbd_config = nullptr;
+                        swkbd_code = nullptr;
+                        swkbd_text = nullptr;
+                        break;
+                    }
+                    ImGui::SameLine();
+                    if (ImGui::Button(forgot.c_str())) {
+                        *swkbd_code = 1;
+                        swkbd_config = nullptr;
+                        swkbd_code = nullptr;
+                        swkbd_text = nullptr;
+                        break;
+                    }
+                    ImGui::SameLine();
+                    if (ImGui::Button(ok.c_str())) {
+                        *swkbd_code = 2;
+                        swkbd_config = nullptr;
+                        swkbd_code = nullptr;
+                        swkbd_text = nullptr;
+                    }
+                    break;
+                }
+                }
+            }
+        }
+        ImGui::End();
+    }
+
+    if (mii_selector_config != nullptr && mii_selector_miis != nullptr &&
+        mii_selector_code != nullptr && mii_selector_selected_mii != nullptr) {
+        ImGui::SetNextWindowPos(ImVec2(io.DisplaySize.x * 0.5f, io.DisplaySize.y * 0.5f),
+                                ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
+        if (ImGui::Begin(
+                (mii_selector_config->title.empty() ? "Mii Selector" : mii_selector_config->title)
+                    .c_str(),
+                nullptr, ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_AlwaysAutoResize)) {
+            if (ImGui::ListBoxHeader("##miis")) {
+                for (std::size_t index = 0; index < mii_selector_miis->size(); ++index) {
+                    if (ImGui::Selectable(
+                            Common::UTF16BufferToUTF8(mii_selector_miis->at(index).mii_name)
+                                .c_str())) {
+                        *mii_selector_code = 0;
+                        *mii_selector_selected_mii = mii_selector_miis->at(index);
+                        mii_selector_config = nullptr;
+                        mii_selector_miis = nullptr;
+                        mii_selector_code = nullptr;
+                        mii_selector_selected_mii = nullptr;
+                        break;
+                    }
+                }
+                ImGui::ListBoxFooter();
+            }
+            if (mii_selector_config && mii_selector_config->enable_cancel_button &&
+                ImGui::Button("Cancel")) {
+                mii_selector_config = nullptr;
+                mii_selector_miis = nullptr;
+                mii_selector_code = nullptr;
+                mii_selector_selected_mii = nullptr;
+            }
+        }
+        ImGui::End();
+    }
+
+    if (show_ipc_recorder_window) {
+        if (ImGui::Begin("IPC Recorder", nullptr, ImGuiWindowFlags_NoSavedSettings)) {
+            if (ImGui::Checkbox("Enabled", &ipc_recorder_enabled)) {
+                IPCDebugger::Recorder& r = Core::System::GetInstance().Kernel().GetIPCRecorder();
+
+                r.SetEnabled(ipc_recorder_enabled);
+
+                if (ipc_recorder_enabled) {
+                    ipc_recorder_callback =
+                        r.BindCallback([&](const IPCDebugger::RequestRecord& record) {
+                            ipc_records[record.id] = record;
+                        });
+                } else {
+                    r.UnbindCallback(ipc_recorder_callback);
+                    ipc_recorder_callback = nullptr;
+                }
+            }
+            ImGui::SameLine();
+            if (ImGui::Button("Clear")) {
+                ipc_records.clear();
+            }
+            ImGui::SameLine();
+            static std::string filter;
+            ImGui::InputTextWithHint("##filter", "Filter", &filter);
+            if (ImGui::ListBoxHeader("##records", ImVec2(-1.0f, -1.0f))) {
+                for (const auto& record : ipc_records) {
+                    std::string service_name;
+                    std::string function_name = "Unknown";
+                    if (record.second.client_port.id != -1) {
+                        service_name = system.ServiceManager().GetServiceNameByPortId(
+                            static_cast<u32>(record.second.client_port.id));
+                    }
+                    if (service_name.empty()) {
+                        service_name = record.second.server_session.name;
+                        service_name = Common::ReplaceAll(service_name, "_Server", "");
+                        service_name = Common::ReplaceAll(service_name, "_Client", "");
+                    }
+                    const std::string label = fmt::format(
+                        "#{} - {} - {} (0x{:08X}) - {} - {}", record.first, service_name,
+                        record.second.function_name.empty() ? "Unknown"
+                                                            : record.second.function_name,
+                        record.second.untranslated_request_cmdbuf.empty()
+                            ? 0xFFFFFFFF
+                            : record.second.untranslated_request_cmdbuf[0],
+                        record.second.is_hle ? "HLE" : "LLE",
+                        IPC_Recorder_GetStatusString(record.second.status));
+                    if (label.find(filter) != std::string::npos) {
+                        ImGui::Selectable(label.c_str());
+                        if (ImGui::IsItemHovered()) {
+                            ImGui::SetTooltip(
+                                "id: %d\n"
+                                "status: %d\n"
+                                "client_process.type: %s\n"
+                                "client_process.name: %s\n"
+                                "client_process.id: %d\n"
+                                "client_thread.type: %s\n"
+                                "client_thread.name: %s\n"
+                                "client_thread.id: %d\n"
+                                "client_session.type: %s\n"
+                                "client_session.name: %s\n"
+                                "client_session.id: %d\n"
+                                "client_port.type: %s\n"
+                                "client_port.name: %s\n"
+                                "client_port.id: %d\n"
+                                "server_process.type: %s\n"
+                                "server_process.name: %s\n"
+                                "server_process.id: %d\n"
+                                "server_thread.type: %s\n"
+                                "server_thread.name: %s\n"
+                                "server_thread.id: %d\n"
+                                "server_session.type: %s\n"
+                                "server_session.name: %s\n"
+                                "server_session.id: %d\n"
+                                "function_name: %s\n"
+                                "is_hle: %s\n"
+                                "untranslated_request_cmdbuf: %s\n"
+                                "translated_request_cmdbuf: %s\n"
+                                "untranslated_reply_cmdbuf: %s\n"
+                                "translated_reply_cmdbuf: %s",
+                                record.first, static_cast<int>(record.second.status),
+                                record.second.client_process.type.c_str(),
+                                record.second.client_process.name.c_str(),
+                                record.second.client_process.id,
+                                record.second.client_thread.type.c_str(),
+                                record.second.client_thread.name.c_str(),
+                                record.second.client_thread.id,
+                                record.second.client_session.type.c_str(),
+                                record.second.client_session.name.c_str(),
+                                record.second.client_session.id,
+                                record.second.client_port.type.c_str(),
+                                record.second.client_port.name.c_str(),
+                                record.second.client_port.id,
+                                record.second.server_process.type.c_str(),
+                                record.second.server_process.name.c_str(),
+                                record.second.server_process.id,
+                                record.second.server_thread.type.c_str(),
+                                record.second.server_thread.name.c_str(),
+                                record.second.server_thread.id,
+                                record.second.server_session.type.c_str(),
+                                record.second.server_session.name.c_str(),
+                                record.second.server_session.id,
+                                record.second.function_name.c_str(),
+                                record.second.is_hle ? "true" : "false",
+                                fmt::format(
+                                    "0x{:08X}",
+                                    fmt::join(record.second.untranslated_request_cmdbuf, ", 0x"))
+                                    .c_str(),
+                                fmt::format(
+                                    "0x{:08X}",
+                                    fmt::join(record.second.translated_request_cmdbuf, ", 0x"))
+                                    .c_str(),
+                                fmt::format(
+                                    "0x{:08X}",
+                                    fmt::join(record.second.untranslated_reply_cmdbuf, ", 0x"))
+                                    .c_str(),
+                                fmt::format(
+                                    "0x{:08X}",
+                                    fmt::join(record.second.translated_reply_cmdbuf, ", 0x"))
+                                    .c_str());
+                        }
+                    }
+                }
+                ImGui::ListBoxFooter();
+            }
+        }
+        ImGui::End();
+    }
+
+    if (show_cheats_window) {
+        if (ImGui::Begin("Cheats", nullptr, ImGuiWindowFlags_NoSavedSettings)) {
+            if (ImGui::Button("Edit File")) {
+                const std::string filepath = fmt::format(
+                    "{}{:016X}.txt", FileUtil::GetUserPath(FileUtil::UserPath::CheatsDir),
+                    system.Kernel().GetCurrentProcess()->codeset->program_id);
+
+                FileUtil::CreateFullPath(filepath);
+
+                if (!FileUtil::Exists(filepath)) {
+                    FileUtil::CreateEmptyFile(filepath);
+                }
+
+#ifdef _WIN32
+                const int code = std::system(fmt::format("start {}", filepath).c_str());
+#else
+                const int code = std::system(fmt::format("xdg-open {}", filepath).c_str());
+#endif
+                LOG_INFO(Frontend, "Opened cheats file in text editor, exit code: {}", code);
+            }
+
+            ImGui::SameLine();
+
+            if (ImGui::Button("Reload File")) {
+                system.CheatEngine().LoadCheatFile();
+            }
+
+            if (ImGui::ListBoxHeader("##cheats", ImVec2(-1.0f, -1.0f))) {
+                for (const auto& cheat : system.CheatEngine().GetCheats()) {
+                    bool enabled = cheat->IsEnabled();
+                    if (ImGui::Checkbox(cheat->GetName().c_str(), &enabled)) {
+                        cheat->SetEnabled(enabled);
+                    }
+                }
+                ImGui::ListBoxFooter();
+            }
+        }
+
+        ImGui::End();
+    }
+
+    if (disk_shader_cache_loading_progress != -1.0f) {
+        if (ImGui::Begin("Loading Shaders", nullptr,
+                         ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_AlwaysAutoResize)) {
+            ImGui::ProgressBar(disk_shader_cache_loading_progress, ImVec2(0.0f, 0.0f));
+        }
+        ImGui::End();
     }
 
     ImGui::Render();

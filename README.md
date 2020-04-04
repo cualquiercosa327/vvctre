@@ -33,11 +33,10 @@ Create a `user` folder where vvctre is.
 
 # GUI Features
 
-- Middle click pause menu
 - Disk shader cache loading progress bar
-- FPS indicator
+- FPS counter
   - You can move it while the left mouse button is held.
-  - You can change its color while the right mouse button is held.
+  - You can open the pause menu by right clicking it.
 - Keyboard applet
 - Mii selector applet
 
