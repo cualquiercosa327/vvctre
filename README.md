@@ -11,10 +11,6 @@ Refer to the license.txt file included.
 | Scripting requests | Read/write memory | [Here](https://github.com/vvanelslande/vvctre/blob/master/RPC.md) |
 | Versions | Sequential number | [SemVer](https://semver.org/) |
 
-# Portable Mode
-
-Create a `user` folder where vvctre is.
-
 # Requirements
 
 - GPU with OpenGL >= 3.3
