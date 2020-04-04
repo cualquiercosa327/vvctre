@@ -413,7 +413,7 @@ void Configuration::Run() {
                             Settings::values.camera_name[static_cast<std::size_t>(
                                 Service::CAM::CameraIndex::InnerCamera)] = "blank";
                         }
-                        if (ImGui::Selectable("image")) {
+                        if (ImGui::Selectable("image (configuration: file path or URL)")) {
                             Settings::values.camera_name[static_cast<std::size_t>(
                                 Service::CAM::CameraIndex::InnerCamera)] = "image";
                         }
@@ -437,7 +437,7 @@ void Configuration::Run() {
                             Settings::values.camera_name[static_cast<std::size_t>(
                                 Service::CAM::CameraIndex::OuterLeftCamera)] = "blank";
                         }
-                        if (ImGui::Selectable("image")) {
+                        if (ImGui::Selectable("image (configuration: file path or URL)")) {
                             Settings::values.camera_name[static_cast<std::size_t>(
                                 Service::CAM::CameraIndex::OuterLeftCamera)] = "image";
                         }
@@ -461,7 +461,7 @@ void Configuration::Run() {
                             Settings::values.camera_name[static_cast<std::size_t>(
                                 Service::CAM::CameraIndex::OuterRightCamera)] = "blank";
                         }
-                        if (ImGui::Selectable("image")) {
+                        if (ImGui::Selectable("image (configuration: file path or URL)")) {
                             Settings::values.camera_name[static_cast<std::size_t>(
                                 Service::CAM::CameraIndex::OuterRightCamera)] = "image";
                         }

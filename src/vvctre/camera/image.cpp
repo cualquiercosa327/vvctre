@@ -2,6 +2,8 @@
 // Licensed under GPLv2 or any later version
 // Refer to the license.txt file included.
 
+#include <LUrlParser.h>
+#include <httplib.h>
 #include "common/assert.h"
 #include "common/file_util.h"
 #include "common/stb_image.h"
@@ -12,7 +14,40 @@
 namespace Camera {
 
 ImageCamera::ImageCamera(const std::string& file) {
-    image = stbi_load(file.c_str(), &file_width, &file_height, nullptr, 3);
+    LUrlParser::clParseURL url = LUrlParser::clParseURL::ParseURL(file);
+
+    if (url.IsValid()) {
+        int port;
+        std::unique_ptr<httplib::Client> client;
+
+        if (url.m_Scheme == "http") {
+            if (!url.GetPort(&port)) {
+                port = 80;
+            }
+
+            client = std::make_unique<httplib::Client>(url.m_Host.c_str(), port);
+        } else {
+            if (!url.GetPort(&port)) {
+                port = 443;
+            }
+
+            client = std::make_unique<httplib::SSLClient>(url.m_Host, port);
+        }
+
+        client->set_follow_location(true);
+
+        std::shared_ptr<httplib::Response> response = client->Get(('/' + url.m_Path).c_str());
+
+        if (response != nullptr) {
+            std::vector<unsigned char> buffer(response->body.size());
+            std::memcpy(buffer.data(), response->body.data(), response->body.size());
+            image = stbi_load_from_memory(buffer.data(), buffer.size(), &file_width, &file_height,
+                                          nullptr, 3);
+        }
+    } else {
+        image = stbi_load(file.c_str(), &file_width, &file_height, nullptr, 3);
+    }
+
     if (image == nullptr) {
         LOG_ERROR(Service_CAM, "Failed to load image");
     }

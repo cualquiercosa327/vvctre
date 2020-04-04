@@ -20,8 +20,13 @@ add_executable(${PROJECT_NAME}
 
 create_target_directory_groups(${PROJECT_NAME})
 
+get_directory_property(OPENSSL_LIBS
+    DIRECTORY ${PROJECT_SOURCE_DIR}/externals/libressl
+    DEFINITION OPENSSL_LIBS)
+
 target_link_libraries(${PROJECT_NAME} PRIVATE common core input_common audio_core)
-target_link_libraries(${PROJECT_NAME} PRIVATE glad clip portable-file-dialogs indicators imgui json ${PLATFORM_LIBRARIES} Threads::Threads)
+target_link_libraries(${PROJECT_NAME} PRIVATE glad clip portable-file-dialogs indicators imgui json ${OPENSSL_LIBS} httplib lurlparser ${PLATFORM_LIBRARIES} Threads::Threads)
+target_compile_definitions(${PROJECT_NAME} PRIVATE -DCPPHTTPLIB_OPENSSL_SUPPORT)
 
 if(UNIX)
     install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION "${CMAKE_INSTALL_PREFIX}/bin")

@@ -802,7 +802,7 @@ void EmuWindow_SDL2::SwapBuffers() {
                             }
                             Settings::LogSettings();
                         }
-                        if (ImGui::Selectable("image")) {
+                        if (ImGui::Selectable("image (configuration: file path or URL)")) {
                             Settings::values.camera_name[static_cast<std::size_t>(
                                 Service::CAM::CameraIndex::InnerCamera)] = "image";
                             auto cam = Service::CAM::GetModule(system);
@@ -842,7 +842,7 @@ void EmuWindow_SDL2::SwapBuffers() {
                             }
                             Settings::LogSettings();
                         }
-                        if (ImGui::Selectable("image")) {
+                        if (ImGui::Selectable("image (configuration: file path or URL)")) {
                             Settings::values.camera_name[static_cast<std::size_t>(
                                 Service::CAM::CameraIndex::OuterLeftCamera)] = "image";
                             auto cam = Service::CAM::GetModule(system);
@@ -882,7 +882,7 @@ void EmuWindow_SDL2::SwapBuffers() {
                             }
                             Settings::LogSettings();
                         }
-                        if (ImGui::Selectable("image")) {
+                        if (ImGui::Selectable("image (configuration: file path or URL)")) {
                             Settings::values.camera_name[static_cast<std::size_t>(
                                 Service::CAM::CameraIndex::OuterRightCamera)] = "image";
                             auto cam = Service::CAM::GetModule(system);
