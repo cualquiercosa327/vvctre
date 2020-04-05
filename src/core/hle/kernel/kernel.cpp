@@ -18,11 +18,10 @@ namespace Kernel {
 
 /// Initialize the kernel
 KernelSystem::KernelSystem(Memory::MemorySystem& memory, Core::Timing& timing,
-                           std::function<void()> prepare_reschedule_callback, u32 system_mode,
-                           u8 n3ds_mode)
+                           std::function<void()> prepare_reschedule_callback, u32 system_mode)
     : memory(memory), timing(timing),
       prepare_reschedule_callback(std::move(prepare_reschedule_callback)) {
-    MemoryInit(system_mode, n3ds_mode);
+    MemoryInit(system_mode);
 
     resource_limits = std::make_unique<ResourceLimitList>(*this);
     thread_manager = std::make_unique<ThreadManager>(*this);

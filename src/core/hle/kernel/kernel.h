@@ -252,7 +252,7 @@ public:
     Core::Timing& timing;
 
 private:
-    void MemoryInit(u32 mem_type, u8 n3ds_mode);
+    void MemoryInit(u32 mem_type);
 
     std::function<void()> prepare_reschedule_callback;
 

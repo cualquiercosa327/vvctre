@@ -36,7 +36,7 @@ static const u32 memory_region_sizes[6][3] = {
     {0x02000000, 0x04C00000, 0x01400000}, // 5
 };
 
-void KernelSystem::MemoryInit(u32 mem_type, u8 n3ds_mode) {
+void KernelSystem::MemoryInit(u32 mem_type) {
     ASSERT(mem_type != 1);
 
     // The kernel allocation regions (APPLICATION, SYSTEM and BASE) are laid out in sequence, with
