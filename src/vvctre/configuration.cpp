@@ -273,9 +273,7 @@ void Configuration::Run() {
                     ImGui::Checkbox("Enable GDB Stub", &Settings::values.use_gdbstub);
                     if (Settings::values.use_gdbstub) {
                         ImGui::SameLine();
-                        ImGui::Spacing();
-                        ImGui::SameLine();
-                        ImGui::Text("GDB Stub Port:");
+                        ImGui::Text("Port:");
                         ImGui::SameLine();
                         ImGui::InputScalar("##gdbstubport", ImGuiDataType_U16,
                                            &Settings::values.gdbstub_port);
