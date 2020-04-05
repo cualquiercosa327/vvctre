@@ -2274,7 +2274,7 @@ void Configuration::Run() {
                         ImGui::SameLine();
                         ImGui::Text(":");
                         ImGui::SameLine();
-                        ImGui::PushItemWidth(40);
+                        ImGui::PushItemWidth(45);
                         ImGui::InputScalar("##udp_input_port", ImGuiDataType_U16,
                                            &Settings::values.udp_input_port);
                         ImGui::PopItemWidth();
