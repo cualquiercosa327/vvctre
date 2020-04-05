@@ -204,7 +204,7 @@ void LoadBootromKeys() {
     }
 }
 
-void LoadNativeFirmKeys3DS() {
+void LoadNativeFirmKeys() {
     constexpr u64 native_firm_id = 0x00040138'00000002;
     FileSys::NCCHArchive archive(native_firm_id, Service::FS::MediaType::NAND);
     std::array<char, 8> exefs_filepath = {'.', 'f', 'i', 'r', 'm', 0, 0, 0};
@@ -259,7 +259,7 @@ void LoadNativeFirmKeys3DS() {
     key_slots.at(0x25).SetKeyX(key);
 }
 
-void LoadSafeModeNativeFirmKeys3DS() {
+void LoadSafeModeNativeFirmKeys() {
     // Use the safe mode native firm instead of the normal mode since there are only 2 version of it
     // and thus we can use fixed offsets
 
@@ -382,8 +382,8 @@ void InitKeys() {
     initialized = true;
     HW::RSA::InitSlots();
     LoadBootromKeys();
-    LoadNativeFirmKeys3DS();
-    LoadSafeModeNativeFirmKey3DS();
+    LoadNativeFirmKeys();
+    LoadSafeModeNativeFirmKeys();
     LoadPresetKeys();
 }
 
