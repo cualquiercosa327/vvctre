@@ -273,10 +273,14 @@ void Configuration::Run() {
                     ImGui::Checkbox("Enable GDB Stub", &Settings::values.use_gdbstub);
                     if (Settings::values.use_gdbstub) {
                         ImGui::SameLine();
+                        ImGui::Spacing();
+                        ImGui::SameLine();
                         ImGui::Text("Port:");
                         ImGui::SameLine();
+                        ImGui::PushItemWidth(45);
                         ImGui::InputScalar("##gdbstubport", ImGuiDataType_U16,
                                            &Settings::values.gdbstub_port);
+                        ImGui::PopItemWidth();
                     }
 
                     ImGui::EndTabItem();
@@ -289,13 +293,15 @@ void Configuration::Run() {
                     ImGui::Checkbox("Use CPU JIT", &Settings::values.use_cpu_jit);
                     ImGui::Checkbox("Limit Speed", &Settings::values.use_frame_limit);
 
-                    ImGui::Text("Speed Limit");
                     ImGui::SameLine();
-                    const u16 min = 1;
-                    const u16 max = 500;
-
-                    ImGui::SliderScalar("##speedlimit", ImGuiDataType_U16,
-                                        &Settings::values.frame_limit, &min, &max);
+                    ImGui::Spacing();
+                    ImGui::SameLine();
+                    ImGui::Text("Limit:");
+                    ImGui::SameLine();
+                    ImGui::PushItemWidth(45);
+                    ImGui::InputScalar("##speedlimit", ImGuiDataType_U16,
+                                       &Settings::values.frame_limit);
+                    ImGui::PopItemWidth();
 
                     ImGui::EndTabItem();
                 }
@@ -2151,6 +2157,8 @@ void Configuration::Run() {
                         float sensitivity = motion_device.Get("sensitivity", 0.01f);
                         float clamp = motion_device.Get("tilt_clamp", 90.0f);
 
+                        ImGui::Spacing();
+                        ImGui::SameLine();
                         ImGui::SameLine();
                         ImGui::Text("Update Period:");
                         ImGui::SameLine();
@@ -2219,6 +2227,8 @@ void Configuration::Run() {
                         int max_y = touch_device.Get("max_y", 850);
 
                         ImGui::SameLine();
+                        ImGui::Spacing();
+                        ImGui::SameLine();
                         ImGui::Text("Min X:");
                         ImGui::SameLine();
                         ImGui::PushItemWidth(45);
@@ -2263,6 +2273,8 @@ void Configuration::Run() {
                         touch_device.Get("engine", "") == "cemuhookudp") {
                         ImGui::Text("UDP:");
 
+                        ImGui::Spacing();
+                        ImGui::SameLine();
                         ImGui::SameLine();
                         ImGui::PushItemWidth(110);
                         ImGui::InputText("##udp_input_address",
