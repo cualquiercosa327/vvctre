@@ -1933,8 +1933,8 @@ void EmuWindow_SDL2::SwapBuffers() {
 
                 ImGui::Separator();
 
-                if (ImGui::Checkbox("Fullscreen", SDL_GetWindowFlags(render_window) &
-                                                      SDL_WINDOW_FULLSCREEN_DESKTOP)) {
+                bool fullscreen = SDL_GetWindowFlags(render_window) & SDL_WINDOW_FULLSCREEN_DESKTOP;
+                if (ImGui::Checkbox("Fullscreen", &fullscreen)) {
                     ToggleFullscreen();
                 }
 
