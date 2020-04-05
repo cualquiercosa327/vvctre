@@ -178,7 +178,7 @@ void System::Reschedule() {
     kernel->GetThreadManager().Reschedule();
 }
 
-System::ResultStatus System::Init(Frontend::EmuWindow& emu_window, u32 system_mode, u8 n3ds_mode) {
+System::ResultStatus System::Init(Frontend::EmuWindow& emu_window, u32 system_mode) {
     LOG_DEBUG(HW_Memory, "initialized OK");
 
     memory = std::make_unique<Memory::MemorySystem>();
