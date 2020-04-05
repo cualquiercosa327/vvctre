@@ -48,7 +48,7 @@ CubebSink::CubebSink(std::string_view target_device_name) : impl(std::make_uniqu
     }
 
     cubeb_devid output_device = nullptr;
-    if (target_device_name != auto_device_name && !target_device_name.empty()) {
+    if (target_device_name != "auto" && !target_device_name.empty()) {
         cubeb_device_collection collection;
         if (cubeb_enumerate_devices(impl->ctx, CUBEB_DEVICE_TYPE_OUTPUT, &collection) != CUBEB_OK) {
             LOG_WARNING(Audio_Sink, "Audio output device enumeration not supported");

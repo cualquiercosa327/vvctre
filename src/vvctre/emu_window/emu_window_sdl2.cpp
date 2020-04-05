@@ -374,17 +374,10 @@ void EmuWindow_SDL2::SwapBuffers() {
                             Settings::Apply();
                             Settings::LogSettings();
                         }
-#ifdef HAVE_CUBEB
-                        if (ImGui::Selectable("cubeb")) {
-                            Settings::values.sink_id = "cubeb";
-                            Settings::Apply();
-                            Settings::LogSettings();
-                        }
-#endif
-                        if (ImGui::Selectable("sdl2")) {
-                            Settings::values.sink_id = "sdl2";
-                            Settings::Apply();
-                            Settings::LogSettings();
+                        for (const auto& sink : AudioCore::GetSinkIDs()) {
+                            if (ImGui::Selectable(sink)) {
+                                Settings::values.sink_id = sink;
+                            }
                         }
                         ImGui::EndCombo();
                     }
@@ -392,8 +385,8 @@ void EmuWindow_SDL2::SwapBuffers() {
                     ImGui::Text("Device:");
                     ImGui::SameLine();
                     if (ImGui::BeginCombo("##device", Settings::values.audio_device_id.c_str())) {
-                        if (ImGui::Selectable(AudioCore::auto_device_name)) {
-                            Settings::values.audio_device_id = AudioCore::auto_device_name;
+                        if (ImGui::Selectable("auto")) {
+                            Settings::values.audio_device_id = "auto";
                         }
 
                         for (const auto& device :

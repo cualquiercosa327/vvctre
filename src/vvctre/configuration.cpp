@@ -335,13 +335,10 @@ void Configuration::Run() {
                         if (ImGui::Selectable("auto")) {
                             Settings::values.sink_id = "auto";
                         }
-#ifdef HAVE_CUBEB
-                        if (ImGui::Selectable("cubeb")) {
-                            Settings::values.sink_id = "cubeb";
-                        }
-#endif
-                        if (ImGui::Selectable("sdl2")) {
-                            Settings::values.sink_id = "sdl2";
+                        for (const auto& sink : AudioCore::GetSinkIDs()) {
+                            if (ImGui::Selectable(sink)) {
+                                Settings::values.sink_id = sink;
+                            }
                         }
                         ImGui::EndCombo();
                     }
@@ -349,8 +346,8 @@ void Configuration::Run() {
                     ImGui::Text("Device:");
                     ImGui::SameLine();
                     if (ImGui::BeginCombo("##device", Settings::values.audio_device_id.c_str())) {
-                        if (ImGui::Selectable(AudioCore::auto_device_name)) {
-                            Settings::values.audio_device_id = AudioCore::auto_device_name;
+                        if (ImGui::Selectable("auto")) {
+                            Settings::values.audio_device_id = "auto";
                         }
 
                         for (const auto& device :
