@@ -329,19 +329,23 @@ void EmuWindow_SDL2::SwapBuffers() {
 
             if (ImGui::BeginMenu("Settings")) {
                 if (ImGui::BeginMenu("General")) {
-                    if (ImGui::MenuItem("Limit Speed", nullptr,
-                                        &Settings::values.use_frame_limit)) {
+                    if (ImGui::Checkbox("Limit Speed", &Settings::values.use_frame_limit)) {
                         Settings::LogSettings();
                     }
 
-                    ImGui::Text("Speed Limit:");
                     ImGui::SameLine();
-                    const u16 min = 1;
-                    const u16 max = 500;
-                    if (ImGui::SliderScalar("##speedlimit", ImGuiDataType_U16,
-                                            &Settings::values.frame_limit, &min, &max)) {
+                    ImGui::Spacing();
+                    ImGui::SameLine();
+                    ImGui::Text("Limit:");
+                    ImGui::SameLine();
+                    ImGui::PushItemWidth(45);
+                    if (ImGui::InputScalar("##speedlimit", ImGuiDataType_U16,
+                                           &Settings::values.frame_limit)) {
                         Settings::LogSettings();
                     }
+                    ImGui::PopItemWidth();
+                    ImGui::SameLine();
+                    ImGui::Text("%");
 
                     ImGui::EndMenu();
                 }

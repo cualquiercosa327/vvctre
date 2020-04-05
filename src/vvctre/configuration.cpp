@@ -302,6 +302,8 @@ void Configuration::Run() {
                     ImGui::InputScalar("##speedlimit", ImGuiDataType_U16,
                                        &Settings::values.frame_limit);
                     ImGui::PopItemWidth();
+                    ImGui::SameLine();
+                    ImGui::Text("%");
 
                     ImGui::EndTabItem();
                 }
@@ -2157,8 +2159,8 @@ void Configuration::Run() {
                         float sensitivity = motion_device.Get("sensitivity", 0.01f);
                         float clamp = motion_device.Get("tilt_clamp", 90.0f);
 
-                        ImGui::Spacing();
                         ImGui::SameLine();
+                        ImGui::Spacing();
                         ImGui::SameLine();
                         ImGui::Text("Update Period:");
                         ImGui::SameLine();
