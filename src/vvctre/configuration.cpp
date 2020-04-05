@@ -2266,7 +2266,7 @@ void Configuration::Run() {
                         ImGui::Text("UDP:");
 
                         ImGui::SameLine();
-                        ImGui::PushItemWidth(125);
+                        ImGui::PushItemWidth(110);
                         ImGui::InputText("##udp_input_address",
                                          &Settings::values.udp_input_address);
                         ImGui::PopItemWidth();
@@ -2274,7 +2274,7 @@ void Configuration::Run() {
                         ImGui::SameLine();
                         ImGui::Text(":");
                         ImGui::SameLine();
-                        ImGui::PushItemWidth(50);
+                        ImGui::PushItemWidth(40);
                         ImGui::InputScalar("##udp_input_port", ImGuiDataType_U16,
                                            &Settings::values.udp_input_port);
                         ImGui::PopItemWidth();
