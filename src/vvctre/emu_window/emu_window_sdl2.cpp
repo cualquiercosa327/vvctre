@@ -571,7 +571,7 @@ void EmuWindow_SDL2::SwapBuffers() {
                         ImGui::EndCombo();
                     }
 
-                    if (ImGui::Checkbox("Dump Textures", , &Settings::values.dump_textures)) {
+                    if (ImGui::Checkbox("Dump Textures", &Settings::values.dump_textures)) {
                         Settings::LogSettings();
                     }
 
