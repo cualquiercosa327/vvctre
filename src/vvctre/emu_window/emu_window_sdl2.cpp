@@ -333,19 +333,21 @@ void EmuWindow_SDL2::SwapBuffers() {
                         Settings::LogSettings();
                     }
 
-                    ImGui::SameLine();
-                    ImGui::Spacing();
-                    ImGui::SameLine();
-                    ImGui::Text("Limit:");
-                    ImGui::SameLine();
-                    ImGui::PushItemWidth(45);
-                    if (ImGui::InputScalar("##speedlimit", ImGuiDataType_U16,
-                                           &Settings::values.frame_limit)) {
-                        Settings::LogSettings();
+                    if (Settings::values.use_frame_limit) {
+                        ImGui::SameLine();
+                        ImGui::Spacing();
+                        ImGui::SameLine();
+                        ImGui::Text("Limit:");
+                        ImGui::SameLine();
+                        ImGui::PushItemWidth(45);
+                        if (ImGui::InputScalar("##speedlimit", ImGuiDataType_U16,
+                                               &Settings::values.frame_limit)) {
+                            Settings::LogSettings();
+                        }
+                        ImGui::PopItemWidth();
+                        ImGui::SameLine();
+                        ImGui::Text("%");
                     }
-                    ImGui::PopItemWidth();
-                    ImGui::SameLine();
-                    ImGui::Text("%");
 
                     ImGui::EndMenu();
                 }
@@ -464,21 +466,20 @@ void EmuWindow_SDL2::SwapBuffers() {
                 }
 
                 if (ImGui::BeginMenu("Graphics")) {
-                    if (ImGui::MenuItem("Use Hardware Renderer", nullptr,
+                    if (ImGui::Checkbox("Use Hardware Renderer",
                                         &Settings::values.use_hw_renderer)) {
                         Settings::Apply();
                         Settings::LogSettings();
                     }
                     ImGui::Indent();
 
-                    if (ImGui::MenuItem("Use Hardware Shader", nullptr,
-                                        &Settings::values.use_hw_shader)) {
+                    if (ImGui::Checkbox("Use Hardware Shader", &Settings::values.use_hw_shader)) {
                         Settings::Apply();
                         Settings::LogSettings();
                     }
                     ImGui::Indent();
 
-                    if (ImGui::MenuItem("Use Accurate Multiplication", nullptr,
+                    if (ImGui::Checkbox("Use Accurate Multiplication",
                                         &Settings::values.shaders_accurate_mul)) {
                         Settings::Apply();
                         Settings::LogSettings();
@@ -487,12 +488,11 @@ void EmuWindow_SDL2::SwapBuffers() {
                     ImGui::Unindent();
                     ImGui::Unindent();
 
-                    if (ImGui::MenuItem("Use Shader JIT", nullptr,
-                                        &Settings::values.use_shader_jit)) {
+                    if (ImGui::Checkbox("Use Shader JIT", &Settings::values.use_shader_jit)) {
                         Settings::LogSettings();
                     }
 
-                    if (ImGui::MenuItem("Enable VSync", nullptr, &Settings::values.enable_vsync)) {
+                    if (ImGui::Checkbox("Enable VSync", &Settings::values.enable_vsync)) {
                         Settings::LogSettings();
                     }
 
@@ -571,17 +571,16 @@ void EmuWindow_SDL2::SwapBuffers() {
                         ImGui::EndCombo();
                     }
 
-                    if (ImGui::MenuItem("Dump Textures", nullptr,
-                                        &Settings::values.dump_textures)) {
+                    if (ImGui::Checkbox("Dump Textures", , &Settings::values.dump_textures)) {
                         Settings::LogSettings();
                     }
 
-                    if (ImGui::MenuItem("Use Custom Textures", nullptr,
+                    if (ImGui::Checkbox("Use Custom Textures", ,
                                         &Settings::values.custom_textures)) {
                         Settings::LogSettings();
                     }
 
-                    if (ImGui::MenuItem("Preload Custom Textures", nullptr,
+                    if (ImGui::Checkbox("Preload Custom Textures", ,
                                         &Settings::values.preload_textures)) {
                         Settings::LogSettings();
                     }
@@ -1931,13 +1930,12 @@ void EmuWindow_SDL2::SwapBuffers() {
             }
 
             if (ImGui::BeginMenu("View")) {
-                ImGui::MenuItem("Cheats", nullptr, &show_cheats_window);
+                ImGui::Checkbox("Cheats", &show_cheats_window);
 
                 ImGui::Separator();
 
-                if (ImGui::MenuItem("Fullscreen", nullptr,
-                                    SDL_GetWindowFlags(render_window) &
-                                        SDL_WINDOW_FULLSCREEN_DESKTOP)) {
+                if (ImGui::Checkbox("Fullscreen", SDL_GetWindowFlags(render_window) &
+                                                      SDL_WINDOW_FULLSCREEN_DESKTOP)) {
                     ToggleFullscreen();
                 }
 
@@ -2034,19 +2032,17 @@ void EmuWindow_SDL2::SwapBuffers() {
 
                     ImGui::Separator();
 
-                    if (ImGui::MenuItem("Use Custom Layout", nullptr,
-                                        &Settings::values.custom_layout)) {
+                    if (ImGui::Checkbox("Use Custom Layout", &Settings::values.custom_layout)) {
                         Settings::Apply();
                         Settings::LogSettings();
                     }
 
-                    if (ImGui::MenuItem("Swap Screens", nullptr, &Settings::values.swap_screen)) {
+                    if (ImGui::Checkbox("Swap Screens", &Settings::values.swap_screen)) {
                         Settings::Apply();
                         Settings::LogSettings();
                     }
 
-                    if (ImGui::MenuItem("Upright Orientation", nullptr,
-                                        &Settings::values.upright_screen)) {
+                    if (ImGui::Checkbox("Upright Orientation", &Settings::values.upright_screen)) {
                         Settings::Apply();
                         Settings::LogSettings();
                     }
@@ -2055,7 +2051,7 @@ void EmuWindow_SDL2::SwapBuffers() {
                 }
 
                 if (ImGui::BeginMenu("Debugging")) {
-                    if (ImGui::MenuItem("IPC Recorder", nullptr, &show_ipc_recorder_window)) {
+                    if (ImGui::Checkbox("IPC Recorder", &show_ipc_recorder_window)) {
                         ipc_records.clear();
 
                         if (!show_ipc_recorder_window) {
@@ -2358,7 +2354,8 @@ void EmuWindow_SDL2::SwapBuffers() {
     }
 
     if (show_ipc_recorder_window) {
-        if (ImGui::Begin("IPC Recorder", nullptr, ImGuiWindowFlags_NoSavedSettings)) {
+        if (ImGui::Begin("IPC Recorder", &show_ipc_recorder_window,
+                         ImGuiWindowFlags_NoSavedSettings)) {
             if (ImGui::Checkbox("Enabled", &ipc_recorder_enabled)) {
                 IPCDebugger::Recorder& r = Core::System::GetInstance().Kernel().GetIPCRecorder();
 
@@ -2482,11 +2479,20 @@ void EmuWindow_SDL2::SwapBuffers() {
                 ImGui::ListBoxFooter();
             }
         }
+        if (!show_ipc_recorder_window) {
+            ipc_recorder_enabled = false;
+
+            IPCDebugger::Recorder& r = Core::System::GetInstance().Kernel().GetIPCRecorder();
+
+            r.SetEnabled(ipc_recorder_enabled);
+            r.UnbindCallback(ipc_recorder_callback);
+            ipc_recorder_callback = nullptr;
+        }
         ImGui::End();
     }
 
     if (show_cheats_window) {
-        if (ImGui::Begin("Cheats", nullptr, ImGuiWindowFlags_NoSavedSettings)) {
+        if (ImGui::Begin("Cheats", &show_cheats_window, ImGuiWindowFlags_NoSavedSettings)) {
             if (ImGui::Button("Edit File")) {
                 const std::string filepath = fmt::format(
                     "{}{:016X}.txt", FileUtil::GetUserPath(FileUtil::UserPath::CheatsDir),

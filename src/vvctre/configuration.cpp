@@ -293,17 +293,19 @@ void Configuration::Run() {
                     ImGui::Checkbox("Use CPU JIT", &Settings::values.use_cpu_jit);
                     ImGui::Checkbox("Limit Speed", &Settings::values.use_frame_limit);
 
-                    ImGui::SameLine();
-                    ImGui::Spacing();
-                    ImGui::SameLine();
-                    ImGui::Text("Limit:");
-                    ImGui::SameLine();
-                    ImGui::PushItemWidth(45);
-                    ImGui::InputScalar("##speedlimit", ImGuiDataType_U16,
-                                       &Settings::values.frame_limit);
-                    ImGui::PopItemWidth();
-                    ImGui::SameLine();
-                    ImGui::Text("%");
+                    if (Settings::values.use_frame_limit) {
+                        ImGui::SameLine();
+                        ImGui::Spacing();
+                        ImGui::SameLine();
+                        ImGui::Text("Limit:");
+                        ImGui::SameLine();
+                        ImGui::PushItemWidth(45);
+                        ImGui::InputScalar("##speedlimit", ImGuiDataType_U16,
+                                           &Settings::values.frame_limit);
+                        ImGui::PopItemWidth();
+                        ImGui::SameLine();
+                        ImGui::Text("%");
+                    }
 
                     ImGui::EndTabItem();
                 }
