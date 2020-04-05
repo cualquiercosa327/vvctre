@@ -1931,8 +1931,6 @@ void EmuWindow_SDL2::SwapBuffers() {
             if (ImGui::BeginMenu("View")) {
                 ImGui::Checkbox("Cheats", &show_cheats_window);
 
-                ImGui::Separator();
-
                 bool fullscreen = SDL_GetWindowFlags(render_window) & SDL_WINDOW_FULLSCREEN_DESKTOP;
                 if (ImGui::Checkbox("Fullscreen", &fullscreen)) {
                     ToggleFullscreen();
