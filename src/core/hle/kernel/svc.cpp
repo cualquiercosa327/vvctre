@@ -892,18 +892,24 @@ ResultCode SVC::CreateThread(Handle* out_handle, u32 entry_point, u32 arg, VAddr
     }
 
     switch (processor_id) {
-    case ThreadProcessorId0:
-        break;
     case ThreadProcessorIdAll:
-        LOG_INFO(Kernel_SVC,
-                 "Newly created thread is allowed to be run in any Core, unimplemented.");
+        LOG_INFO(Kernel_SVC, "Newly created thread is allowed to be run in any core");
+        break;
+    case ThreadProcessorId0:
+        LOG_INFO(Kernel_SVC, "Newly created thread is allowed to be run in AppCore");
         break;
     case ThreadProcessorId1:
-        LOG_ERROR(Kernel_SVC,
-                  "Newly created thread must run in the SysCore (Core1), unimplemented.");
+        LOG_INFO(Kernel_SVC, "Newly created thread is allowed to be run in SysCore");
+        break;
+    case ThreadProcessorId2:
+        LOG_INFO(Kernel_SVC,
+                 "Newly created thread is allowed to be run in additional New 3DS core 1");
+        break;
+    case ThreadProcessorId3:
+        LOG_INFO(Kernel_SVC,
+                 "Newly created thread is allowed to be run in additional New 3DS core 2");
         break;
     default:
-        // TODO(bunnei): Implement support for other processor IDs
         ASSERT_MSG(false, "Unsupported thread processor ID: {}", processor_id);
         break;
     }
