@@ -377,6 +377,8 @@ void EmuWindow_SDL2::SwapBuffers() {
                         for (const auto& sink : AudioCore::GetSinkIDs()) {
                             if (ImGui::Selectable(sink)) {
                                 Settings::values.sink_id = sink;
+                                Settings::Apply();
+                                Settings::LogSettings();
                             }
                         }
                         ImGui::EndCombo();
@@ -387,6 +389,8 @@ void EmuWindow_SDL2::SwapBuffers() {
                     if (ImGui::BeginCombo("##device", Settings::values.audio_device_id.c_str())) {
                         if (ImGui::Selectable("auto")) {
                             Settings::values.audio_device_id = "auto";
+                            Settings::Apply();
+                            Settings::LogSettings();
                         }
 
                         for (const auto& device :
