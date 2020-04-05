@@ -2266,19 +2266,25 @@ void Configuration::Run() {
                         ImGui::Text("UDP:");
 
                         ImGui::SameLine();
+                        ImGui::PushItemWidth(150);
                         ImGui::InputText("##udp_input_address",
                                          &Settings::values.udp_input_address);
+                        ImGui::PopItemWidth();
 
                         ImGui::Text(":");
                         ImGui::SameLine();
+                        ImGui::PushItemWidth(75);
                         ImGui::InputScalar("##udp_input_port", ImGuiDataType_U16,
                                            &Settings::values.udp_input_port);
+                        ImGui::PopItemWidth();
 
                         ImGui::SameLine();
                         ImGui::Text("Pad");
                         ImGui::SameLine();
+                        ImGui::PushItemWidth(15);
                         ImGui::InputScalar("##udp_pad_index", ImGuiDataType_U8,
                                            &Settings::values.udp_pad_index);
+                        ImGui::PopItemWidth();
                     }
 
                     ImGui::EndTabItem();
