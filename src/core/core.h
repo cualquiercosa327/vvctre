@@ -124,42 +124,21 @@ public:
     /**
      * Indicates if the emulated system is powered on (all subsystems initialized and able to run an
      * application).
-     * @returns true if the emulated system is powered on, otherwise false.
+     * @returns True if the emulated system is powered on, otherwise false.
      */
     bool IsPoweredOn() const {
-        return cpu_cores.size() > 0 &&
-               std::all_of(cpu_cores.begin(), cpu_cores.end(),
-                           [](std::shared_ptr<ARM_Interface> ptr) { return ptr != nullptr; });
+        return cpu_core != nullptr;
     }
 
     /// Prepare the core emulation for a reschedule
     void PrepareReschedule();
 
     /**
-     * Gets a reference to the running core.
-     * @returns A reference to the running core.
+     * Gets a reference to the emulated CPU.
+     * @returns A reference to the emulated CPU.
      */
-    ARM_Interface& GetRunningCore() {
-        return *running_core;
-    }
-
-    /**
-     * Gets a reference to a CPU.
-     * @param core_id The ID of the core requested.
-     * @returns A reference to the core.
-     */
-    ARM_Interface& GetCore(u32 core_id) {
-        return *cpu_cores[core_id];
-    }
-
-    u32 GetNumCores() const {
-        return cpu_cores.size();
-    }
-
-    void InvalidateCacheRange(u32 start_address, std::size_t length) {
-        for (const auto& cpu : cpu_cores) {
-            cpu->InvalidateCacheRange(start_address, length);
-        }
+    ARM_Interface& CPU() {
+        return *cpu_core;
     }
 
     /**
@@ -273,8 +252,7 @@ private:
     std::unique_ptr<Loader::AppLoader> app_loader;
 
     /// ARM11 CPU core
-    std::vector<std::shared_ptr<ARM_Interface>> cpu_cores;
-    ARM_Interface* running_core = nullptr;
+    std::shared_ptr<ARM_Interface> cpu_core;
 
     /// DSP core
     std::unique_ptr<AudioCore::DspInterface> dsp_core;
@@ -302,8 +280,6 @@ private:
     std::unique_ptr<Timing> timing;
 
     static System s_instance;
-
-    bool initalized = false;
 
     ResultStatus status = ResultStatus::Success;
     std::string status_details = "";

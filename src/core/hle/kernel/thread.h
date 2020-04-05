@@ -34,9 +34,7 @@ enum ThreadProcessorId : s32 {
     ThreadProcessorIdAll = -1,     ///< Run thread on either core
     ThreadProcessorId0 = 0,        ///< Run thread on core 0 (AppCore)
     ThreadProcessorId1 = 1,        ///< Run thread on core 1 (SysCore)
-    ThreadProcessorId2 = 2,        ///< Run thread on core 2 (additional n3ds core)
-    ThreadProcessorId3 = 3,        ///< Run thread on core 3 (additional n3ds core)
-    ThreadProcessorIdMax = 4,      ///< Processor ID must be less than this
+    ThreadProcessorIdMax = 2,      ///< Processor ID must be less than this
 };
 
 enum class ThreadStatus {
@@ -59,8 +57,14 @@ enum class ThreadWakeupReason {
 
 class ThreadManager {
 public:
-    explicit ThreadManager(Kernel::KernelSystem& kernel, u32 core_id);
+    explicit ThreadManager(Kernel::KernelSystem& kernel);
     ~ThreadManager();
+
+    /**
+     * Creates a new thread ID
+     * @return The new thread ID
+     */
+    u32 NewThreadId();
 
     /**
      * Gets the current thread
@@ -125,9 +129,13 @@ private:
      */
     void ThreadWakeupCallback(u64 thread_id, s64 cycles_late);
 
+    /// Boost low priority threads (temporarily) that have been starved
+    void PriorityBoostStarvedThreads();
+
     Kernel::KernelSystem& kernel;
     ARM_Interface* cpu;
 
+    u32 next_thread_id = 1;
     std::shared_ptr<Thread> current_thread;
     Common::ThreadQueueList<Thread*, ThreadPrioLowest + 1> ready_queue;
     std::unordered_map<u64, Thread*> wakeup_callback_table;
@@ -144,7 +152,7 @@ private:
 
 class Thread final : public WaitObject {
 public:
-    explicit Thread(KernelSystem&, u32 core_id);
+    explicit Thread(KernelSystem&);
     ~Thread() override;
 
     std::string GetName() const override {

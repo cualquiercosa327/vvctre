@@ -286,8 +286,8 @@ void Configuration::Run() {
                     ImGui::EndTabItem();
                 }
 
-                if (ImGui::BeginTabItem("Performance")) {
-                    ImGui::Text("Performance settings are not persistent.");
+                if (ImGui::BeginTabItem("General")) {
+                    ImGui::Text("General settings are not persistent.");
                     ImGui::NewLine();
 
                     ImGui::Checkbox("Use CPU JIT", &Settings::values.use_cpu_jit);
@@ -306,6 +306,23 @@ void Configuration::Run() {
                         ImGui::SameLine();
                         ImGui::Text("%");
                     }
+
+                    if (Settings::values.use_custom_cpu_ticks) {
+                        ImGui::Checkbox("Custom CPU Ticks:",
+                                        &Settings::values.use_custom_cpu_ticks);
+                        ImGui::SameLine();
+                        ImGui::InputScalar("##customcputicks", ImGuiDataType_U64,
+                                           &Settings::values.custom_cpu_ticks);
+                    } else {
+                        ImGui::Checkbox("Custom CPU Ticks", &Settings::values.use_custom_cpu_ticks);
+                    }
+
+                    ImGui::Text("CPU Clock Speed:");
+                    ImGui::SameLine();
+                    u32 min = 5;
+                    u32 max = 400;
+                    ImGui::SliderScalar("##cpuclockspeed", ImGuiDataType_U32,
+                                        &Settings::values.cpu_clock_percentage, &min, &max, "%d%%");
 
                     ImGui::EndTabItem();
                 }

@@ -33,11 +33,12 @@ static constexpr u32 CRO_HASH_SIZE = 0x80;
 class CROHelper final {
 public:
     // TODO (wwylele): pass in the process handle for memory access
-    explicit CROHelper(VAddr cro_address, Kernel::Process& process, Core::System& system)
-        : module_address(cro_address), process(process), system(system) {}
+    explicit CROHelper(VAddr cro_address, Kernel::Process& process, Memory::MemorySystem& memory,
+                       ARM_Interface& cpu)
+        : module_address(cro_address), process(process), memory(memory), cpu(cpu) {}
 
     std::string ModuleName() const {
-        return system.Memory().ReadCString(GetField(ModuleNameOffset), GetField(ModuleNameSize));
+        return memory.ReadCString(GetField(ModuleNameOffset), GetField(ModuleNameSize));
     }
 
     u32 GetFileSize() const {
@@ -143,7 +144,8 @@ public:
 private:
     const VAddr module_address; ///< the virtual address of this module
     Kernel::Process& process;   ///< the owner process of this module
-    Core::System& system;
+    Memory::MemorySystem& memory;
+    ARM_Interface& cpu;
 
     /**
      * Each item in this enum represents a u32 field in the header begin from address+0x80,
@@ -401,11 +403,11 @@ private:
     }
 
     u32 GetField(HeaderField field) const {
-        return system.Memory().Read32(Field(field));
+        return memory.Read32(Field(field));
     }
 
     void SetField(HeaderField field, u32 value) {
-        system.Memory().Write32(Field(field), value);
+        memory.Write32(Field(field), value);
     }
 
     /**
@@ -472,11 +474,12 @@ private:
      *         otherwise error code of the last iteration.
      */
     template <typename FunctionObject>
-    static ResultCode ForEachAutoLinkCRO(Kernel::Process& process, Core::System& system,
-                                         VAddr crs_address, FunctionObject func) {
+    static ResultCode ForEachAutoLinkCRO(Kernel::Process& process, Memory::MemorySystem& memory,
+                                         ARM_Interface& cpu, VAddr crs_address,
+                                         FunctionObject func) {
         VAddr current = crs_address;
         while (current != 0) {
-            CROHelper cro(current, process, system);
+            CROHelper cro(current, process, memory, cpu);
             CASCADE_RESULT(bool next, func(cro));
             if (!next)
                 break;

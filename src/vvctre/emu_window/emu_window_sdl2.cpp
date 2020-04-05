@@ -1922,6 +1922,27 @@ void EmuWindow_SDL2::SwapBuffers() {
                     ImGui::EndMenu();
                 }
 
+                if (ImGui::BeginMenu("Hacks")) {
+                    if (Settings::values.use_custom_cpu_ticks) {
+                        ImGui::Checkbox("Custom CPU Ticks:",
+                                        &Settings::values.use_custom_cpu_ticks);
+                        ImGui::SameLine();
+                        ImGui::InputScalar("##customcputicks", ImGuiDataType_U64,
+                                           &Settings::values.custom_cpu_ticks);
+                    } else {
+                        ImGui::Checkbox("Custom CPU Ticks", &Settings::values.use_custom_cpu_ticks);
+                    }
+
+                    ImGui::Text("CPU Clock Speed:");
+                    ImGui::SameLine();
+                    u32 min = 5;
+                    u32 max = 400;
+                    ImGui::SliderScalar("##cpuclockspeed", ImGuiDataType_U32,
+                                        &Settings::values.cpu_clock_percentage, &min, &max, "%d%%");
+
+                    ImGui::EndMenu();
+                }
+
                 ImGui::EndMenu();
             }
 

@@ -179,7 +179,7 @@ T MemorySystem::Read(const VAddr vaddr) {
     switch (type) {
     case PageType::Unmapped:
         LOG_ERROR(HW_Memory, "unmapped Read{} @ 0x{:08X} at PC 0x{:08X}", sizeof(T) * 8, vaddr,
-                  Core::System::GetInstance().GetRunningCore().GetPC());
+                  Core::System::GetInstance().CPU().GetPC());
         return 0;
     case PageType::Memory:
         ASSERT_MSG(false, "Mapped memory page without a pointer @ {:08X}", vaddr);
@@ -214,8 +214,7 @@ void MemorySystem::Write(const VAddr vaddr, const T data) {
     switch (type) {
     case PageType::Unmapped:
         LOG_ERROR(HW_Memory, "unmapped Write{} 0x{:08X} @ 0x{:08X} at PC 0x{:08X}",
-                  sizeof(data) * 8, (u32)data, vaddr,
-                  Core::System::GetInstance().GetRunningCore().GetPC());
+                  sizeof(data) * 8, (u32)data, vaddr, Core::System::GetInstance().CPU().GetPC());
         return;
     case PageType::Memory:
         ASSERT_MSG(false, "Mapped memory page without a pointer @ {:08X}", vaddr);
@@ -270,7 +269,7 @@ u8* MemorySystem::GetPointer(const VAddr vaddr) {
     }
 
     LOG_ERROR(HW_Memory, "unknown GetPointer @ 0x{:08x} at PC 0x{:08X}", vaddr,
-              Core::System::GetInstance().GetRunningCore().GetPC());
+              Core::System::GetInstance().CPU().GetPC());
     return nullptr;
 }
 
@@ -310,7 +309,7 @@ u8* MemorySystem::GetPhysicalPointer(PAddr address) {
 
     if (area == std::end(memory_areas)) {
         LOG_ERROR(HW_Memory, "unknown GetPhysicalPointer @ 0x{:08X} at PC 0x{:08X}", address,
-                  Core::System::GetInstance().GetRunningCore().GetPC());
+                  Core::System::GetInstance().CPU().GetPC());
         return nullptr;
     }
 
@@ -354,7 +353,7 @@ static std::vector<VAddr> PhysicalToVirtualAddressForRasterizer(PAddr addr) {
     // parts of the texture.
     LOG_ERROR(HW_Memory,
               "Trying to use invalid physical address for rasterizer: {:08X} at PC 0x{:08X}", addr,
-              Core::System::GetInstance().GetRunningCore().GetPC());
+              Core::System::GetInstance().CPU().GetPC());
     return {};
 }
 
@@ -506,8 +505,7 @@ void MemorySystem::ReadBlock(const Kernel::Process& process, const VAddr src_add
             LOG_ERROR(HW_Memory,
                       "unmapped ReadBlock @ 0x{:08X} (start address = 0x{:08X}, size = {}) at PC "
                       "0x{:08X}",
-                      current_vaddr, src_addr, size,
-                      Core::System::GetInstance().GetRunningCore().GetPC());
+                      current_vaddr, src_addr, size, Core::System::GetInstance().CPU().GetPC());
             std::memset(dest_buffer, 0, copy_amount);
             break;
         }
@@ -573,8 +571,7 @@ void MemorySystem::WriteBlock(const Kernel::Process& process, const VAddr dest_a
             LOG_ERROR(HW_Memory,
                       "unmapped WriteBlock @ 0x{:08X} (start address = 0x{:08X}, size = {}) at PC "
                       "0x{:08X}",
-                      current_vaddr, dest_addr, size,
-                      Core::System::GetInstance().GetRunningCore().GetPC());
+                      current_vaddr, dest_addr, size, Core::System::GetInstance().CPU().GetPC());
             break;
         }
         case PageType::Memory: {
@@ -625,8 +622,7 @@ void MemorySystem::ZeroBlock(const Kernel::Process& process, const VAddr dest_ad
             LOG_ERROR(HW_Memory,
                       "unmapped ZeroBlock @ 0x{:08X} (start address = 0x{:08X}, size = {}) at PC "
                       "0x{:08X}",
-                      current_vaddr, dest_addr, size,
-                      Core::System::GetInstance().GetRunningCore().GetPC());
+                      current_vaddr, dest_addr, size, Core::System::GetInstance().CPU().GetPC());
             break;
         }
         case PageType::Memory: {
@@ -680,8 +676,7 @@ void MemorySystem::CopyBlock(const Kernel::Process& dest_process,
             LOG_ERROR(HW_Memory,
                       "unmapped CopyBlock @ 0x{:08X} (start address = 0x{:08X}, size = {}) at PC "
                       "0x{:08X}",
-                      current_vaddr, src_addr, size,
-                      Core::System::GetInstance().GetRunningCore().GetPC());
+                      current_vaddr, src_addr, size, Core::System::GetInstance().CPU().GetPC());
             ZeroBlock(dest_process, dest_addr, copy_amount);
             break;
         }

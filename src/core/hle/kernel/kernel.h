@@ -86,7 +86,7 @@ class KernelSystem {
 public:
     explicit KernelSystem(Memory::MemorySystem& memory, Core::Timing& timing,
                           std::function<void()> prepare_reschedule_callback, u32 system_mode,
-                          u32 num_cores, u8 n3ds_mode);
+                          u8 n3ds_mode);
     ~KernelSystem();
 
     using PortPair = std::pair<std::shared_ptr<ServerPort>, std::shared_ptr<ClientPort>>;
@@ -211,19 +211,13 @@ public:
 
     std::shared_ptr<Process> GetCurrentProcess() const;
     void SetCurrentProcess(std::shared_ptr<Process> process);
-    void SetCurrentProcessForCPU(std::shared_ptr<Process> process, u32 core_id);
 
     void SetCurrentMemoryPageTable(Memory::PageTable* page_table);
 
-    void SetCPUs(std::vector<std::shared_ptr<ARM_Interface>> cpu);
+    void SetCPU(std::shared_ptr<ARM_Interface> cpu);
 
-    void SetRunningCPU(std::shared_ptr<ARM_Interface> cpu);
-
-    ThreadManager& GetThreadManager(u32 core_id);
-    const ThreadManager& GetThreadManager(u32 core_id) const;
-
-    ThreadManager& GetCurrentThreadManager();
-    const ThreadManager& GetCurrentThreadManager() const;
+    ThreadManager& GetThreadManager();
+    const ThreadManager& GetThreadManager() const;
 
     TimerManager& GetTimerManager();
     const TimerManager& GetTimerManager() const;
@@ -248,10 +242,6 @@ public:
     void PrepareReschedule() {
         prepare_reschedule_callback();
     }
-
-    u32 NewThreadId();
-
-    void ResetThreadIDs();
 
     /// Map of named ports managed by the kernel, which can be retrieved using the ConnectToPort
     std::unordered_map<std::string, std::shared_ptr<ClientPort>> named_ports;
@@ -287,16 +277,13 @@ private:
     std::vector<std::shared_ptr<Process>> process_list;
 
     std::shared_ptr<Process> current_process;
-    std::vector<std::shared_ptr<Process>> stored_processes;
 
-    std::vector<std::unique_ptr<ThreadManager>> thread_managers;
+    std::unique_ptr<ThreadManager> thread_manager;
 
     std::unique_ptr<ConfigMem::Handler> config_mem_handler;
     std::unique_ptr<SharedPage::Handler> shared_page_handler;
 
     std::unique_ptr<IPCDebugger::Recorder> ipc_recorder;
-
-    u32 next_thread_id;
 };
 
 } // namespace Kernel
