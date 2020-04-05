@@ -131,8 +131,9 @@ private:
 class TrivialVertexShader {
 public:
     explicit TrivialVertexShader(bool separable) : program(separable) {
-        program.Create(GenerateTrivialVertexShader(separable).code.c_str(), GL_VERTEX_SHADER);
+        program.Create(GenerateTrivialVertexShader(separable).c_str(), GL_VERTEX_SHADER);
     }
+
     GLuint Get() const {
         return program.GetHandle();
     }
