@@ -2477,6 +2477,7 @@ void EmuWindow_SDL2::SwapBuffers() {
             }
         }
         if (!show_ipc_recorder_window) {
+            ipc_records.clear();
             ipc_recorder_enabled = false;
 
             IPCDebugger::Recorder& r = Core::System::GetInstance().Kernel().GetIPCRecorder();
