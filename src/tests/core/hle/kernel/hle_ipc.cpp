@@ -24,7 +24,7 @@ TEST_CASE("HLERequestContext::PopulateFromIncomingCommandBuffer", "[core][kernel
     Core::Timing timing(100);
     Memory::MemorySystem memory;
     Kernel::KernelSystem kernel(
-        memory, timing, [] {}, 0, 0);
+        memory, timing, [] {}, 0);
     auto [server, client] = kernel.CreateSessionPair();
     HLERequestContext context(kernel, std::move(server), nullptr);
 
@@ -237,7 +237,7 @@ TEST_CASE("HLERequestContext::WriteToOutgoingCommandBuffer", "[core][kernel]") {
     Core::Timing timing(100);
     Memory::MemorySystem memory;
     Kernel::KernelSystem kernel(
-        memory, timing, [] {}, 0, 0);
+        memory, timing, [] {}, 0);
     auto [server, client] = kernel.CreateSessionPair();
     HLERequestContext context(kernel, std::move(server), nullptr);
 

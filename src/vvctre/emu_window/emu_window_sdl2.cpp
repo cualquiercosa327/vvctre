@@ -181,7 +181,6 @@ EmuWindow_SDL2::EmuWindow_SDL2(Core::System& system) : system(system) {
     SDL_PumpEvents();
     LOG_INFO(Frontend, "Version: {}", version::vvctre.to_string());
     LOG_INFO(Frontend, "Movie version: {}", version::movie);
-    LOG_INFO(Frontend, "Shader cache version: {}", version::shader_cache);
     Settings::LogSettings();
 
     IMGUI_CHECKVERSION();

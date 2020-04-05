@@ -10,5 +10,4 @@
 namespace version {
 extern const semver::version vvctre;
 extern const u8 movie;
-extern const u8 shader_cache;
 } // namespace version

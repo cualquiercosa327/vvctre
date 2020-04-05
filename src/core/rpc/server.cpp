@@ -53,7 +53,6 @@ Server::Server(Core::System& system, const int port) {
             nlohmann::json{
                 {"vvctre", version::vvctre.to_string()},
                 {"movie", version::movie},
-                {"shader_cache", version::shader_cache},
             }
                 .dump(),
             "application/json");

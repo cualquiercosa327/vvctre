@@ -9,7 +9,6 @@ Get version information.
 
 `vvctre`: vvctre's version  
 `movie`: movie file version  
-`shader_cache`: shader disk cache version
 
 # POST /memory/read
 
