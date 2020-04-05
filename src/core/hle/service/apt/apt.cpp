@@ -835,20 +835,15 @@ void Module::APTInterface::CheckNew3DSApp(Kernel::HLERequestContext& ctx) {
     IPC::RequestParser rp(ctx, 0x101, 0, 0); // 0x01010000
 
     IPC::RequestBuilder rb = rp.MakeBuilder(2, 0);
-    if (apt->unknown_ns_state_field) {
-        rb.Push(RESULT_SUCCESS);
-        rb.Push<u32>(0);
-    } else {
-        rb.Push(RESULT_SUCCESS);
-        rb.Push(true);
-    }
+    rb.Push(RESULT_SUCCESS);
+    rb.Push(false);
 }
 
 void Module::APTInterface::CheckNew3DS(Kernel::HLERequestContext& ctx) {
     IPC::RequestParser rp(ctx, 0x102, 0, 0); // 0x01020000
     IPC::RequestBuilder rb = rp.MakeBuilder(2, 0);
     rb.Push(RESULT_SUCCESS);
-    rb.Push(true);
+    rb.Push(false);
 }
 
 Module::APTInterface::APTInterface(std::shared_ptr<Module> apt, const char* name, u32 max_session)

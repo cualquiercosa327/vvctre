@@ -27,18 +27,13 @@ namespace Kernel {
 
 /// Size of the APPLICATION, SYSTEM and BASE memory regions (respectively) for each system
 /// memory configuration type.
-static const u32 memory_region_sizes[8][3] = {
-    // Old 3DS layouts
+static const u32 memory_region_sizes[6][3] = {
     {0x04000000, 0x02C00000, 0x01400000}, // 0
     {/* This appears to be unused. */},   // 1
     {0x06000000, 0x00C00000, 0x01400000}, // 2
     {0x05000000, 0x01C00000, 0x01400000}, // 3
     {0x04800000, 0x02400000, 0x01400000}, // 4
     {0x02000000, 0x04C00000, 0x01400000}, // 5
-
-    // New 3DS layouts
-    {0x07C00000, 0x06400000, 0x02000000}, // 6
-    {0x0B200000, 0x02E00000, 0x02000000}, // 7
 };
 
 namespace MemoryMode {
@@ -51,18 +46,6 @@ enum N3DSMode : u8 {
 
 void KernelSystem::MemoryInit(u32 mem_type, u8 n3ds_mode) {
     ASSERT(mem_type != 1);
-
-    u32 reported_mem_type = mem_type;
-    if (n3ds_mode == MemoryMode::Mode6 || n3ds_mode == MemoryMode::Mode6_2) {
-        mem_type = 6;
-        reported_mem_type = 6;
-    } else if (n3ds_mode == MemoryMode::Mode7) {
-        mem_type = 7;
-        reported_mem_type = 7;
-    } else {
-        // On the New 3DS, all Old 3DS configurations (<=5) are forced to 6 instead.
-        mem_type = 6;
-    }
 
     // The kernel allocation regions (APPLICATION, SYSTEM and BASE) are laid out in sequence, with
     // the sizes specified in the memory_region_sizes table.
@@ -78,8 +61,8 @@ void KernelSystem::MemoryInit(u32 mem_type, u8 n3ds_mode) {
 
     config_mem_handler = std::make_unique<ConfigMem::Handler>();
     auto& config_mem = config_mem_handler->GetConfigMem();
-    config_mem.app_mem_type = reported_mem_type;
-    config_mem.app_mem_alloc = memory_region_sizes[reported_mem_type][0];
+    config_mem.app_mem_type = mem_type;
+    config_mem.app_mem_alloc = memory_region_sizes[mem_type][0];
     config_mem.sys_mem_alloc = memory_regions[1].size;
     config_mem.base_mem_alloc = memory_regions[2].size;
 

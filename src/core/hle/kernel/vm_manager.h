@@ -99,9 +99,8 @@ public:
     /**
      * The maximum amount of address space managed by the kernel. Addresses above this are never
      * used.
-     * @note This is the limit used by the New 3DS kernel. Old 3DS used 0x20000000.
      */
-    static const u32 MAX_ADDRESS = 0x40000000;
+    static const u32 MAX_ADDRESS = 0x20000000;
 
     /**
      * A map covering the entirety of the managed address space, keyed by the `base` field of each

@@ -18,9 +18,6 @@ void InstallInterfaces(Core::System& system) {
 
     auto ir_user = std::make_shared<IR_USER>(system);
     ir_user->InstallAsService(service_manager);
-
-    auto ir_rst = std::make_shared<IR_RST>(system);
-    ir_rst->InstallAsService(service_manager);
 }
 
 } // namespace Service::IR

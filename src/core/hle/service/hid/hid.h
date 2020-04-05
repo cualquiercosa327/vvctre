@@ -192,9 +192,6 @@ struct DirectionState {
     bool right;
 };
 
-/// Translates analog stick axes to directions. This is exposed for ir_rst module to use.
-DirectionState GetStickDirectionState(s16 circle_pad_x, s16 circle_pad_y);
-
 class Module final {
 public:
     explicit Module(Core::System& system);

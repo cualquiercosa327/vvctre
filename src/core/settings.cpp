@@ -8,7 +8,6 @@
 #include "core/gdbstub/gdbstub.h"
 #include "core/hle/kernel/shared_page.h"
 #include "core/hle/service/hid/hid.h"
-#include "core/hle/service/ir/ir_rst.h"
 #include "core/hle/service/ir/ir_user.h"
 #include "core/hle/service/mic_u.h"
 #include "core/settings.h"
@@ -52,10 +51,6 @@ void Apply() {
         auto ir_user = sm.GetService<Service::IR::IR_USER>("ir:USER");
         if (ir_user) {
             ir_user->ReloadInputDevices();
-        }
-        auto ir_rst = sm.GetService<Service::IR::IR_RST>("ir:rst");
-        if (ir_rst) {
-            ir_rst->ReloadInputDevices();
         }
 
         auto cam = Service::CAM::GetModule(system);

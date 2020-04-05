@@ -21,22 +21,24 @@ namespace Service::IR {
 struct ExtraHIDResponse {
     union {
         BitField<0, 8, u32> header;
-        BitField<8, 12, u32> c_stick_x;
-        BitField<20, 12, u32> c_stick_y;
-    } c_stick;
+        BitField<8, 12, u32> circle_pad_pro_x;
+        BitField<20, 12, u32> circle_pad_pro_y;
+    } circle_pad_pro;
+
     union {
         BitField<0, 5, u8> battery_level;
         BitField<5, 1, u8> zl_not_held;
         BitField<6, 1, u8> zr_not_held;
         BitField<7, 1, u8> r_not_held;
     } buttons;
+
     u8 unknown;
 };
 static_assert(sizeof(ExtraHIDResponse) == 6, "HID status response has wrong size!");
 
 /**
- * An IRDevice emulating Circle Pad Pro or New 3DS additional HID hardware.
- * This device sends periodic udates at a rate configured by the 3DS, and sends calibration data if
+ * An IRDevice emulating Circle Pad Pro.
+ * This device sends periodic updates at a rate configured by the 3DS, and sends calibration data if
  * requested.
  */
 class ExtraHID final : public IRDevice {
@@ -63,7 +65,7 @@ private:
     std::array<u8, 0x40> calibration_data;
     std::unique_ptr<Input::ButtonDevice> zl;
     std::unique_ptr<Input::ButtonDevice> zr;
-    std::unique_ptr<Input::AnalogDevice> c_stick;
+    std::unique_ptr<Input::AnalogDevice> circle_pad_pro;
     std::atomic<bool> is_device_reload_pending;
 };
 

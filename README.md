@@ -1,4 +1,4 @@
-vvctre is a New Nintendo 3DS emulator based on Citra for Windows and Linux.
+vvctre is a Nintendo 3DS emulator based on Citra for Windows and Linux.
 
 vvctre is licensed under the GPLv2 (or any later version).  
 Refer to the license.txt file included.
@@ -38,6 +38,8 @@ Refer to the license.txt file included.
 
 # Removed Features
 
+- New 3DS game support, was causing issues
+- Disk shader cache, was causing issues
 - Dump RomFS
 - System camera support
 - FFmpeg AAC decoder (WMF and FDK are easier to use)

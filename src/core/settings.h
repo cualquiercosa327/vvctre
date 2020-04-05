@@ -102,17 +102,19 @@ static const std::array<const char*, NumButtons> mapping = {{
 } // namespace NativeButton
 
 namespace NativeAnalog {
+
 enum Values {
     CirclePad,
-    CStick,
+    CirclePadPro,
 
     NumAnalogs,
 };
 
 static const std::array<const char*, NumAnalogs> mapping = {{
     "circle_pad",
-    "c_stick",
+    "circle_pad_pro",
 }};
+
 } // namespace NativeAnalog
 
 // A special value for Values::region_value indicating that vvctre will automatically select a
@@ -146,7 +148,7 @@ struct Values {
         InputCommon::GenerateAnalogParamFromKeys(SDL_SCANCODE_UP, SDL_SCANCODE_DOWN,
                                                  SDL_SCANCODE_LEFT, SDL_SCANCODE_RIGHT,
                                                  SDL_SCANCODE_D, 0.5f),
-        // C-Stick
+        // Circle Pad Pro
         InputCommon::GenerateAnalogParamFromKeys(SDL_SCANCODE_I, SDL_SCANCODE_K, SDL_SCANCODE_J,
                                                  SDL_SCANCODE_L, SDL_SCANCODE_D, 0.5f),
     };

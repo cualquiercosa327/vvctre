@@ -34,9 +34,7 @@ enum ThreadProcessorId : s32 {
     ThreadProcessorIdAll = -1,     ///< Run thread on either core
     ThreadProcessorId0 = 0,        ///< Run thread on core 0 (AppCore)
     ThreadProcessorId1 = 1,        ///< Run thread on core 1 (SysCore)
-    ThreadProcessorId2 = 2,        ///< Run thread on core 2 (Additional New 3DS core)
-    ThreadProcessorId3 = 3,        ///< Run thread on core 3 (Additional New 3DS core)
-    ThreadProcessorIdMax = 4,      ///< Processor ID must be less than this
+    ThreadProcessorIdMax = 2,      ///< Processor ID must be less than this
 };
 
 enum class ThreadStatus {

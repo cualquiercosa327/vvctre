@@ -231,18 +231,20 @@ void ExtraHID::SendHIDStatus() {
     if (is_device_reload_pending.exchange(false))
         LoadInputDevices();
 
-    constexpr int C_STICK_CENTER = 0x800;
+    constexpr int CIRCLE_PAD_PRO_CENTER = 0x800;
     // TODO(wwylele): this value is not accurately measured. We currently assume that the axis can
     // take values in the whole range of a 12-bit integer.
-    constexpr int C_STICK_RADIUS = 0x7FF;
+    constexpr int CIRCLE_PAD_PRO_RADIUS = 0x7FF;
 
     float x, y;
-    std::tie(x, y) = c_stick->GetStatus();
+    std::tie(x, y) = circle_pad_pro->GetStatus();
 
     ExtraHIDResponse response;
-    response.c_stick.header.Assign(static_cast<u8>(ResponseID::PollHID));
-    response.c_stick.c_stick_x.Assign(static_cast<u32>(C_STICK_CENTER + C_STICK_RADIUS * x));
-    response.c_stick.c_stick_y.Assign(static_cast<u32>(C_STICK_CENTER + C_STICK_RADIUS * y));
+    response.circle_pad_pro.header.Assign(static_cast<u8>(ResponseID::PollHID));
+    response.circle_pad_pro.circle_pad_pro_x.Assign(
+        static_cast<u32>(CIRCLE_PAD_PRO_CENTER + CIRCLE_PAD_PRO_RADIUS * x));
+    response.circle_pad_pro.circle_pad_pro_y.Assign(
+        static_cast<u32>(CIRCLE_PAD_PRO_CENTER + CIRCLE_PAD_PRO_RADIUS * y));
     response.buttons.battery_level.Assign(0x1F);
     response.buttons.zl_not_held.Assign(!zl->GetStatus());
     response.buttons.zr_not_held.Assign(!zr->GetStatus());
@@ -265,8 +267,8 @@ void ExtraHID::LoadInputDevices() {
         Settings::values.buttons[Settings::NativeButton::ZL]);
     zr = Input::CreateDevice<Input::ButtonDevice>(
         Settings::values.buttons[Settings::NativeButton::ZR]);
-    c_stick = Input::CreateDevice<Input::AnalogDevice>(
-        Settings::values.analogs[Settings::NativeAnalog::CStick]);
+    circle_pad_pro = Input::CreateDevice<Input::AnalogDevice>(
+        Settings::values.analogs[Settings::NativeAnalog::CirclePadPro]);
 }
 
 } // namespace Service::IR

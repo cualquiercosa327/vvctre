@@ -2036,52 +2036,54 @@ void Configuration::Run() {
 
                     ImGui::SameLine();
 
-                    // C-Stick
+                    // Circle Pad Pro
                     ImGui::BeginGroup();
-                    ImGui::Text("C-Stick");
+                    ImGui::Text("Circle Pad Pro");
                     ImGui::NewLine();
                     ImGui::Text(
                         "Up: %s",
-                        AnalogToText(Settings::values.analogs[Settings::NativeAnalog::CStick], "up")
+                        AnalogToText(Settings::values.analogs[Settings::NativeAnalog::CirclePadPro],
+                                     "up")
                             .c_str());
                     ImGui::Text(
                         "Down: %s",
-                        AnalogToText(Settings::values.analogs[Settings::NativeAnalog::CStick],
+                        AnalogToText(Settings::values.analogs[Settings::NativeAnalog::CirclePadPro],
                                      "down")
                             .c_str());
                     ImGui::Text(
                         "Left: %s",
-                        AnalogToText(Settings::values.analogs[Settings::NativeAnalog::CStick],
+                        AnalogToText(Settings::values.analogs[Settings::NativeAnalog::CirclePadPro],
                                      "left")
                             .c_str());
                     ImGui::Text(
                         "Right: %s",
-                        AnalogToText(Settings::values.analogs[Settings::NativeAnalog::CStick],
+                        AnalogToText(Settings::values.analogs[Settings::NativeAnalog::CirclePadPro],
                                      "right")
                             .c_str());
                     ImGui::Text(
                         "Modifier: %s",
-                        AnalogToText(Settings::values.analogs[Settings::NativeAnalog::CStick],
+                        AnalogToText(Settings::values.analogs[Settings::NativeAnalog::CirclePadPro],
                                      "modifier")
                             .c_str());
                     {
                         Common::ParamPackage params(
-                            Settings::values.analogs[Settings::NativeAnalog::CStick]);
+                            Settings::values.analogs[Settings::NativeAnalog::CirclePadPro]);
                         if (params.Get("engine", "") == "sdl") {
                             float deadzone = params.Get("deadzone", 0.0f);
                             ImGui::Text("Deadzone:");
                             ImGui::SameLine();
                             ImGui::PushItemWidth(100);
-                            if (ImGui::SliderFloat("##deadzoneCStick", &deadzone, 0.0f, 1.0f)) {
+                            if (ImGui::SliderFloat("##deadzoneCirclePadPro", &deadzone, 0.0f,
+                                                   1.0f)) {
                                 params.Set("deadzone", deadzone);
-                                Settings::values.analogs[Settings::NativeAnalog::CStick] =
+                                Settings::values.analogs[Settings::NativeAnalog::CirclePadPro] =
                                     params.Serialize();
                             }
                             ImGui::PopItemWidth();
                         }
                     }
-                    if (ImGui::Button("Set All##cstick")) {
-                        SetMapping(Settings::NativeAnalog::CStick,
+                    if (ImGui::Button("Set All##circlepadpro")) {
+                        SetMapping(Settings::NativeAnalog::CirclePadPro,
                                    InputCommon::Polling::DeviceType::Analog);
                     }
                     if (ImGui::IsItemHovered()) {

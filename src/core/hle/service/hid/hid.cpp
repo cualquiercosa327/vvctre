@@ -30,7 +30,7 @@ constexpr u64 gyroscope_update_ticks = BASE_CLOCK_RATE_ARM11 / 101;
 constexpr float accelerometer_coef = 512.0f; // measured from hw test result
 constexpr float gyroscope_coef = 14.375f; // got from hwtest GetGyroscopeLowRawToDpsCoefficient call
 
-DirectionState GetStickDirectionState(s16 circle_pad_x, s16 circle_pad_y) {
+static DirectionState GetStickDirectionState(s16 circle_pad_x, s16 circle_pad_y) {
     // 30 degree and 60 degree are angular thresholds for directions
     constexpr float TAN30 = 0.577350269f;
     constexpr float TAN60 = 1 / TAN30;

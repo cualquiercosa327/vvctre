@@ -901,14 +901,6 @@ ResultCode SVC::CreateThread(Handle* out_handle, u32 entry_point, u32 arg, VAddr
     case ThreadProcessorId1:
         LOG_INFO(Kernel_SVC, "Newly created thread is allowed to be run in SysCore");
         break;
-    case ThreadProcessorId2:
-        LOG_INFO(Kernel_SVC,
-                 "Newly created thread is allowed to be run in additional New 3DS core 1");
-        break;
-    case ThreadProcessorId3:
-        LOG_INFO(Kernel_SVC,
-                 "Newly created thread is allowed to be run in additional New 3DS core 2");
-        break;
     default:
         ASSERT_MSG(false, "Unsupported thread processor ID: {}", processor_id);
         break;

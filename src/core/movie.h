@@ -41,8 +41,8 @@ public:
         return s_instance;
     }
 
-    void StartPlayback(const std::string& movie_file,
-                       std::function<void()> completion_callback = [] {});
+    void StartPlayback(
+        const std::string& movie_file, std::function<void()> completion_callback = [] {});
     void StartRecording(const std::string& movie_file);
 
     /// Prepare to override the clock before playing back movies
@@ -88,12 +88,6 @@ public:
      * When recording: Takes a copy of the given input states so they can be used for playback
      * When playing: Replaces the given input states with the ones stored in the playback file
      */
-    void HandleIrRst(Service::IR::PadState& pad_state, s16& c_stick_x, s16& c_stick_y);
-
-    /**
-     * When recording: Takes a copy of the given input states so they can be used for playback
-     * When playing: Replaces the given input states with the ones stored in the playback file
-     */
     void HandleExtraHidResponse(Service::IR::ExtraHIDResponse& extra_hid_response);
     bool IsPlayingInput() const;
     bool IsRecordingInput() const;
@@ -110,7 +104,7 @@ private:
     void Play(Service::HID::TouchDataEntry& touch_data);
     void Play(Service::HID::AccelerometerDataEntry& accelerometer_data);
     void Play(Service::HID::GyroscopeDataEntry& gyroscope_data);
-    void Play(Service::IR::PadState& pad_state, s16& c_stick_x, s16& c_stick_y);
+    void Play(Service::IR::PadState& pad_state, s16& circle_pad_pro_x, s16& circle_pad_pro_y);
     void Play(Service::IR::ExtraHIDResponse& extra_hid_response);
 
     void Record(const ControllerState& controller_state);
@@ -119,7 +113,8 @@ private:
     void Record(const Service::HID::TouchDataEntry& touch_data);
     void Record(const Service::HID::AccelerometerDataEntry& accelerometer_data);
     void Record(const Service::HID::GyroscopeDataEntry& gyroscope_data);
-    void Record(const Service::IR::PadState& pad_state, const s16& c_stick_x, const s16& c_stick_y);
+    void Record(const Service::IR::PadState& pad_state, const s16& circle_pad_pro_x,
+                const s16& circle_pad_pro_y);
     void Record(const Service::IR::ExtraHIDResponse& extra_hid_response);
 
     ValidationResult ValidateHeader(const VCMHeader& header, u64 program_id = 0) const;

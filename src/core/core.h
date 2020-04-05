@@ -240,10 +240,9 @@ private:
      * @param emu_window Reference to the host-system window used for video output and keyboard
      *                   input.
      * @param system_mode The system mode.
-     * @param n3ds_mode The New 3DS mode.
      * @return ResultStatus code, indicating if the operation succeeded.
      */
-    ResultStatus Init(Frontend::EmuWindow& emu_window, u32 system_mode, u8 n3ds_mode);
+    ResultStatus Init(Frontend::EmuWindow& emu_window, u32 system_mode);
 
     /// Reschedule the core emulation
     void Reschedule();

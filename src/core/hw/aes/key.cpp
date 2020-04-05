@@ -204,7 +204,7 @@ void LoadBootromKeys() {
     }
 }
 
-void LoadNativeFirmKeysOld3DS() {
+void LoadNativeFirmKeys3DS() {
     constexpr u64 native_firm_id = 0x00040138'00000002;
     FileSys::NCCHArchive archive(native_firm_id, Service::FS::MediaType::NAND);
     std::array<char, 8> exefs_filepath = {'.', 'f', 'i', 'r', 'm', 0, 0, 0};
@@ -259,7 +259,7 @@ void LoadNativeFirmKeysOld3DS() {
     key_slots.at(0x25).SetKeyX(key);
 }
 
-void LoadSafeModeNativeFirmKeysOld3DS() {
+void LoadSafeModeNativeFirmKeys3DS() {
     // Use the safe mode native firm instead of the normal mode since there are only 2 version of it
     // and thus we can use fixed offsets
 
@@ -296,125 +296,6 @@ void LoadSafeModeNativeFirmKeysOld3DS() {
         constexpr std::size_t OFFSET = 0x14; // 0x10 bytes for key + 4 bytes between keys
         AESKey key;
         std::memcpy(key.data(), firm_buffer.data() + START_OFFSET + OFFSET * key_slot, sizeof(key));
-        return key;
-    };
-
-    for (std::size_t key_slot{0}; key_slot < 6; ++key_slot) {
-        AESKey key = LoadCommonKey(key_slot);
-        common_key_y_slots[key_slot] = key;
-        LOG_DEBUG(HW_AES, "Loaded common key{}: {}", key_slot, KeyToString(key));
-    }
-}
-
-void LoadNativeFirmKeysNew3DS() {
-    // The first 0x10 bytes of the secret_sector are used as a key to decrypt a KeyX from the
-    // native_firm
-    const std::string filepath =
-        FileUtil::GetUserPath(FileUtil::UserPath::SysDataDir) + SECRET_SECTOR;
-    auto secret = FileUtil::IOFile(filepath, "rb");
-    if (!secret) {
-        return;
-    }
-    ASSERT(secret.GetSize() > 0x10);
-
-    AESKey secret_key;
-    secret.ReadArray(secret_key.data(), secret_key.size());
-
-    // Use the safe mode native firm instead of the normal mode since there are only 1 version of it
-    // and thus we can use fixed offsets
-    constexpr u64 safe_mode_native_firm_id = 0x00040138'20000003;
-
-    // TODO(B3N30): Add the 0x25 KeyX that gets initalized by native_firm
-
-    // TODO(B3N30): Add the 0x18 - 0x1F KeyX that gets initalized by native_firm. This probably
-    // requires the normal native firm with version > 9.6.0-X
-
-    FileSys::NCCHArchive archive(safe_mode_native_firm_id, Service::FS::MediaType::NAND);
-    std::array<char, 8> exefs_filepath = {'.', 'f', 'i', 'r', 'm', 0, 0, 0};
-    FileSys::Path file_path = FileSys::MakeNCCHFilePath(
-        FileSys::NCCHFileOpenType::NCCHData, 0, FileSys::NCCHFilePathType::ExeFS, exefs_filepath);
-    FileSys::Mode open_mode = {};
-    open_mode.read_flag.Assign(1);
-    auto file_result = archive.OpenFile(file_path, open_mode);
-    if (file_result.Failed())
-        return;
-
-    auto firm = std::move(file_result).Unwrap();
-    std::vector<u8> firm_buffer(firm->GetSize());
-    firm->Read(0, firm_buffer.size(), firm_buffer.data());
-    firm->Close();
-
-    FIRM_Header header;
-    std::memcpy(&header, firm_buffer.data(), sizeof(header));
-
-    auto MakeMagic = [](char a, char b, char c, char d) -> u32 {
-        return a | b << 8 | c << 16 | d << 24;
-    };
-    if (MakeMagic('F', 'I', 'R', 'M') != header.magic) {
-        LOG_ERROR(HW_AES, "N3DS SAFE MODE Native Firm has wrong header {}", header.magic);
-        return;
-    }
-
-    u32 arm9_offset(0);
-    u32 arm9_size(0);
-    for (auto section_header : header.section_headers) {
-        if (section_header.firmware_type == FirmwareType::ARM9) {
-            arm9_offset = section_header.offset;
-            arm9_size = section_header.size;
-            break;
-        }
-    }
-
-    if (arm9_offset != 0x66800) {
-        LOG_ERROR(HW_AES, "ARM9 binary at wrong offset: {}", arm9_offset);
-        return;
-    }
-    if (arm9_size != 0x8BA00) {
-        LOG_ERROR(HW_AES, "ARM9 binary has wrong size: {}", arm9_size);
-        return;
-    }
-
-    ARM9_Header arm9_header;
-    std::memcpy(&arm9_header, firm_buffer.data() + arm9_offset, sizeof(arm9_header));
-
-    AESKey keyX_slot0x15;
-    CryptoPP::ECB_Mode<CryptoPP::AES>::Decryption d;
-    d.SetKey(secret_key.data(), secret_key.size());
-    d.ProcessData(keyX_slot0x15.data(), arm9_header.enc_key_x.data(), arm9_header.enc_key_x.size());
-
-    key_slots.at(0x15).SetKeyX(keyX_slot0x15);
-    key_slots.at(0x15).SetKeyY(arm9_header.key_y);
-    auto normal_key_slot0x15 = key_slots.at(0x15).normal;
-    if (!normal_key_slot0x15) {
-        LOG_ERROR(HW_AES, "Failed to get normal key for slot id 0x15");
-        return;
-    }
-
-    constexpr u32 ARM9_BINARY_OFFSET = 0x800; // From the beginning of the ARM9 section
-    std::vector<u8> enc_arm9_binary;
-    enc_arm9_binary.resize(arm9_size - ARM9_BINARY_OFFSET);
-    ASSERT(enc_arm9_binary.size() + arm9_offset + ARM9_BINARY_OFFSET < firm_buffer.size());
-    std::memcpy(enc_arm9_binary.data(), firm_buffer.data() + arm9_offset + ARM9_BINARY_OFFSET,
-                enc_arm9_binary.size());
-
-    std::vector<u8> arm9_binary;
-    arm9_binary.resize(enc_arm9_binary.size());
-    CryptoPP::CTR_Mode<CryptoPP::AES>::Decryption d2;
-    d2.SetKeyWithIV(normal_key_slot0x15->data(), normal_key_slot0x15->size(),
-                    arm9_header.CTR.data(), arm9_header.CTR.size());
-    d2.ProcessData(arm9_binary.data(), enc_arm9_binary.data(), enc_arm9_binary.size());
-
-    AESKey key;
-    constexpr std::size_t SLOT_0x31_KEY_Y_OFFSET = 517368;
-    std::memcpy(key.data(), arm9_binary.data() + SLOT_0x31_KEY_Y_OFFSET, sizeof(key));
-    key_slots.at(0x31).SetKeyY(key);
-    LOG_DEBUG(HW_AES, "Loaded Slot0x31 KeyY: {}", KeyToString(key));
-
-    auto LoadCommonKey = [&arm9_binary](std::size_t key_slot) -> AESKey {
-        constexpr std::size_t START_OFFSET = 541065;
-        constexpr std::size_t OFFSET = 0x14; // 0x10 bytes for key + 4 bytes between keys
-        AESKey key;
-        std::memcpy(key.data(), arm9_binary.data() + START_OFFSET + OFFSET * key_slot, sizeof(key));
         return key;
     };
 
@@ -501,9 +382,8 @@ void InitKeys() {
     initialized = true;
     HW::RSA::InitSlots();
     LoadBootromKeys();
-    LoadNativeFirmKeysOld3DS();
-    LoadSafeModeNativeFirmKeysOld3DS();
-    LoadNativeFirmKeysNew3DS();
+    LoadNativeFirmKeys3DS();
+    LoadSafeModeNativeFirmKey3DS();
     LoadPresetKeys();
 }
 

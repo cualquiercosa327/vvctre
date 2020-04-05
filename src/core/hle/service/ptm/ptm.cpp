@@ -119,7 +119,7 @@ void Module::Interface::CheckNew3DS(Kernel::HLERequestContext& ctx) {
 
     IPC::RequestBuilder rb = rp.MakeBuilder(2, 0);
     rb.Push(RESULT_SUCCESS);
-    rb.Push(true);
+    rb.Push(false);
 }
 
 static void WriteGameCoinData(GameCoin gamecoin_data) {

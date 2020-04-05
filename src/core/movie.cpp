@@ -17,7 +17,6 @@
 #include "core/core.h"
 #include "core/hle/service/hid/hid.h"
 #include "core/hle/service/ir/extra_hid.h"
-#include "core/hle/service/ir/ir_rst.h"
 #include "core/movie.h"
 
 namespace Core {
@@ -31,7 +30,6 @@ enum class ControllerStateType : u8 {
     Touch,
     Accelerometer,
     Gyroscope,
-    IrRst,
     ExtraHidResponse
 };
 
@@ -84,14 +82,6 @@ struct ControllerState {
         } gyroscope;
 
         struct {
-            s16_le x;
-            s16_le y;
-            // These are bool, u8 for platform compatibility
-            u8 zl;
-            u8 zr;
-        } ir_rst;
-
-        struct {
             union {
                 u32_le hex;
 
@@ -99,8 +89,8 @@ struct ControllerState {
                 BitField<5, 1, u32> zl_not_held;
                 BitField<6, 1, u32> zr_not_held;
                 BitField<7, 1, u32> r_not_held;
-                BitField<8, 12, u32> c_stick_x;
-                BitField<20, 12, u32> c_stick_y;
+                BitField<8, 12, u32> circle_pad_pro_x;
+                BitField<20, 12, u32> circle_pad_pro_y;
             };
         } extra_hid_response;
     };
@@ -220,24 +210,6 @@ void Movie::Play(Service::HID::GyroscopeDataEntry& gyroscope_data) {
     gyroscope_data.z = s.gyroscope.z;
 }
 
-void Movie::Play(Service::IR::PadState& pad_state, s16& c_stick_x, s16& c_stick_y) {
-    ControllerState s;
-    std::memcpy(&s, &recorded_input[current_byte], sizeof(ControllerState));
-    current_byte += sizeof(ControllerState);
-
-    if (s.type != ControllerStateType::IrRst) {
-        LOG_ERROR(Movie,
-                  "Expected to read type {}, but found {}. Your playback will be out of sync",
-                  static_cast<int>(ControllerStateType::IrRst), static_cast<int>(s.type));
-        return;
-    }
-
-    c_stick_x = s.ir_rst.x;
-    c_stick_y = s.ir_rst.y;
-    pad_state.zl.Assign(s.ir_rst.zl);
-    pad_state.zr.Assign(s.ir_rst.zr);
-}
-
 void Movie::Play(Service::IR::ExtraHIDResponse& extra_hid_response) {
     ControllerState s;
     std::memcpy(&s, &recorded_input[current_byte], sizeof(ControllerState));
@@ -252,8 +224,10 @@ void Movie::Play(Service::IR::ExtraHIDResponse& extra_hid_response) {
 
     extra_hid_response.buttons.battery_level.Assign(
         static_cast<u8>(s.extra_hid_response.battery_level));
-    extra_hid_response.c_stick.c_stick_x.Assign(s.extra_hid_response.c_stick_x);
-    extra_hid_response.c_stick.c_stick_y.Assign(s.extra_hid_response.c_stick_y);
+    extra_hid_response.circle_pad_pro.circle_pad_pro_x.Assign(
+        s.extra_hid_response.circle_pad_pro_x);
+    extra_hid_response.circle_pad_pro.circle_pad_pro_y.Assign(
+        s.extra_hid_response.circle_pad_pro_y);
     extra_hid_response.buttons.r_not_held.Assign(static_cast<u8>(s.extra_hid_response.r_not_held));
     extra_hid_response.buttons.zl_not_held.Assign(
         static_cast<u8>(s.extra_hid_response.zl_not_held));
@@ -326,26 +300,15 @@ void Movie::Record(const Service::HID::GyroscopeDataEntry& gyroscope_data) {
     Record(s);
 }
 
-void Movie::Record(const Service::IR::PadState& pad_state, const s16& c_stick_x,
-                   const s16& c_stick_y) {
-    ControllerState s;
-    s.type = ControllerStateType::IrRst;
-
-    s.ir_rst.x = c_stick_x;
-    s.ir_rst.y = c_stick_y;
-    s.ir_rst.zl = static_cast<u8>(pad_state.zl);
-    s.ir_rst.zr = static_cast<u8>(pad_state.zr);
-
-    Record(s);
-}
-
 void Movie::Record(const Service::IR::ExtraHIDResponse& extra_hid_response) {
     ControllerState s;
     s.type = ControllerStateType::ExtraHidResponse;
 
     s.extra_hid_response.battery_level.Assign(extra_hid_response.buttons.battery_level);
-    s.extra_hid_response.c_stick_x.Assign(extra_hid_response.c_stick.c_stick_x);
-    s.extra_hid_response.c_stick_y.Assign(extra_hid_response.c_stick.c_stick_y);
+    s.extra_hid_response.circle_pad_pro_x.Assign(
+        extra_hid_response.circle_pad_pro.circle_pad_pro_x);
+    s.extra_hid_response.circle_pad_pro_y.Assign(
+        extra_hid_response.circle_pad_pro.circle_pad_pro_y);
     s.extra_hid_response.r_not_held.Assign(extra_hid_response.buttons.r_not_held);
     s.extra_hid_response.zl_not_held.Assign(extra_hid_response.buttons.zl_not_held);
     s.extra_hid_response.zr_not_held.Assign(extra_hid_response.buttons.zr_not_held);
@@ -516,11 +479,8 @@ void Movie::HandleGyroscopeStatus(Service::HID::GyroscopeDataEntry& gyroscope_da
     Handle(gyroscope_data);
 }
 
-void Movie::HandleIrRst(Service::IR::PadState& pad_state, s16& c_stick_x, s16& c_stick_y) {
-    Handle(pad_state, c_stick_x, c_stick_y);
-}
-
 void Movie::HandleExtraHidResponse(Service::IR::ExtraHIDResponse& extra_hid_response) {
     Handle(extra_hid_response);
 }
+
 } // namespace Core

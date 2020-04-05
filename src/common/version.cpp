@@ -6,6 +6,5 @@
 
 namespace version {
 const semver::version vvctre{24, 1, 1};
-const u8 movie = 1;
-const u8 shader_cache = 2;
+const u8 movie = 2;
 } // namespace version
