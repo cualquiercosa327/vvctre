@@ -5,7 +5,6 @@
 #include <memory>
 #include "core/core.h"
 #include "core/hle/service/ir/ir.h"
-#include "core/hle/service/ir/ir_rst.h"
 #include "core/hle/service/ir/ir_u.h"
 #include "core/hle/service/ir/ir_user.h"
 #include "core/hle/service/service.h"
