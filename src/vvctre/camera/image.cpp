@@ -14,49 +14,49 @@
 namespace Camera {
 
 ImageCamera::ImageCamera(const std::string& file) {
-    LUrlParser::clParseURL url = LUrlParser::clParseURL::ParseURL(file);
+    while (image == nullptr) {
+        LUrlParser::clParseURL url = LUrlParser::clParseURL::ParseURL(file);
 
-    if (url.IsValid()) {
-        int port;
-        std::unique_ptr<httplib::Client> client;
+        if (url.IsValid()) {
+            int port;
+            std::unique_ptr<httplib::Client> client;
 
-        if (url.m_Scheme == "http") {
-            if (!url.GetPort(&port)) {
-                port = 80;
+            if (url.m_Scheme == "http") {
+                if (!url.GetPort(&port)) {
+                    port = 80;
+                }
+
+                client = std::make_unique<httplib::Client>(url.m_Host.c_str(), port);
+            } else {
+                if (!url.GetPort(&port)) {
+                    port = 443;
+                }
+
+                client = std::make_unique<httplib::SSLClient>(url.m_Host, port);
             }
 
-            client = std::make_unique<httplib::Client>(url.m_Host.c_str(), port);
+            client->set_follow_location(true);
+
+            std::shared_ptr<httplib::Response> response = client->Get(('/' + url.m_Path).c_str());
+
+            if (response != nullptr) {
+                std::vector<unsigned char> buffer(response->body.size());
+                std::memcpy(buffer.data(), response->body.data(), response->body.size());
+                image = stbi_load_from_memory(buffer.data(), buffer.size(), &file_width,
+                                              &file_height, nullptr, 3);
+            }
         } else {
-            if (!url.GetPort(&port)) {
-                port = 443;
-            }
-
-            client = std::make_unique<httplib::SSLClient>(url.m_Host, port);
+            image = stbi_load(file.c_str(), &file_width, &file_height, nullptr, 3);
         }
 
-        client->set_follow_location(true);
-
-        std::shared_ptr<httplib::Response> response = client->Get(('/' + url.m_Path).c_str());
-
-        if (response != nullptr) {
-            std::vector<unsigned char> buffer(response->body.size());
-            std::memcpy(buffer.data(), response->body.data(), response->body.size());
-            image = stbi_load_from_memory(buffer.data(), buffer.size(), &file_width, &file_height,
-                                          nullptr, 3);
+        if (image == nullptr) {
+            LOG_ERROR(Service_CAM, "Failed to load image");
         }
-    } else {
-        image = stbi_load(file.c_str(), &file_width, &file_height, nullptr, 3);
-    }
-
-    if (image == nullptr) {
-        LOG_ERROR(Service_CAM, "Failed to load image");
     }
 }
 
 ImageCamera::~ImageCamera() {
-    if (image != nullptr) {
-        free(image);
-    }
+    free(image);
 }
 
 void ImageCamera::SetResolution(const Service::CAM::Resolution& resolution) {
@@ -69,13 +69,6 @@ void ImageCamera::SetFormat(Service::CAM::OutputFormat format) {
 }
 
 std::vector<u16> ImageCamera::ReceiveFrame() {
-    if (image == nullptr) {
-        // Note: 0x80008000 stands for two black pixels in YUV422
-        std::vector<u16> frame(requested_width * requested_height,
-                               format == Service::CAM::OutputFormat::RGB565 ? 0 : 0x8000);
-        return frame;
-    }
-
     std::vector<unsigned char> resized(requested_width * requested_height * 3, 0);
     ASSERT(stbir_resize_uint8(image, file_width, file_height, 0, resized.data(), requested_width,
                               requested_height, 0, 3) == 1);
