@@ -2206,7 +2206,7 @@ void EmuWindow_SDL2::SwapBuffers() {
                     if (ImGui::MenuItem("Stop Playback/Recording", nullptr, nullptr,
                                         movie.IsPlayingInput() || movie.IsRecordingInput())) {
                         movie.Shutdown();
-                        pfd::message("vvctre", "Movie saved");
+                        pfd::message("vvctre", "Movie saved", pfd::choice::ok);
                     }
 
                     ImGui::EndMenu();

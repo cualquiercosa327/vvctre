@@ -1673,7 +1673,7 @@ void Configuration::Run() {
                                 Settings::values.udp_input_port = json["udp_input_port"].get<u16>();
                                 Settings::values.udp_pad_index = json["udp_pad_index"].get<u8>();
                             } catch (nlohmann::json::exception& exception) {
-                                pfd::message("JSON Exception", exception.what());
+                                pfd::message("JSON Exception", exception.what(), pfd::choice::ok);
                             }
                         }
                     }
