@@ -575,12 +575,11 @@ void EmuWindow_SDL2::SwapBuffers() {
                         Settings::LogSettings();
                     }
 
-                    if (ImGui::Checkbox("Use Custom Textures", ,
-                                        &Settings::values.custom_textures)) {
+                    if (ImGui::Checkbox("Use Custom Textures", &Settings::values.custom_textures)) {
                         Settings::LogSettings();
                     }
 
-                    if (ImGui::Checkbox("Preload Custom Textures", ,
+                    if (ImGui::Checkbox("Preload Custom Textures",
                                         &Settings::values.preload_textures)) {
                         Settings::LogSettings();
                     }
