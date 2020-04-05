@@ -41,8 +41,6 @@ public:
      */
     std::pair<std::optional<u32>, ResultStatus> LoadKernelSystemMode() override;
 
-    std::pair<std::optional<u8>, ResultStatus> LoadKernelN3dsMode() override;
-
     ResultStatus IsExecutable(bool& out_executable) override;
 
     ResultStatus ReadCode(std::vector<u8>& buffer) override;

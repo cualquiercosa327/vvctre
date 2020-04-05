@@ -150,7 +150,7 @@ struct ExHeader_ARM11_SystemLocalCaps {
     u64_le program_id;
     u32_le core_version;
     u8 reserved_flag;
-    u8 n3ds_mode;
+    INSERT_PADDING_BYTES(1);
     union {
         u8 flags0;
         BitField<0, 2, u8> ideal_processor;

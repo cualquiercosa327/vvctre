@@ -112,9 +112,8 @@ System::ResultStatus System::Load(Frontend::EmuWindow& emu_window, const std::st
     }
 
     ASSERT(system_mode.first);
-    auto n3ds_mode = app_loader->LoadKernelN3dsMode();
-    ASSERT(n3ds_mode.first);
-    ResultStatus init_result{Init(emu_window, *system_mode.first, *n3ds_mode.first)};
+
+    ResultStatus init_result{Init(emu_window, *system_mode.first)};
     if (init_result != ResultStatus::Success) {
         LOG_CRITICAL(Core, "Failed to initialize system (Error {})!",
                      static_cast<u32>(init_result));

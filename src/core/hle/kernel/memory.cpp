@@ -36,14 +36,6 @@ static const u32 memory_region_sizes[6][3] = {
     {0x02000000, 0x04C00000, 0x01400000}, // 5
 };
 
-namespace MemoryMode {
-enum N3DSMode : u8 {
-    Mode6 = 1,
-    Mode7 = 2,
-    Mode6_2 = 3,
-};
-}
-
 void KernelSystem::MemoryInit(u32 mem_type, u8 n3ds_mode) {
     ASSERT(mem_type != 1);
 
@@ -57,7 +49,7 @@ void KernelSystem::MemoryInit(u32 mem_type, u8 n3ds_mode) {
     }
 
     // We must've allocated the entire FCRAM by the end
-    ASSERT(base == Memory::FCRAM_N3DS_SIZE);
+    ASSERT(base == Memory::FCRAM_SIZE);
 
     config_mem_handler = std::make_unique<ConfigMem::Handler>();
     auto& config_mem = config_mem_handler->GetConfigMem();
@@ -97,7 +89,6 @@ void KernelSystem::HandleSpecialMapping(VMManager& address_space, const AddressM
         {VRAM_VADDR, VRAM_PADDR, VRAM_SIZE},
         {IO_AREA_VADDR, IO_AREA_PADDR, IO_AREA_SIZE},
         {DSP_RAM_VADDR, DSP_RAM_PADDR, DSP_RAM_SIZE},
-        {N3DS_EXTRA_RAM_VADDR, N3DS_EXTRA_RAM_PADDR, N3DS_EXTRA_RAM_SIZE - 0x20000},
     };
 
     VAddr mapping_limit = mapping.address + mapping.size;

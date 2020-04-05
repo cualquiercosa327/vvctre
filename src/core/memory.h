@@ -111,7 +111,6 @@ enum : PAddr {
     FCRAM_PADDR = 0x20000000,
     FCRAM_SIZE = 0x08000000, ///< FCRAM size (128MB)
     FCRAM_PADDR_END = FCRAM_PADDR + FCRAM_SIZE,
-    FCRAM_N3DS_PADDR_END = FCRAM_PADDR + FCRAM_N3DS_SIZE,
 };
 
 /// Virtual user-space memory regions

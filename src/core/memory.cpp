@@ -58,9 +58,8 @@ class MemorySystem::Impl {
 public:
     // Visual Studio would try to allocate these on compile time if they are std::array, which would
     // exceed the memory limit.
-    std::unique_ptr<u8[]> fcram = std::make_unique<u8[]>(Memory::FCRAM_N3DS_SIZE);
+    std::unique_ptr<u8[]> fcram = std::make_unique<u8[]>(Memory::FCRAM_SIZE);
     std::unique_ptr<u8[]> vram = std::make_unique<u8[]>(Memory::VRAM_SIZE);
-    std::unique_ptr<u8[]> n3ds_extra_ram = std::make_unique<u8[]>(Memory::N3DS_EXTRA_RAM_SIZE);
 
     PageTable* current_page_table = nullptr;
     RasterizerCacheMarker cache_marker;
@@ -296,8 +295,7 @@ u8* MemorySystem::GetPhysicalPointer(PAddr address) {
     static constexpr MemoryArea memory_areas[] = {
         {VRAM_PADDR, VRAM_SIZE},
         {DSP_RAM_PADDR, DSP_RAM_SIZE},
-        {FCRAM_PADDR, FCRAM_N3DS_SIZE},
-        {N3DS_EXTRA_RAM_PADDR, N3DS_EXTRA_RAM_SIZE},
+        {FCRAM_PADDR, FCRAM_SIZE},
     };
 
     const auto area =
@@ -326,9 +324,6 @@ u8* MemorySystem::GetPhysicalPointer(PAddr address) {
     case FCRAM_PADDR:
         target_pointer = impl->fcram.get() + offset_into_region;
         break;
-    case N3DS_EXTRA_RAM_PADDR:
-        target_pointer = impl->n3ds_extra_ram.get() + offset_into_region;
-        break;
     default:
         UNREACHABLE();
     }
@@ -344,7 +339,7 @@ static std::vector<VAddr> PhysicalToVirtualAddressForRasterizer(PAddr addr) {
     if (addr >= FCRAM_PADDR && addr < FCRAM_PADDR_END) {
         return {addr - FCRAM_PADDR + LINEAR_HEAP_VADDR, addr - FCRAM_PADDR + NEW_LINEAR_HEAP_VADDR};
     }
-    if (addr >= FCRAM_PADDR_END && addr < FCRAM_N3DS_PADDR_END) {
+    if (addr >= FCRAM_PADDR_END && addr < FCRAM_PADDR_END) {
         return {addr - FCRAM_PADDR + NEW_LINEAR_HEAP_VADDR};
     }
     // While the physical <-> virtual mapping is 1:1 for the regions supported by the cache,
@@ -754,12 +749,12 @@ void WriteMMIO<u64>(MMIORegionPointer mmio_handler, VAddr addr, const u64 data) 
 }
 
 u32 MemorySystem::GetFCRAMOffset(u8* pointer) {
-    ASSERT(pointer >= impl->fcram.get() && pointer <= impl->fcram.get() + Memory::FCRAM_N3DS_SIZE);
+    ASSERT(pointer >= impl->fcram.get() && pointer <= impl->fcram.get() + Memory::FCRAM_SIZE);
     return pointer - impl->fcram.get();
 }
 
 u8* MemorySystem::GetFCRAMPointer(u32 offset) {
-    ASSERT(offset <= Memory::FCRAM_N3DS_SIZE);
+    ASSERT(offset <= Memory::FCRAM_SIZE);
     return impl->fcram.get() + offset;
 }
 

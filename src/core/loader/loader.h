@@ -113,15 +113,6 @@ public:
     }
 
     /**
-     * Loads the N3DS mode that this application uses.
-     * It defaults to 0 (Old 3DS mode) if it can't read the information.
-     * @returns A pair with the optional N3DS mode, and the status.
-     */
-    virtual std::pair<std::optional<u8>, ResultStatus> LoadKernelN3dsMode() {
-        return std::make_pair(0, ResultStatus::Success);
-    }
-
-    /**
      * Get whether this application is executable.
      * @param out_executable Reference to store the executable flag into.
      * @return ResultStatus result of function
