@@ -1680,9 +1680,9 @@ layout (std140) uniform vs_config {
     }
     out += "\n    exec_shader();\n}\n\n";
 
-    out += program_source_opt->code;
+    out += *program_source_opt;
 
-    return {{out}};
+    return out;
 }
 
 static std::string GetGSCommonSource(const PicaGSConfigCommonRaw& config, bool separable_shader) {
