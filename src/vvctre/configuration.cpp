@@ -44,12 +44,14 @@ Configuration::Configuration() {
         window_title.c_str(),
         SDL_WINDOWPOS_UNDEFINED, // x position
         SDL_WINDOWPOS_UNDEFINED, // y position
-        800, 600, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
+        640, 480, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
 
     if (render_window == nullptr) {
         LOG_CRITICAL(Frontend, "Failed to create SDL2 window: {}", SDL_GetError());
         std::exit(1);
     }
+
+    SDL_SetWindowMinimumSize(render_window, 640, 480);
 
     gl_context = SDL_GL_CreateContext(render_window);
     if (gl_context == nullptr) {
@@ -258,6 +260,10 @@ void Configuration::Run() {
                     ImGui::Text("RPC Server Port:");
                     ImGui::SameLine();
                     ImGui::InputInt("##rpcserverport", &Settings::values.rpc_server_port);
+
+                    ImGui::Text("Multiplayer Server URL:");
+                    ImGui::SameLine();
+                    ImGui::InputText("##multiplayerserverurl", &Settings::values.multiplayer_url);
 
                     ImGui::Checkbox("Start in Fullscreen Mode",
                                     &Settings::values.start_in_fullscreen_mode);
@@ -1472,28 +1478,6 @@ void Configuration::Run() {
                     ImGui::EndTabItem();
                 }
 
-                if (ImGui::BeginTabItem("LLE Modules")) {
-                    ImGui::Text("LLE Modules settings are not persistent.");
-                    ImGui::NewLine();
-
-                    for (auto& module : Settings::values.lle_modules) {
-                        ImGui::Checkbox(module.first.c_str(), &module.second);
-                    }
-
-                    ImGui::EndTabItem();
-                }
-
-                if (ImGui::BeginTabItem("Multiplayer")) {
-                    ImGui::Text("Multiplayer settings are not persistent.");
-                    ImGui::NewLine();
-
-                    ImGui::Text("Server URL");
-                    ImGui::SameLine();
-                    ImGui::InputText("##serverurl", &Settings::values.multiplayer_url);
-
-                    ImGui::EndTabItem();
-                }
-
                 if (ImGui::BeginTabItem("Graphics")) {
                     ImGui::Text("Graphics settings are not persistent.");
                     ImGui::NewLine();
@@ -2135,6 +2119,8 @@ void Configuration::Run() {
 
                     ImGui::Text("Motion:");
                     ImGui::SameLine();
+
+                    ImGui::PushItemWidth(100);
                     if (ImGui::BeginCombo("##motion_device", [] {
                             const std::string engine =
                                 Common::ParamPackage(Settings::values.motion_device)
@@ -2158,38 +2144,49 @@ void Configuration::Run() {
 
                         ImGui::EndCombo();
                     }
+                    ImGui::PopItemWidth();
 
                     Common::ParamPackage motion_device(Settings::values.motion_device);
 
                     if (motion_device.Get("engine", "") == "motion_emu") {
                         int update_period = motion_device.Get("update_period", 100);
                         float sensitivity = motion_device.Get("sensitivity", 0.01f);
-                        float tilt_clamp = motion_device.Get("tilt_clamp", 90.0f);
+                        float clamp = motion_device.Get("tilt_clamp", 90.0f);
 
-                        ImGui::Text("Motion Update Period:");
                         ImGui::SameLine();
-                        if (ImGui::InputInt("##update_period", &update_period)) {
+                        ImGui::Text("Update Period:");
+                        ImGui::SameLine();
+                        ImGui::PushItemWidth(30);
+                        if (ImGui::InputInt("##update_period", &update_period, 0)) {
                             motion_device.Set("update_period", update_period);
                             Settings::values.motion_device = motion_device.Serialize();
                         }
+                        ImGui::PopItemWidth();
 
-                        ImGui::Text("Motion Sensitivity:");
                         ImGui::SameLine();
+                        ImGui::Text("Sensitivity:");
+                        ImGui::SameLine();
+                        ImGui::PushItemWidth(40);
                         if (ImGui::InputFloat("##sensitivity", &sensitivity)) {
                             motion_device.Set("sensitivity", sensitivity);
                             Settings::values.motion_device = motion_device.Serialize();
                         }
+                        ImGui::PopItemWidth();
 
-                        ImGui::Text("Motion Tilt Clamp:");
                         ImGui::SameLine();
-                        if (ImGui::InputFloat("##tilt_clamp", &tilt_clamp)) {
-                            motion_device.Set("tilt_clamp", update_period);
+                        ImGui::Text("Clamp:");
+                        ImGui::SameLine();
+                        ImGui::PushItemWidth(50);
+                        if (ImGui::InputFloat("##clamp", &clamp)) {
+                            motion_device.Set("tilt_clamp", clamp);
                             Settings::values.motion_device = motion_device.Serialize();
                         }
+                        ImGui::PopItemWidth();
                     }
 
                     ImGui::Text("Touch:");
                     ImGui::SameLine();
+                    ImGui::PushItemWidth(60);
                     if (ImGui::BeginCombo("##touch_device", [] {
                             const std::string engine =
                                 Common::ParamPackage(Settings::values.touch_device)
@@ -2213,6 +2210,7 @@ void Configuration::Run() {
 
                         ImGui::EndCombo();
                     }
+                    ImGui::PopItemWidth();
 
                     Common::ParamPackage touch_device(Settings::values.touch_device);
 
@@ -2222,48 +2220,66 @@ void Configuration::Run() {
                         int max_x = touch_device.Get("max_x", 1800);
                         int max_y = touch_device.Get("max_y", 850);
 
-                        ImGui::Text("Touch Minimum X:");
                         ImGui::SameLine();
-                        if (ImGui::InputInt("##min_x", &min_x)) {
+                        ImGui::Text("Min X:");
+                        ImGui::SameLine();
+                        ImGui::PushItemWidth(45);
+                        if (ImGui::InputInt("##min_x", &min_x, 0)) {
                             touch_device.Set("min_x", min_x);
                             Settings::values.touch_device = touch_device.Serialize();
                         }
+                        ImGui::PopItemWidth();
 
-                        ImGui::Text("Touch Minimum Y:");
                         ImGui::SameLine();
-                        if (ImGui::InputInt("##min_y", &min_y)) {
+                        ImGui::Text("Min Y:");
+                        ImGui::SameLine();
+                        ImGui::PushItemWidth(45);
+                        if (ImGui::InputInt("##min_y", &min_y, 0)) {
                             touch_device.Set("min_y", min_y);
                             Settings::values.touch_device = touch_device.Serialize();
                         }
+                        ImGui::PopItemWidth();
 
-                        ImGui::Text("Touch Maximum X:");
                         ImGui::SameLine();
-                        if (ImGui::InputInt("##max_x", &max_x)) {
+                        ImGui::Text("Max X:");
+                        ImGui::SameLine();
+                        ImGui::PushItemWidth(45);
+                        if (ImGui::InputInt("##max_x", &max_x, 0)) {
                             touch_device.Set("max_x", max_x);
                             Settings::values.touch_device = touch_device.Serialize();
                         }
+                        ImGui::PopItemWidth();
 
-                        ImGui::Text("Touch Maximum Y:");
                         ImGui::SameLine();
-                        if (ImGui::InputInt("##max_y", &max_y)) {
+                        ImGui::Text("Max Y:");
+                        ImGui::SameLine();
+                        ImGui::PushItemWidth(45);
+                        if (ImGui::InputInt("##max_y", &max_y, 0)) {
                             touch_device.Set("max_y", max_y);
                             Settings::values.touch_device = touch_device.Serialize();
                         }
+                        ImGui::PopItemWidth();
                     }
 
-                    ImGui::Text("UDP Input Address:");
-                    ImGui::SameLine();
-                    ImGui::InputText("##udp_input_address", &Settings::values.udp_input_address);
+                    if (motion_device.Get("engine", "") == "cemuhookudp" ||
+                        touch_device.Get("engine", "") == "cemuhookudp") {
+                        ImGui::Text("UDP:");
 
-                    ImGui::Text("UDP Input Port:");
-                    ImGui::SameLine();
-                    ImGui::InputScalar("##udp_input_port", ImGuiDataType_U16,
-                                       &Settings::values.udp_input_port);
+                        ImGui::SameLine();
+                        ImGui::InputText("##udp_input_address",
+                                         &Settings::values.udp_input_address);
 
-                    ImGui::Text("UDP Pad Index:");
-                    ImGui::SameLine();
-                    ImGui::InputScalar("##udp_pad_index", ImGuiDataType_U8,
-                                       &Settings::values.udp_pad_index);
+                        ImGui::Text(":");
+                        ImGui::SameLine();
+                        ImGui::InputScalar("##udp_input_port", ImGuiDataType_U16,
+                                           &Settings::values.udp_input_port);
+
+                        ImGui::SameLine();
+                        ImGui::Text("Pad");
+                        ImGui::SameLine();
+                        ImGui::InputScalar("##udp_pad_index", ImGuiDataType_U8,
+                                           &Settings::values.udp_pad_index);
+                    }
 
                     ImGui::EndTabItem();
                 }
@@ -2352,6 +2368,17 @@ void Configuration::Run() {
                         ImGui::SameLine();
                         ImGui::InputScalar("##bottombottom", ImGuiDataType_U16,
                                            &Settings::values.custom_bottom_bottom);
+                    }
+
+                    ImGui::EndTabItem();
+                }
+
+                if (ImGui::BeginTabItem("LLE Modules")) {
+                    ImGui::Text("LLE Modules settings are not persistent.");
+                    ImGui::NewLine();
+
+                    for (auto& module : Settings::values.lle_modules) {
+                        ImGui::Checkbox(module.first.c_str(), &module.second);
                     }
 
                     ImGui::EndTabItem();
