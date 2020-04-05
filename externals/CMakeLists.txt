@@ -50,9 +50,6 @@ if (ARCHITECTURE_x86_64)
     target_compile_definitions(xbyak INTERFACE XBYAK_NO_OP_NAMES)
 endif()
 
-# Zstandard
-add_subdirectory(zstd/build/cmake EXCLUDE_FROM_ALL)
-
 # Cubeb
 if (ENABLE_CUBEB)
     set(BUILD_TESTS OFF CACHE BOOL "")

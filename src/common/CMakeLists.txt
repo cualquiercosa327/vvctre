@@ -40,8 +40,6 @@ add_library(common STATIC
     timer.cpp
     timer.h
     vector_math.h
-    zstd_compression.cpp
-    zstd_compression.h
     version.cpp
     version.h
     stb_image.cpp
@@ -65,8 +63,7 @@ endif()
 
 create_target_directory_groups(common)
 
-target_link_libraries(common PUBLIC fmt semver PRIVATE libzstd_static)
-target_include_directories(common PRIVATE ${PROJECT_SOURCE_DIR}/externals/zstd/lib)
+target_link_libraries(common PUBLIC fmt semver PRIVATE)
 
 if (ARCHITECTURE_x86_64)
     target_link_libraries(common PRIVATE xbyak)

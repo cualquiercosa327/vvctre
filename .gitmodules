@@ -34,9 +34,6 @@
 [submodule "semver"]
     path = externals/semver
     url = https://github.com/Neargye/semver.git
-[submodule "zstd"]
-    path = externals/zstd
-    url = https://github.com/facebook/zstd.git
 [submodule "indicators"]
     path = externals/indicators
     url = https://github.com/p-ranav/indicators.git
