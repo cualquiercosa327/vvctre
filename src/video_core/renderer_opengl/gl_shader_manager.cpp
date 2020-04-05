@@ -186,7 +186,7 @@ public:
             auto [iter, new_shader] = shader_cache.emplace(*program, OGLShaderStage{separable});
             OGLShaderStage& cached_shader = iter->second;
             if (new_shader) {
-                cached_shader.Create(program.c_str(), ShaderType);
+                cached_shader.Create(program->c_str(), ShaderType);
             }
             shader_map[key] = &cached_shader;
             return cached_shader.GetHandle();
