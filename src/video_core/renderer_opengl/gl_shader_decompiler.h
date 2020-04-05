@@ -15,9 +15,9 @@ using RegGetter = std::function<std::string(u32)>;
 
 std::string GetCommonDeclarations();
 
-std::string DecompileProgram(const Pica::Shader::ProgramCode& program_code,
-                             const Pica::Shader::SwizzleData& swizzle_data, u32 main_offset,
-                             const RegGetter& inputreg_getter, const RegGetter& outputreg_getter,
-                             bool sanitize_mul);
+std::optional<std::string> DecompileProgram(const Pica::Shader::ProgramCode& program_code,
+                                            const Pica::Shader::SwizzleData& swizzle_data,
+                                            u32 main_offset, const RegGetter& inputreg_getter,
+                                            const RegGetter& outputreg_getter, bool sanitize_mul);
 
 } // namespace OpenGL::ShaderDecompiler
