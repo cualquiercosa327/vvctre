@@ -44,7 +44,7 @@ Configuration::Configuration() {
         window_title.c_str(),
         SDL_WINDOWPOS_UNDEFINED, // x position
         SDL_WINDOWPOS_UNDEFINED, // y position
-        1024, 768, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
+        800, 600, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
 
     if (render_window == nullptr) {
         LOG_CRITICAL(Frontend, "Failed to create SDL2 window: {}", SDL_GetError());
@@ -2130,33 +2130,6 @@ void Configuration::Run() {
                     ImGui::EndGroup();
 
                     ImGui::SameLine();
-
-                    // Hotkeys
-                    ImGui::BeginGroup();
-                    ImGui::Text("Hotkeys");
-                    ImGui::NewLine();
-                    ImGui::Text("Copy Screenshot: CTRL + C");
-                    ImGui::Text("Load File: CTRL + L");
-                    ImGui::Text("Restart Emulation: CTRL + R");
-                    ImGui::Text("Toggle Limit Speed: CTRL + Z");
-                    ImGui::Text("Toggle Dump Textures: CTRL + D");
-                    ImGui::Text("Speed Limit - 5: -");
-                    ImGui::Text("Speed Limit + 5: +");
-                    ImGui::Text("Load Amiibo: F1");
-                    ImGui::Text("Remove Amiibo: F2");
-                    ImGui::Text("Toggle Fullscreen: F11");
-                    ImGui::Text("Window Size Resolution: CTRL + A");
-                    ImGui::Text("1x Resolution: CTRL + 1");
-                    ImGui::Text("2x Resolution: CTRL + 2");
-                    ImGui::Text("3x Resolution: CTRL + 3");
-                    ImGui::Text("4x Resolution: CTRL + 4");
-                    ImGui::Text("5x Resolution: CTRL + 5");
-                    ImGui::Text("6x Resolution: CTRL + 6");
-                    ImGui::Text("7x Resolution: CTRL + 7");
-                    ImGui::Text("8x Resolution: CTRL + 8");
-                    ImGui::Text("9x Resolution: CTRL + 9");
-                    ImGui::Text("10x Resolution: CTRL + 0");
-                    ImGui::EndGroup();
 
                     ImGui::NewLine();
 
