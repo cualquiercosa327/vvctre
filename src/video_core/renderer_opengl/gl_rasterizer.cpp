@@ -165,11 +165,6 @@ RasterizerOpenGL::RasterizerOpenGL(Frontend::EmuWindow& window)
 
 RasterizerOpenGL::~RasterizerOpenGL() {}
 
-void RasterizerOpenGL::LoadDiskResources(const std::atomic_bool& stop_loading,
-                                         const VideoCore::DiskResourceLoadCallback& callback) {
-    shader_program_manager->LoadDiskCache(stop_loading, callback);
-}
-
 void RasterizerOpenGL::SyncEntireState() {
     // Sync fixed function OpenGL state
     SyncClipEnabled();

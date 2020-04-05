@@ -77,7 +77,6 @@ void LogSettings() {
     LogSetting("init_time", values.init_time);
     LogSetting("use_hw_renderer", values.use_hw_renderer);
     LogSetting("use_hw_shader", values.use_hw_shader);
-    LogSetting("use_disk_shader_cache", values.use_disk_shader_cache);
     LogSetting("shaders_accurate_mul", values.shaders_accurate_mul);
     LogSetting("use_shader_jit", values.use_shader_jit);
     LogSetting("resolution_factor", values.resolution_factor);

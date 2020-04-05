@@ -400,7 +400,7 @@ Get or set input settings.
 {
   "analogs": [
     String"CirclePad",
-    String"CStick"
+    String"CirclePadPro"
   ],
   "buttons": [
     String"A",

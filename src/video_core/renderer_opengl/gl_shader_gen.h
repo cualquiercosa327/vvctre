@@ -16,10 +16,6 @@
 
 namespace OpenGL {
 
-namespace ShaderDecompiler {
-struct ProgramResult;
-} // namespace ShaderDecompiler
-
 enum class ProgramType : u32 {
     VS,
     GS,
@@ -210,21 +206,20 @@ struct PicaFixedGSConfig : Common::HashableStruct<PicaGSConfigCommonRaw> {
  * @param separable_shader generates shader that can be used for separate shader object
  * @returns String of the shader source code
  */
-ShaderDecompiler::ProgramResult GenerateTrivialVertexShader(bool separable_shader);
+std::string GenerateTrivialVertexShader(bool separable_shader);
 
 /**
  * Generates the GLSL vertex shader program source code for the given VS program
- * @returns String of the shader source code; boost::none on failure
+ * @returns String of the shader source code; std::nullopt on failure
  */
-std::optional<ShaderDecompiler::ProgramResult> GenerateVertexShader(
-    const Pica::Shader::ShaderSetup& setup, const PicaVSConfig& config, bool separable_shader);
+std::optional<std::string> GenerateVertexShader(const Pica::Shader::ShaderSetup& setup,
+                                                const PicaVSConfig& config, bool separable_shader);
 
 /*
  * Generates the GLSL fixed geometry shader program source code for non-GS PICA pipeline
  * @returns String of the shader source code
  */
-ShaderDecompiler::ProgramResult GenerateFixedGeometryShader(const PicaFixedGSConfig& config,
-                                                            bool separable_shader);
+std::string GenerateFixedGeometryShader(const PicaFixedGSConfig& config, bool separable_shader);
 
 /**
  * Generates the GLSL fragment shader program source code for the current Pica state
@@ -233,8 +228,7 @@ ShaderDecompiler::ProgramResult GenerateFixedGeometryShader(const PicaFixedGSCon
  * @param separable_shader generates shader that can be used for separate shader object
  * @returns String of the shader source code
  */
-ShaderDecompiler::ProgramResult GenerateFragmentShader(const PicaFSConfig& config,
-                                                       bool separable_shader);
+std::string GenerateFragmentShader(const PicaFSConfig& config, bool separable_shader);
 
 } // namespace OpenGL
 

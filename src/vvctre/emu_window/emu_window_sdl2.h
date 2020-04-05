@@ -41,11 +41,6 @@ public:
 
     void Close();
 
-    /// Updates the disk shader cache loading progress bar
-    /// If the progress bar is hidden, it will be shown
-    /// If value == -1.0f, the progress bar will hide
-    void DiskShaderCacheProgress(const float value);
-
     const Frontend::KeyboardConfig* swkbd_config = nullptr;
     u8* swkbd_code = nullptr;
     std::string* swkbd_text = nullptr;
@@ -96,8 +91,6 @@ private:
 
     /// The OpenGL context associated with the window
     SDL_GLContext gl_context;
-
-    float disk_shader_cache_loading_progress = -1.0f;
 
     Core::System& system;
     ImVec4 fps_color{0.0f, 1.0f, 0.0f, 1.0f}; // Green

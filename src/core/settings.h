@@ -177,7 +177,6 @@ struct Values {
     // Renderer
     bool use_hw_renderer = true;
     bool use_hw_shader = true;
-    bool use_disk_shader_cache = true;
     bool shaders_accurate_mul = false;
     bool use_shader_jit = true;
     u16 resolution_factor = 1;

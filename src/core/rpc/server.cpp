@@ -819,28 +819,6 @@ Server::Server(Core::System& system, const int port) {
         }
     });
 
-    server->Get("/usediskshadercache", [&](const httplib::Request& req, httplib::Response& res) {
-        res.set_content(
-            nlohmann::json{
-                {"enabled", Settings::values.use_disk_shader_cache},
-            }
-                .dump(),
-            "application/json");
-    });
-
-    server->Post("/usediskshadercache", [&](const httplib::Request& req, httplib::Response& res) {
-        try {
-            const nlohmann::json json = nlohmann::json::parse(req.body);
-            Settings::values.use_disk_shader_cache = json["enabled"].get<bool>();
-            Settings::Apply();
-            Settings::LogSettings();
-            res.status = 202;
-        } catch (nlohmann::json::exception& exception) {
-            res.status = 500;
-            res.set_content(exception.what(), "text/plain");
-        }
-    });
-
     server->Get("/shaderaccuratemultiplication",
                 [&](const httplib::Request& req, httplib::Response& res) {
                     res.set_content(

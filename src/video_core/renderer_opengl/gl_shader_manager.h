@@ -102,9 +102,6 @@ public:
     ShaderProgramManager(bool separable, bool is_amd);
     ~ShaderProgramManager();
 
-    void LoadDiskCache(const std::atomic_bool& stop_loading,
-                       const VideoCore::DiskResourceLoadCallback& callback);
-
     bool UseProgrammableVertexShader(const Pica::Regs& config, Pica::Shader::ShaderSetup& setup);
 
     void UseTrivialVertexShader();
