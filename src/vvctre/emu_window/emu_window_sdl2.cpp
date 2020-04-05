@@ -2166,7 +2166,7 @@ void EmuWindow_SDL2::SwapBuffers() {
                     if (ImGui::MenuItem("Play", nullptr, nullptr,
                                         !movie.IsPlayingInput() && !movie.IsRecordingInput())) {
                         const auto filename =
-                            pfd::open_file("Play Movie", ".", {"VVCTRE Movie", "*.vcm"}).result();
+                            pfd::open_file("Play Movie", ".", {"VvCtre Movie", "*.vcm"}).result();
                         if (!filename.empty()) {
                             const auto movie_result = movie.ValidateMovie(filename[0]);
                             switch (movie_result) {
@@ -2196,7 +2196,7 @@ void EmuWindow_SDL2::SwapBuffers() {
                     if (ImGui::MenuItem("Record", nullptr, nullptr,
                                         !movie.IsPlayingInput() && !movie.IsRecordingInput())) {
                         const std::string filename =
-                            pfd::save_file("Play Movie", "movie.vcm", {"VVCTRE Movie", "*.vcm"})
+                            pfd::save_file("Play Movie", "movie.vcm", {"VvCtre Movie", "*.vcm"})
                                 .result();
                         if (!filename.empty()) {
                             movie.StartRecording(filename);
