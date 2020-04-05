@@ -18,7 +18,7 @@ TestEnvironment::TestEnvironment(bool mutable_memory_)
     timing = std::make_unique<Core::Timing>(100);
     memory = std::make_unique<Memory::MemorySystem>();
     kernel = std::make_unique<Kernel::KernelSystem>(
-        *memory, *timing, [] {}, 0, 0);
+        *memory, *timing, [] {}, 0);
 
     kernel->SetCurrentProcess(kernel->CreateProcess(kernel->CreateCodeSet("", 0)));
     page_table = &kernel->GetCurrentProcess()->vm_manager.page_table;
