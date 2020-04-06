@@ -154,8 +154,7 @@ public:
     Memory::MemorySystem& memory;
 };
 
-ARM_Dynarmic::ARM_Dynarmic(Core::System* system, Memory::MemorySystem& memory,
-                           PrivilegeMode initial_mode)
+ARM_Dynarmic::ARM_Dynarmic(Core::System* system, Memory::MemorySystem& memory)
     : system(*system), memory(memory), cb(std::make_unique<DynarmicUserCallbacks>(*this)) {
     PageTableChanged();
 }
