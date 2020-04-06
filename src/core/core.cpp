@@ -190,7 +190,7 @@ System::ResultStatus System::Init(Frontend::EmuWindow& emu_window, u32 system_mo
 
     if (Settings::values.use_cpu_jit) {
 #ifdef ARCHITECTURE_x86_64
-        cpu_core = std::make_shared<ARM_Dynarmic>(this, *memory, USER32MODE);
+        cpu_core = std::make_shared<ARM_Dynarmic>(this, *memory);
 #else
         cpu_core = std::make_shared<ARM_DynCom>(this, *memory, USER32MODE);
         LOG_WARNING(Core, "CPU JIT requested, but Dynarmic not available");

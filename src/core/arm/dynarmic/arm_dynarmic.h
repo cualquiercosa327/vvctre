@@ -9,7 +9,7 @@
 #include <dynarmic/A32/a32.h>
 #include "common/common_types.h"
 #include "core/arm/arm_interface.h"
-#include "core/arm/skyeye_common/armstate.h"
+#include "core/arm/dynarmic/arm_dynarmic_cp15.h"
 
 namespace Memory {
 struct PageTable;
@@ -18,13 +18,13 @@ class MemorySystem;
 
 namespace Core {
 class System;
-}
+} // namespace Core
 
 class DynarmicUserCallbacks;
 
 class ARM_Dynarmic final : public ARM_Interface {
 public:
-    ARM_Dynarmic(Core::System* system, Memory::MemorySystem& memory, PrivilegeMode initial_mode);
+    ARM_Dynarmic(Core::System* system, Memory::MemorySystem& memory);
     ~ARM_Dynarmic() override;
 
     void Run() override;
@@ -60,8 +60,10 @@ private:
     std::unique_ptr<DynarmicUserCallbacks> cb;
     std::unique_ptr<Dynarmic::A32::Jit> MakeJit();
 
+    u32 fpexc = 0;
+    CP15State cp15_state;
+
     Dynarmic::A32::Jit* jit = nullptr;
     Memory::PageTable* current_page_table = nullptr;
     std::map<Memory::PageTable*, std::unique_ptr<Dynarmic::A32::Jit>> jits;
-    std::shared_ptr<ARMul_State> interpreter_state;
 };
