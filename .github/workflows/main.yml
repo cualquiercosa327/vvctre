@@ -35,7 +35,10 @@ jobs:
         with:
           filePath: ${{github.workspace}}/src/core/settings.h
           encodedString: ${{github.event.client_payload.header}}
-      - run: |
+      - name: Show settings.h contents
+        if: github.event_name == 'repository_dispatch'
+        shell: bash
+        run: |
           cd $GITHUB_WORKSPACE
           cat ./src/core/settings.h
       - run: git submodule update --init --recursive
