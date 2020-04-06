@@ -265,6 +265,8 @@ void Configuration::Run() {
                     ImGui::SameLine();
                     ImGui::InputText("##multiplayerserverurl", &Settings::values.multiplayer_url);
 
+                    ImGui::Checkbox("Use Virtual SD Card", &Settings::values.use_virtual_sd);
+
                     ImGui::Checkbox("Start in Fullscreen Mode",
                                     &Settings::values.start_in_fullscreen_mode);
 
