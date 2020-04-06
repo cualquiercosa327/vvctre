@@ -1878,7 +1878,8 @@ Server::Server(Core::System& system, const int port) {
     });
 
     server->Post("/customcputicks", [&](const httplib::Request& req, httplib::Response& res) {
-        Settings::values.texture_filter_name = req.body;
+        std::istringstream iss(req.body);
+        iss >> Settings::values.custom_cpu_ticks;
         Settings::LogSettings();
         res.status = 204;
     });
