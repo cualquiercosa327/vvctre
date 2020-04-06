@@ -151,8 +151,8 @@ jobs:
           webhookUrl: ${{github.event.client_payload.discordWebhook}}
   success:
     if: github.event_name == 'repository_dispatch'
-    needs: [build]
-    runs-on: [ubuntu-latest]
+    needs: build
+    runs-on: ubuntu-latest
     steps:
       - uses: Ilshidur/action-discord@master
         env:
