@@ -170,9 +170,28 @@ struct Values {
     bool use_virtual_sd = true;
 
     // System
+
+    /**
+     * Valid values:
+     *  -1: Auto-select
+     *   0: Japan
+     *   1: USA
+     *   2: Europe
+     *   3: Australia
+     *   4: China
+     *   5: Korea
+     *   6: Taiwan
+     */
     int region_value = REGION_VALUE_AUTO_SELECT;
+
+    /**
+     * Valid values:
+     * - InitClock::SystemTime
+     * - InitClock::FixedTime
+     */
     InitClock init_clock = InitClock::SystemTime;
-    u64 init_time = 0;
+
+    u64 init_time = 0; // Unix timestamp
 
     // Renderer
     bool use_hw_renderer = true;
@@ -186,7 +205,16 @@ struct Values {
     float bg_red = 0.0f;
     float bg_green = 0.0f;
     float bg_blue = 0.0f;
+
+    /**
+     * Valid values:
+     *  - StereoRenderOption::Off
+     *  - StereoRenderOption::SideBySide
+     *  - StereoRenderOption::Anaglyph
+     *  - StereoRenderOption::Interlaced
+     */
     StereoRenderOption render_3d = StereoRenderOption::Off;
+
     std::atomic<u8> factor_3d{0};
     bool filter_mode = true;
     std::string pp_shader_name = "none (builtin)";
@@ -194,7 +222,17 @@ struct Values {
     bool sharper_distant_objects = false;
 
     // Layout
+
+    /**
+     * Valid values:
+     *  - LayoutOption::Default
+     *  - LayoutOption::SingleScreen
+     *  - LayoutOption::LargeScreen
+     *  - LayoutOption::SideScreen
+     *  - LayoutOption::MediumScreen
+     */
     LayoutOption layout_option = LayoutOption::Default;
+
     bool swap_screen = false;
     bool upright_screen = false;
     bool custom_layout = false;
@@ -218,7 +256,15 @@ struct Values {
     std::string sink_id = "auto";
     std::string audio_device_id = "auto";
     float volume = 1.0f;
+
+    /**
+     * Valid values:
+     *  - MicInputType::None
+     *  - MicInputType::Real
+     *  - MicInputType::Static
+     */
     MicInputType mic_input_type = MicInputType::None;
+
     std::string mic_input_device;
     float audio_speed = 1.0f;
 

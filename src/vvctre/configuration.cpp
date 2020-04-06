@@ -265,6 +265,36 @@ void Configuration::Run() {
                     ImGui::SameLine();
                     ImGui::InputText("##multiplayerserverurl", &Settings::values.multiplayer_url);
 
+                    ImGui::Text("Start Time:");
+                    ImGui::SameLine();
+                    if (ImGui::BeginCombo("##start_time", [] {
+                            switch (Settings::values.init_clock) {
+                            case Settings::InitClock::SystemTime:
+                                return "System";
+                            case Settings::InitClock::FixedTime:
+                                return "Unix Timestamp";
+                            default:
+                                break;
+                            }
+
+                            return "Invalid";
+                        }())) {
+                        if (ImGui::Selectable("System")) {
+                            Settings::values.init_clock = Settings::InitClock::SystemTime;
+                        }
+
+                        if (ImGui::Selectable("Unix Timestamp")) {
+                            Settings::values.init_clock = Settings::InitClock::FixedTime;
+                        }
+
+                        ImGui::EndCombo();
+                    }
+                    if (Settings::values.init_clock == Settings::InitClock::FixedTime) {
+                        ImGui::SameLine();
+                        ImGui::InputScalar("##start_time_unix_timestamp", ImGuiDataType_U64,
+                                           &Settings::values.init_time);
+                    }
+
                     ImGui::Checkbox("Use Virtual SD Card", &Settings::values.use_virtual_sd);
 
                     ImGui::Checkbox("Start in Fullscreen Mode",
