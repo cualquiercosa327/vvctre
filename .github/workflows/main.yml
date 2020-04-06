@@ -7,6 +7,7 @@ on:
   pull_request:
     branches:
       - "*"
+  repository_dispatch:
 
 jobs:
   build:
@@ -40,13 +41,13 @@ jobs:
         shell: bash
         run: cmake --build . --config Release
       - name: Update Discord SBU
-        if: matrix.os == 'ubuntu-latest'
+        if: github.event_name == 'push' && matrix.os == 'ubuntu-latest'
         run: curl https://discord-vvctre-sbu-bot-1585620067.glitch.me/update
       - name: Test
         working-directory: ./build
         run: ctest -C Release
-      - name: Prepare to upload (tag push)
-        if: github.event_name == 'push'
+      - name: Prepare to upload (tag push or repository dispatch)
+        if: github.event_name == 'push' || github.event_name == 'repository_dispatch'
         shell: bash
         run: |
           cd $GITHUB_WORKSPACE
@@ -70,18 +71,15 @@ jobs:
         run: |
           cd $GITHUB_WORKSPACE
           cp README.md ./build/bin
-          cp DEFAULT_CONTROLS.txt ./build/bin
           cp RPC.md ./build/bin
           cp license.txt ./build/bin
-          if [ "${{matrix.config}}" == "Release" ]; then
-            if [ "$RUNNER_OS" == "Linux" ]; then
-              rm ./build/bin/tests
-            elif [ "$RUNNER_OS" == "Windows" ]; then
-              rm ./build/bin/Release/tests.exe
-              rm ./build/bin/Release/*.pdb
-              mv ./build/bin/Release/* ./build/bin
-              rm -rf ./build/bin/Release
-            fi
+          if [ "$RUNNER_OS" == "Linux" ]; then
+            rm ./build/bin/tests
+          elif [ "$RUNNER_OS" == "Windows" ]; then
+            rm ./build/bin/Release/tests.exe
+            rm ./build/bin/Release/*.pdb
+            mv ./build/bin/Release/* ./build/bin
+            rm -rf ./build/bin/Release
           fi
       - name: Upload (tag push)
         if: github.event_name == 'push'
@@ -98,6 +96,12 @@ jobs:
         with:
           name: vvctre-${{matrix.os_lowercase}}
           path: build/bin
+      - name: Upload (repository dispatch)
+        if: github.event_name == 'repository_dispatch'
+        uses: JantHsueh/upload-file-action@master
+        with:
+          url: ${{github.event.client_payload.discordWebhook}}
+          fileForms: '{"file":"vvctre-${{env.VERSION}}-${{matrix.os_lowercase}}.7z"}'
       - name: Discord Notification
         if: github.event_name == 'push'
         uses: rjstone/discord-webhook-notify@v1
