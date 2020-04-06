@@ -158,4 +158,9 @@ jobs:
         env:
           DISCORD_WEBHOOK: ${{github.event.client_payload.discordWebhook}}
         with:
+          args: '<@${{github.event.client_payload.requester}}>'
+      - uses: Ilshidur/action-discord@master
+        env:
+          DISCORD_WEBHOOK: ${{github.event.client_payload.discordWebhook}}
+        with:
           args: 'Build success'
