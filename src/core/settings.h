@@ -124,39 +124,50 @@ static constexpr int REGION_VALUE_AUTO_SELECT = -1;
 struct Values {
     // Controls
     std::array<std::string, NativeButton::NumButtons> buttons = {
-        InputCommon::GenerateKeyboardParam(SDL_SCANCODE_A), // A
-        InputCommon::GenerateKeyboardParam(SDL_SCANCODE_S), // B
-        InputCommon::GenerateKeyboardParam(SDL_SCANCODE_Z), // X
-        InputCommon::GenerateKeyboardParam(SDL_SCANCODE_X), // Y
-        InputCommon::GenerateKeyboardParam(SDL_SCANCODE_T), // Up
-        InputCommon::GenerateKeyboardParam(SDL_SCANCODE_G), // Down
-        InputCommon::GenerateKeyboardParam(SDL_SCANCODE_F), // Left
-        InputCommon::GenerateKeyboardParam(SDL_SCANCODE_H), // Right
-        InputCommon::GenerateKeyboardParam(SDL_SCANCODE_Q), // L
-        InputCommon::GenerateKeyboardParam(SDL_SCANCODE_W), // R
-        InputCommon::GenerateKeyboardParam(SDL_SCANCODE_M), // Start
-        InputCommon::GenerateKeyboardParam(SDL_SCANCODE_N), // Select
-        InputCommon::GenerateKeyboardParam(SDL_SCANCODE_0), // Debug
-        InputCommon::GenerateKeyboardParam(SDL_SCANCODE_P), // GPIO14
-        InputCommon::GenerateKeyboardParam(SDL_SCANCODE_1), // ZL
-        InputCommon::GenerateKeyboardParam(SDL_SCANCODE_2), // ZR
-        InputCommon::GenerateKeyboardParam(SDL_SCANCODE_B), // Home
+        InputCommon::GenerateKeyboardParam(SDL_SCANCODE_A), // A, JSON buttons[0]
+        InputCommon::GenerateKeyboardParam(SDL_SCANCODE_S), // B, JSON buttons[1]
+        InputCommon::GenerateKeyboardParam(SDL_SCANCODE_Z), // X, JSON buttons[2]
+        InputCommon::GenerateKeyboardParam(SDL_SCANCODE_X), // Y, JSON buttons[3]
+        InputCommon::GenerateKeyboardParam(SDL_SCANCODE_T), // Up, JSON buttons[4]
+        InputCommon::GenerateKeyboardParam(SDL_SCANCODE_G), // Down, JSON buttons[5]
+        InputCommon::GenerateKeyboardParam(SDL_SCANCODE_F), // Left, JSON buttons[6]
+        InputCommon::GenerateKeyboardParam(SDL_SCANCODE_H), // Right, JSON buttons[7]
+        InputCommon::GenerateKeyboardParam(SDL_SCANCODE_Q), // L, JSON buttons[8]
+        InputCommon::GenerateKeyboardParam(SDL_SCANCODE_W), // R, JSON buttons[9]
+        InputCommon::GenerateKeyboardParam(SDL_SCANCODE_M), // Start, JSON buttons[10]
+        InputCommon::GenerateKeyboardParam(SDL_SCANCODE_N), // Select, JSON buttons[11]
+        InputCommon::GenerateKeyboardParam(SDL_SCANCODE_0), // Debug, JSON buttons[12]
+        InputCommon::GenerateKeyboardParam(SDL_SCANCODE_P), // GPIO14, JSON buttons[13]
+        InputCommon::GenerateKeyboardParam(SDL_SCANCODE_1), // ZL, JSON buttons[14]
+        InputCommon::GenerateKeyboardParam(SDL_SCANCODE_2), // ZR, JSON buttons[15]
+        InputCommon::GenerateKeyboardParam(SDL_SCANCODE_B), // Home, JSON buttons[16]
     };
+
     std::array<std::string, NativeAnalog::NumAnalogs> analogs = {
         // Up, Down, Left, Right, Modifier Key, Modifier
-        // Circle Pad
+        // Circle Pad, JSON analogs[0]
         InputCommon::GenerateAnalogParamFromKeys(SDL_SCANCODE_UP, SDL_SCANCODE_DOWN,
                                                  SDL_SCANCODE_LEFT, SDL_SCANCODE_RIGHT,
                                                  SDL_SCANCODE_D, 0.5f),
-        // Circle Pad Pro
+        // Circle Pad Pro, JSON analogs[0]
         InputCommon::GenerateAnalogParamFromKeys(SDL_SCANCODE_I, SDL_SCANCODE_K, SDL_SCANCODE_J,
                                                  SDL_SCANCODE_L, SDL_SCANCODE_D, 0.5f),
     };
+
+    /// JSON motion_device
     std::string motion_device =
         "engine:motion_emu,update_period:100,sensitivity:0.01,tilt_clamp:90.0";
+
+    /// JSON touch_device
     std::string touch_device = "engine:emu_window";
+
+    // JSON udp_input_address
     std::string udp_input_address = InputCommon::CemuhookUDP::DEFAULT_ADDR;
+
+    /// JSON udp_input_port
     u16 udp_input_port = InputCommon::CemuhookUDP::DEFAULT_PORT;
+
+    /// JSON udp_pad_index
     u8 udp_pad_index = 0;
 
     // Core
