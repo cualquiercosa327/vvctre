@@ -90,10 +90,6 @@ int main(int, char**) {
 
     Configuration().Run();
 
-    if (Settings::values.file_path.empty()) {
-        return 1;
-    }
-
     InitializeLogging();
 
     Common::DetachedTasks detached_tasks;

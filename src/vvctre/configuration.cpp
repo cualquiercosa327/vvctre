@@ -94,8 +94,7 @@ void Configuration::Run() {
 
             if (event.type == SDL_QUIT ||
                 (event.type == SDL_WINDOWEVENT && event.window.event == SDL_WINDOWEVENT_CLOSE)) {
-                Settings::values.file_path.clear();
-                return;
+                std::exit(1);
             }
         }
 
@@ -115,9 +114,9 @@ void Configuration::Run() {
                     ImGui::Text("Start settings are not persistent.");
                     ImGui::NewLine();
 
-                    ImGui::Text("File: %s", Settings::values.file_path.empty()
-                                                ? "[not set]"
-                                                : Settings::values.file_path.c_str());
+                    ImGui::TextWrapped("File: %s", Settings::values.file_path.empty()
+                                                       ? "[not set]"
+                                                       : Settings::values.file_path.c_str());
                     ImGui::SameLine();
                     if (ImGui::Button("Browse...##file")) {
                         const std::vector<std::string> result =
@@ -171,9 +170,10 @@ void Configuration::Run() {
                     }
 
                     if (Settings::values.record_movie.empty()) {
-                        ImGui::Text("Play Movie: %s", Settings::values.play_movie.empty()
-                                                          ? "[not set]"
-                                                          : Settings::values.play_movie.c_str());
+                        ImGui::TextWrapped("Play Movie: %s",
+                                           Settings::values.play_movie.empty()
+                                               ? "[not set]"
+                                               : Settings::values.play_movie.c_str());
                         ImGui::SameLine();
                         if (ImGui::Button("Browse...##playmovie")) {
                             const std::vector<std::string> result =
@@ -186,10 +186,10 @@ void Configuration::Run() {
                     }
 
                     if (Settings::values.play_movie.empty()) {
-                        ImGui::Text("Record Movie: %s",
-                                    Settings::values.record_movie.empty()
-                                        ? "[not set]"
-                                        : Settings::values.record_movie.c_str());
+                        ImGui::TextWrapped("Record Movie: %s",
+                                           Settings::values.record_movie.empty()
+                                               ? "[not set]"
+                                               : Settings::values.record_movie.c_str());
                         ImGui::SameLine();
                         if (ImGui::Button("Browse...##recordmovie")) {
                             const std::string record_movie =
