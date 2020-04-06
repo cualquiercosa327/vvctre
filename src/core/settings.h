@@ -149,7 +149,7 @@ struct Values {
         InputCommon::GenerateAnalogParamFromKeys(SDL_SCANCODE_UP, SDL_SCANCODE_DOWN,
                                                  SDL_SCANCODE_LEFT, SDL_SCANCODE_RIGHT,
                                                  SDL_SCANCODE_D, 0.5f),
-        // Circle Pad Pro, JSON analogs[0]
+        // Circle Pad Pro, JSON analogs[1]
         InputCommon::GenerateAnalogParamFromKeys(SDL_SCANCODE_I, SDL_SCANCODE_K, SDL_SCANCODE_J,
                                                  SDL_SCANCODE_L, SDL_SCANCODE_D, 0.5f),
     };
