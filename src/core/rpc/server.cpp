@@ -1875,7 +1875,7 @@ Server::Server(Core::System& system, const int port) {
     });
 
     server->Get("/customcputicks", [&](const httplib::Request& req, httplib::Response& res) {
-        res.set_content(Settings::values.texture_filter_name, "text/plain");
+        res.set_content(std::to_string(Settings::values.custom_cpu_ticks), "text/plain");
     });
 
     server->Post("/customcputicks", [&](const httplib::Request& req, httplib::Response& res) {
