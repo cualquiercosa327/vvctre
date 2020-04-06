@@ -1863,6 +1863,39 @@ Server::Server(Core::System& system, const int port) {
         res.status = 204;
     });
 
+    server->Get("/usecustomcputicks", [&](const httplib::Request& req, httplib::Response& res) {
+        res.set_content(Settings::values.use_custom_cpu_ticks ? "true" : "false", "text/plain");
+    });
+
+    server->Post("/usecustomcputicks", [&](const httplib::Request& req, httplib::Response& res) {
+        Settings::values.use_custom_cpu_ticks = req.body == "true";
+        Settings::LogSettings();
+        res.status = 204;
+    });
+
+    server->Get("/customcputicks", [&](const httplib::Request& req, httplib::Response& res) {
+        res.set_content(Settings::values.texture_filter_name, "text/plain");
+    });
+
+    server->Post("/customcputicks", [&](const httplib::Request& req, httplib::Response& res) {
+        Settings::values.texture_filter_name = req.body;
+        Settings::Apply();
+        Settings::LogSettings();
+        res.status = 204;
+    });
+
+    server->Get("/cpuclockpercentage", [&](const httplib::Request& req, httplib::Response& res) {
+        res.set_content(std::to_string(Settings::values.cpu_clock_percentage), "text/plain");
+    });
+
+    server->Post("/cpuclockpercentage", [&](const httplib::Request& req, httplib::Response& res) {
+        std::istringstream iss(req.body);
+        iss >> Settings::values.cpu_clock_percentage;
+        Settings::Apply();
+        Settings::LogSettings();
+        res.status = 204;
+    });
+
     request_handler_thread = std::thread([this, port] { server->listen("0.0.0.0", port); });
     LOG_INFO(RPC_Server, "RPC server running on port {}", port);
 }

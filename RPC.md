@@ -1206,3 +1206,18 @@ Get or set the texture filter.
 ## Request/Reply
 
 can be none, xBRZ freescale, Anime4K Ultrafast, or Bicubic
+
+# GET/POST /usecustomcputicks
+
+Get or set use_custom_cpu_ticks.
+Body: true or false.
+
+# GET/POST /customcputicks
+
+Get or set custom_cpu_ticks.
+Body: number.
+
+# GET/POST /cpuclockpercentage
+
+Get or set CPU clock percentage.
+Body: number.
