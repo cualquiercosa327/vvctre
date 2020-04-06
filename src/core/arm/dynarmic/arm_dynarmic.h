@@ -54,6 +54,8 @@ public:
     void PageTableChanged() override;
 
 private:
+    void ServeBreak();
+
     friend class DynarmicUserCallbacks;
     Core::System& system;
     Memory::MemorySystem& memory;

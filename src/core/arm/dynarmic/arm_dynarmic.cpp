@@ -119,11 +119,7 @@ public:
             if (GDBStub::IsConnected()) {
                 parent.jit->HaltExecution();
                 parent.SetPC(pc);
-                Kernel::Thread* thread =
-                    parent.system.Kernel().GetThreadManager().GetCurrentThread();
-                parent.SaveContext(thread->context);
-                GDBStub::Break();
-                GDBStub::SendTrap(thread, 5);
+                parent.ServeBreak();
                 return;
             }
             break;
@@ -168,6 +164,10 @@ void ARM_Dynarmic::Run() {
 
 void ARM_Dynarmic::Step() {
     jit->Step();
+
+    if (GDBStub::IsConnected()) {
+        ServeBreak();
+    }
 }
 
 void ARM_Dynarmic::SetPC(u32 pc) {
@@ -294,6 +294,13 @@ void ARM_Dynarmic::PageTableChanged() {
     auto new_jit = MakeJit();
     jit = new_jit.get();
     jits.emplace(current_page_table, std::move(new_jit));
+}
+
+void ARM_Dynarmic::ServeBreak() {
+    Kernel::Thread* thread = system.Kernel().GetThreadManager().GetCurrentThread();
+    SaveContext(thread->context);
+    GDBStub::Break();
+    GDBStub::SendTrap(thread, 5);
 }
 
 std::unique_ptr<Dynarmic::A32::Jit> ARM_Dynarmic::MakeJit() {
