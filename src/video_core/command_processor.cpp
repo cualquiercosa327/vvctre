@@ -285,6 +285,9 @@ static void WritePicaReg(u32 id, u32 value, u32 mask) {
         const auto& index_info = regs.pipeline.index_array;
         const u8* index_address_8 =
             VideoCore::g_memory->GetPhysicalPointer(base_address + index_info.offset);
+        if (index_address_8 == nullptr) {
+            break;
+        }
         const u16* index_address_16 = reinterpret_cast<const u16*>(index_address_8);
         bool index_u16 = index_info.format != 0;
 

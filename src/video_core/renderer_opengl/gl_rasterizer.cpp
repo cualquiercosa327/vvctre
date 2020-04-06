@@ -263,6 +263,9 @@ RasterizerOpenGL::VertexArrayInfo RasterizerOpenGL::AnalyzeVertexArray(bool is_i
         const auto& index_info = regs.pipeline.index_array;
         PAddr address = vertex_attributes.GetPhysicalBaseAddress() + index_info.offset;
         const u8* index_address_8 = VideoCore::g_memory->GetPhysicalPointer(address);
+        if (index_address_8 == nullptr) {
+            return {};
+        }
         const u16* index_address_16 = reinterpret_cast<const u16*>(index_address_8);
         bool index_u16 = index_info.format != 0;
 
@@ -419,6 +422,10 @@ bool RasterizerOpenGL::AccelerateDrawBatchInternal(bool is_indexed) {
     GLenum primitive_mode = GetCurrentPrimitiveMode();
 
     auto [vs_input_index_min, vs_input_index_max, vs_input_size] = AnalyzeVertexArray(is_indexed);
+
+    if (vs_input_size == 0) {
+        return false;
+    }
 
     if (vs_input_size > VERTEX_BUFFER_SIZE) {
         LOG_WARNING(Render_OpenGL, "Too large vertex input size {}", vs_input_size);
