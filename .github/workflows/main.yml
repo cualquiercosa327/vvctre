@@ -114,7 +114,7 @@ jobs:
         with:
           url: ${{github.event.client_payload.discordWebhook}}
           fileForms: '{"file":"vvctre-${{env.VERSION}}-${{matrix.os_lowercase}}.7z"}'
-      - name: Discord Notification
+      - name: Discord Success Notification
         if: github.event_name == 'push'
         uses: rjstone/discord-webhook-notify@v1
         with:
@@ -123,3 +123,10 @@ jobs:
             vvctre ${{env.VERSION}} for ${{runner.os}} can now be downloaded from:
             https://github.com/${{github.repository}}/releases/tag/${{env.VERSION}}
           webhookUrl: ${{secrets.DISCORD_WEBHOOK}}
+      - name: Discord Failed Notification (repository dispatch)
+        if: failure() && github.event_name == 'repository_dispatch'
+        uses: rjstone/discord-webhook-notify@v1
+        with:
+          severity: error
+          details: ${{runner.os}} build failed
+          webhookUrl: ${{github.event.client_payload.discordWebhook}}
