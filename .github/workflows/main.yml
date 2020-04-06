@@ -156,6 +156,6 @@ jobs:
     steps:
       - uses: Ilshidur/action-discord@master
         env:
-          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+          DISCORD_WEBHOOK: ${{github.event.client_payload.discordWebhook}}
         with:
           args: 'Build success'
