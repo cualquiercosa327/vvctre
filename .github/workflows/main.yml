@@ -58,8 +58,8 @@ jobs:
       - name: Test
         working-directory: ./build
         run: ctest -C Release
-      - name: Prepare to upload (tag push or repository dispatch)
-        if: github.event_name == 'push' || github.event_name == 'repository_dispatch'
+      - name: Prepare to upload (tag push)
+        if: github.event_name == 'push'
         shell: bash
         run: |
           cd $GITHUB_WORKSPACE
@@ -74,6 +74,26 @@ jobs:
             mv ./build/bin/Release/* ./build/bin
             rm -rf ./build/bin/Release
           fi
+          export VERSION=${GITHUB_REF:10}
+          echo ::set-env name=VERSION::$VERSION
+          7z a vvctre-$VERSION-${{matrix.os_lowercase}}.7z ./build/bin/*
+      - name: Prepare to upload (repository dispatch)
+        if: github.event_name == 'repository_dispatch'
+        shell: bash
+        run: |
+          cd $GITHUB_WORKSPACE
+          cp README.md ./build/bin
+          cp RPC.md ./build/bin
+          cp license.txt ./build/bin
+          if [ "$RUNNER_OS" == "Linux" ]; then
+            rm ./build/bin/tests
+          elif [ "$RUNNER_OS" == "Windows" ]; then
+            rm ./build/bin/Release/tests.exe
+            rm ./build/bin/Release/*.pdb
+            mv ./build/bin/Release/* ./build/bin
+            rm -rf ./build/bin/Release
+          fi
+          git diff HEAD > ./build/bin/changes.diff
           export VERSION=${GITHUB_REF:10}
           echo ::set-env name=VERSION::$VERSION
           7z a vvctre-$VERSION-${{matrix.os_lowercase}}.7z ./build/bin/*
