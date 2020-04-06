@@ -132,7 +132,7 @@ jobs:
         with:
           url: ${{github.event.client_payload.discordWebhook}}
           forms: '{}'
-          fileForms: '{"file": "vvctre-${{github.event.client_payload.requester}}-${{matrix.os_lowercase}}.7z"}'
+          fileForms: '{"file": "vvctre-custom-build-${{github.event.client_payload.requester}}-${{matrix.os_lowercase}}.7z"}'
       - name: Discord Success Notification (tag push)
         if: github.event_name == 'push'
         uses: rjstone/discord-webhook-notify@v1
