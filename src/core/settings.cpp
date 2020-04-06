@@ -39,6 +39,8 @@ void Apply() {
 
     auto& system = Core::System::GetInstance();
     if (system.IsPoweredOn()) {
+        system.CoreTiming().UpdateClockSpeed(Settings::values.cpu_clock_percentage);
+
         AudioCore::DspInterface& dsp = system.DSP();
         dsp.SetSink(values.sink_id, values.audio_device_id);
 
