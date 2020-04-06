@@ -1879,7 +1879,6 @@ Server::Server(Core::System& system, const int port) {
 
     server->Post("/customcputicks", [&](const httplib::Request& req, httplib::Response& res) {
         Settings::values.texture_filter_name = req.body;
-        Settings::Apply();
         Settings::LogSettings();
         res.status = 204;
     });
