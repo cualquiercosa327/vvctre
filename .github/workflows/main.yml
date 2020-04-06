@@ -149,3 +149,13 @@ jobs:
           severity: error
           details: ${{runner.os}} build failed
           webhookUrl: ${{github.event.client_payload.discordWebhook}}
+  success:
+    if: github.event_name == 'repository_dispatch'
+    needs: [build]
+    runs-on: [ubuntu-latest]
+    steps:
+      - uses: Ilshidur/action-discord@master
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+        with:
+          args: 'Build success'
