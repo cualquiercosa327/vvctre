@@ -2321,8 +2321,6 @@ void Configuration::Run() {
                         touch_device.Get("engine", "") == "cemuhookudp") {
                         ImGui::Text("UDP:");
 
-                        ImGui::Spacing();
-                        ImGui::SameLine();
                         ImGui::SameLine();
                         ImGui::PushItemWidth(110);
                         ImGui::InputText("##udp_input_address",
