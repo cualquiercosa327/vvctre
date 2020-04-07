@@ -136,13 +136,8 @@ constexpr int MAX_SLICE_LENGTH = 20000;
 
 class Timing {
 public:
-    explicit Timing(u32 cpu_clock_percentage);
+    explicit Timing(const bool testing = false);
     ~Timing();
-
-    /**
-     * Updates the value of the cpu clock scaling to the new percentage.
-     */
-    void UpdateClockSpeed(u32 cpu_clock_percentage);
 
     /**
      * This should only be called from the emu thread, if you are calling it any other thread, you
@@ -238,9 +233,8 @@ private:
     // that slice.
     bool is_global_timer_sane = true;
 
-    // Stores a scaling for the internal clockspeed. Changing this number results in
-    // under/overclocking the guest cpu
-    double cpu_clock_scale = 1.0;
+    // Don't use custom CPU ticks and CPU clock percentage settings
+    const bool testing;
 };
 
 } // namespace Core

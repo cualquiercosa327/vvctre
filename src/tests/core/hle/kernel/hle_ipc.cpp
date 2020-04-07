@@ -21,7 +21,7 @@ static std::shared_ptr<Object> MakeObject(Kernel::KernelSystem& kernel) {
 }
 
 TEST_CASE("HLERequestContext::PopulateFromIncomingCommandBuffer", "[core][kernel]") {
-    Core::Timing timing(100);
+    Core::Timing timing(true);
     Memory::MemorySystem memory;
     Kernel::KernelSystem kernel(
         memory, timing, [] {}, 0);
@@ -234,7 +234,7 @@ TEST_CASE("HLERequestContext::PopulateFromIncomingCommandBuffer", "[core][kernel
 }
 
 TEST_CASE("HLERequestContext::WriteToOutgoingCommandBuffer", "[core][kernel]") {
-    Core::Timing timing(100);
+    Core::Timing timing(true);
     Memory::MemorySystem memory;
     Kernel::KernelSystem kernel(
         memory, timing, [] {}, 0);

@@ -11,7 +11,7 @@
 #include "core/memory.h"
 
 TEST_CASE("Memory::IsValidVirtualAddress", "[core][memory]") {
-    Core::Timing timing(100);
+    Core::Timing timing(true);
     Memory::MemorySystem memory;
     Kernel::KernelSystem kernel(
         memory, timing, [] {}, 0);

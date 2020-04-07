@@ -187,7 +187,7 @@ System::ResultStatus System::Init(Frontend::EmuWindow& emu_window, u32 system_mo
 
     memory = std::make_unique<Memory::MemorySystem>();
 
-    timing = std::make_unique<Timing>(Settings::values.cpu_clock_percentage);
+    timing = std::make_unique<Timing>();
 
     kernel = std::make_unique<Kernel::KernelSystem>(
         *memory, *timing, [this] { PrepareReschedule(); }, system_mode);

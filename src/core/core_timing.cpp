@@ -21,11 +21,7 @@ bool Timing::Event::operator<(const Event& right) const {
     return std::tie(time, fifo_order) < std::tie(right.time, right.fifo_order);
 }
 
-Timing::Timing(u32 cpu_clock_percentage) : cpu_clock_scale(100.0 / cpu_clock_percentage) {}
-
-void Timing::UpdateClockSpeed(u32 cpu_clock_percentage) {
-    this->cpu_clock_scale = 100.0 / cpu_clock_percentage;
-}
+Timing::Timing(const bool testing) : testing(testing) {}
 
 TimingEventType* Timing::RegisterEvent(const std::string& name, TimedCallback callback) {
     auto info = event_types.emplace(name, TimingEventType{callback, nullptr});
@@ -47,9 +43,11 @@ u64 Timing::GetTicks() const {
 }
 
 void Timing::AddTicks(u64 ticks) {
-    downcount -= static_cast<u64>(
-        (Settings::values.use_custom_cpu_ticks ? Settings::values.custom_cpu_ticks : ticks) *
-        cpu_clock_scale);
+    downcount -= testing ? ticks
+                         : static_cast<u64>((Settings::values.use_custom_cpu_ticks
+                                                 ? Settings::values.custom_cpu_ticks
+                                                 : ticks) *
+                                            (100.0 / Settings::values.cpu_clock_percentage));
 }
 
 u64 Timing::GetIdleTicks() const {

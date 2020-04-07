@@ -1892,7 +1892,6 @@ Server::Server(Core::System& system, const int port) {
     server->Post("/cpuclockpercentage", [&](const httplib::Request& req, httplib::Response& res) {
         std::istringstream iss(req.body);
         iss >> Settings::values.cpu_clock_percentage;
-        Settings::Apply();
         Settings::LogSettings();
         res.status = 204;
     });
