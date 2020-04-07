@@ -744,7 +744,7 @@ bool RasterizerOpenGL::Draw(bool accelerate, bool is_indexed) {
                 state.texture_units[texture_index].texture_2d = default_texture;
             }
         } else {
-            state.texture_units[texture_index].texture_2d = default_texture;
+            state.texture_units[texture_index].texture_2d = 0;
         }
     }
 
