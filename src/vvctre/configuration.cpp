@@ -114,9 +114,9 @@ void Configuration::Run() {
                     ImGui::Text("Start settings are not persistent.");
                     ImGui::NewLine();
 
-                    ImGui::TextWrapped("File: %s", Settings::values.file_path.empty()
-                                                       ? "[not set]"
-                                                       : Settings::values.file_path.c_str());
+                    ImGui::Text("File:");
+                    ImGui::SameLine();
+                    ImGui::InputText("##file", &Settings::values.file_path);
                     ImGui::SameLine();
                     if (ImGui::Button("Browse...##file")) {
                         const std::vector<std::string> result =
@@ -170,10 +170,9 @@ void Configuration::Run() {
                     }
 
                     if (Settings::values.record_movie.empty()) {
-                        ImGui::TextWrapped("Play Movie: %s",
-                                           Settings::values.play_movie.empty()
-                                               ? "[not set]"
-                                               : Settings::values.play_movie.c_str());
+                        ImGui::Text("Play Movie:");
+                        ImGui::SameLine();
+                        ImGui::InputText("##playmovie", &Settings::values.play_movie);
                         ImGui::SameLine();
                         if (ImGui::Button("Browse...##playmovie")) {
                             const std::vector<std::string> result =
@@ -186,10 +185,9 @@ void Configuration::Run() {
                     }
 
                     if (Settings::values.play_movie.empty()) {
-                        ImGui::TextWrapped("Record Movie: %s",
-                                           Settings::values.record_movie.empty()
-                                               ? "[not set]"
-                                               : Settings::values.record_movie.c_str());
+                        ImGui::Text("Record Movie:");
+                        ImGui::SameLine();
+                        ImGui::InputText("##recordmovie", &Settings::values.record_movie);
                         ImGui::SameLine();
                         if (ImGui::Button("Browse...##recordmovie")) {
                             const std::string record_movie =
@@ -259,7 +257,7 @@ void Configuration::Run() {
 
                     ImGui::Text("RPC Server Port:");
                     ImGui::SameLine();
-                    ImGui::InputInt("##rpcserverport", &Settings::values.rpc_server_port);
+                    ImGui::InputInt("##rpcserverport", &Settings::values.rpc_server_port, 0);
 
                     ImGui::Text("Multiplayer Server URL:");
                     ImGui::SameLine();
