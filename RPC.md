@@ -194,6 +194,8 @@ Replies with a screenshot in PNG format using the layout in the body.
 ```json
 {
   "is_rotated": Boolean,
+  "width": Number,
+  "height": Number,
   "top_screen": {
     "enabled": Boolean,
     "left": Number,
