@@ -94,7 +94,7 @@ jobs:
             rm -rf ./build/bin/Release
           fi
           git diff HEAD > ./build/bin/changes.diff
-          7z a vvctre-custom-build-${{github.event.client_payload.requester}}-${{matrix.os_lowercase}}.7z ./build/bin/*
+          7z a vvctre-custom-build-${{github.run_number}}-${{matrix.os_lowercase}}.7z ./build/bin/*
       - name: Prepare to upload (pull request)
         if: github.event_name == 'pull_request'
         shell: bash
@@ -132,7 +132,7 @@ jobs:
         with:
           url: ${{github.event.client_payload.discordWebhook}}
           forms: '{}'
-          fileForms: '{"file": "vvctre-custom-build-${{github.event.client_payload.requester}}-${{matrix.os_lowercase}}.7z"}'
+          fileForms: '{"file": "vvctre-custom-build-${{github.run_number}}-${{matrix.os_lowercase}}.7z"}'
       - name: Discord Success Notification (tag push)
         if: github.event_name == 'push'
         uses: rjstone/discord-webhook-notify@v1
