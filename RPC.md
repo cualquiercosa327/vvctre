@@ -185,6 +185,32 @@ Get or set the motion state.
 
 Replies with a screenshot in PNG format.
 
+# POST /customscreenshot
+
+Replies with a screenshot in PNG format using the layout in the body.
+
+## Request Body
+
+```json
+{
+  "is_rotated": Boolean,
+  "top_screen": {
+    "enabled": Boolean,
+    "left": Number,
+    "top": Number,
+    "right": Number,
+    "bottom": Number
+  },
+  "bottom_screen": {
+    "enabled": Boolean,
+    "left": Number,
+    "top": Number,
+    "right": Number,
+    "bottom": Number
+  }
+}
+```
+
 # GET /layout
 
 Get the current layout.
@@ -198,6 +224,7 @@ Get the current layout.
   "width": Number,
   "height": Number,
   "top_screen": {
+    "enabled": Boolean,
     "width": Number,
     "height": Number,
     "left": Number,
@@ -206,6 +233,7 @@ Get the current layout.
     "bottom": Number
   },
   "bottom_screen": {
+    "enabled": Boolean,
     "width": Number,
     "height": Number,
     "left": Number,

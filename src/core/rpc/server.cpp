@@ -44,6 +44,55 @@ void from_json(const nlohmann::json& json, Vec3<float>& v) {
 
 } // namespace Common
 
+namespace Layout {
+
+void to_json(nlohmann::json& json, const Layout::FramebufferLayout& layout) {
+    json = nlohmann::json{
+        {"swap_screens", Settings::values.swap_screen},
+        {"is_rotated", layout.is_rotated},
+        {"width", layout.width},
+        {"height", layout.height},
+        {"top_screen",
+         {
+             {"enabled", layout.top_screen_enabled},
+             {"width", layout.top_screen.GetWidth()},
+             {"height", layout.top_screen.GetHeight()},
+             {"left", layout.top_screen.left},
+             {"top", layout.top_screen.top},
+             {"right", layout.top_screen.right},
+             {"bottom", layout.top_screen.bottom},
+         }},
+        {"bottom_screen",
+         {
+             {"enabled", layout.bottom_screen_enabled},
+             {"width", layout.bottom_screen.GetWidth()},
+             {"height", layout.bottom_screen.GetHeight()},
+             {"left", layout.bottom_screen.left},
+             {"top", layout.bottom_screen.top},
+             {"right", layout.bottom_screen.right},
+             {"bottom", layout.bottom_screen.bottom},
+         }},
+    };
+}
+
+void from_json(const nlohmann::json& json, Layout::FramebufferLayout& layout) {
+    json.at("is_rotated").get_to(layout.is_rotated);
+    json.at("width").get_to(layout.width);
+    json.at("height").get_to(layout.height);
+    json.at("top_screen").at("enabled").get_to(layout.top_screen_enabled);
+    json.at("top_screen").at("left").get_to(layout.top_screen.left);
+    json.at("top_screen").at("top").get_to(layout.top_screen.top);
+    json.at("top_screen").at("right").get_to(layout.top_screen.right);
+    json.at("top_screen").at("bottom").get_to(layout.top_screen.bottom);
+    json.at("bottom_screen").at("enabled").get_to(layout.bottom_screen_enabled);
+    json.at("bottom_screen").at("left").get_to(layout.bottom_screen.left);
+    json.at("bottom_screen").at("top").get_to(layout.bottom_screen.top);
+    json.at("bottom_screen").at("right").get_to(layout.bottom_screen.right);
+    json.at("bottom_screen").at("bottom").get_to(layout.bottom_screen.bottom);
+}
+
+} // namespace Layout
+
 namespace RPC {
 
 Server::Server(Core::System& system, const int port) {
@@ -404,6 +453,87 @@ Server::Server(Core::System& system, const int port) {
         }
     });
 
+    server->Post("/customscreenshot", [&](const httplib::Request& req, httplib::Response& res) {
+        if (!system.IsPoweredOn()) {
+            res.status = 503;
+            res.set_content("emulation not running", "text/plain");
+            return;
+        }
+
+        if (VideoCore::g_renderer == nullptr) {
+            res.status = 503;
+            res.set_content("booting", "text/plain");
+            return;
+        }
+
+        try {
+            const Layout::FramebufferLayout layout = nlohmann::json::parse(req.body);
+
+            Common::Event done;
+            std::vector<u8> data(layout.width * layout.height * 4);
+            if (VideoCore::RequestScreenshot(
+                    data.data(), [&] { done.Set(); }, layout)) {
+                res.status = 503;
+                res.set_content("another screenshot is pending", "text/plain");
+                return;
+            }
+            done.Wait();
+
+            const auto rotate = [](const std::vector<u8>& input,
+                                   const Layout::FramebufferLayout& layout) {
+                std::vector<u8> output(input.size());
+
+                for (std::size_t i = 0; i < layout.height; i++) {
+                    for (std::size_t j = 0; j < layout.width; j++) {
+                        for (std::size_t k = 0; k < 4; k++) {
+                            output[i * (layout.width * 4) + j * 4 + k] =
+                                input[(layout.height - i - 1) * (layout.width * 4) + j * 4 + k];
+                        }
+                    }
+                }
+
+                return output;
+            };
+
+            const auto convert_bgra_to_rgba = [](const std::vector<u8>& input,
+                                                 const Layout::FramebufferLayout& layout) {
+                int offset = 0;
+                std::vector<u8> output(input.size());
+
+                for (u32 y = 0; y < layout.height; ++y) {
+                    for (u32 x = 0; x < layout.width; ++x) {
+                        output[offset] = input[offset + 2];
+                        output[offset + 1] = input[offset + 1];
+                        output[offset + 2] = input[offset];
+                        output[offset + 3] = input[offset + 3];
+
+                        offset += 4;
+                    }
+                }
+
+                return output;
+            };
+
+            data = convert_bgra_to_rgba(rotate(data, layout), layout);
+
+            std::vector<u8> out;
+            stbi_write_func* f = [](void* context, void* data, int size) {
+                std::vector<u8>* out = static_cast<std::vector<u8>*>(context);
+                out->resize(size);
+                std::memcpy(out->data(), data, size);
+            };
+            if (stbi_write_png_to_func(f, &out, layout.width, layout.height, 4, data.data(),
+                                       layout.width * 4) == 0) {
+                res.set_content("failed to encode", "text/plain");
+            } else {
+                res.set_content(reinterpret_cast<const char*>(out.data()), out.size(), "image/png");
+            }
+        } catch (nlohmann::json::exception& exception) {
+            res.status = 500;
+            res.set_content(exception.what(), "text/plain");
+        }
+    });
+
     server->Get("/layout", [&](const httplib::Request& req, httplib::Response& res) {
         if (!system.IsPoweredOn()) {
             res.status = 503;
@@ -411,34 +541,8 @@ Server::Server(Core::System& system, const int port) {
             return;
         }
 
-        const Layout::FramebufferLayout& layout =
-            VideoCore::g_renderer->GetRenderWindow().GetFramebufferLayout();
         res.set_content(
-            nlohmann::json{
-                {"swap_screens", Settings::values.swap_screen},
-                {"is_rotated", layout.is_rotated},
-                {"width", layout.width},
-                {"height", layout.height},
-                {"top_screen",
-                 {
-                     {"width", layout.top_screen.GetWidth()},
-                     {"height", layout.top_screen.GetHeight()},
-                     {"left", layout.top_screen.left},
-                     {"top", layout.top_screen.top},
-                     {"right", layout.top_screen.right},
-                     {"bottom", layout.top_screen.bottom},
-                 }},
-                {"bottom_screen",
-                 {
-                     {"width", layout.bottom_screen.GetWidth()},
-                     {"height", layout.bottom_screen.GetHeight()},
-                     {"left", layout.bottom_screen.left},
-                     {"top", layout.bottom_screen.top},
-                     {"right", layout.bottom_screen.right},
-                     {"bottom", layout.bottom_screen.bottom},
-                 }},
-            }
-                .dump(),
+            nlohmann::json(VideoCore::g_renderer->GetRenderWindow().GetFramebufferLayout()).dump(),
             "application/json");
     });
 
