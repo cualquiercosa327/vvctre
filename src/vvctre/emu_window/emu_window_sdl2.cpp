@@ -2384,6 +2384,7 @@ void EmuWindow_SDL2::SwapBuffers() {
     }
 
     if (show_ipc_recorder_window) {
+        ImGui::SetNextWindowSize(ImVec2(480, 640), ImGuiCond_Appearing);
         if (ImGui::Begin("IPC Recorder", &show_ipc_recorder_window,
                          ImGuiWindowFlags_NoSavedSettings)) {
             if (ImGui::Checkbox("Enabled", &ipc_recorder_enabled)) {
