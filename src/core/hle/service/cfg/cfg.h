@@ -13,11 +13,11 @@
 
 namespace FileSys {
 class ArchiveBackend;
-}
+} // namespace FileSys
 
 namespace Core {
 class System;
-}
+} // namespace Core
 
 namespace Service::CFG {
 
