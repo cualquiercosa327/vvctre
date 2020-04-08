@@ -1942,44 +1942,57 @@ void EmuWindow_SDL2::SwapBuffers() {
             }
 
             if (ImGui::BeginMenu("View")) {
-                ImGui::Checkbox("Cheats", &show_cheats_window);
-
-                bool fullscreen = SDL_GetWindowFlags(render_window) & SDL_WINDOW_FULLSCREEN_DESKTOP;
-                if (ImGui::Checkbox("Fullscreen", &fullscreen)) {
-                    ToggleFullscreen();
-                }
-
-                ImGui::Separator();
                 if (ImGui::BeginMenu("Layout")) {
                     if (!Settings::values.custom_layout) {
-                        if (ImGui::MenuItem("Default")) {
-                            Settings::values.layout_option = Settings::LayoutOption::Default;
-                            Settings::Apply();
-                            Settings::LogSettings();
-                        }
+                        ImGui::Text("Layout:");
+                        ImGui::SameLine();
+                        if (ImGui::BeginCombo("##layout", [] {
+                                switch (Settings::values.layout_option) {
+                                case Settings::LayoutOption::Default:
+                                    return "Default";
+                                case Settings::LayoutOption::SingleScreen:
+                                    return "Single Screen";
+                                case Settings::LayoutOption::LargeScreen:
+                                    return "Large Screen";
+                                case Settings::LayoutOption::SideScreen:
+                                    return "Side by Side";
+                                case Settings::LayoutOption::MediumScreen:
+                                    return "Medium Screen";
+                                default:
+                                    break;
+                                }
 
-                        if (ImGui::MenuItem("Single Screen")) {
-                            Settings::values.layout_option = Settings::LayoutOption::SingleScreen;
-                            Settings::Apply();
-                            Settings::LogSettings();
-                        }
-
-                        if (ImGui::MenuItem("Large Screen")) {
-                            Settings::values.layout_option = Settings::LayoutOption::LargeScreen;
-                            Settings::Apply();
-                            Settings::LogSettings();
-                        }
-
-                        if (ImGui::MenuItem("Side by Side")) {
-                            Settings::values.layout_option = Settings::LayoutOption::SideScreen;
-                            Settings::Apply();
-                            Settings::LogSettings();
-                        }
-
-                        if (ImGui::MenuItem("Medium Screen")) {
-                            Settings::values.layout_option = Settings::LayoutOption::MediumScreen;
-                            Settings::Apply();
-                            Settings::LogSettings();
+                                return "Invalid";
+                            }())) {
+                            if (ImGui::Selectable("Default")) {
+                                Settings::values.layout_option = Settings::LayoutOption::Default;
+                                Settings::Apply();
+                                Settings::LogSettings();
+                            }
+                            if (ImGui::Selectable("Single Screen")) {
+                                Settings::values.layout_option =
+                                    Settings::LayoutOption::SingleScreen;
+                                Settings::Apply();
+                                Settings::LogSettings();
+                            }
+                            if (ImGui::Selectable("Large Screen")) {
+                                Settings::values.layout_option =
+                                    Settings::LayoutOption::LargeScreen;
+                                Settings::Apply();
+                                Settings::LogSettings();
+                            }
+                            if (ImGui::Selectable("Side by Side")) {
+                                Settings::values.layout_option = Settings::LayoutOption::SideScreen;
+                                Settings::Apply();
+                                Settings::LogSettings();
+                            }
+                            if (ImGui::Selectable("Medium Screen")) {
+                                Settings::values.layout_option =
+                                    Settings::LayoutOption::MediumScreen;
+                                Settings::Apply();
+                                Settings::LogSettings();
+                            }
+                            ImGui::EndCombo();
                         }
                     } else {
                         ImGui::Text("Top Left");
@@ -2077,6 +2090,13 @@ void EmuWindow_SDL2::SwapBuffers() {
                     }
 
                     ImGui::EndMenu();
+                }
+
+                ImGui::Checkbox("Cheats", &show_cheats_window);
+
+                bool fullscreen = SDL_GetWindowFlags(render_window) & SDL_WINDOW_FULLSCREEN_DESKTOP;
+                if (ImGui::Checkbox("Fullscreen", &fullscreen)) {
+                    ToggleFullscreen();
                 }
 
                 ImGui::EndMenu();
