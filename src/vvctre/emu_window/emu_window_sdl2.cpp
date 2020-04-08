@@ -2523,6 +2523,7 @@ void EmuWindow_SDL2::SwapBuffers() {
     }
 
     if (show_cheats_window) {
+        ImGui::SetNextWindowSize(ImVec2(480, 640), ImGuiCond_Appearing);
         if (ImGui::Begin("Cheats", &show_cheats_window, ImGuiWindowFlags_NoSavedSettings)) {
             if (ImGui::Button("Edit File")) {
                 const std::string filepath = fmt::format(
@@ -2547,6 +2548,10 @@ void EmuWindow_SDL2::SwapBuffers() {
 
             if (ImGui::Button("Reload File")) {
                 system.CheatEngine().LoadCheatFile();
+            }
+
+            if (ImGui::Button("Save File")) {
+                system.CheatEngine().SaveCheatFile();
             }
 
             if (ImGui::ListBoxHeader("##cheats", ImVec2(-1.0f, -1.0f))) {
