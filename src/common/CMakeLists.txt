@@ -11,7 +11,6 @@ add_library(common STATIC
     common_funcs.h
     common_paths.h
     common_types.h
-    fastmem_mapper.cpp
     fastmem_mapper.h
     file_util.cpp
     file_util.h
@@ -52,6 +51,12 @@ add_library(common STATIC
     stb_image_resize.h
 )
 
+if(UNIX)
+    target_sources(common PRIVATE fastmem_mapper_posix.cpp)
+else()
+    target_sources(common PRIVATE fastmem_mapper_generic.cpp)
+endif()
+
 if(ARCHITECTURE_x86_64)
     target_sources(common
         PRIVATE
@@ -65,7 +70,7 @@ endif()
 
 create_target_directory_groups(common)
 
-target_link_libraries(common PUBLIC fmt semver PRIVATE)
+target_link_libraries(common PUBLIC fmt semver ${PLATFORM_LIBRARIES})
 
 if (ARCHITECTURE_x86_64)
     target_link_libraries(common PRIVATE xbyak)
