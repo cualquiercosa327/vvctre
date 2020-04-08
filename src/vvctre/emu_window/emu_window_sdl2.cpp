@@ -2550,6 +2550,8 @@ void EmuWindow_SDL2::SwapBuffers() {
                 system.CheatEngine().LoadCheatFile();
             }
 
+            ImGui::SameLine();
+
             if (ImGui::Button("Save File")) {
                 system.CheatEngine().SaveCheatFile();
             }
