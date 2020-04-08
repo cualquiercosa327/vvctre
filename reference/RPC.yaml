@@ -2,8 +2,803 @@ openapi: 3.0.0
 info:
   title: RPC
   version: '1.0'
+  description: 'API that can be used for remote control, debugging, and more.'
+  contact: {}
+  license: {}
 servers:
   - url: 'http://127.0.0.1:47889'
-paths: {}
+paths:
+  /version:
+    get:
+      summary: Get version
+      tags: []
+      responses: {}
+      operationId: get-version
+  /memory/read:
+    post:
+      summary: Read memory
+      tags: []
+      responses: {}
+      operationId: post-memory-read
+  /memory/write:
+    post:
+      summary: Write memory
+      tags: []
+      responses: {}
+      operationId: post-memory-write
+  /padstate:
+    get:
+      summary: Get the pad state
+      tags: []
+      responses: {}
+      operationId: get-padstate
+    post:
+      summary: Set the pad state
+      tags: []
+      responses: {}
+      operationId: post-padstate
+  /circlepadstate:
+    get:
+      summary: Get the circle pad state
+      tags: []
+      responses: {}
+      operationId: get-circlepadstate
+    post:
+      summary: Set the circle pad state
+      tags: []
+      responses: {}
+      operationId: post-circlepadstate
+  /touchstate:
+    get:
+      summary: Get the touch screen state
+      tags: []
+      responses: {}
+      operationId: get-touchstate
+    post:
+      summary: Set the touch screen state
+      tags: []
+      responses: {}
+      operationId: post-touchstate
+  /motionstate:
+    get:
+      summary: Get the motion state
+      tags: []
+      responses: {}
+      operationId: get-motionstate
+    post:
+      summary: Set the motion state
+      tags: []
+      responses: {}
+      operationId: post-motionstate
+  /screenshot:
+    get:
+      summary: Screenshot
+      tags: []
+      responses: {}
+      operationId: get-screenshot
+  /customscreenshot:
+    post:
+      summary: Screenshot with custom layout
+      tags: []
+      responses: {}
+      operationId: post-customscreenshot
+  /layout:
+    get:
+      summary: Get the current layout
+      tags: []
+      responses: {}
+      operationId: get-layout
+  /layout/custom:
+    post:
+      summary: Set the layout to a custom layout
+      tags: []
+      responses: {}
+      operationId: post-layout-custom
+  /layout/default:
+    get:
+      summary: Set the layout to Default Top Bottom Screen
+      tags: []
+      responses: {}
+      operationId: get-layout-default
+  /layout/singlescreen:
+    get:
+      summary: Set the layout to Single Screen Only
+      tags: []
+      responses: {}
+      operationId: get-layout-singlescreen
+  /layout/largescreen:
+    get:
+      summary: Set the layout to Large Screen Small Screen
+      tags: []
+      responses: {}
+      operationId: get-layout-largescreen
+  /layout/sidebyside:
+    get:
+      summary: Set the layout to Side by Side
+      tags: []
+      responses: {}
+      operationId: get-layout-sidebyside
+  /layout/mediumscreen:
+    get:
+      summary: Set the layout to Large Screen Medium Screen
+      tags: []
+      responses: {}
+      operationId: get-layout-mediumscreen
+  /layout/swapscreens:
+    post:
+      summary: Set whether swap screens is enabled
+      tags: []
+      responses: {}
+      operationId: post-layout-swapscreens
+  /layout/upright:
+    post:
+      summary: Set whether upright orientation is enabled
+      tags: []
+      responses: {}
+      operationId: post-layout-upright
+  /backgroundcolor:
+    get:
+      summary: Get background color
+      tags: []
+      responses: {}
+      operationId: get-backgroundcolor
+    post:
+      summary: Set background color
+      tags: []
+      responses: {}
+      operationId: post-backgroundcolor
+  /speedlimit:
+    post:
+      summary: Set speed limit
+      tags: []
+      responses: {}
+      operationId: post-speedlimit
+    get:
+      summary: Get speed limit
+      tags: []
+      responses: {}
+      operationId: get-speedlimit
+  /amiibo:
+    post:
+      summary: Load or remove amiibo
+      tags: []
+      responses: {}
+      operationId: post-amiibo
+      requestBody:
+        description: Load amiibo
+        content:
+          application/octet-stream:
+            schema:
+              type: string
+              description: 'emptybody=remove,filebody=load'
+      description: ''
+  /3d:
+    post:
+      summary: Set 3D settings
+      tags: []
+      responses: {}
+      operationId: post-3d
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                mode:
+                  type: number
+                  enum:
+                    - Off = 0
+                    - SideBySide = 1
+                    - Anaglyph = 2
+                    - Interlaced = 3
+                intensity:
+                  type: number
+    get:
+      summary: Get 3D settings
+      tags: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  mode:
+                    type: number
+                    enum:
+                      - Off = 0
+                      - SideBySide = 1
+                      - Anaglyph = 2
+                      - Interlaced = 3
+                  intensity:
+                    type: number
+              examples: {}
+      operationId: get-3d
+  /microphone:
+    get:
+      summary: Get microphone settings
+      tags: []
+      responses: {}
+      operationId: get-microphone
+    post:
+      summary: Set microphone settings
+      tags: []
+      responses: {}
+      operationId: post-microphone
+  /resolution:
+    post:
+      summary: Set resolution
+      tags: []
+      responses: {}
+      operationId: post-resolution
+    get:
+      summary: Get resolution
+      tags: []
+      responses: {}
+      operationId: get-resolution
+  /frameadvancing:
+    get:
+      summary: Get whether frame advancing is enabled
+      tags: []
+      responses: {}
+      operationId: get-frameadvancing
+    post:
+      summary: Set whether frame advancing is enabled
+      tags: []
+      responses: {}
+      operationId: post-frameadvancing
+  /frameadvancing/advance:
+    get:
+      summary: "Advance a frame, enables frame advancing if it's not enabled"
+      tags: []
+      responses: {}
+      operationId: get-frameadvancing-advance
+  /controls:
+    get:
+      summary: Get controls
+      tags: []
+      responses: {}
+      operationId: get-controls
+    post:
+      summary: Set controls
+      tags: []
+      responses: {}
+      operationId: post-controls
+  /multiplayerurl:
+    post:
+      summary: Set multiplayer URL
+      tags: []
+      responses: {}
+      operationId: post-multiplayerurl
+    get:
+      summary: Get multiplayer URL
+      tags: []
+      responses: {}
+      operationId: get-multiplayerurl
+  /usehardwarerenderer:
+    get:
+      summary: Get whether the hardware renderer is enabled
+      tags: []
+      responses: {}
+      operationId: get-usehardwarerenderer
+    post:
+      summary: Set whether the hardware renderer is enabled
+      tags: []
+      responses: {}
+      operationId: post-usehardwarerenderer
+  /usehardwareshader:
+    get:
+      summary: Get whether the hardware shader is enabled
+      tags: []
+      responses: {}
+      operationId: get-usehardwareshader
+    post:
+      summary: Set whether the hardware shader is enabled
+      tags: []
+      responses: {}
+      operationId: post-usehardwareshader
+  /shaderaccuratemultiplication:
+    get:
+      summary: Get whether shader accurate multiplication is enabled
+      tags: []
+      responses: {}
+      operationId: get-shaderaccuratemultiplication
+    post:
+      summary: Set whether shader accurate multiplication is enabled
+      tags: []
+      responses: {}
+      operationId: post-shaderaccuratemultiplication
+  /useshaderjit:
+    get:
+      summary: Get whether the shader JIT is used instead of the interpreter for software shader
+      tags: []
+      responses: {}
+      operationId: get-useshaderjit
+    post:
+      summary: Set whether the shader JIT is used instead of the interpreter for software shader
+      tags: []
+      responses: {}
+      operationId: post-useshaderjit
+  /filtermode:
+    get:
+      summary: Get the filtering mode
+      tags: []
+      responses: {}
+      operationId: get-filtermode
+  /filtermode/nearest:
+    get:
+      summary: Set the filtering mode to nearest
+      tags: []
+      responses: {}
+      operationId: get-filtermode-nearest
+  /filtermode/linear:
+    get:
+      summary: Set the filtering mode to linear
+      tags: []
+      responses: {}
+      operationId: get-filtermode-linear
+  /postprocessingshader:
+    get:
+      summary: Get the post processing shader name
+      tags: []
+      responses: {}
+      operationId: get-postprocessingshader
+    post:
+      summary: Set the post processing shader name
+      tags: []
+      responses: {}
+      operationId: post-postprocessingshader
+  /dumptextures:
+    get:
+      summary: Get whether texture dumping is enabled
+      tags: []
+      responses: {}
+      operationId: get-dumptextures
+    post:
+      summary: Set whether texture dumping is enabled
+      tags: []
+      responses: {}
+      operationId: post-dumptextures
+  /customtextures:
+    get:
+      summary: Get whether custom textures are used
+      tags: []
+      responses: {}
+      operationId: get-customtextures
+    post:
+      summary: Set whether custom textures are used
+      tags: []
+      responses: {}
+      operationId: post-customtextures
+  /preloadcustomtextures:
+    get:
+      summary: Get whether custom texture preloading is enabled
+      tags: []
+      responses: {}
+      operationId: get-preloadcustomtextures
+    post:
+      summary: Set whether custom texture preloading is enabled
+      tags: []
+      responses: {}
+      operationId: post-preloadcustomtextures
+  /usecpujit:
+    get:
+      summary: Get whether the CPU JIT is used instead of the interpreter
+      tags: []
+      responses: {}
+      operationId: get-usecpujit
+    post:
+      summary: Set whether the CPU JIT is used instead of the interpreter
+      tags: []
+      responses: {}
+      operationId: post-usecpujit
+  /dspemulation:
+    get:
+      summary: Get DSP emulation settings
+      tags: []
+      responses: {}
+      operationId: get-dspemulation
+    post:
+      summary: Set DSP emulation settings
+      tags: []
+      responses: {}
+      operationId: post-dspemulation
+  /audioengine:
+    get:
+      summary: Get the audio output engine
+      tags: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  name:
+                    type: string
+                    enum:
+                      - cubeb
+                      - sdl2
+                      - 'null'
+                required:
+                  - name
+      operationId: get-audioengine
+    post:
+      summary: Set the audio output engine
+      tags: []
+      responses: {}
+      operationId: post-audioengine
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  enum:
+                    - cubeb
+                    - sdl2
+                    - 'null'
+              required:
+                - name
+  /audiodevice:
+    get:
+      summary: Get the audio output device
+      tags: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  value:
+                    type: string
+                required:
+                  - value
+      operationId: get-audiodevice
+    post:
+      summary: Set the audio output device
+      tags: []
+      responses: {}
+      operationId: post-audiodevice
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                value:
+                  type: string
+              required:
+                - value
+  /audiovolume:
+    get:
+      summary: Get the audio output volume
+      tags: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  value:
+                    type: number
+                    description: float
+                required:
+                  - value
+      operationId: get-audiovolume
+    post:
+      summary: Set the audio output volume
+      tags: []
+      responses: {}
+      operationId: post-audiovolume
+  /audiospeed:
+    get:
+      summary: Get the audio output speed
+      tags: []
+      responses: {}
+      operationId: get-audiospeed
+    post:
+      summary: Set the audio output speed
+      tags: []
+      responses: {}
+      operationId: post-audiospeed
+  /usevirtualsdcard:
+    get:
+      summary: Get whether a virtual SD card is used
+      tags: []
+      responses: {}
+      operationId: get-usevirtualsdcard
+    post:
+      summary: Set whether a virtual SD card is used
+      tags: []
+      responses: {}
+      operationId: post-usevirtualsdcard
+  /region:
+    get:
+      summary: "Get the console's region"
+      tags: []
+      responses: {}
+      operationId: get-region
+    post:
+      summary: "Set the console's region"
+      tags: []
+      responses: {}
+      operationId: post-region
+  /startclock:
+    get:
+      summary: Get the time to use when emulation starts
+      tags: []
+      responses: {}
+      operationId: get-startclock
+    post:
+      summary: Set the time to use when emulation starts
+      tags: []
+      responses: {}
+      operationId: post-startclock
+  /usevsync:
+    get:
+      summary: Get whether VSync is enabled
+      tags: []
+      responses: {}
+      operationId: get-usevsync
+  /logfilter:
+    get:
+      summary: Get the log filter
+      tags: []
+      responses: {}
+      operationId: get-logfilter
+    post:
+      summary: Set the log filter
+      tags: []
+      responses: {}
+      operationId: post-logfilter
+  /recordframetimes:
+    get:
+      summary: Get the whether frametime recording is enabled
+      tags: []
+      responses: {}
+      operationId: get-recordframetimes
+    post:
+      summary: Set the whether frametime recording is enabled
+      tags: []
+      responses: {}
+      operationId: post-recordframetimes
+  /cameras:
+    get:
+      summary: Get camera settings
+      tags: []
+      responses: {}
+      operationId: get-cameras
+    post:
+      summary: Set camera settings
+      tags: []
+      responses: {}
+      operationId: post-cameras
+  /gdbstub:
+    get:
+      summary: Get GDB stub enabled and port
+      tags: []
+      responses: {}
+      operationId: get-gdbstub
+    post:
+      summary: Set GDB stub enabled and port
+      tags: []
+      responses: {}
+      operationId: post-gdbstub
+  /llemodules:
+    get:
+      summary: Get LLE modules
+      tags: []
+      responses: {}
+      operationId: get-llemodules
+    post:
+      summary: Set LLE modules
+      tags: []
+      responses: {}
+      operationId: post-llemodules
+  /movie:
+    get:
+      summary: Get the movie state
+      tags: []
+      responses: {}
+      operationId: get-movie
+  /movie/stop:
+    get:
+      summary: Stop movie playback/recording
+      tags: []
+      responses: {}
+      operationId: get-movie-stop
+  /movie/play:
+    get:
+      summary: Play a movie
+      tags: []
+      responses: {}
+      operationId: get-movie-play
+  /movie/record:
+    get:
+      summary: Record a movie
+      tags: []
+      responses: {}
+      operationId: get-movie-record
+  /boot:
+    post:
+      summary: Boot a file
+      tags: []
+      responses: {}
+      operationId: post-boot
+  /installciafile:
+    post:
+      summary: Install a CIA file
+      tags: []
+      responses: {}
+      operationId: post-installciafile
+  /cheats:
+    get:
+      summary: Get the cheats
+      tags: []
+      responses: {}
+      operationId: get-cheats
+  /reloadcheats:
+    get:
+      summary: Reload cheats from the file
+      tags: []
+      responses: {}
+      operationId: get-reloadcheats
+  /savecheats:
+    get:
+      summary: Save the cheats to the file
+      tags: []
+      responses: {}
+      operationId: get-savecheats
+  /addcheat:
+    post:
+      summary: Add a cheat
+      tags: []
+      responses: {}
+      operationId: post-addcheat
+  /removecheat:
+    post:
+      summary: Remove a cheat
+      tags: []
+      responses: {}
+      operationId: post-removecheat
+  /updatecheat:
+    post:
+      summary: Update a cheat
+      tags: []
+      responses: {}
+      operationId: post-updatecheat
+  /pause:
+    post:
+      summary: Pause emulation
+      tags: []
+      responses: {}
+      operationId: post-pause
+  /continue:
+    get:
+      summary: Continue emulation
+      tags: []
+      responses: {}
+      operationId: get-continue
+  /registers/0-15:
+    get:
+      summary: Get the ARM 0-15 register values
+      tags: []
+      responses: {}
+      operationId: get-registers-0-15
+    post:
+      summary: Get a ARM 0-15 register value
+      operationId: post-registers-0-15
+      responses:
+        '200':
+          description: OK
+  /registers/cpsr:
+    get:
+      summary: Get the ARM CPSR register value
+      tags: []
+      responses: {}
+      operationId: get-registers-cpsr
+    post:
+      summary: Set the ARM CPSR register value
+      tags: []
+      responses: {}
+      operationId: post-registers-cpsr
+  /registers/vfp:
+    get:
+      summary: Get the ARM VFP register values
+      tags: []
+      responses: {}
+      operationId: get-registers-vfp
+    post:
+      summary: Set a ARM VFP register value
+      tags: []
+      responses: {}
+      operationId: post-registers-vfp
+  /registers/vfpsystem:
+    get:
+      summary: Get the ARM VFP system register values
+      tags: []
+      responses: {}
+      operationId: get-registers-vfpsystem
+    post:
+      summary: Set a ARM VFP system register value
+      tags: []
+      responses: {}
+      operationId: post-registers-vfpsystem
+  /registers/cp15:
+    get:
+      summary: Get the ARM CP15 register values
+      tags: []
+      responses: {}
+      operationId: get-registers-cp15
+    post:
+      summary: Set a ARM CP15 register value
+      tags: []
+      responses: {}
+      operationId: post-registers-cp15
+  /restart:
+    get:
+      summary: Restart emulation
+      tags: []
+      responses: {}
+      operationId: get-restart
+  /reloadcameras:
+    get:
+      summary: Reload camera images
+      tags: []
+      responses: {}
+      operationId: get-reloadcameras
+  /texturefilter:
+    get:
+      summary: Get the texture filter
+      tags: []
+      responses: {}
+      operationId: get-texturefilter
+    post:
+      summary: Set the texture filter
+      tags: []
+      responses: {}
+      operationId: post-texturefilter
+  /usecustomcputicks:
+    get:
+      summary: Get whether custom CPU ticks are used
+      tags: []
+      responses: {}
+      operationId: get-usecustomcputicks
+    post:
+      summary: Set whether custom CPU ticks are used
+      tags: []
+      responses: {}
+      operationId: post-usecustomcputicks
+  /customcputicks:
+    get:
+      summary: Set custom CPU ticks
+      tags: []
+      responses: {}
+      operationId: get-customcputicks
+    post:
+      summary: Set custom CPU ticks
+      tags: []
+      responses: {}
+      operationId: post-customcputicks
+  /cpuclockpercentage:
+    get:
+      summary: Get CPU clock percentage
+      tags: []
+      responses: {}
+      operationId: get-cpuclockpercentage
+    post:
+      summary: Set CPU clock percentage
+      tags: []
+      responses: {}
+      operationId: post-cpuclockpercentage
 components:
   schemas: {}
