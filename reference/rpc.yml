@@ -434,14 +434,11 @@ paths:
       summary: Screenshot
       tags:
         - Remote Control
-      responses:
-        '200':
-          description: OK
-          content:
-            image/png:
-              schema: {}
       operationId: get-screenshot
       description: Screenshot
+      responses:
+        '200':
+          description: 'Body: PNG'
   /customscreenshot:
     post:
       summary: Screenshot with custom layout
@@ -504,10 +501,10 @@ paths:
                 - height
                 - top_screen
                 - bottom_screen
+      description: Screenshot with custom layout
       responses:
         '200':
-          description: PNG
-      description: Screenshot with custom layout
+          description: 'Body: PNG'
   /layout:
     get:
       summary: Get the current layout
