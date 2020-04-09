@@ -326,7 +326,8 @@ paths:
   /motionstate:
     get:
       summary: Get the motion state
-      tags: []
+      tags:
+        - Remote Control
       responses:
         '200':
           description: OK
@@ -375,7 +376,8 @@ paths:
       description: Get the motion state
     post:
       summary: Set the motion state
-      tags: []
+      tags:
+        - Remote Control
       responses:
         '204':
           description: No Content
