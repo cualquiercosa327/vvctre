@@ -14,18 +14,57 @@ paths:
       tags: []
       responses: {}
       operationId: get-version
+      description: ''
   /memory/read:
     post:
       summary: Read memory
       tags: []
-      responses: {}
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: number
       operationId: post-memory-read
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                address:
+                  type: number
+                size:
+                  type: number
+              required:
+                - address
+                - size
   /memory/write:
     post:
       summary: Write memory
       tags: []
-      responses: {}
+      responses:
+        '204':
+          description: No Content
       operationId: post-memory-write
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                address:
+                  type: number
+                data:
+                  type: array
+                  items:
+                    type: number
+              required:
+                - address
+                - data
   /padstate:
     get:
       summary: Get the pad state
@@ -41,13 +80,44 @@ paths:
     get:
       summary: Get the circle pad state
       tags: []
-      responses: {}
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  x:
+                    type: number
+                    description: float
+                  'y':
+                    type: number
+                    description: float
+                required:
+                  - x
+                  - 'y'
       operationId: get-circlepadstate
     post:
       summary: Set the circle pad state
       tags: []
       responses: {}
       operationId: post-circlepadstate
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                x:
+                  type: string
+                  description: float
+                'y':
+                  type: string
+                  description: float
+              required:
+                - x
+                - 'y'
   /touchstate:
     get:
       summary: Get the touch screen state
@@ -63,13 +133,100 @@ paths:
     get:
       summary: Get the motion state
       tags: []
-      responses: {}
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  accel:
+                    type: object
+                    required:
+                      - x
+                      - 'y'
+                      - z
+                    properties:
+                      x:
+                        type: number
+                        description: float
+                      'y':
+                        type: number
+                        description: float
+                      z:
+                        type: number
+                        description: float
+                  gyro:
+                    type: object
+                    required:
+                      - x
+                      - 'y'
+                      - z
+                    description: float
+                    properties:
+                      x:
+                        type: number
+                        description: float
+                      'y':
+                        type: number
+                        description: float
+                      z:
+                        type: number
+                        description: float
+                required:
+                  - accel
+                  - gyro
       operationId: get-motionstate
     post:
       summary: Set the motion state
       tags: []
       responses: {}
       operationId: post-motionstate
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                accel:
+                  type: object
+                  required:
+                    - x
+                    - 'y'
+                    - z
+                  description: ''
+                  properties:
+                    x:
+                      type: number
+                      description: float
+                    'y':
+                      type: number
+                      description: float
+                    z:
+                      type: number
+                      description: float
+                gyro:
+                  type: object
+                  required:
+                    - x
+                    - 'y'
+                    - z
+                  properties:
+                    x:
+                      type: number
+                      description: float
+                    'y':
+                      type: number
+                      description: float
+                    z:
+                      type: number
+                      description: float
+              required:
+                - accel
+                - gyro
+        description: ''
+      description: 'If the body is {}, the real state is used.'
   /screenshot:
     get:
       summary: Screenshot
@@ -80,13 +237,143 @@ paths:
     post:
       summary: Screenshot with custom layout
       tags: []
-      responses: {}
       operationId: post-customscreenshot
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                is_rotated:
+                  type: boolean
+                width:
+                  type: number
+                height:
+                  type: number
+                top_screen:
+                  type: object
+                  required:
+                    - enabled
+                    - left
+                    - top
+                    - right
+                    - bottom
+                  properties:
+                    enabled:
+                      type: boolean
+                    left:
+                      type: number
+                    top:
+                      type: number
+                    right:
+                      type: number
+                    bottom:
+                      type: number
+                bottom_screen:
+                  type: object
+                  required:
+                    - enabled
+                    - left
+                    - top
+                    - right
+                    - bottom
+                  properties:
+                    enabled:
+                      type: boolean
+                    left:
+                      type: number
+                    top:
+                      type: number
+                    right:
+                      type: number
+                    bottom:
+                      type: number
+              required:
+                - is_rotated
+                - width
+                - height
+                - top_screen
+                - bottom_screen
+      responses:
+        '200':
+          description: PNG
   /layout:
     get:
       summary: Get the current layout
       tags: []
-      responses: {}
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  swap_screens:
+                    type: boolean
+                  is_rotated:
+                    type: boolean
+                  width:
+                    type: number
+                  height:
+                    type: number
+                  top_screen:
+                    type: object
+                    required:
+                      - enabled
+                      - width
+                      - height
+                      - left
+                      - top
+                      - right
+                      - bottom
+                    properties:
+                      enabled:
+                        type: boolean
+                      width:
+                        type: number
+                      height:
+                        type: number
+                      left:
+                        type: number
+                      top:
+                        type: number
+                      right:
+                        type: number
+                      bottom:
+                        type: number
+                  bottom_screen:
+                    type: object
+                    required:
+                      - enabled
+                      - width
+                      - height
+                      - left
+                      - top
+                      - right
+                      - bottom
+                    properties:
+                      enabled:
+                        type: boolean
+                      width:
+                        type: number
+                      height:
+                        type: number
+                      left:
+                        type: number
+                      top:
+                        type: number
+                      right:
+                        type: number
+                      bottom:
+                        type: number
+                required:
+                  - swap_screens
+                  - is_rotated
+                  - width
+                  - height
+                  - top_screen
+                  - bottom_screen
       operationId: get-layout
   /layout/custom:
     post:
@@ -94,35 +381,86 @@ paths:
       tags: []
       responses: {}
       operationId: post-layout-custom
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                top_screen:
+                  type: object
+                  required:
+                    - left
+                    - top
+                    - right
+                    - bottom
+                  properties:
+                    left:
+                      type: number
+                    top:
+                      type: number
+                    right:
+                      type: number
+                    bottom:
+                      type: number
+                bottom_screen:
+                  type: object
+                  required:
+                    - left
+                    - top
+                    - right
+                    - bottom
+                  properties:
+                    left:
+                      type: number
+                    top:
+                      type: number
+                    right:
+                      type: number
+                    bottom:
+                      type: number
+              required:
+                - top_screen
+                - bottom_screen
   /layout/default:
     get:
       summary: Set the layout to Default Top Bottom Screen
       tags: []
-      responses: {}
+      responses:
+        '204':
+          description: No Content
       operationId: get-layout-default
   /layout/singlescreen:
     get:
       summary: Set the layout to Single Screen Only
       tags: []
-      responses: {}
+      responses:
+        '204':
+          description: No Content
       operationId: get-layout-singlescreen
   /layout/largescreen:
     get:
       summary: Set the layout to Large Screen Small Screen
       tags: []
-      responses: {}
+      responses:
+        '204':
+          description: No Content
       operationId: get-layout-largescreen
   /layout/sidebyside:
     get:
       summary: Set the layout to Side by Side
       tags: []
-      responses: {}
+      responses:
+        '204':
+          description: No Content
       operationId: get-layout-sidebyside
   /layout/mediumscreen:
     get:
       summary: Set the layout to Large Screen Medium Screen
       tags: []
-      responses: {}
+      responses:
+        '204':
+          description: No Content
       operationId: get-layout-mediumscreen
   /layout/swapscreens:
     post:
@@ -130,23 +468,83 @@ paths:
       tags: []
       responses: {}
       operationId: post-layout-swapscreens
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                enabled:
+                  type: boolean
+              required:
+                - enabled
   /layout/upright:
     post:
       summary: Set whether upright orientation is enabled
       tags: []
       responses: {}
       operationId: post-layout-upright
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                upright:
+                  type: boolean
+              required:
+                - upright
   /backgroundcolor:
     get:
       summary: Get background color
       tags: []
-      responses: {}
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  red:
+                    type: string
+                    description: float
+                  green:
+                    type: string
+                    description: float
+                  blue:
+                    type: string
+                    description: float
+                required:
+                  - red
+                  - green
+                  - blue
       operationId: get-backgroundcolor
+      requestBody: {}
     post:
       summary: Set background color
       tags: []
       responses: {}
       operationId: post-backgroundcolor
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                red:
+                  type: string
+                  description: float
+                green:
+                  type: string
+                  description: float
+                blue:
+                  type: string
+                  description: float
+              required:
+                - red
+                - green
+                - blue
   /speedlimit:
     post:
       summary: Set speed limit
@@ -165,13 +563,11 @@ paths:
       responses: {}
       operationId: post-amiibo
       requestBody:
-        description: Load amiibo
-        content:
-          application/octet-stream:
-            schema:
-              type: string
-              description: 'emptybody=remove,filebody=load'
-      description: ''
+        description: ''
+      description: |-
+        If the body is a amiibo file, the file is loaded.
+
+        If the body is empty, the amiibo is removed.
   /3d:
     post:
       summary: Set 3D settings
@@ -219,13 +615,49 @@ paths:
     get:
       summary: Get microphone settings
       tags: []
-      responses: {}
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  type:
+                    type: number
+                    enum:
+                      - None = 0
+                      - Real = 1
+                      - Static = 2
+                  device:
+                    type: string
+                required:
+                  - type
+                  - device
       operationId: get-microphone
+      description: ''
     post:
       summary: Set microphone settings
       tags: []
       responses: {}
       operationId: post-microphone
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                type:
+                  type: number
+                  enum:
+                    - None = 0
+                    - Real = 1
+                    - Static = 2
+                device:
+                  type: string
+              required:
+                - type
+                - device
   /resolution:
     post:
       summary: Set resolution
@@ -241,24 +673,136 @@ paths:
     get:
       summary: Get whether frame advancing is enabled
       tags: []
-      responses: {}
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  enabled:
+                    type: boolean
+                required:
+                  - enabled
       operationId: get-frameadvancing
     post:
       summary: Set whether frame advancing is enabled
       tags: []
-      responses: {}
       operationId: post-frameadvancing
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                enabled:
+                  type: boolean
+              required:
+                - enabled
   /frameadvancing/advance:
     get:
       summary: "Advance a frame, enables frame advancing if it's not enabled"
       tags: []
-      responses: {}
+      responses:
+        '204':
+          description: No Content
       operationId: get-frameadvancing-advance
   /controls:
     get:
       summary: Get controls
       tags: []
-      responses: {}
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  analogs:
+                    type: array
+                    items:
+                      type: string
+                  buttons:
+                    type: array
+                    items:
+                      type: string
+                  motion_device:
+                    type: string
+                  touch_device:
+                    type: string
+                  udp_input_address:
+                    type: string
+                  udp_input_port:
+                    type: number
+                  udp_pad_index:
+                    type: number
+                required:
+                  - analogs
+                  - buttons
+                  - motion_device
+                  - touch_device
+                  - udp_input_address
+                  - udp_input_port
+                  - udp_pad_index
+              examples:
+                Keyboard and mouse:
+                  value:
+                    analogs:
+                      - 'engine:analog_from_button,modifier:engine$0keyboard$1code$07,left:engine$0keyboard$1code$080,up:engine$0keyboard$1code$082,right:engine$0keyboard$1code$079,down:engine$0keyboard$1code$081,modifier_scale:0.500000'
+                      - 'engine:analog_from_button,modifier:engine$0keyboard$1code$07,left:engine$0keyboard$1code$013,up:engine$0keyboard$1code$012,right:engine$0keyboard$1code$015,down:engine$0keyboard$1code$014,modifier_scale:0.500000'
+                    buttons:
+                      - 'engine:keyboard,code:4'
+                      - 'engine:keyboard,code:22'
+                      - 'engine:keyboard,code:29'
+                      - 'engine:keyboard,code:27'
+                      - 'engine:keyboard,code:23'
+                      - 'engine:keyboard,code:10'
+                      - 'engine:keyboard,code:9'
+                      - 'engine:keyboard,code:11'
+                      - 'engine:keyboard,code:20'
+                      - 'engine:keyboard,code:26'
+                      - 'engine:keyboard,code:16'
+                      - 'engine:keyboard,code:17'
+                      - 'engine:keyboard,code:39'
+                      - 'engine:keyboard,code:19'
+                      - 'engine:keyboard,code:30'
+                      - 'engine:keyboard,code:31'
+                      - 'engine:keyboard,code:5'
+                    motion_device: 'engine:motion_emu,update_period:100,sensitivity:0.01,tilt_clamp:90.0'
+                    touch_device: 'engine:emu_window'
+                    udp_input_address: 127.0.0.1
+                    udp_input_port: 26760
+                    udp_pad_index: 0
+                Gamepad and UDP:
+                  value:
+                    analogs:
+                      - 'axis_x:0,engine:sdl,port:0,guid:030000006d0400001dc2000000007801,axis_y:1'
+                      - 'axis_x:3,engine:sdl,port:0,guid:030000006d0400001dc2000000007801,axis_y:4'
+                    buttons:
+                      - 'engine:sdl,port:0,guid:030000006d0400001dc2000000007801,button:1'
+                      - 'engine:sdl,port:0,guid:030000006d0400001dc2000000007801,button:0'
+                      - 'engine:sdl,port:0,guid:030000006d0400001dc2000000007801,button:3'
+                      - 'engine:sdl,port:0,guid:030000006d0400001dc2000000007801,button:2'
+                      - 'engine:sdl,port:0,guid:030000006d0400001dc2000000007801,direction:up,hat:0'
+                      - 'engine:sdl,port:0,guid:030000006d0400001dc2000000007801,direction:down,hat:0'
+                      - 'engine:sdl,port:0,guid:030000006d0400001dc2000000007801,direction:left,hat:0'
+                      - 'engine:sdl,port:0,guid:030000006d0400001dc2000000007801,direction:right,hat:0'
+                      - 'engine:sdl,port:0,guid:030000006d0400001dc2000000007801,button:4'
+                      - 'engine:sdl,port:0,guid:030000006d0400001dc2000000007801,button:5'
+                      - 'engine:sdl,port:0,guid:030000006d0400001dc2000000007801,button:7'
+                      - 'engine:sdl,port:0,guid:030000006d0400001dc2000000007801,button:6'
+                      - 'engine:sdl,port:0,guid:030000006d0400001dc2000000007801,button:10'
+                      - 'engine:sdl,port:0,guid:030000006d0400001dc2000000007801,button:10'
+                      - 'engine:sdl,port:0,axis:2,guid:030000006d0400001dc2000000007801,direction:+,threshold:0.5'
+                      - 'engine:sdl,port:0,axis:5,guid:030000006d0400001dc2000000007801,direction:+,threshold:0.5'
+                      - 'engine:keyboard,code:5'
+                    motion_device: 'engine:cemuhookudp'
+                    touch_device: 'engine:cemuhookudp'
+                    udp_input_address: 192.168.1.81
+                    udp_input_port: 20000
+                    udp_pad_index: 0
       operationId: get-controls
     post:
       summary: Set controls
@@ -271,11 +815,33 @@ paths:
       tags: []
       responses: {}
       operationId: post-multiplayerurl
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                value:
+                  type: string
+              required:
+                - value
     get:
       summary: Get multiplayer URL
       tags: []
-      responses: {}
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  value:
+                    type: string
+                required:
+                  - value
       operationId: get-multiplayerurl
+      description: ''
   /usehardwarerenderer:
     get:
       summary: Get whether the hardware renderer is enabled
@@ -324,19 +890,37 @@ paths:
     get:
       summary: Get the filtering mode
       tags: []
-      responses: {}
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  mode:
+                    type: string
+                    enum:
+                      - linear
+                      - nearest
+                required:
+                  - mode
       operationId: get-filtermode
   /filtermode/nearest:
     get:
       summary: Set the filtering mode to nearest
       tags: []
-      responses: {}
+      responses:
+        '204':
+          description: No Content
       operationId: get-filtermode-nearest
   /filtermode/linear:
     get:
       summary: Set the filtering mode to linear
       tags: []
-      responses: {}
+      responses:
+        '204':
+          description: No Content
       operationId: get-filtermode-linear
   /postprocessingshader:
     get:
@@ -353,24 +937,63 @@ paths:
     get:
       summary: Get whether texture dumping is enabled
       tags: []
-      responses: {}
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  enabled:
+                    type: boolean
       operationId: get-dumptextures
     post:
       summary: Set whether texture dumping is enabled
       tags: []
       responses: {}
       operationId: post-dumptextures
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                enabled:
+                  type: boolean
   /customtextures:
     get:
       summary: Get whether custom textures are used
       tags: []
-      responses: {}
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  enabled:
+                    type: boolean
+                required:
+                  - enabled
       operationId: get-customtextures
+      requestBody: {}
     post:
       summary: Set whether custom textures are used
       tags: []
-      responses: {}
       operationId: post-customtextures
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                enabled:
+                  type: boolean
+              required:
+                - enabled
+        description: ''
   /preloadcustomtextures:
     get:
       summary: Get whether custom texture preloading is enabled
@@ -397,13 +1020,44 @@ paths:
     get:
       summary: Get DSP emulation settings
       tags: []
-      responses: {}
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  emulation:
+                    type: string
+                    enum:
+                      - hle
+                      - lle
+                  multithreaded:
+                    type: boolean
+                required:
+                  - emulation
+                  - multithreaded
       operationId: get-dspemulation
     post:
       summary: Set DSP emulation settings
       tags: []
       responses: {}
       operationId: post-dspemulation
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                emulation:
+                  type: string
+                multithreaded:
+                  description: only needed if emulation == lle
+                  type: boolean
+              required:
+                - emulation
+                - multithreaded
   /audioengine:
     get:
       summary: Get the audio output engine
@@ -446,7 +1100,7 @@ paths:
                 - name
   /audiodevice:
     get:
-      summary: Get the audio output device
+      summary: Get the audio device
       tags: []
       responses:
         '200':
@@ -478,7 +1132,7 @@ paths:
                 - value
   /audiovolume:
     get:
-      summary: Get the audio output volume
+      summary: Get the audio volume
       tags: []
       responses:
         '200':
@@ -499,17 +1153,52 @@ paths:
       tags: []
       responses: {}
       operationId: post-audiovolume
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                value:
+                  type: number
+                  description: float
+              required:
+                - value
+        description: ''
   /audiospeed:
     get:
-      summary: Get the audio output speed
+      summary: Get the audio speed
       tags: []
-      responses: {}
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  value:
+                    description: float
+                    type: number
+                required:
+                  - value
       operationId: get-audiospeed
     post:
       summary: Set the audio output speed
       tags: []
       responses: {}
       operationId: post-audiospeed
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                value:
+                  type: number
+                  description: float
+              required:
+                - value
   /usevirtualsdcard:
     get:
       summary: Get whether a virtual SD card is used
@@ -553,13 +1242,34 @@ paths:
     get:
       summary: Get the log filter
       tags: []
-      responses: {}
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  value:
+                    type: string
+                required:
+                  - value
       operationId: get-logfilter
     post:
       summary: Set the log filter
       tags: []
       responses: {}
       operationId: post-logfilter
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                value:
+                  type: string
+              required:
+                - value
   /recordframetimes:
     get:
       summary: Get the whether frametime recording is enabled
@@ -575,35 +1285,355 @@ paths:
     get:
       summary: Get camera settings
       tags: []
-      responses: {}
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  name:
+                    type: array
+                    items:
+                      type: string
+                  config:
+                    type: array
+                    items:
+                      type: string
+                  flip:
+                    type: array
+                    items:
+                      type: number
+                required:
+                  - name
+                  - config
+                  - flip
       operationId: get-cameras
     post:
       summary: Set camera settings
       tags: []
       responses: {}
       operationId: post-cameras
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: array
+                  items:
+                    type: string
+                config:
+                  type: array
+                  items:
+                    type: string
+                flip:
+                  type: array
+                  items:
+                    type: number
   /gdbstub:
     get:
       summary: Get GDB stub enabled and port
       tags: []
-      responses: {}
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  enabled:
+                    type: boolean
+                  port:
+                    type: number
+                required:
+                  - enabled
+                  - port
       operationId: get-gdbstub
     post:
       summary: Set GDB stub enabled and port
       tags: []
-      responses: {}
       operationId: post-gdbstub
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                enabled:
+                  type: boolean
+                port:
+                  type: number
+              required:
+                - enabled
+                - port
   /llemodules:
     get:
       summary: Get LLE modules
       tags: []
       responses: {}
       operationId: get-llemodules
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                FS:
+                  type: boolean
+                PM:
+                  type: boolean
+                LDR:
+                  type: boolean
+                PXI:
+                  type: boolean
+                ERR:
+                  type: boolean
+                AC:
+                  type: boolean
+                ACT:
+                  type: boolean
+                AM:
+                  type: boolean
+                BOSS:
+                  type: boolean
+                CAM:
+                  type: boolean
+                CECD:
+                  type: boolean
+                CFG:
+                  type: boolean
+                DLP:
+                  type: boolean
+                DSP:
+                  type: boolean
+                FRD:
+                  type: boolean
+                GSP:
+                  type: boolean
+                HID:
+                  type: boolean
+                IR:
+                  type: boolean
+                MIC:
+                  type: boolean
+                MVD:
+                  type: boolean
+                NDM:
+                  type: boolean
+                NEWS:
+                  type: boolean
+                NFC:
+                  type: boolean
+                NIM:
+                  type: boolean
+                NS:
+                  type: boolean
+                NWM:
+                  type: boolean
+                PTM:
+                  type: boolean
+                QTM:
+                  type: boolean
+                CSND:
+                  type: boolean
+                HTTP:
+                  type: boolean
+                SOC:
+                  type: boolean
+                SSL:
+                  type: boolean
+                PS:
+                  type: boolean
+                MCU:
+                  type: boolean
+                CDC:
+                  type: boolean
+                GPIO:
+                  type: boolean
+                I2C:
+                  type: boolean
+                MP:
+                  type: boolean
+                PDN:
+                  type: boolean
+                SPI:
+                  type: boolean
+              required:
+                - FS
+                - PM
+                - LDR
+                - PXI
+                - ERR
+                - AC
+                - ACT
+                - AM
+                - BOSS
+                - CAM
+                - CECD
+                - CFG
+                - DLP
+                - DSP
+                - FRD
+                - GSP
+                - HID
+                - IR
+                - MIC
+                - MVD
+                - NDM
+                - NEWS
+                - NFC
+                - NIM
+                - NS
+                - NWM
+                - PTM
+                - QTM
+                - CSND
+                - HTTP
+                - SOC
+                - SSL
+                - PS
+                - MCU
+                - CDC
+                - GPIO
+                - I2C
+                - MP
+                - PDN
+                - SPI
     post:
       summary: Set LLE modules
       tags: []
       responses: {}
       operationId: post-llemodules
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                FS:
+                  type: boolean
+                PM:
+                  type: boolean
+                LDR:
+                  type: boolean
+                PXI:
+                  type: boolean
+                ERR:
+                  type: boolean
+                AC:
+                  type: boolean
+                ACT:
+                  type: boolean
+                AM:
+                  type: boolean
+                BOSS:
+                  type: boolean
+                CAM:
+                  type: boolean
+                CECD:
+                  type: boolean
+                CFG:
+                  type: boolean
+                DLP:
+                  type: boolean
+                DSP:
+                  type: boolean
+                FRD:
+                  type: boolean
+                GSP:
+                  type: boolean
+                HID:
+                  type: boolean
+                IR:
+                  type: boolean
+                MIC:
+                  type: boolean
+                MVD:
+                  type: boolean
+                NDM:
+                  type: boolean
+                NEWS:
+                  type: boolean
+                NFC:
+                  type: boolean
+                NIM:
+                  type: boolean
+                NS:
+                  type: boolean
+                NWM:
+                  type: boolean
+                PTM:
+                  type: boolean
+                QTM:
+                  type: boolean
+                CSND:
+                  type: boolean
+                HTTP:
+                  type: boolean
+                SOC:
+                  type: boolean
+                SSL:
+                  type: boolean
+                PS:
+                  type: boolean
+                MCU:
+                  type: boolean
+                CDC:
+                  type: boolean
+                GPIO:
+                  type: boolean
+                I2C:
+                  type: boolean
+                MP:
+                  type: boolean
+                PDN:
+                  type: boolean
+                SPI:
+                  type: boolean
+              required:
+                - FS
+                - PM
+                - LDR
+                - PXI
+                - ERR
+                - AC
+                - ACT
+                - AM
+                - BOSS
+                - CAM
+                - CECD
+                - CFG
+                - DLP
+                - DSP
+                - FRD
+                - GSP
+                - HID
+                - IR
+                - MIC
+                - NDM
+                - NEWS
+                - NFC
+                - NIM
+                - NS
+                - NWM
+                - PTM
+                - QTM
+                - CSND
+                - HTTP
+                - SOC
+                - SSL
+                - PS
+                - MCU
+                - CDC
+                - GPIO
+                - I2C
+                - MP
+                - PDN
+                - SPI
   /movie:
     get:
       summary: Get the movie state
@@ -634,17 +1664,68 @@ paths:
       tags: []
       responses: {}
       operationId: post-boot
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+              required:
+                - file
+        description: ''
   /installciafile:
     post:
       summary: Install a CIA file
       tags: []
       responses: {}
       operationId: post-installciafile
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+              required:
+                - file
   /cheats:
     get:
       summary: Get the cheats
       tags: []
-      responses: {}
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                    type:
+                      type: string
+                      enum:
+                        - Gateway
+                    code:
+                      type: string
+                    comments:
+                      type: string
+                    enabled:
+                      type: boolean
+                    index:
+                      type: number
+                  required:
+                    - name
+                    - type
+                    - code
+                    - comments
+                    - enabled
+                    - index
       operationId: get-cheats
   /reloadcheats:
     get:
@@ -664,6 +1745,31 @@ paths:
       tags: []
       responses: {}
       operationId: post-addcheat
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                type:
+                  type: string
+                  enum:
+                    - Gateway
+                code:
+                  type: string
+                comments:
+                  type: string
+                enabled:
+                  type: boolean
+              required:
+                - name
+                - type
+                - code
+                - comments
+                - enabled
+        description: ''
   /removecheat:
     post:
       summary: Remove a cheat
@@ -686,8 +1792,11 @@ paths:
     get:
       summary: Continue emulation
       tags: []
-      responses: {}
       operationId: get-continue
+      responses:
+        '204':
+          description: No Content
+      parameters: []
   /registers/0-15:
     get:
       summary: Get the ARM 0-15 register values
@@ -782,23 +1891,45 @@ paths:
     get:
       summary: Set custom CPU ticks
       tags: []
-      responses: {}
+      responses:
+        '200':
+          description: OK
+          content:
+            text/plain:
+              schema:
+                type: boolean
       operationId: get-customcputicks
     post:
       summary: Set custom CPU ticks
       tags: []
       responses: {}
       operationId: post-customcputicks
+      requestBody:
+        content:
+          text/plain:
+            schema:
+              type: boolean
   /cpuclockpercentage:
     get:
       summary: Get CPU clock percentage
       tags: []
-      responses: {}
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: number
       operationId: get-cpuclockpercentage
     post:
       summary: Set CPU clock percentage
       tags: []
       responses: {}
       operationId: post-cpuclockpercentage
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: number
 components:
   schemas: {}
