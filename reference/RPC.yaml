@@ -1574,7 +1574,9 @@ paths:
                   type: boolean
               required:
                 - enabled
-      description: Set whether the CPU JIT is used instead of the interpreter
+      description: |-
+        Set whether the CPU JIT is used instead of the interpreter.
+        Restarts emulation.
   /dspemulation:
     get:
       summary: Get DSP emulation settings
@@ -1622,7 +1624,9 @@ paths:
               required:
                 - emulation
                 - multithreaded
-      description: Set DSP emulation settings
+      description: |-
+        Set DSP emulation settings.
+        Restarts emulation.
   /audioengine:
     get:
       summary: Get the audio output engine
@@ -1826,7 +1830,9 @@ paths:
                   type: boolean
               required:
                 - enabled
-      description: Set whether a virtual SD card is used
+      description: |-
+        Set whether a virtual SD card is used.
+        Restarts emulation.
   /region:
     get:
       summary: "Get the console's region"
@@ -1865,7 +1871,9 @@ paths:
                   description: '-1: Auto-select, 0: Japan, 1: USA, 2: Europe, 3: Australia, 4: China, 5: Korea, 6: Taiwan'
               required:
                 - value
-      description: "Set the console's region"
+      description: |-
+        Set the console's region.
+        Restarts emulation.
   /startclock:
     get:
       summary: Get the time to use when emulation starts
@@ -1897,7 +1905,9 @@ paths:
         '204':
           description: No Content
       operationId: post-startclock
-      description: Set the time to use when emulation starts
+      description: |-
+        Set the time to use when emulation starts.
+        Restarts emulation.
       requestBody:
         content:
           application/json:
@@ -2377,7 +2387,7 @@ paths:
                 - SPI
       description: |-
         Set LLE modules
-        Restarts the emulation.
+        Restarts emulation.
   /movie:
     get:
       summary: Get the movie state
