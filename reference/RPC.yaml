@@ -662,12 +662,35 @@ paths:
     post:
       summary: Set resolution
       tags: []
-      responses: {}
+      responses:
+        '204':
+          description: No Content
       operationId: post-resolution
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                resolution:
+                  type: number
+              required:
+                - resolution
     get:
       summary: Get resolution
       tags: []
-      responses: {}
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  resolution:
+                    type: string
+                required:
+                  - resolution
       operationId: get-resolution
   /frameadvancing:
     get:
@@ -926,13 +949,36 @@ paths:
     get:
       summary: Get the post processing shader name
       tags: []
-      responses: {}
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  name:
+                    type: string
+                required:
+                  - name
       operationId: get-postprocessingshader
     post:
       summary: Set the post processing shader name
       tags: []
-      responses: {}
+      responses:
+        '204':
+          description: No Content
       operationId: post-postprocessingshader
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+              required:
+                - name
   /dumptextures:
     get:
       summary: Get whether texture dumping is enabled
@@ -998,13 +1044,36 @@ paths:
     get:
       summary: Get whether custom texture preloading is enabled
       tags: []
-      responses: {}
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  enabled:
+                    type: boolean
+                required:
+                  - enabled
       operationId: get-preloadcustomtextures
     post:
       summary: Set whether custom texture preloading is enabled
       tags: []
-      responses: {}
+      responses:
+        '204':
+          description: No Content
       operationId: post-preloadcustomtextures
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                enabled:
+                  type: boolean
+              required:
+                - enabled
   /usecpujit:
     get:
       summary: Get whether the CPU JIT is used instead of the interpreter
@@ -1214,13 +1283,38 @@ paths:
     get:
       summary: "Get the console's region"
       tags: []
-      responses: {}
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  value:
+                    type: number
+                    description: '-1: Auto-select, 0: Japan, 1: USA, 2: Europe, 3: Australia, 4: China, 5: Korea, 6: Taiwan'
+                required:
+                  - value
       operationId: get-region
     post:
       summary: "Set the console's region"
       tags: []
-      responses: {}
+      responses:
+        '204':
+          description: No Content
       operationId: post-region
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                value:
+                  type: number
+                  description: '-1: Auto-select, 0: Japan, 1: USA, 2: Europe, 3: Australia, 4: China, 5: Korea, 6: Taiwan'
+              required:
+                - value
   /startclock:
     get:
       summary: Get the time to use when emulation starts
@@ -1274,13 +1368,36 @@ paths:
     get:
       summary: Get the whether frametime recording is enabled
       tags: []
-      responses: {}
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  enabled:
+                    type: boolean
+                required:
+                  - enabled
       operationId: get-recordframetimes
     post:
       summary: Set the whether frametime recording is enabled
       tags: []
-      responses: {}
+      responses:
+        '204':
+          description: No Content
       operationId: post-recordframetimes
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                enabled:
+                  type: boolean
+              required:
+                - enabled
   /cameras:
     get:
       summary: Get camera settings
@@ -1638,26 +1755,64 @@ paths:
     get:
       summary: Get the movie state
       tags: []
-      responses: {}
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  playing:
+                    type: boolean
+                  recording:
+                    type: boolean
+                required:
+                  - playing
+                  - recording
       operationId: get-movie
   /movie/stop:
     get:
       summary: Stop movie playback/recording
       tags: []
-      responses: {}
+      responses:
+        '204':
+          description: No Content
       operationId: get-movie-stop
   /movie/play:
-    get:
-      summary: Play a movie
-      tags: []
-      responses: {}
-      operationId: get-movie-play
+    post:
+      summary: ''
+      operationId: post-movie-play
+      responses:
+        '204':
+          description: No Content
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+              required:
+                - file
   /movie/record:
-    get:
-      summary: Record a movie
-      tags: []
-      responses: {}
-      operationId: get-movie-record
+    post:
+      summary: ''
+      operationId: post-movie-record
+      responses:
+        '204':
+          description: No Content
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+              required:
+                - file
   /boot:
     post:
       summary: Boot a file
@@ -1731,8 +1886,10 @@ paths:
     get:
       summary: Reload cheats from the file
       tags: []
-      responses: {}
       operationId: get-reloadcheats
+      responses:
+        '204':
+          description: No Content
   /savecheats:
     get:
       summary: Save the cheats to the file
@@ -1774,8 +1931,20 @@ paths:
     post:
       summary: Remove a cheat
       tags: []
-      responses: {}
+      responses:
+        '204':
+          description: No Content
       operationId: post-removecheat
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                index:
+                  type: number
+              required:
+                - index
   /updatecheat:
     post:
       summary: Update a cheat
@@ -1783,11 +1952,12 @@ paths:
       responses: {}
       operationId: post-updatecheat
   /pause:
-    post:
-      summary: Pause emulation
-      tags: []
-      responses: {}
-      operationId: post-pause
+    get:
+      summary: ''
+      operationId: get-pause
+      responses:
+        '204':
+          description: No Content
   /continue:
     get:
       summary: Continue emulation
@@ -1804,7 +1974,7 @@ paths:
       responses: {}
       operationId: get-registers-0-15
     post:
-      summary: Get a ARM 0-15 register value
+      summary: Set a ARM 0-15 register value
       operationId: post-registers-0-15
       responses:
         '200':
