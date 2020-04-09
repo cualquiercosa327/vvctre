@@ -301,7 +301,8 @@ paths:
       description: Get the touch screen state
     post:
       summary: Set the touch screen state
-      tags: []
+      tags:
+        - Remote Control
       responses:
         '204':
           description: No Content
