@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   title: RPC
-  version: '1.0'
+  version: Unstable
   description: 'API that can be used for remote control, debugging, and more.'
   contact: {}
   license: {}
@@ -12,9 +12,23 @@ paths:
     get:
       summary: Get version
       tags: []
-      responses: {}
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  vvctre:
+                    type: string
+                  movie:
+                    type: number
+                required:
+                  - vvctre
+                  - movie
       operationId: get-version
-      description: ''
+      description: Get version
   /memory/read:
     post:
       summary: Read memory
@@ -42,6 +56,7 @@ paths:
               required:
                 - address
                 - size
+      description: Read memory
   /memory/write:
     post:
       summary: Write memory
@@ -65,17 +80,148 @@ paths:
               required:
                 - address
                 - data
+      description: Write memory
   /padstate:
     get:
       summary: Get the pad state
       tags: []
-      responses: {}
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  hex:
+                    type: number
+                  a:
+                    type: boolean
+                  b:
+                    type: boolean
+                  select:
+                    type: boolean
+                  start:
+                    type: boolean
+                  right:
+                    type: boolean
+                  left:
+                    type: boolean
+                  up:
+                    type: boolean
+                  down:
+                    type: boolean
+                  r:
+                    type: boolean
+                  l:
+                    type: boolean
+                  x:
+                    type: boolean
+                  'y':
+                    type: boolean
+                  debug:
+                    type: boolean
+                  gpio14:
+                    type: boolean
+                  circle_right:
+                    type: boolean
+                  circle_left:
+                    type: boolean
+                  circle_up:
+                    type: boolean
+                  circle_down:
+                    type: boolean
+                required:
+                  - hex
+                  - a
+                  - b
+                  - select
+                  - start
+                  - right
+                  - left
+                  - up
+                  - down
+                  - r
+                  - l
+                  - x
+                  - 'y'
+                  - debug
+                  - gpio14
+                  - circle_right
+                  - circle_left
+                  - circle_up
+                  - circle_down
       operationId: get-padstate
+      description: Get the pad state
     post:
       summary: Set the pad state
       tags: []
-      responses: {}
+      responses:
+        '204':
+          description: No Content
       operationId: post-padstate
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                a:
+                  type: boolean
+                b:
+                  type: boolean
+                select:
+                  type: boolean
+                start:
+                  type: boolean
+                right:
+                  type: boolean
+                left:
+                  type: boolean
+                up:
+                  type: boolean
+                down:
+                  type: boolean
+                r:
+                  type: boolean
+                l:
+                  type: boolean
+                x:
+                  type: boolean
+                'y':
+                  type: boolean
+                debug:
+                  type: boolean
+                gpio14:
+                  type: boolean
+                circle_right:
+                  type: boolean
+                circle_left:
+                  type: boolean
+                circle_up:
+                  type: boolean
+                circle_down:
+                  type: boolean
+              required:
+                - a
+                - b
+                - select
+                - start
+                - right
+                - left
+                - up
+                - down
+                - r
+                - l
+                - x
+                - 'y'
+                - debug
+                - gpio14
+                - circle_right
+                - circle_left
+                - circle_up
+                - circle_down
+      description: Set the pad state
   /circlepadstate:
     get:
       summary: Get the circle pad state
@@ -98,10 +244,13 @@ paths:
                   - x
                   - 'y'
       operationId: get-circlepadstate
+      description: Get the circle pad state
     post:
       summary: Set the circle pad state
       tags: []
-      responses: {}
+      responses:
+        '204':
+          description: No Content
       operationId: post-circlepadstate
       requestBody:
         content:
@@ -118,17 +267,55 @@ paths:
               required:
                 - x
                 - 'y'
+      description: Set the circle pad state
   /touchstate:
     get:
       summary: Get the touch screen state
       tags: []
-      responses: {}
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  x:
+                    type: number
+                  'y':
+                    type: number
+                  pressed:
+                    type: boolean
+                required:
+                  - x
+                  - 'y'
+                  - pressed
       operationId: get-touchstate
+      description: Get the touch screen state
     post:
       summary: Set the touch screen state
       tags: []
-      responses: {}
+      responses:
+        '204':
+          description: No Content
       operationId: post-touchstate
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                x:
+                  type: number
+                'y':
+                  type: number
+                pressed:
+                  type: boolean
+              required:
+                - x
+                - 'y'
+                - pressed
+      description: Set the touch screen state
   /motionstate:
     get:
       summary: Get the motion state
@@ -178,10 +365,13 @@ paths:
                   - accel
                   - gyro
       operationId: get-motionstate
+      description: Get the motion state
     post:
       summary: Set the motion state
       tags: []
-      responses: {}
+      responses:
+        '204':
+          description: No Content
       operationId: post-motionstate
       requestBody:
         content:
@@ -226,13 +416,21 @@ paths:
                 - accel
                 - gyro
         description: ''
-      description: 'If the body is {}, the real state is used.'
+      description: |-
+        Set the motion state
+        If the body is {}, the real state is used.
   /screenshot:
     get:
       summary: Screenshot
       tags: []
-      responses: {}
+      responses:
+        '200':
+          description: OK
+          content:
+            image/png:
+              schema: {}
       operationId: get-screenshot
+      description: Screenshot
   /customscreenshot:
     post:
       summary: Screenshot with custom layout
@@ -297,6 +495,7 @@ paths:
       responses:
         '200':
           description: PNG
+      description: Screenshot with custom layout
   /layout:
     get:
       summary: Get the current layout
@@ -375,11 +574,14 @@ paths:
                   - top_screen
                   - bottom_screen
       operationId: get-layout
+      description: Get the current layout
   /layout/custom:
     post:
       summary: Set the layout to a custom layout
       tags: []
-      responses: {}
+      responses:
+        '204':
+          description: No Content
       operationId: post-layout-custom
       requestBody:
         content:
@@ -422,6 +624,7 @@ paths:
               required:
                 - top_screen
                 - bottom_screen
+      description: Set the layout to a custom layout
   /layout/default:
     get:
       summary: Set the layout to Default Top Bottom Screen
@@ -430,6 +633,7 @@ paths:
         '204':
           description: No Content
       operationId: get-layout-default
+      description: Set the layout to Default Top Bottom Screen
   /layout/singlescreen:
     get:
       summary: Set the layout to Single Screen Only
@@ -438,6 +642,7 @@ paths:
         '204':
           description: No Content
       operationId: get-layout-singlescreen
+      description: Set the layout to Single Screen Only
   /layout/largescreen:
     get:
       summary: Set the layout to Large Screen Small Screen
@@ -446,6 +651,7 @@ paths:
         '204':
           description: No Content
       operationId: get-layout-largescreen
+      description: Set the layout to Large Screen Small Screen
   /layout/sidebyside:
     get:
       summary: Set the layout to Side by Side
@@ -454,6 +660,7 @@ paths:
         '204':
           description: No Content
       operationId: get-layout-sidebyside
+      description: Set the layout to Side by Side
   /layout/mediumscreen:
     get:
       summary: Set the layout to Large Screen Medium Screen
@@ -462,11 +669,14 @@ paths:
         '204':
           description: No Content
       operationId: get-layout-mediumscreen
+      description: Set the layout to Large Screen Medium Screen
   /layout/swapscreens:
     post:
       summary: Set whether swap screens is enabled
       tags: []
-      responses: {}
+      responses:
+        '204':
+          description: No Content
       operationId: post-layout-swapscreens
       requestBody:
         content:
@@ -478,11 +688,14 @@ paths:
                   type: boolean
               required:
                 - enabled
+      description: Set whether swap screens is enabled
   /layout/upright:
     post:
       summary: Set whether upright orientation is enabled
       tags: []
-      responses: {}
+      responses:
+        '204':
+          description: No Content
       operationId: post-layout-upright
       requestBody:
         content:
@@ -494,6 +707,7 @@ paths:
                   type: boolean
               required:
                 - upright
+      description: Set whether upright orientation is enabled
   /backgroundcolor:
     get:
       summary: Get background color
@@ -521,10 +735,13 @@ paths:
                   - blue
       operationId: get-backgroundcolor
       requestBody: {}
+      description: Get background color
     post:
       summary: Set background color
       tags: []
-      responses: {}
+      responses:
+        '204':
+          description: No Content
       operationId: post-backgroundcolor
       requestBody:
         content:
@@ -545,22 +762,56 @@ paths:
                 - red
                 - green
                 - blue
+      description: Get background color
   /speedlimit:
     post:
       summary: Set speed limit
       tags: []
-      responses: {}
+      responses:
+        '204':
+          description: No Content
       operationId: post-speedlimit
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                enabled:
+                  type: boolean
+                percentage:
+                  type: number
+              required:
+                - enabled
+                - percentage
+      description: Set speed limit
     get:
       summary: Get speed limit
       tags: []
-      responses: {}
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  enabled:
+                    type: boolean
+                  percentage:
+                    type: number
+                required:
+                  - enabled
+                  - percentage
       operationId: get-speedlimit
+      description: Get speed limit
   /amiibo:
     post:
       summary: Load or remove amiibo
       tags: []
-      responses: {}
+      responses:
+        '204':
+          description: No Content
       operationId: post-amiibo
       requestBody:
         description: ''
@@ -572,7 +823,9 @@ paths:
     post:
       summary: Set 3D settings
       tags: []
-      responses: {}
+      responses:
+        '204':
+          description: No Content
       operationId: post-3d
       requestBody:
         content:
@@ -589,6 +842,7 @@ paths:
                     - Interlaced = 3
                 intensity:
                   type: number
+      description: Set 3D settings
     get:
       summary: Get 3D settings
       tags: []
@@ -611,6 +865,7 @@ paths:
                     type: number
               examples: {}
       operationId: get-3d
+      description: Get 3D settings
   /microphone:
     get:
       summary: Get microphone settings
@@ -635,11 +890,13 @@ paths:
                   - type
                   - device
       operationId: get-microphone
-      description: ''
+      description: Get microphone settings
     post:
       summary: Set microphone settings
       tags: []
-      responses: {}
+      responses:
+        '204':
+          description: No Content
       operationId: post-microphone
       requestBody:
         content:
@@ -658,6 +915,7 @@ paths:
               required:
                 - type
                 - device
+      description: Set microphone settings
   /resolution:
     post:
       summary: Set resolution
@@ -676,6 +934,7 @@ paths:
                   type: number
               required:
                 - resolution
+      description: Set resolution
     get:
       summary: Get resolution
       tags: []
@@ -692,6 +951,7 @@ paths:
                 required:
                   - resolution
       operationId: get-resolution
+      description: Get resolution
   /frameadvancing:
     get:
       summary: Get whether frame advancing is enabled
@@ -709,6 +969,7 @@ paths:
                 required:
                   - enabled
       operationId: get-frameadvancing
+      description: Get whether frame advancing is enabled
     post:
       summary: Set whether frame advancing is enabled
       tags: []
@@ -723,6 +984,7 @@ paths:
                   type: boolean
               required:
                 - enabled
+      description: Get whether frame advancing is enabled
   /frameadvancing/advance:
     get:
       summary: "Advance a frame, enables frame advancing if it's not enabled"
@@ -731,6 +993,7 @@ paths:
         '204':
           description: No Content
       operationId: get-frameadvancing-advance
+      description: "Advance a frame, enables frame advancing if it's not enabled"
   /controls:
     get:
       summary: Get controls
@@ -827,16 +1090,54 @@ paths:
                     udp_input_port: 20000
                     udp_pad_index: 0
       operationId: get-controls
+      description: Get controls
     post:
       summary: Set controls
       tags: []
-      responses: {}
+      responses:
+        '204':
+          description: No Content
       operationId: post-controls
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                buttons:
+                  type: array
+                  items:
+                    type: string
+                analogs:
+                  type: array
+                  items:
+                    type: string
+                motion_device:
+                  type: string
+                touch_device:
+                  type: string
+                udp_input_address:
+                  type: string
+                udp_input_port:
+                  type: number
+                udp_pad_index:
+                  type: number
+              required:
+                - buttons
+                - analogs
+                - motion_device
+                - touch_device
+                - udp_input_address
+                - udp_input_port
+                - udp_pad_index
+      description: Set controls
   /multiplayerurl:
     post:
       summary: Set multiplayer URL
       tags: []
-      responses: {}
+      responses:
+        '204':
+          description: No Content
       operationId: post-multiplayerurl
       requestBody:
         content:
@@ -848,6 +1149,7 @@ paths:
                   type: string
               required:
                 - value
+      description: Set multiplayer URL
     get:
       summary: Get multiplayer URL
       tags: []
@@ -864,51 +1166,151 @@ paths:
                 required:
                   - value
       operationId: get-multiplayerurl
-      description: ''
+      description: Get multiplayer URL
   /usehardwarerenderer:
     get:
       summary: Get whether the hardware renderer is enabled
       tags: []
-      responses: {}
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  enabled:
+                    type: boolean
+                required:
+                  - enabled
       operationId: get-usehardwarerenderer
+      description: Get whether the hardware renderer is enabled
     post:
       summary: Set whether the hardware renderer is enabled
       tags: []
-      responses: {}
+      responses:
+        '204':
+          description: No Content
       operationId: post-usehardwarerenderer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                enabled:
+                  type: boolean
+              required:
+                - enabled
+      description: Set whether the hardware renderer is enabled
   /usehardwareshader:
     get:
       summary: Get whether the hardware shader is enabled
       tags: []
-      responses: {}
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  enabled:
+                    type: boolean
+                required:
+                  - enabled
       operationId: get-usehardwareshader
+      description: Get whether the hardware shader is enabled
     post:
       summary: Set whether the hardware shader is enabled
       tags: []
-      responses: {}
+      responses:
+        '204':
+          description: No Content
       operationId: post-usehardwareshader
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                enabled:
+                  type: boolean
+              required:
+                - enabled
+      description: Set whether the hardware shader is enabled
   /shaderaccuratemultiplication:
     get:
       summary: Get whether shader accurate multiplication is enabled
       tags: []
-      responses: {}
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  enabled:
+                    type: boolean
+                required:
+                  - enabled
       operationId: get-shaderaccuratemultiplication
+      description: Get whether shader accurate multiplication is enabled
     post:
       summary: Set whether shader accurate multiplication is enabled
       tags: []
-      responses: {}
+      responses:
+        '204':
+          description: No Content
       operationId: post-shaderaccuratemultiplication
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                enabled:
+                  type: boolean
+              required:
+                - enabled
+      description: Set whether shader accurate multiplication is enabled
   /useshaderjit:
     get:
       summary: Get whether the shader JIT is used instead of the interpreter for software shader
       tags: []
-      responses: {}
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  enabled:
+                    type: boolean
+                required:
+                  - enabled
       operationId: get-useshaderjit
+      description: Get whether the shader JIT is used instead of the interpreter for software shader
     post:
       summary: Set whether the shader JIT is used instead of the interpreter for software shader
       tags: []
-      responses: {}
+      responses:
+        '204':
+          description: No Content
       operationId: post-useshaderjit
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                enabled:
+                  type: boolean
+              required:
+                - enabled
+      description: Set whether the shader JIT is used instead of the interpreter for software shader
   /filtermode:
     get:
       summary: Get the filtering mode
@@ -929,6 +1331,7 @@ paths:
                 required:
                   - mode
       operationId: get-filtermode
+      description: Get the filtering mode
   /filtermode/nearest:
     get:
       summary: Set the filtering mode to nearest
@@ -937,6 +1340,7 @@ paths:
         '204':
           description: No Content
       operationId: get-filtermode-nearest
+      description: Set the filtering mode to nearest
   /filtermode/linear:
     get:
       summary: Set the filtering mode to linear
@@ -945,6 +1349,7 @@ paths:
         '204':
           description: No Content
       operationId: get-filtermode-linear
+      description: Set the filtering mode to linear
   /postprocessingshader:
     get:
       summary: Get the post processing shader name
@@ -962,6 +1367,7 @@ paths:
                 required:
                   - name
       operationId: get-postprocessingshader
+      description: Get the post processing shader name
     post:
       summary: Set the post processing shader name
       tags: []
@@ -979,6 +1385,7 @@ paths:
                   type: string
               required:
                 - name
+      description: Set the post processing shader name
   /dumptextures:
     get:
       summary: Get whether texture dumping is enabled
@@ -994,10 +1401,13 @@ paths:
                   enabled:
                     type: boolean
       operationId: get-dumptextures
+      description: Get whether texture dumping is enabled
     post:
       summary: Set whether texture dumping is enabled
       tags: []
-      responses: {}
+      responses:
+        '204':
+          description: No Content
       operationId: post-dumptextures
       requestBody:
         content:
@@ -1007,6 +1417,7 @@ paths:
               properties:
                 enabled:
                   type: boolean
+      description: Set whether texture dumping is enabled
   /customtextures:
     get:
       summary: Get whether custom textures are used
@@ -1025,6 +1436,7 @@ paths:
                   - enabled
       operationId: get-customtextures
       requestBody: {}
+      description: Get whether custom textures are used
     post:
       summary: Set whether custom textures are used
       tags: []
@@ -1040,6 +1452,7 @@ paths:
               required:
                 - enabled
         description: ''
+      description: Set whether custom textures are used
   /preloadcustomtextures:
     get:
       summary: Get whether custom texture preloading is enabled
@@ -1057,6 +1470,7 @@ paths:
                 required:
                   - enabled
       operationId: get-preloadcustomtextures
+      description: Get whether custom texture preloading is enabled
     post:
       summary: Set whether custom texture preloading is enabled
       tags: []
@@ -1074,17 +1488,43 @@ paths:
                   type: boolean
               required:
                 - enabled
+      description: Set whether custom texture preloading is enabled
   /usecpujit:
     get:
       summary: Get whether the CPU JIT is used instead of the interpreter
       tags: []
-      responses: {}
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  enabled:
+                    type: boolean
+                required:
+                  - enabled
       operationId: get-usecpujit
+      description: Get whether the CPU JIT is used instead of the interpreter
     post:
       summary: Set whether the CPU JIT is used instead of the interpreter
       tags: []
-      responses: {}
+      responses:
+        '204':
+          description: No Content
       operationId: post-usecpujit
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                enabled:
+                  type: boolean
+              required:
+                - enabled
+      description: Set whether the CPU JIT is used instead of the interpreter
   /dspemulation:
     get:
       summary: Get DSP emulation settings
@@ -1108,10 +1548,13 @@ paths:
                   - emulation
                   - multithreaded
       operationId: get-dspemulation
+      description: Get DSP emulation settings
     post:
       summary: Set DSP emulation settings
       tags: []
-      responses: {}
+      responses:
+        '204':
+          description: No Content
       operationId: post-dspemulation
       requestBody:
         content:
@@ -1127,6 +1570,7 @@ paths:
               required:
                 - emulation
                 - multithreaded
+      description: Set DSP emulation settings
   /audioengine:
     get:
       summary: Get the audio output engine
@@ -1148,10 +1592,13 @@ paths:
                 required:
                   - name
       operationId: get-audioengine
+      description: Get the audio output engine
     post:
       summary: Set the audio output engine
       tags: []
-      responses: {}
+      responses:
+        '204':
+          description: No Content
       operationId: post-audioengine
       requestBody:
         content:
@@ -1167,6 +1614,7 @@ paths:
                     - 'null'
               required:
                 - name
+      description: Set the audio output engine
   /audiodevice:
     get:
       summary: Get the audio device
@@ -1184,10 +1632,13 @@ paths:
                 required:
                   - value
       operationId: get-audiodevice
+      description: Get the audio device
     post:
-      summary: Set the audio output device
+      summary: Set the audio device
       tags: []
-      responses: {}
+      responses:
+        '204':
+          description: No Content
       operationId: post-audiodevice
       requestBody:
         content:
@@ -1199,6 +1650,7 @@ paths:
                   type: string
               required:
                 - value
+      description: Set the audio device
   /audiovolume:
     get:
       summary: Get the audio volume
@@ -1217,10 +1669,13 @@ paths:
                 required:
                   - value
       operationId: get-audiovolume
+      description: Get the audio volume
     post:
-      summary: Set the audio output volume
+      summary: Set the audio volume
       tags: []
-      responses: {}
+      responses:
+        '204':
+          description: No Content
       operationId: post-audiovolume
       requestBody:
         content:
@@ -1234,6 +1689,7 @@ paths:
               required:
                 - value
         description: ''
+      description: Set the audio volume
   /audiospeed:
     get:
       summary: Get the audio speed
@@ -1252,10 +1708,13 @@ paths:
                 required:
                   - value
       operationId: get-audiospeed
+      description: Get the audio speed
     post:
-      summary: Set the audio output speed
+      summary: Set the audio speed
       tags: []
-      responses: {}
+      responses:
+        '204':
+          description: No Content
       operationId: post-audiospeed
       requestBody:
         content:
@@ -1268,17 +1727,44 @@ paths:
                   description: float
               required:
                 - value
+      description: Set the audio speed
   /usevirtualsdcard:
     get:
       summary: Get whether a virtual SD card is used
       tags: []
-      responses: {}
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  enabled:
+                    type: boolean
+                required:
+                  - enabled
       operationId: get-usevirtualsdcard
+      requestBody: {}
+      description: Get whether a virtual SD card is used
     post:
       summary: Set whether a virtual SD card is used
       tags: []
-      responses: {}
+      responses:
+        '204':
+          description: No Content
       operationId: post-usevirtualsdcard
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                enabled:
+                  type: boolean
+              required:
+                - enabled
+      description: Set whether a virtual SD card is used
   /region:
     get:
       summary: "Get the console's region"
@@ -1297,6 +1783,7 @@ paths:
                 required:
                   - value
       operationId: get-region
+      description: "Get the console's region"
     post:
       summary: "Set the console's region"
       tags: []
@@ -1315,23 +1802,71 @@ paths:
                   description: '-1: Auto-select, 0: Japan, 1: USA, 2: Europe, 3: Australia, 4: China, 5: Korea, 6: Taiwan'
               required:
                 - value
+      description: "Set the console's region"
   /startclock:
     get:
       summary: Get the time to use when emulation starts
       tags: []
-      responses: {}
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  clock:
+                    type: string
+                    enum:
+                      - system
+                      - fixed
+                  unix_timestamp:
+                    type: number
+                required:
+                  - clock
       operationId: get-startclock
+      description: Get the time to use when emulation starts
     post:
       summary: Set the time to use when emulation starts
       tags: []
-      responses: {}
+      responses:
+        '204':
+          description: No Content
       operationId: post-startclock
+      description: Set the time to use when emulation starts
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                clock:
+                  type: string
+                  enum:
+                    - system
+                    - fixed
+                unix_timestamp:
+                  type: number
+              required:
+                - clock
   /usevsync:
     get:
       summary: Get whether VSync is enabled
       tags: []
-      responses: {}
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  enabled:
+                    type: boolean
+                required:
+                  - enabled
       operationId: get-usevsync
+      description: Get whether VSync is enabled
   /logfilter:
     get:
       summary: Get the log filter
@@ -1349,10 +1884,13 @@ paths:
                 required:
                   - value
       operationId: get-logfilter
+      description: Get the log filter
     post:
       summary: Set the log filter
       tags: []
-      responses: {}
+      responses:
+        '204':
+          description: No Content
       operationId: post-logfilter
       requestBody:
         content:
@@ -1364,6 +1902,7 @@ paths:
                   type: string
               required:
                 - value
+      description: Set the log filter
   /recordframetimes:
     get:
       summary: Get the whether frametime recording is enabled
@@ -1381,6 +1920,7 @@ paths:
                 required:
                   - enabled
       operationId: get-recordframetimes
+      description: Get the whether frametime recording is enabled
     post:
       summary: Set the whether frametime recording is enabled
       tags: []
@@ -1398,6 +1938,7 @@ paths:
                   type: boolean
               required:
                 - enabled
+      description: Set the whether frametime recording is enabled
   /cameras:
     get:
       summary: Get camera settings
@@ -1427,10 +1968,13 @@ paths:
                   - config
                   - flip
       operationId: get-cameras
+      description: Get camera settings
     post:
       summary: Set camera settings
       tags: []
-      responses: {}
+      responses:
+        '204':
+          description: No Content
       operationId: post-cameras
       requestBody:
         content:
@@ -1450,6 +1994,7 @@ paths:
                   type: array
                   items:
                     type: number
+      description: Set camera settings
   /gdbstub:
     get:
       summary: Get GDB stub enabled and port
@@ -1470,6 +2015,7 @@ paths:
                   - enabled
                   - port
       operationId: get-gdbstub
+      description: Get GDB stub enabled and port
     post:
       summary: Set GDB stub enabled and port
       tags: []
@@ -1487,11 +2033,14 @@ paths:
               required:
                 - enabled
                 - port
+      description: Set GDB stub enabled and port
   /llemodules:
     get:
       summary: Get LLE modules
       tags: []
-      responses: {}
+      responses:
+        '204':
+          description: No Content
       operationId: get-llemodules
       requestBody:
         content:
@@ -1620,10 +2169,13 @@ paths:
                 - MP
                 - PDN
                 - SPI
+      description: Get LLE modules
     post:
       summary: Set LLE modules
       tags: []
-      responses: {}
+      responses:
+        '204':
+          description: No Content
       operationId: post-llemodules
       requestBody:
         content:
@@ -1751,6 +2303,9 @@ paths:
                 - MP
                 - PDN
                 - SPI
+      description: |-
+        Set LLE modules
+        Restarts the emulation.
   /movie:
     get:
       summary: Get the movie state
@@ -1771,6 +2326,7 @@ paths:
                   - playing
                   - recording
       operationId: get-movie
+      description: Get the movie state
   /movie/stop:
     get:
       summary: Stop movie playback/recording
@@ -1779,9 +2335,10 @@ paths:
         '204':
           description: No Content
       operationId: get-movie-stop
+      description: Stop movie playback/recording
   /movie/play:
     post:
-      summary: ''
+      summary: Play movie
       operationId: post-movie-play
       responses:
         '204':
@@ -1796,9 +2353,10 @@ paths:
                   type: string
               required:
                 - file
+      description: Play movie
   /movie/record:
     post:
-      summary: ''
+      summary: Record movie
       operationId: post-movie-record
       responses:
         '204':
@@ -1813,11 +2371,14 @@ paths:
                   type: string
               required:
                 - file
+      description: Record movie
   /boot:
     post:
       summary: Boot a file
       tags: []
-      responses: {}
+      responses:
+        '204':
+          description: No Content
       operationId: post-boot
       requestBody:
         content:
@@ -1830,11 +2391,14 @@ paths:
               required:
                 - file
         description: ''
+      description: Boot a file
   /installciafile:
     post:
       summary: Install a CIA file
       tags: []
-      responses: {}
+      responses:
+        '204':
+          description: No Content
       operationId: post-installciafile
       requestBody:
         content:
@@ -1846,6 +2410,7 @@ paths:
                   type: string
               required:
                 - file
+      description: Install a CIA file
   /cheats:
     get:
       summary: Get the cheats
@@ -1882,6 +2447,7 @@ paths:
                     - enabled
                     - index
       operationId: get-cheats
+      description: Get the cheats
   /reloadcheats:
     get:
       summary: Reload cheats from the file
@@ -1890,17 +2456,23 @@ paths:
       responses:
         '204':
           description: No Content
+      description: Reload cheats from the file
   /savecheats:
     get:
       summary: Save the cheats to the file
       tags: []
-      responses: {}
+      responses:
+        '204':
+          description: No Content
       operationId: get-savecheats
+      description: Save the cheats to the file
   /addcheat:
     post:
       summary: Add a cheat
       tags: []
-      responses: {}
+      responses:
+        '204':
+          description: No Content
       operationId: post-addcheat
       requestBody:
         content:
@@ -1927,6 +2499,7 @@ paths:
                 - comments
                 - enabled
         description: ''
+      description: Add a cheat
   /removecheat:
     post:
       summary: Remove a cheat
@@ -1945,19 +2518,51 @@ paths:
                   type: number
               required:
                 - index
+      description: Remove a cheat
   /updatecheat:
     post:
       summary: Update a cheat
       tags: []
-      responses: {}
+      responses:
+        '204':
+          description: No Content
       operationId: post-updatecheat
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                index:
+                  type: string
+                name:
+                  type: string
+                type:
+                  type: string
+                  enum:
+                    - Gateway
+                code:
+                  type: string
+                comments:
+                  type: string
+                enabled:
+                  type: boolean
+              required:
+                - index
+                - name
+                - type
+                - code
+                - comments
+                - enabled
+      description: Update a cheat
   /pause:
     get:
-      summary: ''
+      summary: Pause emulation
       operationId: get-pause
       responses:
         '204':
           description: No Content
+      description: Pause emulation
   /continue:
     get:
       summary: Continue emulation
@@ -1967,99 +2572,552 @@ paths:
         '204':
           description: No Content
       parameters: []
+      description: Continue emulation
   /registers/0-15:
     get:
       summary: Get the ARM 0-15 register values
       tags: []
-      responses: {}
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: number
       operationId: get-registers-0-15
+      description: Get the ARM 0-15 register values
     post:
       summary: Set a ARM 0-15 register value
       operationId: post-registers-0-15
       responses:
-        '200':
-          description: OK
+        '204':
+          description: No Content
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                index:
+                  type: number
+                value:
+                  type: number
+              required:
+                - index
+                - value
+      description: Set a ARM 0-15 register value
   /registers/cpsr:
     get:
       summary: Get the ARM CPSR register value
       tags: []
-      responses: {}
+      responses:
+        '200':
+          description: OK
+          content:
+            text/plain:
+              schema:
+                type: number
       operationId: get-registers-cpsr
+      description: Get the ARM CPSR register value
     post:
       summary: Set the ARM CPSR register value
       tags: []
-      responses: {}
+      responses:
+        '204':
+          description: No Content
       operationId: post-registers-cpsr
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                value:
+                  type: number
+              required:
+                - value
+      description: Set the ARM CPSR register value
   /registers/vfp:
     get:
       summary: Get the ARM VFP register values
       tags: []
-      responses: {}
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: number
       operationId: get-registers-vfp
+      description: Get the ARM VFP register values
     post:
       summary: Set a ARM VFP register value
       tags: []
-      responses: {}
+      responses:
+        '204':
+          description: No Content
       operationId: post-registers-vfp
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                index:
+                  type: number
+                value:
+                  type: number
+              required:
+                - index
+                - value
+      description: Set a ARM VFP register value
   /registers/vfpsystem:
     get:
       summary: Get the ARM VFP system register values
       tags: []
-      responses: {}
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: number
       operationId: get-registers-vfpsystem
+      description: |-
+        [0]: FPSID
+        [1]: FPSCR
+        [2]: FPINST
+        [3]: FPINST2
+        [4]: MVFR0
+        [5]: MVFR1
     post:
       summary: Set a ARM VFP system register value
       tags: []
-      responses: {}
+      responses:
+        '204':
+          description: No Content
       operationId: post-registers-vfpsystem
+      description: |-
+        [0]: FPSID
+        [1]: FPSCR
+        [2]: FPINST
+        [3]: FPINST2
+        [4]: MVFR0
+        [5]: MVFR1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                index:
+                  type: number
+                value:
+                  type: number
+              required:
+                - index
+                - value
   /registers/cp15:
     get:
       summary: Get the ARM CP15 register values
       tags: []
-      responses: {}
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: number
       operationId: get-registers-cp15
+      description: |-
+        [0]: CP15_MAIN_ID
+
+        [1]: CP15_CACHE_TYPE
+
+        [2]: CP15_TCM_STATUS
+
+        [3]: CP15_TLB_TYPE
+
+        [4]: CP15_CPU_ID
+
+        [5]: CP15_PROCESSOR_FEATURE_0
+
+        [6]: CP15_PROCESSOR_FEATURE_1
+
+        [7]: CP15_DEBUG_FEATURE_0
+
+        [8]: CP15_AUXILIARY_FEATURE_0
+
+        [9]: CP15_MEMORY_MODEL_FEATURE_0
+
+        [10]: CP15_MEMORY_MODEL_FEATURE_1
+
+        [11]: CP15_MEMORY_MODEL_FEATURE_2
+
+        [12]: CP15_MEMORY_MODEL_FEATURE_3
+
+        [13]: CP15_ISA_FEATURE_0
+
+        [14]: CP15_ISA_FEATURE_1
+
+        [15]: CP15_ISA_FEATURE_2
+
+        [16]: CP15_ISA_FEATURE_3
+
+        [17]: CP15_ISA_FEATURE_4
+
+        [18]: CP15_CONTROL
+
+        [19]: CP15_AUXILIARY_CONTROL
+
+        [20]: CP15_COPROCESSOR_ACCESS_CONTROL
+
+        [21]: CP15_TRANSLATION_BASE_TABLE_0
+
+        [22]: CP15_TRANSLATION_BASE_TABLE_1
+
+        [23]: CP15_TRANSLATION_BASE_CONTROL
+
+        [24]: CP15_DOMAIN_ACCESS_CONTROL
+
+        [25]: CP15_RESERVED
+
+        [26]: CP15_FAULT_STATUS
+
+        [27]: CP15_INSTR_FAULT_STATUS
+
+        [28]: CP15_INST_FSR
+
+        [29]: CP15_FAULT_ADDRESS
+
+        [30]: CP15_WFAR
+
+        [31]: CP15_IFAR
+
+        [32]: CP15_WAIT_FOR_INTERRUPT
+
+        [33]: CP15_PHYS_ADDRESS
+
+        [34]: CP15_INVALIDATE_INSTR_CACHE
+
+        [35]: CP15_INVALIDATE_INSTR_CACHE_USING_MVA
+
+        [36]: CP15_INVALIDATE_INSTR_CACHE_USING_INDEX
+
+        [37]: CP15_FLUSH_PREFETCH_BUFFER
+
+        [38]: CP15_FLUSH_BRANCH_TARGET_CACHE
+
+        [39]: CP15_FLUSH_BRANCH_TARGET_CACHE_ENTRY
+
+        [40]: CP15_INVALIDATE_DATA_CACHE
+
+        [41]: CP15_INVALIDATE_DATA_CACHE_LINE_USING_MVA
+
+        [42]: CP15_INVALIDATE_DATA_CACHE_LINE_USING_INDEX
+
+        [43]: CP15_INVALIDATE_DATA_AND_INSTR_CACHE
+
+        [44]: CP15_CLEAN_DATA_CACHE
+
+        [45]: CP15_CLEAN_DATA_CACHE_LINE_USING_MVA
+
+        [46]: CP15_CLEAN_DATA_CACHE_LINE_USING_INDEX
+
+        [47]: CP15_DATA_SYNC_BARRIER
+
+        [48]: CP15_DATA_MEMORY_BARRIER
+
+        [49]: CP15_CLEAN_AND_INVALIDATE_DATA_CACHE
+
+        [50]: CP15_CLEAN_AND_INVALIDATE_DATA_CACHE_LINE_USING_MVA
+
+        [51]: CP15_CLEAN_AND_INVALIDATE_DATA_CACHE_LINE_USING_INDEX
+
+        [52]: CP15_INVALIDATE_ITLB
+
+        [53]: CP15_INVALIDATE_ITLB_SINGLE_ENTRY
+
+        [54]: CP15_INVALIDATE_ITLB_ENTRY_ON_ASID_MATCH
+
+        [55]: CP15_INVALIDATE_ITLB_ENTRY_ON_MVA
+
+        [56]: CP15_INVALIDATE_DTLB
+
+        [57]: CP15_INVALIDATE_DTLB_SINGLE_ENTRY
+
+        [58]: CP15_INVALIDATE_DTLB_ENTRY_ON_ASID_MATCH
+
+        [59]: CP15_INVALIDATE_DTLB_ENTRY_ON_MVA
+
+        [60]: CP15_INVALIDATE_UTLB
+
+        [61]: CP15_INVALIDATE_UTLB_SINGLE_ENTRY
+
+        [62]: CP15_INVALIDATE_UTLB_ENTRY_ON_ASID_MATCH
+
+        [63]: CP15_INVALIDATE_UTLB_ENTRY_ON_MVA
+
+        [64]: CP15_DATA_CACHE_LOCKDOWN
+
+        [65]: CP15_TLB_LOCKDOWN
+
+        [66]: CP15_PRIMARY_REGION_REMAP
+
+        [67]: CP15_NORMAL_REGION_REMAP
+
+        [68]: CP15_PID
+
+        [69]: CP15_CONTEXT_ID
+
+        [70]: CP15_THREAD_UPRW
+
+        [71]: CP15_THREAD_URO
+
+        [72]: CP15_THREAD_PRW
+
+        [73]: CP15_PERFORMANCE_MONITOR_CONTROL
+
+        [74]: CP15_CYCLE_COUNTER
+
+        [75]: CP15_COUNT_0
+
+        [76]: CP15_COUNT_1
+
+        [77]: CP15_READ_MAIN_TLB_LOCKDOWN_ENTRY
+
+        [78]: CP15_WRITE_MAIN_TLB_LOCKDOWN_ENTRY
+
+        [79]: CP15_MAIN_TLB_LOCKDOWN_VIRT_ADDRESS
+
+        [80]: CP15_MAIN_TLB_LOCKDOWN_PHYS_ADDRESS
+
+        [81]: CP15_MAIN_TLB_LOCKDOWN_ATTRIBUTE
+
+        [82]: CP15_TLB_DEBUG_CONTROL
+
+        [83]: CP15_TLB_FAULT_ADDR
+
+        [84]: CP15_TLB_FAULT_STATUS
     post:
       summary: Set a ARM CP15 register value
       tags: []
-      responses: {}
+      responses:
+        '204':
+          description: No Content
       operationId: post-registers-cp15
+      description: |-
+        [0]: CP15_MAIN_ID
+
+        [1]: CP15_CACHE_TYPE
+
+        [2]: CP15_TCM_STATUS
+
+        [3]: CP15_TLB_TYPE
+
+        [4]: CP15_CPU_ID
+
+        [5]: CP15_PROCESSOR_FEATURE_0
+
+        [6]: CP15_PROCESSOR_FEATURE_1
+
+        [7]: CP15_DEBUG_FEATURE_0
+
+        [8]: CP15_AUXILIARY_FEATURE_0
+
+        [9]: CP15_MEMORY_MODEL_FEATURE_0
+
+        [10]: CP15_MEMORY_MODEL_FEATURE_1
+
+        [11]: CP15_MEMORY_MODEL_FEATURE_2
+
+        [12]: CP15_MEMORY_MODEL_FEATURE_3
+
+        [13]: CP15_ISA_FEATURE_0
+
+        [14]: CP15_ISA_FEATURE_1
+
+        [15]: CP15_ISA_FEATURE_2
+
+        [16]: CP15_ISA_FEATURE_3
+
+        [17]: CP15_ISA_FEATURE_4
+
+        [18]: CP15_CONTROL
+
+        [19]: CP15_AUXILIARY_CONTROL
+
+        [20]: CP15_COPROCESSOR_ACCESS_CONTROL
+
+        [21]: CP15_TRANSLATION_BASE_TABLE_0
+
+        [22]: CP15_TRANSLATION_BASE_TABLE_1
+
+        [23]: CP15_TRANSLATION_BASE_CONTROL
+
+        [24]: CP15_DOMAIN_ACCESS_CONTROL
+
+        [25]: CP15_RESERVED
+
+        [26]: CP15_FAULT_STATUS
+
+        [27]: CP15_INSTR_FAULT_STATUS
+
+        [28]: CP15_INST_FSR
+
+        [29]: CP15_FAULT_ADDRESS
+
+        [30]: CP15_WFAR
+
+        [31]: CP15_IFAR
+
+        [32]: CP15_WAIT_FOR_INTERRUPT
+
+        [33]: CP15_PHYS_ADDRESS
+
+        [34]: CP15_INVALIDATE_INSTR_CACHE
+
+        [35]: CP15_INVALIDATE_INSTR_CACHE_USING_MVA
+
+        [36]: CP15_INVALIDATE_INSTR_CACHE_USING_INDEX
+
+        [37]: CP15_FLUSH_PREFETCH_BUFFER
+
+        [38]: CP15_FLUSH_BRANCH_TARGET_CACHE
+
+        [39]: CP15_FLUSH_BRANCH_TARGET_CACHE_ENTRY
+
+        [40]: CP15_INVALIDATE_DATA_CACHE
+
+        [41]: CP15_INVALIDATE_DATA_CACHE_LINE_USING_MVA
+
+        [42]: CP15_INVALIDATE_DATA_CACHE_LINE_USING_INDEX
+
+        [43]: CP15_INVALIDATE_DATA_AND_INSTR_CACHE
+
+        [44]: CP15_CLEAN_DATA_CACHE
+
+        [45]: CP15_CLEAN_DATA_CACHE_LINE_USING_MVA
+
+        [46]: CP15_CLEAN_DATA_CACHE_LINE_USING_INDEX
+
+        [47]: CP15_DATA_SYNC_BARRIER
+
+        [48]: CP15_DATA_MEMORY_BARRIER
+
+        [49]: CP15_CLEAN_AND_INVALIDATE_DATA_CACHE
+
+        [50]: CP15_CLEAN_AND_INVALIDATE_DATA_CACHE_LINE_USING_MVA
+
+        [51]: CP15_CLEAN_AND_INVALIDATE_DATA_CACHE_LINE_USING_INDEX
+
+        [52]: CP15_INVALIDATE_ITLB
+
+        [53]: CP15_INVALIDATE_ITLB_SINGLE_ENTRY
+
+        [54]: CP15_INVALIDATE_ITLB_ENTRY_ON_ASID_MATCH
+
+        [55]: CP15_INVALIDATE_ITLB_ENTRY_ON_MVA
+
+        [56]: CP15_INVALIDATE_DTLB
+
+        [57]: CP15_INVALIDATE_DTLB_SINGLE_ENTRY
+
+        [58]: CP15_INVALIDATE_DTLB_ENTRY_ON_ASID_MATCH
+
+        [59]: CP15_INVALIDATE_DTLB_ENTRY_ON_MVA
+
+        [60]: CP15_INVALIDATE_UTLB
+
+        [61]: CP15_INVALIDATE_UTLB_SINGLE_ENTRY
+
+        [62]: CP15_INVALIDATE_UTLB_ENTRY_ON_ASID_MATCH
+
+        [63]: CP15_INVALIDATE_UTLB_ENTRY_ON_MVA
+
+        [64]: CP15_DATA_CACHE_LOCKDOWN
+
+        [65]: CP15_TLB_LOCKDOWN
+
+        [66]: CP15_PRIMARY_REGION_REMAP
+
+        [67]: CP15_NORMAL_REGION_REMAP
+
+        [68]: CP15_PID
+
+        [69]: CP15_CONTEXT_ID
+
+        [70]: CP15_THREAD_UPRW
+
+        [71]: CP15_THREAD_URO
+
+        [72]: CP15_THREAD_PRW
+
+        [73]: CP15_PERFORMANCE_MONITOR_CONTROL
+
+        [74]: CP15_CYCLE_COUNTER
+
+        [75]: CP15_COUNT_0
+
+        [76]: CP15_COUNT_1
+
+        [77]: CP15_READ_MAIN_TLB_LOCKDOWN_ENTRY
+
+        [78]: CP15_WRITE_MAIN_TLB_LOCKDOWN_ENTRY
+
+        [79]: CP15_MAIN_TLB_LOCKDOWN_VIRT_ADDRESS
+
+        [80]: CP15_MAIN_TLB_LOCKDOWN_PHYS_ADDRESS
+
+        [81]: CP15_MAIN_TLB_LOCKDOWN_ATTRIBUTE
+
+        [82]: CP15_TLB_DEBUG_CONTROL
+
+        [83]: CP15_TLB_FAULT_ADDR
+
+        [84]: CP15_TLB_FAULT_STATUS
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                index:
+                  type: number
+                value:
+                  type: number
+              required:
+                - index
+                - value
   /restart:
     get:
       summary: Restart emulation
       tags: []
-      responses: {}
+      responses:
+        '204':
+          description: No Content
       operationId: get-restart
+      description: Restart emulation
   /reloadcameras:
     get:
       summary: Reload camera images
       tags: []
-      responses: {}
+      responses:
+        '204':
+          description: No Content
       operationId: get-reloadcameras
+      description: Reload camera images
   /texturefilter:
     get:
       summary: Get the texture filter
-      tags: []
-      responses: {}
-      operationId: get-texturefilter
-    post:
-      summary: Set the texture filter
-      tags: []
-      responses: {}
-      operationId: post-texturefilter
-  /usecustomcputicks:
-    get:
-      summary: Get whether custom CPU ticks are used
-      tags: []
-      responses: {}
-      operationId: get-usecustomcputicks
-    post:
-      summary: Set whether custom CPU ticks are used
-      tags: []
-      responses: {}
-      operationId: post-usecustomcputicks
-  /customcputicks:
-    get:
-      summary: Set custom CPU ticks
       tags: []
       responses:
         '200':
@@ -2068,17 +3126,73 @@ paths:
             text/plain:
               schema:
                 type: boolean
-      operationId: get-customcputicks
+      operationId: get-texturefilter
+      description: Get the texture filter
     post:
-      summary: Set custom CPU ticks
+      summary: Set the texture filter
       tags: []
-      responses: {}
-      operationId: post-customcputicks
+      responses:
+        '204':
+          description: No Content
+      operationId: post-texturefilter
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: boolean
+      description: Set the texture filter
+  /usecustomcputicks:
+    get:
+      summary: Get whether custom CPU ticks are used
+      tags: []
+      responses:
+        '200':
+          description: OK
+          content:
+            text/plain:
+              schema:
+                type: boolean
+      operationId: get-usecustomcputicks
+      description: Get whether custom CPU ticks are used
+    post:
+      summary: Set whether custom CPU ticks are used
+      tags: []
+      responses:
+        '204':
+          description: No Content
+      operationId: post-usecustomcputicks
       requestBody:
         content:
           text/plain:
             schema:
               type: boolean
+      description: Set whether custom CPU ticks are used
+  /customcputicks:
+    get:
+      summary: Get custom CPU ticks
+      tags: []
+      responses:
+        '200':
+          description: OK
+          content:
+            text/plain:
+              schema:
+                type: number
+      operationId: get-customcputicks
+      description: Get custom CPU ticks
+    post:
+      summary: Set custom CPU ticks
+      tags: []
+      responses:
+        '204':
+          description: No Content
+      operationId: post-customcputicks
+      requestBody:
+        content:
+          text/plain:
+            schema:
+              type: number
+      description: Set custom CPU ticks
   /cpuclockpercentage:
     get:
       summary: Get CPU clock percentage
@@ -2091,15 +3205,19 @@ paths:
               schema:
                 type: number
       operationId: get-cpuclockpercentage
+      description: Get CPU clock percentage
     post:
       summary: Set CPU clock percentage
       tags: []
-      responses: {}
+      responses:
+        '204':
+          description: No Content
       operationId: post-cpuclockpercentage
       requestBody:
         content:
           application/json:
             schema:
               type: number
+      description: Set CPU clock percentage
 components:
   schemas: {}
