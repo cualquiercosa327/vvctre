@@ -1985,7 +1985,7 @@ paths:
       description: Set the log filter
   /recordframetimes:
     get:
-      summary: Get the whether frametime recording is enabled
+      summary: Get whether frametime recording is enabled
       tags:
         - Settings
       responses:
@@ -2003,7 +2003,7 @@ paths:
       operationId: get-recordframetimes
       description: Get the whether frametime recording is enabled
     post:
-      summary: Set the whether frametime recording is enabled
+      summary: Set whether frametime recording is enabled
       tags: []
       responses:
         '204':
