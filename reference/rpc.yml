@@ -1012,13 +1012,16 @@ paths:
       description: Get whether frame advancing is enabled
   /frameadvancing/advance:
     get:
-      summary: "Advance a frame, enables frame advancing if it's not enabled"
+      summary: Advance a frame
       tags: []
       responses:
         '204':
           description: No Content
       operationId: get-frameadvancing-advance
-      description: "Advance a frame, enables frame advancing if it's not enabled"
+      description: |-
+        Advance a frame.
+
+        Enables frame advancing if it's not enabled.
   /controls:
     get:
       summary: Get controls
