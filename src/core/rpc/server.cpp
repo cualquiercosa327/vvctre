@@ -1323,10 +1323,10 @@ Server::Server(Core::System& system, const int port) {
         try {
             const nlohmann::json json = nlohmann::json::parse(req.body);
             Settings::values.log_filter = json["value"].get<std::string>();
-            Settings::LogSettings();
             Log::Filter log_filter(Log::Level::Debug);
             log_filter.ParseFilterString(Settings::values.log_filter);
             Log::SetGlobalFilter(log_filter);
+            Settings::LogSettings();
             res.status = 204;
         } catch (nlohmann::json::exception& exception) {
             res.status = 500;
