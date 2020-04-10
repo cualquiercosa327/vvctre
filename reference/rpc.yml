@@ -786,7 +786,8 @@ paths:
   /speedlimit:
     post:
       summary: Set speed limit
-      tags: []
+      tags:
+        - Settings
       responses:
         '204':
           description: No Content
@@ -943,7 +944,8 @@ paths:
   /resolution:
     post:
       summary: Set resolution
-      tags: []
+      tags:
+        - Settings
       responses:
         '204':
           description: No Content
@@ -980,7 +982,8 @@ paths:
   /frameadvancing:
     get:
       summary: Get whether frame advancing is enabled
-      tags: []
+      tags:
+        - TAS
       responses:
         '200':
           description: OK
@@ -997,7 +1000,8 @@ paths:
       description: Get whether frame advancing is enabled
     post:
       summary: Set whether frame advancing is enabled
-      tags: []
+      tags:
+        - TAS
       operationId: post-frameadvancing
       requestBody:
         content:
@@ -1013,7 +1017,8 @@ paths:
   /frameadvancing/advance:
     get:
       summary: Advance a frame
-      tags: []
+      tags:
+        - TAS
       responses:
         '204':
           description: No Content
@@ -1858,7 +1863,8 @@ paths:
       description: "Get the console's region"
     post:
       summary: "Set the console's region"
-      tags: []
+      tags:
+        - Settings
       responses:
         '204':
           description: No Content
@@ -1903,7 +1909,8 @@ paths:
       description: Get the time to use when emulation starts
     post:
       summary: Set the time to use when emulation starts
-      tags: []
+      tags:
+        - Settings
       responses:
         '204':
           description: No Content
@@ -2053,7 +2060,8 @@ paths:
       description: Get camera settings
     post:
       summary: Set camera settings
-      tags: []
+      tags:
+        - Settings
       responses:
         '204':
           description: No Content
@@ -2395,8 +2403,6 @@ paths:
   /movie:
     get:
       summary: Get the movie state
-      tags:
-        - Movie
       responses:
         '200':
           description: OK
@@ -2414,16 +2420,18 @@ paths:
                   - recording
       operationId: get-movie
       description: Get the movie state
+      tags:
+        - TAS
   /movie/stop:
     get:
       summary: Stop movie playback/recording
-      tags:
-        - Movie
       responses:
         '204':
           description: No Content
       operationId: get-movie-stop
       description: Stop movie playback/recording
+      tags:
+        - TAS
   /movie/play:
     post:
       summary: Play movie
@@ -2443,7 +2451,7 @@ paths:
                 - file
       description: Play movie
       tags:
-        - Movie
+        - TAS
   /movie/record:
     post:
       summary: Record movie
@@ -2463,7 +2471,7 @@ paths:
                 - file
       description: Record movie
       tags:
-        - Movie
+        - TAS
   /boot:
     post:
       summary: Boot a file
