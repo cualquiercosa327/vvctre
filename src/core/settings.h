@@ -212,7 +212,15 @@ struct Values {
     u16 resolution_factor = 1;
     bool use_frame_limit = true;
     u16 frame_limit = 100;
+
+    /**
+     * Valid values:
+     *  - Anime4K Ultrafast
+     *  - Bicubic
+     *  - xBRZ freescale
+     */
     std::string texture_filter_name = "none";
+
     float bg_red = 0.0f;
     float bg_green = 0.0f;
     float bg_blue = 0.0f;
