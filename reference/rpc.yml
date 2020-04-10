@@ -982,8 +982,6 @@ paths:
   /frameadvancing:
     get:
       summary: Get whether frame advancing is enabled
-      tags:
-        - TAS
       responses:
         '200':
           description: OK
@@ -998,10 +996,10 @@ paths:
                   - enabled
       operationId: get-frameadvancing
       description: Get whether frame advancing is enabled
+      tags:
+        - Tool-assisted speedrun
     post:
       summary: Set whether frame advancing is enabled
-      tags:
-        - TAS
       operationId: post-frameadvancing
       requestBody:
         content:
@@ -1014,11 +1012,11 @@ paths:
               required:
                 - enabled
       description: Get whether frame advancing is enabled
+      tags:
+        - Tool-assisted speedrun
   /frameadvancing/advance:
     get:
       summary: Advance a frame
-      tags:
-        - TAS
       responses:
         '204':
           description: No Content
@@ -1027,6 +1025,8 @@ paths:
         Advance a frame.
 
         Enables frame advancing if it's not enabled.
+      tags:
+        - Tool-assisted speedrun
   /controls:
     get:
       summary: Get controls
@@ -2421,7 +2421,7 @@ paths:
       operationId: get-movie
       description: Get the movie state
       tags:
-        - TAS
+        - Tool-assisted speedrun
   /movie/stop:
     get:
       summary: Stop movie playback/recording
@@ -2431,7 +2431,7 @@ paths:
       operationId: get-movie-stop
       description: Stop movie playback/recording
       tags:
-        - TAS
+        - Tool-assisted speedrun
   /movie/play:
     post:
       summary: Play movie
@@ -2451,7 +2451,7 @@ paths:
                 - file
       description: Play movie
       tags:
-        - TAS
+        - Tool-assisted speedrun
   /movie/record:
     post:
       summary: Record movie
@@ -2471,7 +2471,7 @@ paths:
                 - file
       description: Record movie
       tags:
-        - TAS
+        - Tool-assisted speedrun
   /boot:
     post:
       summary: Boot a file
