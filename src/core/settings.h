@@ -215,9 +215,10 @@ struct Values {
 
     /**
      * Valid values:
-     *  - Anime4K Ultrafast
-     *  - Bicubic
-     *  - xBRZ freescale
+     * - "none"
+     *  - "Anime4K Ultrafast"
+     *  - "Bicubic"
+     *  - "xBRZ freescale"
      */
     std::string texture_filter_name = "none";
 
