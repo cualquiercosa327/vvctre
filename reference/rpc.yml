@@ -434,14 +434,11 @@ paths:
       summary: Screenshot
       tags:
         - Remote Control
-      responses:
-        '200':
-          description: OK
-          content:
-            image/png:
-              schema: {}
       operationId: get-screenshot
       description: Screenshot
+      responses:
+        '200':
+          description: 'Body: PNG'
   /customscreenshot:
     post:
       summary: Screenshot with custom layout
@@ -504,10 +501,10 @@ paths:
                 - height
                 - top_screen
                 - bottom_screen
+      description: Screenshot with custom layout
       responses:
         '200':
-          description: PNG
-      description: Screenshot with custom layout
+          description: 'Body: PNG'
   /layout:
     get:
       summary: Get the current layout
@@ -789,7 +786,8 @@ paths:
   /speedlimit:
     post:
       summary: Set speed limit
-      tags: []
+      tags:
+        - Settings
       responses:
         '204':
           description: No Content
@@ -946,7 +944,8 @@ paths:
   /resolution:
     post:
       summary: Set resolution
-      tags: []
+      tags:
+        - Settings
       responses:
         '204':
           description: No Content
@@ -983,7 +982,6 @@ paths:
   /frameadvancing:
     get:
       summary: Get whether frame advancing is enabled
-      tags: []
       responses:
         '200':
           description: OK
@@ -998,9 +996,10 @@ paths:
                   - enabled
       operationId: get-frameadvancing
       description: Get whether frame advancing is enabled
+      tags:
+        - Tool Assisted Speedrun
     post:
       summary: Set whether frame advancing is enabled
-      tags: []
       operationId: post-frameadvancing
       requestBody:
         content:
@@ -1013,10 +1012,11 @@ paths:
               required:
                 - enabled
       description: Get whether frame advancing is enabled
+      tags:
+        - Tool Assisted Speedrun
   /frameadvancing/advance:
     get:
       summary: Advance a frame
-      tags: []
       responses:
         '204':
           description: No Content
@@ -1025,6 +1025,8 @@ paths:
         Advance a frame.
 
         Enables frame advancing if it's not enabled.
+      tags:
+        - Tool Assisted Speedrun
   /controls:
     get:
       summary: Get controls
@@ -1861,7 +1863,8 @@ paths:
       description: "Get the console's region"
     post:
       summary: "Set the console's region"
-      tags: []
+      tags:
+        - Settings
       responses:
         '204':
           description: No Content
@@ -1906,7 +1909,8 @@ paths:
       description: Get the time to use when emulation starts
     post:
       summary: Set the time to use when emulation starts
-      tags: []
+      tags:
+        - Settings
       responses:
         '204':
           description: No Content
@@ -2056,7 +2060,8 @@ paths:
       description: Get camera settings
     post:
       summary: Set camera settings
-      tags: []
+      tags:
+        - Settings
       responses:
         '204':
           description: No Content
@@ -2398,8 +2403,6 @@ paths:
   /movie:
     get:
       summary: Get the movie state
-      tags:
-        - Movie
       responses:
         '200':
           description: OK
@@ -2417,16 +2420,18 @@ paths:
                   - recording
       operationId: get-movie
       description: Get the movie state
+      tags:
+        - Tool Assisted Speedrun
   /movie/stop:
     get:
       summary: Stop movie playback/recording
-      tags:
-        - Movie
       responses:
         '204':
           description: No Content
       operationId: get-movie-stop
       description: Stop movie playback/recording
+      tags:
+        - Tool Assisted Speedrun
   /movie/play:
     post:
       summary: Play movie
@@ -2446,7 +2451,7 @@ paths:
                 - file
       description: Play movie
       tags:
-        - Movie
+        - Tool Assisted Speedrun
   /movie/record:
     post:
       summary: Record movie
@@ -2466,7 +2471,7 @@ paths:
                 - file
       description: Record movie
       tags:
-        - Movie
+        - Tool Assisted Speedrun
   /boot:
     post:
       summary: Boot a file
