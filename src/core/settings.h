@@ -215,7 +215,7 @@ struct Values {
 
     /**
      * Valid values:
-     * - "none"
+     *  - "none"
      *  - "Anime4K Ultrafast"
      *  - "Bicubic"
      *  - "xBRZ freescale"
