@@ -153,159 +153,19 @@ public:
     HTTP_C();
 
 private:
-    /**
-     * HTTP_C::Initialize service function
-     *  Inputs:
-     *      1 : POST buffer size
-     *      2 : 0x20
-     *      3 : 0x0 (Filled with process ID by ARM11 Kernel)
-     *      4 : 0x0
-     *      5 : POST buffer memory block handle
-     *  Outputs:
-     *      1 : Result of function, 0 on success, otherwise error code
-     */
     void Initialize(Kernel::HLERequestContext& ctx);
-
-    /**
-     * HTTP_C::CreateContext service function
-     *  Inputs:
-     *      1 : URL buffer size, including null-terminator
-     *      2 : RequestMethod
-     *      3 : (URLSize << 4) | 10
-     *      4 : URL data pointer
-     *  Outputs:
-     *      1 : Result of function, 0 on success, otherwise error code
-     *      2 : HTTP context handle
-     */
     void CreateContext(Kernel::HLERequestContext& ctx);
-
-    /**
-     * HTTP_C::CreateContext service function
-     *  Inputs:
-     *      1 : Context handle
-     *  Outputs:
-     *      1 : Result of function, 0 on success, otherwise error code
-     */
     void CloseContext(Kernel::HLERequestContext& ctx);
-
-    /**
-     * HTTP_C::InitializeConnectionSession service function
-     *  Inputs:
-     *      1 : HTTP context handle
-     *      2 : 0x20, processID translate-header for the ARM11-kernel
-     *      3 : processID set by the ARM11-kernel
-     *  Outputs:
-     *      1 : Result of function, 0 on success, otherwise error code
-     */
     void InitializeConnectionSession(Kernel::HLERequestContext& ctx);
-
-    /**
-     * HTTP_C::BeginRequest service function
-     *  Inputs:
-     * 1 : Context handle
-     *  Outputs:
-     *      1 : Result of function, 0 on success, otherwise error code
-     */
     void BeginRequest(Kernel::HLERequestContext& ctx);
-
-    /**
-     * HTTP_C::BeginRequestAsync service function
-     *  Inputs:
-     * 1 : Context handle
-     *  Outputs:
-     *      1 : Result of function, 0 on success, otherwise error code
-     */
     void BeginRequestAsync(Kernel::HLERequestContext& ctx);
-
-    /**
-     * HTTP_C::AddRequestHeader service function
-     *  Inputs:
-     * 1 : Context handle
-     * 2 : Header name buffer size, including null-terminator.
-     * 3 : Header value buffer size, including null-terminator.
-     * 4 : (HeaderNameSize<<14) | 0xC02
-     * 5 : Header name data pointer
-     * 6 : (HeaderValueSize<<4) | 10
-     * 7 : Header value data pointer
-     *  Outputs:
-     *      1 : Result of function, 0 on success, otherwise error code
-     */
     void AddRequestHeader(Kernel::HLERequestContext& ctx);
-
-    /**
-     * HTTP_C::AddPostDataAscii service function
-     *  Inputs:
-     * 1 : Context handle
-     * 2 : Form name buffer size, including null-terminator.
-     * 3 : Form value buffer size, including null-terminator.
-     * 4 : (FormNameSize<<14) | 0xC02
-     * 5 : Form name data pointer
-     * 6 : (FormValueSize<<4) | 10
-     * 7 : Form value data pointer
-     *  Outputs:
-     *      1 : Result of function, 0 on success, otherwise error code
-     */
     void AddPostDataAscii(Kernel::HLERequestContext& ctx);
-
-    /**
-     * HTTP_C::SetClientCertContext service function
-     *  Inputs:
-     * 1 : Context handle
-     * 2 : Cert context handle
-     *  Outputs:
-     *      1 : Result of function, 0 on success, otherwise error code
-     */
     void SetClientCertContext(Kernel::HLERequestContext& ctx);
-
-    /**
-     * HTTP_C::GetSSLError service function
-     *  Inputs:
-     * 1 : Context handle
-     * 2 : Unknown
-     *  Outputs:
-     *      1 : Result of function, 0 on success, otherwise error code
-     *      2 : SSL Error code
-     */
     void GetSSLError(Kernel::HLERequestContext& ctx);
-
-    /**
-     * HTTP_C::OpenClientCertContext service function
-     *  Inputs:
-     *      1 :  Cert size
-     *      2 :  Key size
-     *      3 :  (CertSize<<4) | 10
-     *      4 :  Pointer to input cert
-     *      5 :  (KeySize<<4) | 10
-     *      6 :  Pointer to input key
-     *  Outputs:
-     *      1 : Result of function, 0 on success, otherwise error code
-     */
     void OpenClientCertContext(Kernel::HLERequestContext& ctx);
-
-    /**
-     * HTTP_C::OpenDefaultClientCertContext service function
-     *  Inputs:
-     * 1 : CertID
-     *  Outputs:
-     *      1 : Result of function, 0 on success, otherwise error code
-     *      2 : Client Cert context handle
-     */
     void OpenDefaultClientCertContext(Kernel::HLERequestContext& ctx);
-
-    /**
-     * HTTP_C::CloseClientCertContext service function
-     *  Inputs:
-     * 1 : ClientCert Handle
-     *  Outputs:
-     *      1 : Result of function, 0 on success, otherwise error code
-     */
     void CloseClientCertContext(Kernel::HLERequestContext& ctx);
-
-    /**
-     * HTTP_C::Finalize service function
-     *  Outputs:
-     *      1 : Result of function, 0 on success, otherwise error code
-     */
     void Finalize(Kernel::HLERequestContext& ctx);
 
     void DecryptClCertA();

@@ -160,113 +160,23 @@ private:
     void GetRotation(Kernel::HLERequestContext& ctx);
     void SetBlockAlignment(Kernel::HLERequestContext& ctx);
     void GetBlockAlignment(Kernel::HLERequestContext& ctx);
-
-    /**
-     * Y2R_U::SetSpacialDithering service function
-     *  Inputs:
-     *      1 : u8, 0 = Disabled, 1 = Enabled
-     *  Outputs:
-     *      1 : Result of function, 0 on success, otherwise error code
-     */
     void SetSpacialDithering(Kernel::HLERequestContext& ctx);
-
-    /**
-     * Y2R_U::GetSpacialDithering service function
-     *  Outputs:
-     *      1 : Result of function, 0 on success, otherwise error code
-     *      2 : u8, 0 = Disabled, 1 = Enabled
-     */
     void GetSpacialDithering(Kernel::HLERequestContext& ctx);
-
-    /**
-     * Y2R_U::SetTemporalDithering service function
-     *  Inputs:
-     *      1 : u8, 0 = Disabled, 1 = Enabled
-     *  Outputs:
-     *      1 : Result of function, 0 on success, otherwise error code
-     */
     void SetTemporalDithering(Kernel::HLERequestContext& ctx);
-
-    /**
-     * Y2R_U::GetTemporalDithering service function
-     *  Outputs:
-     *      1 : Result of function, 0 on success, otherwise error code
-     *      2 : u8, 0 = Disabled, 1 = Enabled
-     */
     void GetTemporalDithering(Kernel::HLERequestContext& ctx);
-
-    /**
-     * Y2R_U::SetTransferEndInterrupt service function
-     *  Inputs:
-     *      1 : u8, 0 = Disabled, 1 = Enabled
-     *  Outputs:
-     *      1 : Result of function, 0 on success, otherwise error code
-     */
     void SetTransferEndInterrupt(Kernel::HLERequestContext& ctx);
-
-    /**
-     * Y2R_U::GetTransferEndInterrupt service function
-     *  Outputs:
-     *      1 : Result of function, 0 on success, otherwise error code
-     *      2 : u8, 0 = Disabled, 1 = Enabled
-     */
     void GetTransferEndInterrupt(Kernel::HLERequestContext& ctx);
-
-    /**
-     * Y2R_U::GetTransferEndEvent service function
-     *  Outputs:
-     *      1 : Result of function, 0 on success, otherwise error code
-     *      3 : The handle of the completion event
-     */
     void GetTransferEndEvent(Kernel::HLERequestContext& ctx);
-
     void SetSendingY(Kernel::HLERequestContext& ctx);
     void SetSendingU(Kernel::HLERequestContext& ctx);
     void SetSendingV(Kernel::HLERequestContext& ctx);
     void SetSendingYUYV(Kernel::HLERequestContext& ctx);
-
-    /**
-     * Y2R::IsFinishedSendingYuv service function
-     * Output:
-     *       1 : Result of the function, 0 on success, otherwise error code
-     *       2 : u8, 0 = Not Finished, 1 = Finished
-     */
     void IsFinishedSendingYuv(Kernel::HLERequestContext& ctx);
-
-    /**
-     * Y2R::IsFinishedSendingY service function
-     * Output:
-     *       1 : Result of the function, 0 on success, otherwise error code
-     *       2 : u8, 0 = Not Finished, 1 = Finished
-     */
     void IsFinishedSendingY(Kernel::HLERequestContext& ctx);
-
-    /**
-     * Y2R::IsFinishedSendingU service function
-     * Output:
-     *       1 : Result of the function, 0 on success, otherwise error code
-     *       2 : u8, 0 = Not Finished, 1 = Finished
-     */
     void IsFinishedSendingU(Kernel::HLERequestContext& ctx);
-
-    /**
-     * Y2R::IsFinishedSendingV service function
-     * Output:
-     *       1 : Result of the function, 0 on success, otherwise error code
-     *       2 : u8, 0 = Not Finished, 1 = Finished
-     */
     void IsFinishedSendingV(Kernel::HLERequestContext& ctx);
-
     void SetReceiving(Kernel::HLERequestContext& ctx);
-
-    /**
-     * Y2R::IsFinishedReceiving service function
-     * Output:
-     *       1 : Result of the function, 0 on success, otherwise error code
-     *       2 : u8, 0 = Not Finished, 1 = Finished
-     */
     void IsFinishedReceiving(Kernel::HLERequestContext& ctx);
-
     void SetInputLineWidth(Kernel::HLERequestContext& ctx);
     void GetInputLineWidth(Kernel::HLERequestContext& ctx);
     void SetInputLines(Kernel::HLERequestContext& ctx);
@@ -282,12 +192,7 @@ private:
     void StartConversion(Kernel::HLERequestContext& ctx);
     void StopConversion(Kernel::HLERequestContext& ctx);
     void IsBusyConversion(Kernel::HLERequestContext& ctx);
-
-    /**
-     * Y2R_U::SetPackageParameter service function
-     */
     void SetPackageParameter(Kernel::HLERequestContext& ctx);
-
     void PingProcess(Kernel::HLERequestContext& ctx);
     void DriverInitialize(Kernel::HLERequestContext& ctx);
     void DriverFinalize(Kernel::HLERequestContext& ctx);

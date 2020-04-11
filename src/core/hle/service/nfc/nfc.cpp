@@ -299,6 +299,41 @@ void Module::Interface::GetIdentificationBlock(Kernel::HLERequestContext& ctx) {
     LOG_DEBUG(Service_NFC, "called");
 }
 
+void Module::Interface::GetAmiiboSettings(Kernel::HLERequestContext& ctx) {
+    IPC::RequestParser rp(ctx, 0x17, 0, 0);
+
+    if (nfc->nfc_tag_state != TagState::TagDataLoaded && nfc->nfc_tag_state != TagState::Unknown6) {
+        LOG_ERROR(Service_NFC, "Invalid TagState {}", static_cast<int>(nfc->nfc_tag_state));
+        IPC::RequestBuilder rb = rp.MakeBuilder(1, 0);
+        rb.Push(ResultCode(ErrCodes::CommandInvalidForState, ErrorModule::NFC,
+                           ErrorSummary::InvalidState, ErrorLevel::Status));
+        return;
+    }
+
+    IPC::RequestBuilder rb = rp.MakeBuilder(1, 0);
+    rb.Push<u32>(0xC8A17628); // amiibo wasn't setup by the amiibo Settings applet
+
+    LOG_WARNING(Service_NFC, "(STUBBED) called");
+}
+
+void Module::Interface::OpenAppData(Kernel::HLERequestContext& ctx) {
+    IPC::RequestParser rp(ctx, 0x13, 1, 0);
+    rp.Skip(1, false);
+
+    if (nfc->nfc_tag_state != TagState::TagDataLoaded && nfc->nfc_tag_state != TagState::Unknown6) {
+        LOG_ERROR(Service_NFC, "Invalid TagState {}", static_cast<int>(nfc->nfc_tag_state));
+        IPC::RequestBuilder rb = rp.MakeBuilder(1, 0);
+        rb.Push(ResultCode(ErrCodes::CommandInvalidForState, ErrorModule::NFC,
+                           ErrorSummary::InvalidState, ErrorLevel::Status));
+        return;
+    }
+
+    IPC::RequestBuilder rb = rp.MakeBuilder(1, 0);
+    rb.Push<u32>(0xC8A17620); // InitializeWriteAppData wasn't used previously
+
+    LOG_WARNING(Service_NFC, "(STUBBED) called");
+}
+
 std::shared_ptr<Module> Module::Interface::GetModule() const {
     return nfc;
 }

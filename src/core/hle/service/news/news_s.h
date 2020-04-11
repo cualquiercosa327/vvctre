@@ -14,15 +14,6 @@ public:
     NEWS_S();
 
 private:
-    /**
-     * GetTotalNotifications service function.
-     *  Inputs:
-     *      0 : 0x00050000
-     *  Outputs:
-     *      0 : 0x00050080
-     *      1 : Result of function, 0 on success, otherwise error code
-     *      2 : Number of notifications
-     */
     void GetTotalNotifications(Kernel::HLERequestContext& ctx);
 };
 

@@ -203,86 +203,13 @@ public:
         std::shared_ptr<Module> GetModule() const;
 
     protected:
-        /**
-         * HID::GetIPCHandles service function
-         *  Inputs:
-         *      None
-         *  Outputs:
-         *      1 : Result of function, 0 on success, otherwise error code
-         *      2 : IPC Command Structure translate-header
-         *      3 : Handle to HID shared memory
-         *      4 : Event signaled by HID
-         *      5 : Event signaled by HID
-         *      6 : Event signaled by HID
-         *      7 : Gyroscope event
-         *      8 : Event signaled by HID
-         */
         void GetIPCHandles(Kernel::HLERequestContext& ctx);
-
-        /**
-         * HID::EnableAccelerometer service function
-         *  Inputs:
-         *      None
-         *  Outputs:
-         *      1 : Result of function, 0 on success, otherwise error code
-         */
         void EnableAccelerometer(Kernel::HLERequestContext& ctx);
-
-        /**
-         * HID::DisableAccelerometer service function
-         *  Inputs:
-         *      None
-         *  Outputs:
-         *      1 : Result of function, 0 on success, otherwise error code
-         */
         void DisableAccelerometer(Kernel::HLERequestContext& ctx);
-
-        /**
-         * HID::EnableGyroscopeLow service function
-         *  Inputs:
-         *      None
-         *  Outputs:
-         *      1 : Result of function, 0 on success, otherwise error code
-         */
         void EnableGyroscopeLow(Kernel::HLERequestContext& ctx);
-
-        /**
-         * HID::DisableGyroscopeLow service function
-         *  Inputs:
-         *      None
-         *  Outputs:
-         *      1 : Result of function, 0 on success, otherwise error code
-         */
         void DisableGyroscopeLow(Kernel::HLERequestContext& ctx);
-
-        /**
-         * HID::GetSoundVolume service function
-         *  Inputs:
-         *      None
-         *  Outputs:
-         *      1 : Result of function, 0 on success, otherwise error code
-         *      2 : u8 output value
-         */
         void GetSoundVolume(Kernel::HLERequestContext& ctx);
-
-        /**
-         * HID::GetGyroscopeLowRawToDpsCoefficient service function
-         *  Inputs:
-         *      None
-         *  Outputs:
-         *      1 : Result of function, 0 on success, otherwise error code
-         *      2 : float output value
-         */
         void GetGyroscopeLowRawToDpsCoefficient(Kernel::HLERequestContext& ctx);
-
-        /**
-         * HID::GetGyroscopeLowCalibrateParam service function
-         *  Inputs:
-         *      None
-         *  Outputs:
-         *      1 : Result of function, 0 on success, otherwise error code
-         *      2~6 (18 bytes) : struct GyroscopeCalibrateParam
-         */
         void GetGyroscopeLowCalibrateParam(Kernel::HLERequestContext& ctx);
 
     private:

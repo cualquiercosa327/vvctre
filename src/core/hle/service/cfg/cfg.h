@@ -104,138 +104,17 @@ public:
 
         std::shared_ptr<Module> GetModule() const;
 
-        /**
-         * CFG::GetCountryCodeString service function
-         *  Inputs:
-         *      1 : Country Code ID
-         *  Outputs:
-         *      1 : Result of function, 0 on success, otherwise error code
-         *      2 : Country's 2-char string
-         */
         void GetCountryCodeString(Kernel::HLERequestContext& ctx);
-
-        /**
-         * CFG::GetCountryCodeID service function
-         *  Inputs:
-         *      1 : Country Code 2-char string
-         *  Outputs:
-         *      1 : Result of function, 0 on success, otherwise error code
-         *      2 : Country Code ID
-         */
         void GetCountryCodeID(Kernel::HLERequestContext& ctx);
-
-        /**
-         * CFG::SecureInfoGetRegion service function
-         *  Inputs:
-         *      1 : None
-         *  Outputs:
-         *      0 : Result Header code
-         *      1 : Result of function, 0 on success, otherwise error code
-         *      2 : Region value loaded from SecureInfo offset 0x100
-         */
         void SecureInfoGetRegion(Kernel::HLERequestContext& ctx, u16 id);
-
-        /**
-         * CFG::GenHashConsoleUnique service function
-         *  Inputs:
-         *      1 : 20 bit application ID salt
-         *  Outputs:
-         *      0 : Result Header code
-         *      1 : Result of function, 0 on success, otherwise error code
-         *      2 : Hash/"ID" lower word
-         *      3 : Hash/"ID" upper word
-         */
         void GenHashConsoleUnique(Kernel::HLERequestContext& ctx);
-
-        /**
-         * CFG::GetRegionCanadaUSA service function
-         *  Inputs:
-         *      1 : None
-         *  Outputs:
-         *      0 : Result Header code
-         *      1 : Result of function, 0 on success, otherwise error code
-         *      2 : 1 if the system is a Canada or USA model, 0 otherwise
-         */
         void GetRegionCanadaUSA(Kernel::HLERequestContext& ctx);
-
-        /**
-         * CFG::GetSystemModel service function
-         *  Inputs:
-         *      0 : 0x00050000
-         *  Outputs:
-         *      1 : Result of function, 0 on success, otherwise error code
-         *      2 : Model of the console
-         */
         void GetSystemModel(Kernel::HLERequestContext& ctx);
-
-        /**
-         * CFG::GetModelNintendo2DS service function
-         *  Inputs:
-         *      0 : 0x00060000
-         *  Outputs:
-         *      1 : Result of function, 0 on success, otherwise error code
-         *      2 : 0 if the system is a Nintendo 2DS, 1 otherwise
-         */
         void GetModelNintendo2DS(Kernel::HLERequestContext& ctx);
-
-        /**
-         * CFG::GetConfigInfoBlk2 service function
-         *  Inputs:
-         *      0 : 0x00010082
-         *      1 : Size
-         *      2 : Block ID
-         *      3 : Descriptor for the output buffer
-         *      4 : Output buffer pointer
-         *  Outputs:
-         *      1 : Result of function, 0 on success, otherwise error code
-         */
         void GetConfigInfoBlk2(Kernel::HLERequestContext& ctx);
-
-        /**
-         * CFG::GetConfigInfoBlk8 service function
-         *  Inputs:
-         *      0 : 0x04010082 / 0x08010082
-         *      1 : Size
-         *      2 : Block ID
-         *      3 : Descriptor for the output buffer
-         *      4 : Output buffer pointer
-         *  Outputs:
-         *      1 : Result of function, 0 on success, otherwise error code
-         */
         void GetConfigInfoBlk8(Kernel::HLERequestContext& ctx, u16 id);
-
-        /**
-         * CFG::SetConfigInfoBlk4 service function
-         *  Inputs:
-         *      0 : 0x04020082 / 0x08020082
-         *      1 : Block ID
-         *      2 : Size
-         *      3 : Descriptor for the output buffer
-         *      4 : Output buffer pointer
-         *  Outputs:
-         *      1 : Result of function, 0 on success, otherwise error code
-         *  Note:
-         *      The parameters order is different from GetConfigInfoBlk2/8's,
-         *      where Block ID and Size are switched.
-         */
         void SetConfigInfoBlk4(Kernel::HLERequestContext& ctx, u16 id);
-
-        /**
-         * CFG::UpdateConfigNANDSavegame service function
-         *  Inputs:
-         *      0 : 0x04030000 / 0x08030000
-         *  Outputs:
-         *      1 : Result of function, 0 on success, otherwise error code
-         */
         void UpdateConfigNANDSavegame(Kernel::HLERequestContext& ctx, u16 id);
-
-        /**
-         * CFG::FormatConfig service function
-         *  Inputs:
-         *      0 : 0x08060000
-         *  Outputs:
-         *      1 : Result of function, 0 on success, otherwise error code
-         */
         void FormatConfig(Kernel::HLERequestContext& ctx);
 
         /// A helper function for dispatching service functions that have multiple IDs

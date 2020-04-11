@@ -233,178 +233,22 @@ private:
      */
     void SignalInterruptForThread(InterruptId interrupt_id, u32 thread_id);
 
-    /**
-     * GSP_GPU::WriteHWRegs service function
-     *
-     * Writes sequential GSP GPU hardware registers
-     *
-     *  Inputs:
-     *      1 : address of first GPU register
-     *      2 : number of registers to write sequentially
-     *      4 : pointer to source data array
-     */
     void WriteHWRegs(Kernel::HLERequestContext& ctx);
-
-    /**
-     * GSP_GPU::WriteHWRegsWithMask service function
-     *
-     * Updates sequential GSP GPU hardware registers using masks
-     *
-     *  Inputs:
-     *      1 : address of first GPU register
-     *      2 : number of registers to update sequentially
-     *      4 : pointer to source data array
-     *      6 : pointer to mask array
-     */
     void WriteHWRegsWithMask(Kernel::HLERequestContext& ctx);
-
-    /// Read a GSP GPU hardware register
     void ReadHWRegs(Kernel::HLERequestContext& ctx);
-
-    /**
-     * GSP_GPU::SetBufferSwap service function
-     *
-     * Updates GPU display framebuffer configuration using the specified parameters.
-     *
-     *  Inputs:
-     *      1 : Screen ID (0 = top screen, 1 = bottom screen)
-     *      2-7 : FrameBufferInfo structure
-     *  Outputs:
-     *      1: Result code
-     */
     void SetBufferSwap(Kernel::HLERequestContext& ctx);
-
-    /**
-     * GSP_GPU::FlushDataCache service function
-     *
-     * This Function is a no-op, We aren't emulating the CPU cache any time soon.
-     *
-     *  Inputs:
-     *      1 : Address
-     *      2 : Size
-     *      3 : Value 0, some descriptor for the KProcess Handle
-     *      4 : KProcess handle
-     *  Outputs:
-     *      1 : Result of function, 0 on success, otherwise error code
-     */
     void FlushDataCache(Kernel::HLERequestContext& ctx);
-
-    /**
-     * GSP_GPU::InvalidateDataCache service function
-     *
-     * This Function is a no-op, We aren't emulating the CPU cache any time soon.
-     *
-     *  Inputs:
-     *      1 : Address
-     *      2 : Size
-     *      3 : Value 0, some descriptor for the KProcess Handle
-     *      4 : KProcess handle
-     *  Outputs:
-     *      1 : Result of function, 0 on success, otherwise error code
-     */
     void InvalidateDataCache(Kernel::HLERequestContext& ctx);
-
-    /**
-     * GSP_GPU::SetLcdForceBlack service function
-     *
-     * Enable or disable REG_LCDCOLORFILL with the color black.
-     *
-     *  Inputs:
-     *      1: Black color fill flag (0 = don't fill, !0 = fill)
-     *  Outputs:
-     *      1: Result code
-     */
     void SetLcdForceBlack(Kernel::HLERequestContext& ctx);
-
-    /// This triggers handling of the GX command written to the command buffer in shared memory.
     void TriggerCmdReqQueue(Kernel::HLERequestContext& ctx);
-
-    /**
-     * GSP_GPU::SetAxiConfigQoSMode service function
-     *  Inputs:
-     *      1 : Mode, unused in emulator
-     *  Outputs:
-     *      1 : Result of function, 0 on success, otherwise error code
-     */
     void SetAxiConfigQoSMode(Kernel::HLERequestContext& ctx);
-
-    /**
-     * GSP_GPU::RegisterInterruptRelayQueue service function
-     *  Inputs:
-     *      1 : "Flags" field, purpose is unknown
-     *      3 : Handle to GSP synchronization event
-     *  Outputs:
-     *      1 : Result of function, 0x2A07 on success, otherwise error code
-     *      2 : Thread index into GSP command buffer
-     *      4 : Handle to GSP shared memory
-     */
     void RegisterInterruptRelayQueue(Kernel::HLERequestContext& ctx);
-
-    /**
-     * GSP_GPU::UnregisterInterruptRelayQueue service function
-     *  Outputs:
-     *      1 : Result of function, 0 on success, otherwise error code
-     */
     void UnregisterInterruptRelayQueue(Kernel::HLERequestContext& ctx);
-
-    /**
-     * GSP_GPU::AcquireRight service function
-     *  Outputs:
-     *      1: Result code
-     */
     void AcquireRight(Kernel::HLERequestContext& ctx);
-
-    /**
-     * GSP_GPU::ReleaseRight service function
-     *  Outputs:
-     *      1: Result code
-     */
     void ReleaseRight(Kernel::HLERequestContext& ctx);
-
-    /**
-     * Releases rights to the GPU.
-     * Will fail if the session_data doesn't have the GPU right
-     */
     void ReleaseRight(SessionData* session_data);
-
-    /**
-     * GSP_GPU::ImportDisplayCaptureInfo service function
-     *
-     * Returns information about the current framebuffer state
-     *
-     *  Inputs:
-     *      0: Header 0x00180000
-     *  Outputs:
-     *      0: Header Code[0x00180240]
-     *      1: Result code
-     *      2: Left framebuffer virtual address for the main screen
-     *      3: Right framebuffer virtual address for the main screen
-     *      4: Main screen framebuffer format
-     *      5: Main screen framebuffer width
-     *      6: Left framebuffer virtual address for the bottom screen
-     *      7: Right framebuffer virtual address for the bottom screen
-     *      8: Bottom screen framebuffer format
-     *      9: Bottom screen framebuffer width
-     */
     void ImportDisplayCaptureInfo(Kernel::HLERequestContext& ctx);
-
-    /**
-     * GSP_GPU::StoreDataCache service function
-     *
-     * This Function is a no-op, We aren't emulating the CPU cache any time soon.
-     *
-     *  Inputs:
-     *      0 : Header code [0x001F0082]
-     *      1 : Address
-     *      2 : Size
-     *      3 : Value 0, some descriptor for the KProcess Handle
-     *      4 : KProcess handle
-     *  Outputs:
-     *      1 : Result of function, 0 on success, otherwise error code
-     */
     void StoreDataCache(Kernel::HLERequestContext& ctx);
-
-    /// Force the 3D LED State (0 = On, Non-Zero = Off)
     void SetLedForceOff(Kernel::HLERequestContext& ctx);
 
     /// Returns the session data for the specified registered thread id, or nullptr if not found.

@@ -24,15 +24,6 @@ namespace Service::SM {
 
 constexpr int MAX_PENDING_NOTIFICATIONS = 16;
 
-/**
- * SRV::RegisterClient service function
- *  Inputs:
- *      0: 0x00010002
- *      1: ProcessId Header (must be 0x20)
- *  Outputs:
- *      0: 0x00010040
- *      1: ResultCode
- */
 void SRV::RegisterClient(Kernel::HLERequestContext& ctx) {
     IPC::RequestParser rp(ctx, 0x1, 0, 2);
 
@@ -49,16 +40,6 @@ void SRV::RegisterClient(Kernel::HLERequestContext& ctx) {
     LOG_WARNING(Service_SRV, "(STUBBED) called");
 }
 
-/**
- * SRV::EnableNotification service function
- *  Inputs:
- *      0: 0x00020000
- *  Outputs:
- *      0: 0x00020042
- *      1: ResultCode
- *      2: Translation descriptor: 0x20
- *      3: Handle to semaphore signaled on process notification
- */
 void SRV::EnableNotification(Kernel::HLERequestContext& ctx) {
     IPC::RequestParser rp(ctx, 0x2, 0, 0);
 
@@ -71,17 +52,6 @@ void SRV::EnableNotification(Kernel::HLERequestContext& ctx) {
     LOG_WARNING(Service_SRV, "(STUBBED) called");
 }
 
-/**
- * SRV::GetServiceHandle service function
- *  Inputs:
- *      0: 0x00050100
- *      1-2: 8-byte UTF-8 service name
- *      3: Name length
- *      4: Flags (bit0: if not set, return port-handle if session-handle unavailable)
- *  Outputs:
- *      1: ResultCode
- *      3: Service handle
- */
 void SRV::GetServiceHandle(Kernel::HLERequestContext& ctx) {
     IPC::RequestParser rp(ctx, 0x5, 4, 0);
     auto name_buf = rp.PopRaw<std::array<char, 8>>();
@@ -157,15 +127,6 @@ void SRV::GetServiceHandle(Kernel::HLERequestContext& ctx) {
     }
 }
 
-/**
- * SRV::Subscribe service function
- *  Inputs:
- *      0: 0x00090040
- *      1: Notification ID
- *  Outputs:
- *      0: 0x00090040
- *      1: ResultCode
- */
 void SRV::Subscribe(Kernel::HLERequestContext& ctx) {
     IPC::RequestParser rp(ctx, 0x9, 1, 0);
     u32 notification_id = rp.Pop<u32>();
@@ -175,15 +136,6 @@ void SRV::Subscribe(Kernel::HLERequestContext& ctx) {
     LOG_WARNING(Service_SRV, "(STUBBED) called, notification_id=0x{:X}", notification_id);
 }
 
-/**
- * SRV::Unsubscribe service function
- *  Inputs:
- *      0: 0x000A0040
- *      1: Notification ID
- *  Outputs:
- *      0: 0x000A0040
- *      1: ResultCode
- */
 void SRV::Unsubscribe(Kernel::HLERequestContext& ctx) {
     IPC::RequestParser rp(ctx, 0xA, 1, 0);
     u32 notification_id = rp.Pop<u32>();
@@ -193,16 +145,6 @@ void SRV::Unsubscribe(Kernel::HLERequestContext& ctx) {
     LOG_WARNING(Service_SRV, "(STUBBED) called, notification_id=0x{:X}", notification_id);
 }
 
-/**
- * SRV::PublishToSubscriber service function
- *  Inputs:
- *      0: 0x000C0080
- *      1: Notification ID
- *      2: Flags (bit0: only fire if not fired, bit1: report errors)
- *  Outputs:
- *      0: 0x000C0040
- *      1: ResultCode
- */
 void SRV::PublishToSubscriber(Kernel::HLERequestContext& ctx) {
     IPC::RequestParser rp(ctx, 0xC, 2, 0);
     u32 notification_id = rp.Pop<u32>();
