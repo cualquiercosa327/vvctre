@@ -153,7 +153,8 @@ EmuWindow_SDL2::EmuWindow_SDL2(Core::System& system) : system(system) {
                          SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
 
     if (render_window == nullptr) {
-        LOG_CRITICAL(Frontend, "Failed to create SDL2 window: {}", SDL_GetError());
+        pfd::message("vvctre", fmt::format("Failed to create window: {}", SDL_GetError()),
+                     pfd::choice::ok, pfd::icon::error);
         std::exit(1);
     }
 
@@ -166,12 +167,14 @@ EmuWindow_SDL2::EmuWindow_SDL2(Core::System& system) : system(system) {
 
     gl_context = SDL_GL_CreateContext(render_window);
     if (gl_context == nullptr) {
-        LOG_CRITICAL(Frontend, "Failed to create SDL2 GL context: {}", SDL_GetError());
+        pfd::message("vvctre", fmt::format("Failed to create OpenGL context: {}", SDL_GetError()),
+                     pfd::choice::ok, pfd::icon::error);
         std::exit(1);
     }
 
     if (!gladLoadGLLoader(static_cast<GLADloadproc>(SDL_GL_GetProcAddress))) {
-        LOG_CRITICAL(Frontend, "Failed to initialize GL functions: {}", SDL_GetError());
+        pfd::message("vvctre", fmt::format("Failed to initialize OpenGL: {}", SDL_GetError()),
+                     pfd::choice::ok, pfd::icon::error);
         std::exit(1);
     }
 

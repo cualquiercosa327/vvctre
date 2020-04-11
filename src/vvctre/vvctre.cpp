@@ -121,7 +121,8 @@ int main(int, char**) {
         pfd::message("vvctre", "CPU not initialized", pfd::choice::ok, pfd::icon::error);
         return -1;
     case Core::System::ResultStatus::ErrorGetLoader:
-        pfd::message("vvctre", fmt::format("Failed to obtain loader for {}!", file),
+        pfd::message("vvctre",
+                     fmt::format("Failed to obtain loader for {}!", Settings::values.file_path),
                      pfd::choice::ok, pfd::icon::error);
         return -1;
     case Core::System::ResultStatus::ErrorSystemMode:
@@ -142,19 +143,14 @@ int main(int, char**) {
                      pfd::icon::error);
         return -1;
     case Core::System::ResultStatus::ErrorVideoCore:
-        LOG_CRITICAL(Frontend, );
         pfd::message(
             "vvctre",
             "VideoCore error. Ensure that you have the latest graphics drivers for your GPU.",
             pfd::choice::ok, pfd::icon::error);
         return -1;
     case Core::System::ResultStatus::ErrorVideoCore_ErrorGenericDrivers:
-        LOG_CRITICAL(Frontend,
-                     "You are running default Windows drivers "
-                     "for your GPU. You need to install the "
-                     "proper drivers for your graphics card from the manufacturer's website.");
-        pfd::message("vvctre", fmt::format("CPU not initialized", file), pfd::choice::ok,
-                     pfd::icon::error);
+        pfd::message("vvctre", fmt::format("CPU not initialized", Settings::values.file_path),
+                     pfd::choice::ok, pfd::icon::error);
         return -1;
     case Core::System::ResultStatus::ErrorVideoCore_ErrorBelowGL33:
         pfd::message("vvctre",

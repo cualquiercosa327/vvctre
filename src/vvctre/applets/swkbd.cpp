@@ -2,6 +2,7 @@
 // Licensed under GPLv2 or any later version
 // Refer to the license.txt file included.
 
+#include <portable-file-dialogs.h>
 #include "video_core/renderer_opengl/renderer_opengl.h"
 #include "vvctre/applets/swkbd.h"
 #include "vvctre/emu_window/emu_window_sdl2.h"

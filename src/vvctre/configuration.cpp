@@ -47,21 +47,24 @@ Configuration::Configuration() {
         640, 480, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
 
     if (render_window == nullptr) {
-        LOG_CRITICAL(Frontend, "Failed to create SDL2 window: {}", SDL_GetError());
-        std::exit(1);
+        pfd::message("vvctre", fmt::format("Failed to create window: {}", SDL_GetError()),
+                     pfd::choice::ok, pfd::icon::error);
+        std::exit(-1);
     }
 
     SDL_SetWindowMinimumSize(render_window, 640, 480);
 
     gl_context = SDL_GL_CreateContext(render_window);
     if (gl_context == nullptr) {
-        LOG_CRITICAL(Frontend, "Failed to create SDL2 GL context: {}", SDL_GetError());
-        std::exit(1);
+        pfd::message("vvctre", fmt::format("Failed to create OpenGL context: {}", SDL_GetError()),
+                     pfd::choice::ok, pfd::icon::error);
+        std::exit(-1);
     }
 
     if (!gladLoadGLLoader(static_cast<GLADloadproc>(SDL_GL_GetProcAddress))) {
-        LOG_CRITICAL(Frontend, "Failed to initialize GL functions: {}", SDL_GetError());
-        std::exit(1);
+        pfd::message("vvctre", fmt::format("Failed to initialize OpenGL: {}", SDL_GetError()),
+                     pfd::choice::ok, pfd::icon::error);
+        std::exit(-1);
     }
 
     SDL_GL_SetSwapInterval(1);
