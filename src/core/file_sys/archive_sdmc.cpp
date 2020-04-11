@@ -366,13 +366,12 @@ u64 SDMCArchive::GetFreeBytes() const {
 
 ArchiveFactory_SDMC::ArchiveFactory_SDMC(const std::string& sdmc_directory)
     : sdmc_directory(sdmc_directory) {
-
     LOG_DEBUG(Service_FS, "Directory {} set as SDMC.", sdmc_directory);
 }
 
 bool ArchiveFactory_SDMC::Initialize() {
     if (!Settings::values.use_virtual_sd) {
-        LOG_WARNING(Service_FS, "SDMC disabled by config.");
+        LOG_WARNING(Service_FS, "SDMC disabled.");
         return false;
     }
 
@@ -404,4 +403,5 @@ ResultVal<ArchiveFormatInfo> ArchiveFactory_SDMC::GetFormatInfo(const Path& path
     LOG_ERROR(Service_FS, "Unimplemented GetFormatInfo archive {}", GetName());
     return ResultCode(-1);
 }
+
 } // namespace FileSys

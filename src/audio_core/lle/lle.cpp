@@ -335,15 +335,17 @@ struct DspLle::Impl final {
         if (dsp.recv_data_on_start) {
             for (u8 i = 0; i < 3; ++i) {
                 do {
-                    while (!teakra.RecvDataIsReady(i))
+                    while (!teakra.RecvDataIsReady(i)) {
                         RunTeakraSlice();
+                    }
                 } while (teakra.RecvData(i) != 1);
             }
         }
 
         // Get pipe base address
-        while (!teakra.RecvDataIsReady(2))
+        while (!teakra.RecvDataIsReady(2)) {
             RunTeakraSlice();
+        }
         pipe_base_waddr = teakra.RecvData(2);
 
         loaded = true;

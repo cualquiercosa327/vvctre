@@ -59,7 +59,7 @@ ArchiveFactory_SDMCWriteOnly::ArchiveFactory_SDMCWriteOnly(const std::string& mo
 
 bool ArchiveFactory_SDMCWriteOnly::Initialize() {
     if (!Settings::values.use_virtual_sd) {
-        LOG_WARNING(Service_FS, "SDMC disabled by config.");
+        LOG_WARNING(Service_FS, "SDMC disabled.");
         return false;
     }
 
