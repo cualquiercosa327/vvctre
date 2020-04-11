@@ -28,6 +28,8 @@ void SDL2_SoftwareKeyboard::Execute(const KeyboardConfig& config) {
     Finalize(text, code);
 }
 
-void SDL2_SoftwareKeyboard::ShowError(const std::string& error) {}
+void SDL2_SoftwareKeyboard::ShowError(const std::string& error) {
+    pfd::message("vvctre", error, pfd::choice::ok, pfd::icon::error);
+}
 
 } // namespace Frontend

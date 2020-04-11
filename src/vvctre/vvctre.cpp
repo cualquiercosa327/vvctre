@@ -118,39 +118,49 @@ int main(int, char**) {
 
     switch (load_result) {
     case Core::System::ResultStatus::ErrorNotInitialized:
-        LOG_CRITICAL(Frontend, "CPU not initialized");
+        pfd::message("vvctre", "CPU not initialized", pfd::choice::ok, pfd::icon::error);
         return -1;
     case Core::System::ResultStatus::ErrorGetLoader:
-        LOG_CRITICAL(Frontend, "Failed to obtain loader for {}!", Settings::values.file_path);
+        pfd::message("vvctre", fmt::format("Failed to obtain loader for {}!", file),
+                     pfd::choice::ok, pfd::icon::error);
         return -1;
     case Core::System::ResultStatus::ErrorSystemMode:
-        LOG_CRITICAL(Frontend, "Failed to determine system mode!");
+        pfd::message("vvctre", "Failed to determine system mode!", pfd::choice::ok,
+                     pfd::icon::error);
         return -1;
     case Core::System::ResultStatus::ErrorLoader:
-        LOG_CRITICAL(Frontend, "Failed to load ROM!");
+        pfd::message("vvctre", "Failed to load ROM!", pfd::choice::ok, pfd::icon::error);
         return -1;
     case Core::System::ResultStatus::ErrorLoader_ErrorEncrypted:
-        LOG_CRITICAL(Frontend, "The game that you are trying to load must be decrypted before "
-                               "being used with vvctre. \n\n For more information on dumping and "
-                               "decrypting games, please refer to: "
-                               "https://citra-emu.org/wiki/dumping-game-cartridges/");
+        pfd::message(
+            "vvctre",
+            "The game that you are trying to load must be decrypted before being used with vvctre.",
+            pfd::choice::ok, pfd::icon::error);
         return -1;
     case Core::System::ResultStatus::ErrorLoader_ErrorInvalidFormat:
-        LOG_CRITICAL(Frontend, "The ROM format is not supported.");
+        pfd::message("vvctre", "The ROM format is not supported.", pfd::choice::ok,
+                     pfd::icon::error);
         return -1;
     case Core::System::ResultStatus::ErrorVideoCore:
-        LOG_CRITICAL(Frontend, "VideoCore error. Ensure that you have the latest graphics "
-                               "drivers for your GPU.");
+        LOG_CRITICAL(Frontend, );
+        pfd::message(
+            "vvctre",
+            "VideoCore error. Ensure that you have the latest graphics drivers for your GPU.",
+            pfd::choice::ok, pfd::icon::error);
         return -1;
     case Core::System::ResultStatus::ErrorVideoCore_ErrorGenericDrivers:
         LOG_CRITICAL(Frontend,
                      "You are running default Windows drivers "
                      "for your GPU. You need to install the "
                      "proper drivers for your graphics card from the manufacturer's website.");
+        pfd::message("vvctre", fmt::format("CPU not initialized", file), pfd::choice::ok,
+                     pfd::icon::error);
         return -1;
     case Core::System::ResultStatus::ErrorVideoCore_ErrorBelowGL33:
-        LOG_CRITICAL(Frontend, "Your GPU may not support OpenGL 3.3, or you do not "
-                               "have the latest graphics driver.");
+        pfd::message("vvctre",
+                     "Your GPU may not support OpenGL 3.3, or you do not "
+                     "have the latest graphics driver.",
+                     pfd::choice::ok, pfd::icon::error);
         return -1;
     default:
         break;
