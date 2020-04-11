@@ -84,7 +84,7 @@ u16 NWM_UDS::GetNextAvailableNodeId() {
 }
 
 void NWM_UDS::BroadcastNodeMap() {
-    // Note: This is not how UDS on a 3ds does it but it shouldn't be
+    // Note: This is not how UDS on a 3DS does it but it shouldn't be
     // necessary for vvctre
     WifiPacket packet;
     packet.channel = network_channel;
@@ -232,7 +232,7 @@ void NWM_UDS::HandleEAPoLPacket(const WifiPacket& packet) {
 
         // TODO(B3N30): send the eapol packet just to the new client and implement a proper
         // broadcast packet for all other clients
-        // On a 3ds the eapol packet is only sent to packet.transmitter_address
+        // On a 3DS the eapol packet is only sent to packet.transmitter_address
         // while a packet containing the node information is broadcasted
         // For now we will broadcast the eapol packet instead
         eapol_logoff.destination_address = BroadcastMac;
@@ -271,7 +271,7 @@ void NWM_UDS::HandleEAPoLPacket(const WifiPacket& packet) {
         connection_event->Signal();
     } else if (connection_status.status == static_cast<u32>(NetworkStatus::ConnectedAsClient)) {
         // TODO(B3N30): Remove that section and send/receive a proper connection_status packet
-        // On a 3ds this packet wouldn't be addressed to already connected clients
+        // On a 3DS this packet wouldn't be addressed to already connected clients
         // We use this information because in the current implementation the host
         // isn't broadcasting the node information
         auto logoff = ParseEAPoLLogoffFrame(packet.data);
@@ -1041,7 +1041,7 @@ void NWM_UDS::DisconnectNetwork(Kernel::HLERequestContext& ctx) {
     {
         std::lock_guard lock(connection_status_mutex);
         if (connection_status.status == static_cast<u32>(NetworkStatus::ConnectedAsHost)) {
-            // A real 3ds makes strange things here. We do the same
+            // A real 3DS makes strange things here. We do the same
             u16_le tmp_node_id = connection_status.network_node_id;
             connection_status = {};
             connection_status.status = static_cast<u32>(NetworkStatus::ConnectedAsHost);

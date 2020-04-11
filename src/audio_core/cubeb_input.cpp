@@ -45,7 +45,7 @@ CubebInput::~CubebInput() {
 }
 
 void CubebInput::StartSampling(const Frontend::Mic::Parameters& params) {
-    // Cubeb apparently only supports signed 16 bit PCM (and float32 which the 3ds doesn't support)
+    // Cubeb apparently only supports signed 16 bit PCM (and float32 which the 3DS doesn't support)
     // TODO resample the input stream
     if (params.sign == Frontend::Mic::Signedness::Unsigned) {
         LOG_ERROR(Audio,

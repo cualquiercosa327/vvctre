@@ -51,7 +51,7 @@ constexpr u32 GetSampleRateInHz(SampleRate sample_rate) {
     }
 }
 
-// The 3ds hardware was tested to write to the sharedmem every 15 samples regardless of sample_rate.
+// The 3DS hardware was tested to write to the sharedmem every 15 samples regardless of sample_rate.
 // So we can just divide the sample rate by 16 and that'll give the correct timing for the event
 constexpr u64 GetBufferUpdateRate(SampleRate sample_rate) {
     return GetSampleRateInHz(sample_rate) / 16;

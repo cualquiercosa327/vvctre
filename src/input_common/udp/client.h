@@ -33,7 +33,7 @@ struct DeviceStatus {
     std::tuple<Common::Vec3<float>, Common::Vec3<float>> motion_status;
     std::tuple<float, float, bool> touch_status;
 
-    // Calibration data for scaling the device's touch area to 3ds
+    // Calibration data for scaling the device's touch area to 3DS
     struct CalibrationData {
         u16 min_x{};
         u16 min_y{};
