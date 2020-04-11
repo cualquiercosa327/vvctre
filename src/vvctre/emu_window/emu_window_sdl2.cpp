@@ -215,7 +215,7 @@ void EmuWindow_SDL2::SwapBuffers() {
             ImGui::SetWindowFocus(nullptr);
         }
         ImGui::SetWindowPos(ImVec2(), ImGuiCond_Once);
-        ImGui::TextColored(fps_color, "%d FPS", static_cast<int>(ImGui::GetIO().Framerate));
+        ImGui::TextColored(fps_color, "%d FPS", static_cast<int>(io.Framerate));
         if (ImGui::BeginPopupContextItem(nullptr, ImGuiMouseButton_Right)) {
             system.frontend_paused = true;
 
