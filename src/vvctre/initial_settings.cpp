@@ -2168,8 +2168,6 @@ void InitialSettings::Run() {
                     }
                     ImGui::EndGroup();
 
-                    ImGui::SameLine();
-
                     ImGui::NewLine();
 
                     ImGui::Text("Motion:");
