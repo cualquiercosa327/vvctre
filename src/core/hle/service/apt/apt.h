@@ -109,6 +109,7 @@ public:
         void CloseLibraryApplet(Kernel::HLERequestContext& ctx);
         void SendCaptureBufferInfo(Kernel::HLERequestContext& ctx);
         void ReceiveCaptureBufferInfo(Kernel::HLERequestContext& ctx);
+        void GetCaptureInfo(Kernel::HLERequestContext& ctx);
         void GetStartupArgument(Kernel::HLERequestContext& ctx);
         void SetScreenCapPostPermission(Kernel::HLERequestContext& ctx);
         void GetScreenCapPostPermission(Kernel::HLERequestContext& ctx);
