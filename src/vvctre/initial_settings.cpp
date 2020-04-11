@@ -2182,7 +2182,7 @@ void InitialSettings::Run() {
                             if (engine == "motion_emu") {
                                 return "Right Click";
                             } else if (engine == "cemuhookudp") {
-                                return "UDP";
+                                return "CemuhookUDP";
                             }
 
                             return "Invalid";
@@ -2191,7 +2191,7 @@ void InitialSettings::Run() {
                             Settings::values.motion_device = "engine:motion_emu";
                         }
 
-                        if (ImGui::Selectable("UDP")) {
+                        if (ImGui::Selectable("CemuhookUDP")) {
                             Settings::values.motion_device = "engine:cemuhookudp";
                         }
 
@@ -2250,7 +2250,7 @@ void InitialSettings::Run() {
                             if (engine == "emu_window") {
                                 return "Mouse";
                             } else if (engine == "cemuhookudp") {
-                                return "UDP";
+                                return "CemuhookUDP";
                             }
 
                             return "Invalid";
@@ -2259,7 +2259,7 @@ void InitialSettings::Run() {
                             Settings::values.touch_device = "engine:emu_window";
                         }
 
-                        if (ImGui::Selectable("UDP")) {
+                        if (ImGui::Selectable("CemuhookUDP")) {
                             Settings::values.touch_device = "engine:cemuhookudp";
                         }
 

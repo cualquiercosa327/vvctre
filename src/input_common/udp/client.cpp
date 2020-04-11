@@ -167,7 +167,7 @@ void Client::OnPadData(Response::PadData data) {
         return;
     }
     packet_sequence = data.packet_counter;
-    // Due to differences between the 3ds and cemuhookudp motion directions, we need to invert
+    // Due to differences between the 3DS and CemuhookUDP motion directions, we need to invert
     // accel.x and accel.z and also invert pitch and yaw. See
     // https://github.com/citra-emu/citra/pull/4049 for more details on gyro/accel
     Common::Vec3f accel = Common::MakeVec<float>(-data.accel.x, data.accel.y, -data.accel.z);
