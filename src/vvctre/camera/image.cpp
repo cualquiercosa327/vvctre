@@ -50,7 +50,7 @@ ImageCamera::ImageCamera(const std::string& file) {
         }
 
         if (image == nullptr) {
-            LOG_ERROR(Service_CAM, "Failed to load image");
+            LOG_DEBUG(Service_CAM, "Failed to load image");
         }
     }
 }
