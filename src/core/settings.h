@@ -349,7 +349,7 @@ struct Values {
     };
 
     // Used by the frontend
-    std::string file_path;
+    std::string file_path; // full path with double backslash
     bool start_in_fullscreen_mode = false;
     int rpc_server_port = 47889;
     std::string play_movie;
