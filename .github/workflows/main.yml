@@ -166,3 +166,18 @@ jobs:
           DISCORD_WEBHOOK: ${{github.event.client_payload.discordWebhook}}
         with:
           args: 'Delete webhook'
+  cancelled:
+    if: github.event_name == 'repository_dispatch' && cancelled()
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: Ilshidur/action-discord@master
+        env:
+          DISCORD_WEBHOOK: ${{github.event.client_payload.discordWebhook}}
+        with:
+          args: 'works'
+      - uses: Ilshidur/action-discord@master
+        env:
+          DISCORD_WEBHOOK: ${{github.event.client_payload.discordWebhook}}
+        with:
+          args: 'Delete webhook'
