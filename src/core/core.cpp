@@ -95,8 +95,8 @@ System::ResultStatus System::RunLoop(bool tight_loop) {
 System::ResultStatus System::Load(Frontend::EmuWindow& emu_window, const std::string& filepath) {
     app_loader = Loader::GetLoader(filepath);
     if (!app_loader) {
-        LOG_CRITICAL(Core, "Failed to obtain loader for {}!", filepath);
-        return ResultStatus::ErrorGetLoader;
+        LOG_CRITICAL(Core, "Unsupported file format", filepath);
+        return ResultStatus::ErrorLoader_ErrorUnsupportedFormat;
     }
     std::pair<std::optional<u32>, Loader::ResultStatus> system_mode =
         app_loader->LoadKernelSystemMode();

@@ -120,9 +120,6 @@ int main(int, char**) {
     case Core::System::ResultStatus::ErrorNotInitialized:
         pfd::message("vvctre", "Not initialized", pfd::choice::ok, pfd::icon::error);
         return -1;
-    case Core::System::ResultStatus::ErrorGetLoader:
-        pfd::message("vvctre", "Unsupported file format", pfd::choice::ok, pfd::icon::error);
-        return -1;
     case Core::System::ResultStatus::ErrorSystemMode:
         pfd::message("vvctre", "Failed to determine system mode", pfd::choice::ok,
                      pfd::icon::error);
