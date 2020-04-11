@@ -124,34 +124,48 @@ static constexpr int REGION_VALUE_AUTO_SELECT = -1;
 struct Values {
     // Controls
     std::array<std::string, NativeButton::NumButtons> buttons = {
-        InputCommon::GenerateKeyboardParam(SDL_SCANCODE_A), // A, JSON buttons[0]
-        InputCommon::GenerateKeyboardParam(SDL_SCANCODE_S), // B, JSON buttons[1]
-        InputCommon::GenerateKeyboardParam(SDL_SCANCODE_Z), // X, JSON buttons[2]
-        InputCommon::GenerateKeyboardParam(SDL_SCANCODE_X), // Y, JSON buttons[3]
-        InputCommon::GenerateKeyboardParam(SDL_SCANCODE_T), // Up, JSON buttons[4]
-        InputCommon::GenerateKeyboardParam(SDL_SCANCODE_G), // Down, JSON buttons[5]
-        InputCommon::GenerateKeyboardParam(SDL_SCANCODE_F), // Left, JSON buttons[6]
-        InputCommon::GenerateKeyboardParam(SDL_SCANCODE_H), // Right, JSON buttons[7]
-        InputCommon::GenerateKeyboardParam(SDL_SCANCODE_Q), // L, JSON buttons[8]
-        InputCommon::GenerateKeyboardParam(SDL_SCANCODE_W), // R, JSON buttons[9]
-        InputCommon::GenerateKeyboardParam(SDL_SCANCODE_M), // Start, JSON buttons[10]
-        InputCommon::GenerateKeyboardParam(SDL_SCANCODE_N), // Select, JSON buttons[11]
-        InputCommon::GenerateKeyboardParam(SDL_SCANCODE_0), // Debug, JSON buttons[12]
-        InputCommon::GenerateKeyboardParam(SDL_SCANCODE_P), // GPIO14, JSON buttons[13]
-        InputCommon::GenerateKeyboardParam(SDL_SCANCODE_1), // ZL, JSON buttons[14]
-        InputCommon::GenerateKeyboardParam(SDL_SCANCODE_2), // ZR, JSON buttons[15]
-        InputCommon::GenerateKeyboardParam(SDL_SCANCODE_B), // Home, JSON buttons[16]
+        // All the code below can be changed to JSON buttons
+        InputCommon::GenerateKeyboardParam(SDL_SCANCODE_A), // A,
+        InputCommon::GenerateKeyboardParam(SDL_SCANCODE_S), // B
+        InputCommon::GenerateKeyboardParam(SDL_SCANCODE_Z), // X
+        InputCommon::GenerateKeyboardParam(SDL_SCANCODE_X), // Y
+        InputCommon::GenerateKeyboardParam(SDL_SCANCODE_T), // Up
+        InputCommon::GenerateKeyboardParam(SDL_SCANCODE_G), // Down
+        InputCommon::GenerateKeyboardParam(SDL_SCANCODE_F), // Left
+        InputCommon::GenerateKeyboardParam(SDL_SCANCODE_H), // Right
+        InputCommon::GenerateKeyboardParam(SDL_SCANCODE_Q), // L
+        InputCommon::GenerateKeyboardParam(SDL_SCANCODE_W), // R
+        InputCommon::GenerateKeyboardParam(SDL_SCANCODE_M), // Start
+        InputCommon::GenerateKeyboardParam(SDL_SCANCODE_N), // Select
+        InputCommon::GenerateKeyboardParam(SDL_SCANCODE_0), // Debug
+        InputCommon::GenerateKeyboardParam(SDL_SCANCODE_P), // GPIO14
+        InputCommon::GenerateKeyboardParam(SDL_SCANCODE_1), // ZL
+        InputCommon::GenerateKeyboardParam(SDL_SCANCODE_2), // ZR
+        InputCommon::GenerateKeyboardParam(SDL_SCANCODE_B), // Home
+        // All the code above can be changed to JSON buttons
     };
 
     std::array<std::string, NativeAnalog::NumAnalogs> analogs = {
-        // Up, Down, Left, Right, Modifier Key, Modifier
-        // Circle Pad, JSON analogs[0]
-        InputCommon::GenerateAnalogParamFromKeys(SDL_SCANCODE_UP, SDL_SCANCODE_DOWN,
-                                                 SDL_SCANCODE_LEFT, SDL_SCANCODE_RIGHT,
-                                                 SDL_SCANCODE_D, 0.5f),
-        // Circle Pad Pro, JSON analogs[1]
-        InputCommon::GenerateAnalogParamFromKeys(SDL_SCANCODE_I, SDL_SCANCODE_K, SDL_SCANCODE_J,
-                                                 SDL_SCANCODE_L, SDL_SCANCODE_D, 0.5f),
+        // All the code below can be changed to JSON analogs
+        InputCommon::GenerateAnalogParamFromKeys(
+            // Circle Pad
+            SDL_SCANCODE_UP,    // Up
+            SDL_SCANCODE_DOWN,  // Down
+            SDL_SCANCODE_LEFT,  // Left
+            SDL_SCANCODE_RIGHT, // Right
+            SDL_SCANCODE_D,     // Modifier Key
+            0.5f                // Modifier
+            ),
+        InputCommon::GenerateAnalogParamFromKeys(
+            // Circle Pad Pro
+            SDL_SCANCODE_I, // Up
+            SDL_SCANCODE_K, // Down
+            SDL_SCANCODE_J, // Left
+            SDL_SCANCODE_L, // Right
+            SDL_SCANCODE_D, // Modifier Key
+            0.5f            // Modifier
+            ),
+        // All the code above can be changed to JSON analogs
     };
 
     /// JSON motion_device
@@ -349,7 +363,11 @@ struct Values {
     };
 
     // Used by the frontend
-    std::string file_path; // full path with double backslash
+
+    /// If you're making a custom build and you use Windows,
+    /// this needs to be a full path with double backslash
+    std::string file_path;
+
     bool start_in_fullscreen_mode = false;
     int rpc_server_port = 47889;
     std::string play_movie;
