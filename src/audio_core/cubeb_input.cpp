@@ -49,7 +49,7 @@ void CubebInput::StartSampling(const Frontend::Mic::Parameters& params) {
     // TODO resample the input stream
     if (params.sign == Frontend::Mic::Signedness::Unsigned) {
         LOG_ERROR(Audio,
-                  "Application requested unsupported unsigned pcm format. Falling back to signed");
+                  "Application requested unsupported unsigned PCM format. Falling back to signed");
     }
 
     impl->sample_size_in_bytes = params.sample_size / 8;
