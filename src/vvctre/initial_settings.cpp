@@ -2241,7 +2241,7 @@ void InitialSettings::Run() {
 
                     ImGui::Text("Touch:");
                     ImGui::SameLine();
-                    ImGui::PushItemWidth(60);
+                    ImGui::PushItemWidth(100);
                     if (ImGui::BeginCombo("##touch_device", [] {
                             const std::string engine =
                                 Common::ParamPackage(Settings::values.touch_device)
@@ -2320,7 +2320,7 @@ void InitialSettings::Run() {
 
                     if (motion_device.Get("engine", "") == "cemuhookudp" ||
                         touch_device.Get("engine", "") == "cemuhookudp") {
-                        ImGui::Text("UDP:");
+                        ImGui::Text("CemuhookUDP:");
 
                         ImGui::SameLine();
                         ImGui::PushItemWidth(110);
