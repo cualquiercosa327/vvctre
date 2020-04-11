@@ -154,8 +154,9 @@ Loader::ResultStatus NCCHContainer::Load() {
         }
 
         // Verify we are loading the correct file type...
-        if (Loader::MakeMagic('N', 'C', 'C', 'H') != ncch_header.magic)
+        if (Loader::MakeMagic('N', 'C', 'C', 'H') != ncch_header.magic) {
             return Loader::ResultStatus::ErrorInvalidFormat;
+        }
 
         has_header = true;
         bool failed_to_decrypt = false;

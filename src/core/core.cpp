@@ -109,7 +109,7 @@ System::ResultStatus System::Load(Frontend::EmuWindow& emu_window, const std::st
         case Loader::ResultStatus::ErrorEncrypted:
             return ResultStatus::ErrorLoader_ErrorEncrypted;
         case Loader::ResultStatus::ErrorInvalidFormat:
-            return ResultStatus::ErrorLoader_ErrorInvalidFormat;
+            return ResultStatus::ErrorLoader_ErrorUnsupportedFormat;
         default:
             return ResultStatus::ErrorSystemMode;
         }
@@ -136,9 +136,9 @@ System::ResultStatus System::Load(Frontend::EmuWindow& emu_window, const std::st
         case Loader::ResultStatus::ErrorEncrypted:
             return ResultStatus::ErrorLoader_ErrorEncrypted;
         case Loader::ResultStatus::ErrorInvalidFormat:
-            return ResultStatus::ErrorLoader_ErrorInvalidFormat;
+            return ResultStatus::ErrorLoader_ErrorUnsupportedFormat;
         default:
-            return ResultStatus::ErrorLoader;
+            UNREACHABLE();
         }
     }
     cheat_engine = std::make_unique<Cheats::CheatEngine>(*this);
@@ -231,7 +231,7 @@ System::ResultStatus System::Init(Frontend::EmuWindow& emu_window, u32 system_mo
         case VideoCore::ResultStatus::ErrorBelowGL33:
             return ResultStatus::ErrorVideoCore_ErrorBelowGL33;
         default:
-            return ResultStatus::ErrorVideoCore;
+            UNREACHABLE();
         }
     }
 

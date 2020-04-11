@@ -118,44 +118,32 @@ int main(int, char**) {
 
     switch (load_result) {
     case Core::System::ResultStatus::ErrorNotInitialized:
-        pfd::message("vvctre", "CPU not initialized", pfd::choice::ok, pfd::icon::error);
+        pfd::message("vvctre", "Not initialized", pfd::choice::ok, pfd::icon::error);
         return -1;
     case Core::System::ResultStatus::ErrorGetLoader:
-        pfd::message("vvctre",
-                     fmt::format("Failed to obtain loader for {}!", Settings::values.file_path),
-                     pfd::choice::ok, pfd::icon::error);
+        pfd::message("vvctre", "File format not supported!", pfd::choice::ok, pfd::icon::error);
         return -1;
     case Core::System::ResultStatus::ErrorSystemMode:
         pfd::message("vvctre", "Failed to determine system mode!", pfd::choice::ok,
                      pfd::icon::error);
         return -1;
-    case Core::System::ResultStatus::ErrorLoader:
-        pfd::message("vvctre", "Failed to load ROM!", pfd::choice::ok, pfd::icon::error);
-        return -1;
     case Core::System::ResultStatus::ErrorLoader_ErrorEncrypted:
-        pfd::message(
-            "vvctre",
-            "The game that you are trying to load must be decrypted before being used with vvctre.",
-            pfd::choice::ok, pfd::icon::error);
+        pfd::message("vvctre", "Encrypted file", pfd::choice::ok, pfd::icon::error);
         return -1;
-    case Core::System::ResultStatus::ErrorLoader_ErrorInvalidFormat:
-        pfd::message("vvctre", "The ROM format is not supported.", pfd::choice::ok,
-                     pfd::icon::error);
-        return -1;
-    case Core::System::ResultStatus::ErrorVideoCore:
-        pfd::message(
-            "vvctre",
-            "VideoCore error. Ensure that you have the latest graphics drivers for your GPU.",
-            pfd::choice::ok, pfd::icon::error);
+    case Core::System::ResultStatus::ErrorLoader_ErrorUnsupportedFormat:
+        pfd::message("vvctre", "Unsupported file format", pfd::choice::ok, pfd::icon::error);
         return -1;
     case Core::System::ResultStatus::ErrorVideoCore_ErrorGenericDrivers:
-        pfd::message("vvctre", fmt::format("CPU not initialized", Settings::values.file_path),
+        pfd::message("vvctre",
+                     "You are running default Windows drivers for your GPU.\n"
+                     "You need to install the proper drivers for your graphics card from the "
+                     "manufacturer's website.",
                      pfd::choice::ok, pfd::icon::error);
         return -1;
     case Core::System::ResultStatus::ErrorVideoCore_ErrorBelowGL33:
         pfd::message("vvctre",
-                     "Your GPU may not support OpenGL 3.3, or you do not "
-                     "have the latest graphics driver.",
+                     "Your GPU may not support OpenGL 3.3,"
+                     "or you don't have the latest graphics driver.",
                      pfd::choice::ok, pfd::icon::error);
         return -1;
     default:
@@ -186,8 +174,8 @@ int main(int, char**) {
             break;
         }
         case Core::System::ResultStatus::FatalError: {
-            pfd::message("vvctre", "Fatal error.\nCheck the log for more details.", pfd::choice::ok,
-                         pfd::icon::error);
+            pfd::message("vvctre", "Fatal error.\nCheck the console window for more details.",
+                         pfd::choice::ok, pfd::icon::error);
             system.SetStatus(Core::System::ResultStatus::Success);
             break;
         }
