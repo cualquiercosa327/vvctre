@@ -10,10 +10,10 @@
 
 struct SDL_Window;
 
-class Configuration {
+class InitialSettings {
 public:
-    Configuration();
-    ~Configuration();
+    InitialSettings();
+    ~InitialSettings();
 
     void Run();
 

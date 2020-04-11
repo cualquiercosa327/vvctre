@@ -178,11 +178,9 @@ void DebuggerBackend::Write(const Entry& entry) {
     SUB(Core, ARM11)                                                                               \
     SUB(Core, Timing)                                                                              \
     SUB(Core, Cheats)                                                                              \
-    CLS(Config)                                                                                    \
+    CLS(Settings)                                                                                  \
     CLS(Debug)                                                                                     \
     SUB(Debug, Emulated)                                                                           \
-    SUB(Debug, GPU)                                                                                \
-    SUB(Debug, Breakpoint)                                                                         \
     SUB(Debug, GDBStub)                                                                            \
     CLS(Kernel)                                                                                    \
     SUB(Kernel, SVC)                                                                               \

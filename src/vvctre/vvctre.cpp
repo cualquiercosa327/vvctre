@@ -43,8 +43,8 @@
 #include "vvctre/applets/mii_selector.h"
 #include "vvctre/applets/swkbd.h"
 #include "vvctre/camera/image.h"
-#include "vvctre/configuration.h"
 #include "vvctre/emu_window/emu_window_sdl2.h"
+#include "vvctre/initial_settings.h"
 
 #ifndef _MSC_VER
 #include <unistd.h>
@@ -88,7 +88,7 @@ int main(int, char**) {
     SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 8);
     SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, 0);
 
-    Configuration().Run();
+    InitialSettings().Run();
 
     InitializeLogging();
 

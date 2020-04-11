@@ -34,11 +34,11 @@
 #include "input_common/main.h"
 #include "video_core/renderer_opengl/post_processing_opengl.h"
 #include "video_core/renderer_opengl/texture_filters/texture_filterer.h"
-#include "vvctre/configuration.h"
+#include "vvctre/initial_settings.h"
 
-Configuration::Configuration() {
+InitialSettings::InitialSettings() {
     const std::string window_title =
-        fmt::format("vvctre {} Configuration", version::vvctre.to_string());
+        fmt::format("vvctre {} - Initial Settings", version::vvctre.to_string());
 
     render_window = SDL_CreateWindow(
         window_title.c_str(),
@@ -86,7 +86,7 @@ Configuration::Configuration() {
     ImGui::GetStyle().ScrollbarRounding = 0.0f;
 }
 
-void Configuration::Run() {
+void InitialSettings::Run() {
     SDL_Event event;
     std::shared_ptr<Service::CFG::Module> cfg = std::make_shared<Service::CFG::Module>();
 
@@ -2475,7 +2475,7 @@ void Configuration::Run() {
     }
 }
 
-Configuration::~Configuration() {
+InitialSettings::~InitialSettings() {
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplSDL2_Shutdown();
     ImGui::DestroyContext();

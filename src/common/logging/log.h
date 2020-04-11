@@ -50,11 +50,9 @@ enum class Class : ClassType {
     Core_ARM11,        ///< ARM11 CPU core
     Core_Timing,       ///< CoreTiming functions
     Core_Cheats,       ///< Cheat functions
-    Config,            ///< Emulator configuration (including commandline)
+    Settings,          ///< Settings
     Debug,             ///< Debugging tools
     Debug_Emulated,    ///< Debug messages from the emulated programs
-    Debug_GPU,         ///< GPU debugging tools
-    Debug_Breakpoint,  ///< Logging breakpoints and watchpoints
     Debug_GDBStub,     ///< GDB Stub
     Kernel,            ///< The HLE implementation of the CTR kernel
     Kernel_SVC,        ///< Kernel system calls

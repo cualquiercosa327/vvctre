@@ -14,8 +14,8 @@ add_executable(${PROJECT_NAME}
     camera/image.h
     camera/util.cpp
     camera/util.h
-    configuration.cpp
-    configuration.h
+    initial_settings.cpp
+    initial_settings.h
 )
 
 create_target_directory_groups(${PROJECT_NAME})

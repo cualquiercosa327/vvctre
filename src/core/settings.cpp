@@ -64,11 +64,11 @@ void Apply() {
 
 template <typename T>
 void LogSetting(const std::string& name, const T& value) {
-    LOG_INFO(Config, "{}: {}", name, value);
+    LOG_INFO(Settings, "{}: {}", name, value);
 }
 
 void LogSettings() {
-    LOG_INFO(Config, "Configuration:");
+    LOG_INFO(Settings, "Settings:");
     LogSetting("use_cpu_jit", values.use_cpu_jit);
     LogSetting("multiplayer_url", values.multiplayer_url);
     LogSetting("use_virtual_sd", values.use_virtual_sd);
