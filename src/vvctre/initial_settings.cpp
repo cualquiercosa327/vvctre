@@ -1734,8 +1734,8 @@ void InitialSettings::Run() {
                     }
                     ImGui::NewLine();
 
-                    const auto SetMapping = [&](const auto native_id,
-                                                InputCommon::Polling::DeviceType device_type) {
+                    const auto GetInput =
+                        [&](InputCommon::Polling::DeviceType device_type) -> std::string {
                         switch (device_type) {
                         case InputCommon::Polling::DeviceType::Button: {
                             auto pollers = InputCommon::Polling::GetPollers(device_type);
@@ -1751,20 +1751,17 @@ void InitialSettings::Run() {
                                         for (auto& poller : pollers) {
                                             poller->Stop();
                                         }
-                                        Settings::values.buttons[native_id] = params.Serialize();
-                                        return;
+                                        return params.Serialize();
                                     }
                                 }
 
                                 while (SDL_PollEvent(&event)) {
                                     if (event.type == SDL_KEYUP) {
-                                        Settings::values.buttons[native_id] =
-                                            InputCommon::GenerateKeyboardParam(
-                                                event.key.keysym.scancode);
                                         for (auto& poller : pollers) {
                                             poller->Stop();
                                         }
-                                        return;
+                                        return InputCommon::GenerateKeyboardParam(
+                                            event.key.keysym.scancode);
                                     }
                                 }
                             }
@@ -1787,8 +1784,7 @@ void InitialSettings::Run() {
                                         for (auto& poller : pollers) {
                                             poller->Stop();
                                         }
-                                        Settings::values.analogs[native_id] = params.Serialize();
-                                        return;
+                                        return params.Serialize();
                                     }
                                 }
 
@@ -1797,15 +1793,13 @@ void InitialSettings::Run() {
                                         pollers.clear();
                                         keyboard_scancodes.push_back(event.key.keysym.scancode);
                                         if (keyboard_scancodes.size() == 5) {
-                                            Settings::values.analogs[native_id] =
-                                                InputCommon::GenerateAnalogParamFromKeys(
-                                                    keyboard_scancodes[0], keyboard_scancodes[1],
-                                                    keyboard_scancodes[2], keyboard_scancodes[3],
-                                                    keyboard_scancodes[4], 0.5f);
                                             for (auto& poller : pollers) {
                                                 poller->Stop();
                                             }
-                                            return;
+                                            return InputCommon::GenerateAnalogParamFromKeys(
+                                                keyboard_scancodes[0], keyboard_scancodes[1],
+                                                keyboard_scancodes[2], keyboard_scancodes[3],
+                                                keyboard_scancodes[4], 0.5f);
                                         }
                                     }
                                 }
@@ -1814,7 +1808,7 @@ void InitialSettings::Run() {
                             break;
                         }
                         default: {
-                            return;
+                            return "engine:null";
                         }
                         }
                     };
@@ -1874,7 +1868,6 @@ void InitialSettings::Run() {
                     // Buttons
                     ImGui::BeginGroup();
                     ImGui::Text("Buttons");
-                    ImGui::NewLine();
 
                     ImGui::Text("A:");
                     ImGui::SameLine();
@@ -1882,8 +1875,8 @@ void InitialSettings::Run() {
                             (ButtonToText(Settings::values.buttons[Settings::NativeButton::A]) +
                              "##ButtonA")
                                 .c_str())) {
-                        SetMapping(Settings::NativeButton::A,
-                                   InputCommon::Polling::DeviceType::Button);
+                        Settings::values.buttons[Settings::NativeButton::A] =
+                            GetInput(InputCommon::Polling::DeviceType::Button);
                     }
 
                     ImGui::Text("B:");
@@ -1892,8 +1885,8 @@ void InitialSettings::Run() {
                             (ButtonToText(Settings::values.buttons[Settings::NativeButton::B]) +
                              "##ButtonB")
                                 .c_str())) {
-                        SetMapping(Settings::NativeButton::B,
-                                   InputCommon::Polling::DeviceType::Button);
+                        Settings::values.buttons[Settings::NativeButton::B] =
+                            GetInput(InputCommon::Polling::DeviceType::Button);
                     }
 
                     ImGui::Text("X:");
@@ -1902,8 +1895,8 @@ void InitialSettings::Run() {
                             (ButtonToText(Settings::values.buttons[Settings::NativeButton::X]) +
                              "##ButtonX")
                                 .c_str())) {
-                        SetMapping(Settings::NativeButton::X,
-                                   InputCommon::Polling::DeviceType::Button);
+                        Settings::values.buttons[Settings::NativeButton::X] =
+                            GetInput(InputCommon::Polling::DeviceType::Button);
                     }
 
                     ImGui::Text("Y:");
@@ -1912,8 +1905,8 @@ void InitialSettings::Run() {
                             (ButtonToText(Settings::values.buttons[Settings::NativeButton::Y]) +
                              "##ButtonY")
                                 .c_str())) {
-                        SetMapping(Settings::NativeButton::Y,
-                                   InputCommon::Polling::DeviceType::Button);
+                        Settings::values.buttons[Settings::NativeButton::Y] =
+                            GetInput(InputCommon::Polling::DeviceType::Button);
                     }
 
                     ImGui::Text("L:");
@@ -1922,8 +1915,8 @@ void InitialSettings::Run() {
                             (ButtonToText(Settings::values.buttons[Settings::NativeButton::L]) +
                              "##ButtonL")
                                 .c_str())) {
-                        SetMapping(Settings::NativeButton::L,
-                                   InputCommon::Polling::DeviceType::Button);
+                        Settings::values.buttons[Settings::NativeButton::L] =
+                            GetInput(InputCommon::Polling::DeviceType::Button);
                     }
 
                     ImGui::Text("R:");
@@ -1932,8 +1925,8 @@ void InitialSettings::Run() {
                             (ButtonToText(Settings::values.buttons[Settings::NativeButton::R]) +
                              "##ButtonR")
                                 .c_str())) {
-                        SetMapping(Settings::NativeButton::R,
-                                   InputCommon::Polling::DeviceType::Button);
+                        Settings::values.buttons[Settings::NativeButton::R] =
+                            GetInput(InputCommon::Polling::DeviceType::Button);
                     }
 
                     ImGui::Text("ZL:");
@@ -1942,8 +1935,8 @@ void InitialSettings::Run() {
                             (ButtonToText(Settings::values.buttons[Settings::NativeButton::ZL]) +
                              "##ButtonZL")
                                 .c_str())) {
-                        SetMapping(Settings::NativeButton::ZL,
-                                   InputCommon::Polling::DeviceType::Button);
+                        Settings::values.buttons[Settings::NativeButton::ZL] =
+                            GetInput(InputCommon::Polling::DeviceType::Button);
                     }
                     if (ImGui::IsItemHovered()) {
                         ImGui::SetTooltip(
@@ -1956,8 +1949,8 @@ void InitialSettings::Run() {
                             (ButtonToText(Settings::values.buttons[Settings::NativeButton::ZR]) +
                              "##ButtonZR")
                                 .c_str())) {
-                        SetMapping(Settings::NativeButton::ZR,
-                                   InputCommon::Polling::DeviceType::Button);
+                        Settings::values.buttons[Settings::NativeButton::ZR] =
+                            GetInput(InputCommon::Polling::DeviceType::Button);
                     }
                     if (ImGui::IsItemHovered()) {
                         ImGui::SetTooltip(
@@ -1970,8 +1963,8 @@ void InitialSettings::Run() {
                             (ButtonToText(Settings::values.buttons[Settings::NativeButton::Start]) +
                              "##ButtonStart")
                                 .c_str())) {
-                        SetMapping(Settings::NativeButton::Start,
-                                   InputCommon::Polling::DeviceType::Button);
+                        Settings::values.buttons[Settings::NativeButton::Start] =
+                            GetInput(InputCommon::Polling::DeviceType::Button);
                     }
 
                     ImGui::Text("Select:");
@@ -1981,8 +1974,8 @@ void InitialSettings::Run() {
                                  Settings::values.buttons[Settings::NativeButton::Select]) +
                              "##ButtonSelect")
                                 .c_str())) {
-                        SetMapping(Settings::NativeButton::Select,
-                                   InputCommon::Polling::DeviceType::Button);
+                        Settings::values.buttons[Settings::NativeButton::Select] =
+                            GetInput(InputCommon::Polling::DeviceType::Button);
                     }
 
                     ImGui::Text("Debug:");
@@ -1991,8 +1984,8 @@ void InitialSettings::Run() {
                             (ButtonToText(Settings::values.buttons[Settings::NativeButton::Debug]) +
                              "##ButtonDebug")
                                 .c_str())) {
-                        SetMapping(Settings::NativeButton::Debug,
-                                   InputCommon::Polling::DeviceType::Button);
+                        Settings::values.buttons[Settings::NativeButton::Debug] =
+                            GetInput(InputCommon::Polling::DeviceType::Button);
                     }
 
                     ImGui::Text("GPIO14:");
@@ -2002,8 +1995,8 @@ void InitialSettings::Run() {
                                  Settings::values.buttons[Settings::NativeButton::Gpio14]) +
                              "##ButtonGPIO14")
                                 .c_str())) {
-                        SetMapping(Settings::NativeButton::Gpio14,
-                                   InputCommon::Polling::DeviceType::Button);
+                        Settings::values.buttons[Settings::NativeButton::Gpio14] =
+                            GetInput(InputCommon::Polling::DeviceType::Button);
                     }
                     ImGui::EndGroup();
 
@@ -2012,32 +2005,116 @@ void InitialSettings::Run() {
                     // Circle Pad
                     ImGui::BeginGroup();
                     ImGui::Text("Circle Pad");
-                    ImGui::NewLine();
-                    ImGui::Text(
-                        "Up: %s",
-                        AnalogToText(Settings::values.analogs[Settings::NativeAnalog::CirclePad],
-                                     "up")
-                            .c_str());
-                    ImGui::Text(
-                        "Down: %s",
-                        AnalogToText(Settings::values.analogs[Settings::NativeAnalog::CirclePad],
-                                     "down")
-                            .c_str());
-                    ImGui::Text(
-                        "Left: %s",
-                        AnalogToText(Settings::values.analogs[Settings::NativeAnalog::CirclePad],
-                                     "left")
-                            .c_str());
-                    ImGui::Text(
-                        "Right: %s",
-                        AnalogToText(Settings::values.analogs[Settings::NativeAnalog::CirclePad],
-                                     "right")
-                            .c_str());
-                    ImGui::Text(
-                        "Modifier: %s",
-                        AnalogToText(Settings::values.analogs[Settings::NativeAnalog::CirclePad],
-                                     "modifier")
-                            .c_str());
+                    ImGui::Text("Up:");
+                    ImGui::SameLine();
+                    if (ImGui::Button(
+                            (AnalogToText(
+                                 Settings::values.analogs[Settings::NativeAnalog::CirclePad],
+                                 "up") +
+                             "##CirclePadUp")
+                                .c_str())) {
+                        Common::ParamPackage params = Common::ParamPackage(
+                            Settings::values.analogs[Settings::NativeAnalog::CirclePad]);
+                        if (params.Get("engine", "") != "analog_from_button") {
+                            Settings::values.analogs[Settings::NativeAnalog::CirclePad] =
+                                InputCommon::GenerateAnalogParamFromKeys(
+                                    SDL_SCANCODE_UP, SDL_SCANCODE_DOWN, SDL_SCANCODE_LEFT,
+                                    SDL_SCANCODE_RIGHT, SDL_SCANCODE_D, 0.5f);
+                            params = Common::ParamPackage(
+                                Settings::values.analogs[Settings::NativeAnalog::CirclePad]);
+                        }
+                        params.Set("up", GetInput(InputCommon::Polling::DeviceType::Button));
+                        Settings::values.analogs[Settings::NativeAnalog::CirclePad] =
+                            params.Serialize();
+                    }
+                    ImGui::Text("Down:");
+                    ImGui::SameLine();
+                    if (ImGui::Button(
+                            (AnalogToText(
+                                 Settings::values.analogs[Settings::NativeAnalog::CirclePad],
+                                 "down") +
+                             "##CirclePadDown")
+                                .c_str())) {
+                        Common::ParamPackage params = Common::ParamPackage(
+                            Settings::values.analogs[Settings::NativeAnalog::CirclePad]);
+                        if (params.Get("engine", "") != "analog_from_button") {
+                            Settings::values.analogs[Settings::NativeAnalog::CirclePad] =
+                                InputCommon::GenerateAnalogParamFromKeys(
+                                    SDL_SCANCODE_UP, SDL_SCANCODE_DOWN, SDL_SCANCODE_LEFT,
+                                    SDL_SCANCODE_RIGHT, SDL_SCANCODE_D, 0.5f);
+                            params = Common::ParamPackage(
+                                Settings::values.analogs[Settings::NativeAnalog::CirclePad]);
+                        }
+                        params.Set("down", GetInput(InputCommon::Polling::DeviceType::Button));
+                        Settings::values.analogs[Settings::NativeAnalog::CirclePad] =
+                            params.Serialize();
+                    }
+                    ImGui::Text("Left:");
+                    ImGui::SameLine();
+                    if (ImGui::Button(
+                            (AnalogToText(
+                                 Settings::values.analogs[Settings::NativeAnalog::CirclePad],
+                                 "left") +
+                             "##CirclePadLeft")
+                                .c_str())) {
+                        Common::ParamPackage params = Common::ParamPackage(
+                            Settings::values.analogs[Settings::NativeAnalog::CirclePad]);
+                        if (params.Get("engine", "") != "analog_from_button") {
+                            Settings::values.analogs[Settings::NativeAnalog::CirclePad] =
+                                InputCommon::GenerateAnalogParamFromKeys(
+                                    SDL_SCANCODE_UP, SDL_SCANCODE_DOWN, SDL_SCANCODE_LEFT,
+                                    SDL_SCANCODE_RIGHT, SDL_SCANCODE_D, 0.5f);
+                            params = Common::ParamPackage(
+                                Settings::values.analogs[Settings::NativeAnalog::CirclePad]);
+                        }
+                        params.Set("left", GetInput(InputCommon::Polling::DeviceType::Button));
+                        Settings::values.analogs[Settings::NativeAnalog::CirclePad] =
+                            params.Serialize();
+                    }
+                    ImGui::Text("Right:");
+                    ImGui::SameLine();
+                    if (ImGui::Button(
+                            (AnalogToText(
+                                 Settings::values.analogs[Settings::NativeAnalog::CirclePad],
+                                 "right") +
+                             "##CirclePadRight")
+                                .c_str())) {
+                        Common::ParamPackage params = Common::ParamPackage(
+                            Settings::values.analogs[Settings::NativeAnalog::CirclePad]);
+                        if (params.Get("engine", "") != "analog_from_button") {
+                            Settings::values.analogs[Settings::NativeAnalog::CirclePad] =
+                                InputCommon::GenerateAnalogParamFromKeys(
+                                    SDL_SCANCODE_UP, SDL_SCANCODE_DOWN, SDL_SCANCODE_LEFT,
+                                    SDL_SCANCODE_RIGHT, SDL_SCANCODE_D, 0.5f);
+                            params = Common::ParamPackage(
+                                Settings::values.analogs[Settings::NativeAnalog::CirclePad]);
+                        }
+                        params.Set("right", GetInput(InputCommon::Polling::DeviceType::Button));
+                        Settings::values.analogs[Settings::NativeAnalog::CirclePad] =
+                            params.Serialize();
+                    }
+                    ImGui::Text("Modifier:");
+                    ImGui::SameLine();
+                    if (ImGui::Button(
+                            (AnalogToText(
+                                 Settings::values.analogs[Settings::NativeAnalog::CirclePad],
+                                 "modifier") +
+                             "##CirclePadModifier")
+                                .c_str())) {
+                        Common::ParamPackage params = Common::ParamPackage(
+                            Settings::values.analogs[Settings::NativeAnalog::CirclePad]);
+                        if (params.Get("engine", "") != "analog_from_button") {
+                            Settings::values.analogs[Settings::NativeAnalog::CirclePad] =
+                                InputCommon::GenerateAnalogParamFromKeys(
+                                    SDL_SCANCODE_UP, SDL_SCANCODE_DOWN, SDL_SCANCODE_LEFT,
+                                    SDL_SCANCODE_RIGHT, SDL_SCANCODE_D, 0.5f);
+                            params = Common::ParamPackage(
+                                Settings::values.analogs[Settings::NativeAnalog::CirclePad]);
+                        }
+                        params.Set("modifier", GetInput(InputCommon::Polling::DeviceType::Button));
+                        Settings::values.analogs[Settings::NativeAnalog::CirclePad] =
+                            params.Serialize();
+                    }
                     {
                         Common::ParamPackage params(
                             Settings::values.analogs[Settings::NativeAnalog::CirclePad]);
@@ -2052,11 +2129,21 @@ void InitialSettings::Run() {
                                     params.Serialize();
                             }
                             ImGui::PopItemWidth();
+                        } else if (params.Get("engine", "") == "analog_from_button") {
+                            float modifier_scale = params.Get("modifier_scale", 0.5f);
+                            ImGui::SameLine();
+                            ImGui::PushItemWidth(100);
+                            if (ImGui::InputFloat("##modifierScaleCirclePad", &modifier_scale)) {
+                                params.Set("modifier_scale", modifier_scale);
+                                Settings::values.analogs[Settings::NativeAnalog::CirclePad] =
+                                    params.Serialize();
+                            }
+                            ImGui::PopItemWidth();
                         }
                     }
                     if (ImGui::Button("Set All##circlepad")) {
-                        SetMapping(Settings::NativeAnalog::CirclePad,
-                                   InputCommon::Polling::DeviceType::Analog);
+                        Settings::values.analogs[Settings::NativeAnalog::CirclePad] =
+                            GetInput(InputCommon::Polling::DeviceType::Analog);
                     }
                     if (ImGui::IsItemHovered()) {
                         ImGui::SetTooltip("Keyboard: Press the keys to use for Up, Down, "
@@ -2070,32 +2157,116 @@ void InitialSettings::Run() {
                     // Circle Pad Pro
                     ImGui::BeginGroup();
                     ImGui::Text("Circle Pad Pro");
-                    ImGui::NewLine();
-                    ImGui::Text(
-                        "Up: %s",
-                        AnalogToText(Settings::values.analogs[Settings::NativeAnalog::CirclePadPro],
-                                     "up")
-                            .c_str());
-                    ImGui::Text(
-                        "Down: %s",
-                        AnalogToText(Settings::values.analogs[Settings::NativeAnalog::CirclePadPro],
-                                     "down")
-                            .c_str());
-                    ImGui::Text(
-                        "Left: %s",
-                        AnalogToText(Settings::values.analogs[Settings::NativeAnalog::CirclePadPro],
-                                     "left")
-                            .c_str());
-                    ImGui::Text(
-                        "Right: %s",
-                        AnalogToText(Settings::values.analogs[Settings::NativeAnalog::CirclePadPro],
-                                     "right")
-                            .c_str());
-                    ImGui::Text(
-                        "Modifier: %s",
-                        AnalogToText(Settings::values.analogs[Settings::NativeAnalog::CirclePadPro],
-                                     "modifier")
-                            .c_str());
+                    ImGui::Text("Up:");
+                    ImGui::SameLine();
+                    if (ImGui::Button(
+                            (AnalogToText(
+                                 Settings::values.analogs[Settings::NativeAnalog::CirclePadPro],
+                                 "up") +
+                             "##CirclePadProUp")
+                                .c_str())) {
+                        Common::ParamPackage params = Common::ParamPackage(
+                            Settings::values.analogs[Settings::NativeAnalog::CirclePadPro]);
+                        if (params.Get("engine", "") != "analog_from_button") {
+                            Settings::values.analogs[Settings::NativeAnalog::CirclePadPro] =
+                                InputCommon::GenerateAnalogParamFromKeys(
+                                    SDL_SCANCODE_I, SDL_SCANCODE_K, SDL_SCANCODE_J, SDL_SCANCODE_L,
+                                    SDL_SCANCODE_D, 0.5f);
+                            params = Common::ParamPackage(
+                                Settings::values.analogs[Settings::NativeAnalog::CirclePadPro]);
+                        }
+                        params.Set("up", GetInput(InputCommon::Polling::DeviceType::Button));
+                        Settings::values.analogs[Settings::NativeAnalog::CirclePadPro] =
+                            params.Serialize();
+                    }
+                    ImGui::Text("Down:");
+                    ImGui::SameLine();
+                    if (ImGui::Button(
+                            (AnalogToText(
+                                 Settings::values.analogs[Settings::NativeAnalog::CirclePadPro],
+                                 "down") +
+                             "##CirclePadProDown")
+                                .c_str())) {
+                        Common::ParamPackage params = Common::ParamPackage(
+                            Settings::values.analogs[Settings::NativeAnalog::CirclePadPro]);
+                        if (params.Get("engine", "") != "analog_from_button") {
+                            Settings::values.analogs[Settings::NativeAnalog::CirclePadPro] =
+                                InputCommon::GenerateAnalogParamFromKeys(
+                                    SDL_SCANCODE_I, SDL_SCANCODE_K, SDL_SCANCODE_J, SDL_SCANCODE_L,
+                                    SDL_SCANCODE_D, 0.5f);
+                            params = Common::ParamPackage(
+                                Settings::values.analogs[Settings::NativeAnalog::CirclePadPro]);
+                        }
+                        params.Set("down", GetInput(InputCommon::Polling::DeviceType::Button));
+                        Settings::values.analogs[Settings::NativeAnalog::CirclePadPro] =
+                            params.Serialize();
+                    }
+                    ImGui::Text("Left:");
+                    ImGui::SameLine();
+                    if (ImGui::Button(
+                            (AnalogToText(
+                                 Settings::values.analogs[Settings::NativeAnalog::CirclePadPro],
+                                 "left") +
+                             "##CirclePadProLeft")
+                                .c_str())) {
+                        Common::ParamPackage params = Common::ParamPackage(
+                            Settings::values.analogs[Settings::NativeAnalog::CirclePadPro]);
+                        if (params.Get("engine", "") != "analog_from_button") {
+                            Settings::values.analogs[Settings::NativeAnalog::CirclePadPro] =
+                                InputCommon::GenerateAnalogParamFromKeys(
+                                    SDL_SCANCODE_I, SDL_SCANCODE_K, SDL_SCANCODE_J, SDL_SCANCODE_L,
+                                    SDL_SCANCODE_D, 0.5f);
+                            params = Common::ParamPackage(
+                                Settings::values.analogs[Settings::NativeAnalog::CirclePadPro]);
+                        }
+                        params.Set("left", GetInput(InputCommon::Polling::DeviceType::Button));
+                        Settings::values.analogs[Settings::NativeAnalog::CirclePadPro] =
+                            params.Serialize();
+                    }
+                    ImGui::Text("Right:");
+                    ImGui::SameLine();
+                    if (ImGui::Button(
+                            (AnalogToText(
+                                 Settings::values.analogs[Settings::NativeAnalog::CirclePadPro],
+                                 "right") +
+                             "##CirclePadProRight")
+                                .c_str())) {
+                        Common::ParamPackage params = Common::ParamPackage(
+                            Settings::values.analogs[Settings::NativeAnalog::CirclePadPro]);
+                        if (params.Get("engine", "") != "analog_from_button") {
+                            Settings::values.analogs[Settings::NativeAnalog::CirclePadPro] =
+                                InputCommon::GenerateAnalogParamFromKeys(
+                                    SDL_SCANCODE_I, SDL_SCANCODE_K, SDL_SCANCODE_J, SDL_SCANCODE_L,
+                                    SDL_SCANCODE_D, 0.5f);
+                            params = Common::ParamPackage(
+                                Settings::values.analogs[Settings::NativeAnalog::CirclePadPro]);
+                        }
+                        params.Set("right", GetInput(InputCommon::Polling::DeviceType::Button));
+                        Settings::values.analogs[Settings::NativeAnalog::CirclePadPro] =
+                            params.Serialize();
+                    }
+                    ImGui::Text("Modifier:");
+                    ImGui::SameLine();
+                    if (ImGui::Button(
+                            (AnalogToText(
+                                 Settings::values.analogs[Settings::NativeAnalog::CirclePadPro],
+                                 "modifier") +
+                             "##CirclePadProModifier")
+                                .c_str())) {
+                        Common::ParamPackage params = Common::ParamPackage(
+                            Settings::values.analogs[Settings::NativeAnalog::CirclePadPro]);
+                        if (params.Get("engine", "") != "analog_from_button") {
+                            Settings::values.analogs[Settings::NativeAnalog::CirclePadPro] =
+                                InputCommon::GenerateAnalogParamFromKeys(
+                                    SDL_SCANCODE_I, SDL_SCANCODE_K, SDL_SCANCODE_J, SDL_SCANCODE_L,
+                                    SDL_SCANCODE_D, 0.5f);
+                            params = Common::ParamPackage(
+                                Settings::values.analogs[Settings::NativeAnalog::CirclePadPro]);
+                        }
+                        params.Set("modifier", GetInput(InputCommon::Polling::DeviceType::Button));
+                        Settings::values.analogs[Settings::NativeAnalog::CirclePadPro] =
+                            params.Serialize();
+                    }
                     {
                         Common::ParamPackage params(
                             Settings::values.analogs[Settings::NativeAnalog::CirclePadPro]);
@@ -2111,11 +2282,21 @@ void InitialSettings::Run() {
                                     params.Serialize();
                             }
                             ImGui::PopItemWidth();
+                        } else if (params.Get("engine", "") == "analog_from_button") {
+                            float modifier_scale = params.Get("modifier_scale", 0.5f);
+                            ImGui::SameLine();
+                            ImGui::PushItemWidth(100);
+                            if (ImGui::InputFloat("##modifierScaleCirclePadPro", &modifier_scale)) {
+                                params.Set("modifier_scale", modifier_scale);
+                                Settings::values.analogs[Settings::NativeAnalog::CirclePadPro] =
+                                    params.Serialize();
+                            }
+                            ImGui::PopItemWidth();
                         }
                     }
                     if (ImGui::Button("Set All##circlepadpro")) {
-                        SetMapping(Settings::NativeAnalog::CirclePadPro,
-                                   InputCommon::Polling::DeviceType::Analog);
+                        Settings::values.analogs[Settings::NativeAnalog::CirclePadPro] =
+                            GetInput(InputCommon::Polling::DeviceType::Analog);
                     }
                     if (ImGui::IsItemHovered()) {
                         ImGui::SetTooltip("Keyboard: Press the keys to use for Up, Down, "
@@ -2129,15 +2310,14 @@ void InitialSettings::Run() {
                     // D-Pad
                     ImGui::BeginGroup();
                     ImGui::Text("D-Pad");
-                    ImGui::NewLine();
                     ImGui::Text("Up:");
                     ImGui::SameLine();
                     if (ImGui::Button(
                             (ButtonToText(Settings::values.buttons[Settings::NativeButton::Up]) +
                              "##DPadUp")
                                 .c_str())) {
-                        SetMapping(Settings::NativeButton::Up,
-                                   InputCommon::Polling::DeviceType::Button);
+                        Settings::values.buttons[Settings::NativeButton::Up] =
+                            GetInput(InputCommon::Polling::DeviceType::Button);
                     }
                     ImGui::Text("Down:");
                     ImGui::SameLine();
@@ -2145,8 +2325,8 @@ void InitialSettings::Run() {
                             (ButtonToText(Settings::values.buttons[Settings::NativeButton::Down]) +
                              "##DPadDown")
                                 .c_str())) {
-                        SetMapping(Settings::NativeButton::Down,
-                                   InputCommon::Polling::DeviceType::Button);
+                        Settings::values.buttons[Settings::NativeButton::Down] =
+                            GetInput(InputCommon::Polling::DeviceType::Button);
                     }
                     ImGui::Text("Left:");
                     ImGui::SameLine();
@@ -2154,8 +2334,8 @@ void InitialSettings::Run() {
                             (ButtonToText(Settings::values.buttons[Settings::NativeButton::Left]) +
                              "##DPadLeft")
                                 .c_str())) {
-                        SetMapping(Settings::NativeButton::Left,
-                                   InputCommon::Polling::DeviceType::Button);
+                        Settings::values.buttons[Settings::NativeButton::Left] =
+                            GetInput(InputCommon::Polling::DeviceType::Button);
                     }
                     ImGui::Text("Right:");
                     ImGui::SameLine();
@@ -2163,8 +2343,8 @@ void InitialSettings::Run() {
                             (ButtonToText(Settings::values.buttons[Settings::NativeButton::Right]) +
                              "##DPadRight")
                                 .c_str())) {
-                        SetMapping(Settings::NativeButton::Right,
-                                   InputCommon::Polling::DeviceType::Button);
+                        Settings::values.buttons[Settings::NativeButton::Right] =
+                            GetInput(InputCommon::Polling::DeviceType::Button);
                     }
                     ImGui::EndGroup();
 
