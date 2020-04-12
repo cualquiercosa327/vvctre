@@ -648,14 +648,16 @@ void Module::APTInterface::CloseLibraryApplet(Kernel::HLERequestContext& ctx) {
 
 void Module::APTInterface::LoadSysMenuArg(Kernel::HLERequestContext& ctx) {
     IPC::RequestParser rp(ctx, 0x36, 1, 0); // 0x00360040
-    u32 size = rp.Pop<u32>();
-    ASSERT(size == 0x40);
+    u32 size = std::min(rp.Pop<u32>(), 0x40u);
 
-    IPC::RequestBuilder rb = rp.MakeBuilder(2, 2);
-    rb.Push(RESULT_SUCCESS);
-    rb.Push(static_cast<u32>(apt->sys_menu_arg_buffer.size()));
     // This service function does not clear the buffer.
-    rb.PushStaticBuffer(apt->sys_menu_arg_buffer, 0);
+
+    std::vector<u8> buffer;
+    std::copy_n(apt->sys_menu_arg_buffer.cbegin(), size, buffer.begin());
+
+    IPC::RequestBuilder rb = rp.MakeBuilder(1, 2);
+    rb.Push(RESULT_SUCCESS);
+    rb.PushStaticBuffer(std::move(buffer), 0);
 
     LOG_DEBUG(Service_APT, "called");
 }
