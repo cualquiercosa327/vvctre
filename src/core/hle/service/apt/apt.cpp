@@ -652,7 +652,7 @@ void Module::APTInterface::LoadSysMenuArg(Kernel::HLERequestContext& ctx) {
 
     // This service function does not clear the buffer.
 
-    std::vector<u8> buffer;
+    std::vector<u8> buffer(size);
     std::copy_n(apt->sys_menu_arg_buffer.cbegin(), size, buffer.begin());
 
     IPC::RequestBuilder rb = rp.MakeBuilder(1, 2);
@@ -666,6 +666,8 @@ void Module::APTInterface::StoreSysMenuArg(Kernel::HLERequestContext& ctx) {
     IPC::RequestParser rp(ctx, 0x37, 1, 2); // 0x00370042
     auto size = std::min<std::size_t>(rp.Pop<u32>(), SysMenuArgSize);
     const auto& buffer = rp.PopStaticBuffer();
+
+    ASSERT_MSG(buffer.size() >= size, "Buffer too small to hold requested data");
 
     std::copy_n(buffer.cbegin(), size, apt->sys_menu_arg_buffer.begin());
 
