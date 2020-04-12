@@ -652,8 +652,10 @@ void Module::APTInterface::LoadSysMenuArg(Kernel::HLERequestContext& ctx) {
 
     // This service function does not clear the buffer.
 
-    std::vector<u8> buffer;
-    std::copy_n(apt->sys_menu_arg_buffer.cbegin(), size, buffer.begin());
+    std::vector<u8> buffer(size);
+    const auto stored_size = apt->sys_menu_arg_buffer.size();
+    std::copy_n(apt->sys_menu_arg_buffer.cbegin(), std::min<std::size_t>(size, stored_size),
+                buffer.begin());
 
     IPC::RequestBuilder rb = rp.MakeBuilder(1, 2);
     rb.Push(RESULT_SUCCESS);
