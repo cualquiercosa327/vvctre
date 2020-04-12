@@ -646,6 +646,32 @@ void Module::APTInterface::CloseLibraryApplet(Kernel::HLERequestContext& ctx) {
     rb.Push(apt->applet_manager->CloseLibraryApplet(std::move(object), std::move(buffer)));
 }
 
+void Module::APTInterface::LoadSysMenuArg(Kernel::HLERequestContext& ctx) {
+    IPC::RequestParser rp(ctx, 0x36, 1, 0); // 0x00360040
+    u32 size = rp.Pop<u32>();
+    ASSERT(size == 0x40);
+
+    IPC::RequestBuilder rb = rp.MakeBuilder(1, 2);
+    rb.Push(RESULT_SUCCESS);
+    rb.Push(static_cast<u32>(apt->sys_menu_arg_buffer.size()));
+    // This service function does not clear the buffer.
+    rb.PushStaticBuffer(apt->sys_menu_arg_buffer, 0);
+
+    LOG_DEBUG(Service_APT, "called");
+}
+
+void Module::APTInterface::StoreSysMenuArg(Kernel::HLERequestContext& ctx) {
+    IPC::RequestParser rp(ctx, 0x37, 1, 2); // 0x00370042
+    u32 size = rp.Pop<u32>();
+    ASSERT(size == 0x40);
+    apt->sys_menu_arg_buffer = rp.PopStaticBuffer();
+
+    IPC::RequestBuilder rb = rp.MakeBuilder(1, 0);
+    rb.Push(RESULT_SUCCESS);
+
+    LOG_DEBUG(Service_APT, "called");
+}
+
 void Module::APTInterface::SendCaptureBufferInfo(Kernel::HLERequestContext& ctx) {
     IPC::RequestParser rp(ctx, 0x40, 1, 2); // 0x00400042
     u32 size = rp.Pop<u32>();

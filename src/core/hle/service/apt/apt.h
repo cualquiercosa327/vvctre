@@ -107,6 +107,8 @@ public:
         void CancelLibraryApplet(Kernel::HLERequestContext& ctx);
         void PrepareToCloseLibraryApplet(Kernel::HLERequestContext& ctx);
         void CloseLibraryApplet(Kernel::HLERequestContext& ctx);
+        void LoadSysMenuArg(Kernel::HLERequestContext& ctx);
+        void StoreSysMenuArg(Kernel::HLERequestContext& ctx);
         void SendCaptureBufferInfo(Kernel::HLERequestContext& ctx);
         void ReceiveCaptureBufferInfo(Kernel::HLERequestContext& ctx);
         void GetCaptureInfo(Kernel::HLERequestContext& ctx);
@@ -140,6 +142,7 @@ private:
     u8 unknown_ns_state_field = 0;
 
     std::vector<u8> screen_capture_buffer;
+    std::vector<u8> sys_menu_arg_buffer;
 
     ScreencapPostPermission screen_capture_post_permission =
         ScreencapPostPermission::CleanThePermission; // TODO(JamePeng): verify the initial value
