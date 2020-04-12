@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <array>
 #include <memory>
 #include <vector>
 #include "common/common_funcs.h"
@@ -41,6 +42,8 @@ struct CaptureBufferInfo {
     u32_le bottom_screen_format;
 };
 static_assert(sizeof(CaptureBufferInfo) == 0x20, "CaptureBufferInfo struct has incorrect size");
+
+static const std::size_t SysMenuArgSize = 0x40;
 
 enum class StartupArgumentType : u32 {
     OtherApp = 0,
@@ -142,7 +145,7 @@ private:
     u8 unknown_ns_state_field = 0;
 
     std::vector<u8> screen_capture_buffer;
-    std::vector<u8> sys_menu_arg_buffer;
+    std::array<u8, SysMenuArgSize> sys_menu_arg_buffer;
 
     ScreencapPostPermission screen_capture_post_permission =
         ScreencapPostPermission::CleanThePermission; // TODO(JamePeng): verify the initial value

@@ -648,14 +648,12 @@ void Module::APTInterface::CloseLibraryApplet(Kernel::HLERequestContext& ctx) {
 
 void Module::APTInterface::LoadSysMenuArg(Kernel::HLERequestContext& ctx) {
     IPC::RequestParser rp(ctx, 0x36, 1, 0); // 0x00360040
-    u32 size = std::min(rp.Pop<u32>(), 0x40u);
+    auto size = std::min<std::size_t>(rp.Pop<u32>(), SysMenuArgSize);
 
     // This service function does not clear the buffer.
 
-    std::vector<u8> buffer(size);
-    const auto stored_size = apt->sys_menu_arg_buffer.size();
-    std::copy_n(apt->sys_menu_arg_buffer.cbegin(), std::min<std::size_t>(size, stored_size),
-                buffer.begin());
+    std::vector<u8> buffer;
+    std::copy_n(apt->sys_menu_arg_buffer.cbegin(), size, buffer.begin());
 
     IPC::RequestBuilder rb = rp.MakeBuilder(1, 2);
     rb.Push(RESULT_SUCCESS);
@@ -666,9 +664,10 @@ void Module::APTInterface::LoadSysMenuArg(Kernel::HLERequestContext& ctx) {
 
 void Module::APTInterface::StoreSysMenuArg(Kernel::HLERequestContext& ctx) {
     IPC::RequestParser rp(ctx, 0x37, 1, 2); // 0x00370042
-    u32 size = rp.Pop<u32>();
-    ASSERT(size == 0x40);
-    apt->sys_menu_arg_buffer = rp.PopStaticBuffer();
+    auto size = std::min<std::size_t>(rp.Pop<u32>(), SysMenuArgSize);
+    const auto& buffer = rp.PopStaticBuffer();
+
+    std::copy_n(buffer.cbegin(), size, apt->sys_menu_arg_buffer.begin());
 
     IPC::RequestBuilder rb = rp.MakeBuilder(1, 0);
     rb.Push(RESULT_SUCCESS);
