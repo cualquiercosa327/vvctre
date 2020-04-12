@@ -651,7 +651,7 @@ void Module::APTInterface::LoadSysMenuArg(Kernel::HLERequestContext& ctx) {
     u32 size = rp.Pop<u32>();
     ASSERT(size == 0x40);
 
-    IPC::RequestBuilder rb = rp.MakeBuilder(1, 2);
+    IPC::RequestBuilder rb = rp.MakeBuilder(2, 2);
     rb.Push(RESULT_SUCCESS);
     rb.Push(static_cast<u32>(apt->sys_menu_arg_buffer.size()));
     // This service function does not clear the buffer.
