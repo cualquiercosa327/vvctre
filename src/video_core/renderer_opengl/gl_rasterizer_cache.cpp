@@ -846,6 +846,19 @@ void CachedSurface::DownloadGLTexture(const Common::Rectangle<u32>& rect, GLuint
     std::size_t buffer_offset =
         (rect.bottom * stride + rect.left) * GetGLBytesPerPixel(pixel_format);
 
+    const bool use_pbo = type == SurfaceType::DepthStencil;
+    if (use_pbo && !pixel_buffers[0].handle) {
+        const GLsizeiptr pbo_size = width * height * GetGLBytesPerPixel(pixel_format);
+        pixel_buffers[0].Create();
+        pixel_buffers[1].Create();
+        // glBufferData() with NULL pointer reserves memory space
+        glBindBuffer(GL_PIXEL_PACK_BUFFER, pixel_buffers[0].handle);
+        glBufferData(GL_PIXEL_PACK_BUFFER, pbo_size, nullptr, GL_STREAM_READ);
+        glBindBuffer(GL_PIXEL_PACK_BUFFER, pixel_buffers[1].handle);
+        glBufferData(GL_PIXEL_PACK_BUFFER, pbo_size, nullptr, GL_STREAM_READ);
+        glBindBuffer(GL_PIXEL_PACK_BUFFER, 0);
+    }
+
     // If not 1x scale, blit scaled texture to a new 1x texture and use that to flush
     if (res_scale != 1) {
         auto scaled_rect = rect;
@@ -866,7 +879,12 @@ void CachedSurface::DownloadGLTexture(const Common::Rectangle<u32>& rect, GLuint
         state.Apply();
 
         glActiveTexture(GL_TEXTURE0);
-        glGetTexImage(GL_TEXTURE_2D, 0, tuple.format, tuple.type, &gl_buffer[buffer_offset]);
+        if (use_pbo) {
+            glBindBuffer(GL_PIXEL_PACK_BUFFER, pixel_buffers[pbo_index].handle);
+            glGetTexImage(GL_TEXTURE_2D, 0, tuple.format, tuple.type, nullptr);
+        } else {
+            glGetTexImage(GL_TEXTURE_2D, 0, tuple.format, tuple.type, &gl_buffer[buffer_offset]);
+        }
     } else {
         state.ResetTexture(texture.handle);
         state.draw.read_framebuffer = read_fb_handle;
@@ -887,9 +905,30 @@ void CachedSurface::DownloadGLTexture(const Common::Rectangle<u32>& rect, GLuint
             glFramebufferTexture2D(GL_READ_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D,
                                    texture.handle, 0);
         }
-        glReadPixels(static_cast<GLint>(rect.left), static_cast<GLint>(rect.bottom),
-                     static_cast<GLsizei>(rect.GetWidth()), static_cast<GLsizei>(rect.GetHeight()),
-                     tuple.format, tuple.type, &gl_buffer[buffer_offset]);
+
+        if (use_pbo) {
+            // copy pixels from framebuffer to PBO
+            // OpenGL should perform asynch DMA transfer, so glReadPixels() will return immediately.
+            glBindBuffer(GL_PIXEL_PACK_BUFFER, pixel_buffers[pbo_index].handle);
+            glReadPixels(static_cast<GLint>(rect.left), static_cast<GLint>(rect.bottom),
+                         static_cast<GLsizei>(rect.GetWidth()),
+                         static_cast<GLsizei>(rect.GetHeight()), tuple.format, tuple.type, nullptr);
+        } else {
+            glReadPixels(static_cast<GLint>(rect.left), static_cast<GLint>(rect.bottom),
+                         static_cast<GLsizei>(rect.GetWidth()),
+                         static_cast<GLsizei>(rect.GetHeight()), tuple.format, tuple.type,
+                         &gl_buffer[buffer_offset]);
+        }
+    }
+
+    if (use_pbo) {
+        // map the PBO that contains framebuffer pixels
+        pbo_index = (pbo_index + 1) % 2;
+        glBindBuffer(GL_PIXEL_PACK_BUFFER, pixel_buffers[pbo_index].handle);
+        GLubyte* pbo_data = static_cast<GLubyte*>(glMapBuffer(GL_PIXEL_PACK_BUFFER, GL_READ_ONLY));
+        std::copy(pbo_data, pbo_data + gl_buffer.size() - buffer_offset, &gl_buffer[buffer_offset]);
+        glUnmapBuffer(GL_PIXEL_PACK_BUFFER); // release pointer to the mapped buffer
+        glBindBuffer(GL_PIXEL_PACK_BUFFER, 0);
     }
 
     glPixelStorei(GL_PACK_ROW_LENGTH, 0);
@@ -1730,6 +1769,9 @@ void RasterizerCacheOpenGL::FlushRegion(PAddr addr, u32 size, Surface flush_surf
             SurfaceParams params = surface->FromInterval(interval);
             surface->DownloadGLTexture(surface->GetSubRect(params), read_framebuffer.handle,
                                        draw_framebuffer.handle);
+            // downloaded rect could be bigger than requested, shouldn't flushed interval reflect
+            // that?
+            /*interval = SurfaceInterval(params.addr, params.end);*/
         }
         surface->FlushGLBuffer(boost::icl::first(interval), boost::icl::last_next(interval));
         flushed_intervals += interval;
