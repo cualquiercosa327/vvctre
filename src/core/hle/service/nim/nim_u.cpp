@@ -18,10 +18,14 @@ NIM_U::NIM_U(Core::System& system) : ServiceFramework("nim:u", 2) {
         {0x00090000, &NIM_U::CheckSysUpdateAvailable, "CheckSysUpdateAvailable"},
         {0x000A0000, nullptr, "GetState"},
         {0x000B0000, nullptr, "GetSystemTitleHash"},
+        {0x00110000, &NIM_U::Unknown, "Unknown"},
     };
     RegisterHandlers(functions);
+
     nim_system_update_event =
         system.Kernel().CreateEvent(Kernel::ResetType::OneShot, "NIM System Update Event");
+
+    unknown_event = system.Kernel().CreateEvent(Kernel::ResetType::OneShot, "NIM Unknown Event");
 }
 
 NIM_U::~NIM_U() = default;
@@ -42,6 +46,15 @@ void NIM_U::CheckSysUpdateAvailable(Kernel::HLERequestContext& ctx) {
     rb.Push(false); // No update available
 
     LOG_WARNING(Service_NIM, "(STUBBED) called");
+}
+
+void NIM_U::Unknown(Kernel::HLERequestContext& ctx) {
+    IPC::RequestParser rp(ctx, 0x11, 0, 0); // 0x00110000
+    unknown_event->Signal();
+
+    IPC::RequestBuilder rb = rp.MakeBuilder(1, 2);
+    rb.Push(RESULT_SUCCESS);
+    rb.PushCopyObjects(unknown_event);
 }
 
 } // namespace Service::NIM
