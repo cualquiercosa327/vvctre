@@ -120,6 +120,7 @@ public:
         void GetScreenCapPostPermission(Kernel::HLERequestContext& ctx);
         void CheckNew3DSApp(Kernel::HLERequestContext& ctx);
         void CheckNew3DS(Kernel::HLERequestContext& ctx);
+        void IsTitleAllowed(Kernel::HLERequestContext& ctx);
 
     private:
         bool application_reset_prepared{};
