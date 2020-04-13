@@ -11,7 +11,7 @@
 
 namespace Memory {
 class PageTable;
-}
+} // namespace Memory
 
 namespace Common {
 
