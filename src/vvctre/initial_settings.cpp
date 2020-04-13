@@ -109,7 +109,7 @@ void InitialSettings::Run() {
         if (ImGui::Begin("", nullptr,
                          ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoTitleBar |
                              ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse |
-                             ImGuiWindowFlags_NoMove)) {
+                             ImGuiWindowFlags_NoMove | ImGuiWindowFlags_HorizontalScrollbar)) {
             ImGui::SetWindowPos(ImVec2(), ImGuiCond_Once);
             ImGui::SetWindowSize(io.DisplaySize);
             if (ImGui::BeginTabBar("##tabBar")) {
@@ -119,7 +119,7 @@ void InitialSettings::Run() {
 
                     ImGui::Text("File:");
                     ImGui::SameLine();
-                    ImGui::PushItemWidth(335);
+                    ImGui::PushItemWidth(330);
                     ImGui::InputText("##file", &Settings::values.file_path);
                     ImGui::PopItemWidth();
                     ImGui::SameLine();
