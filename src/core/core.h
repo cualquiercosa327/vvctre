@@ -5,6 +5,7 @@
 #pragma once
 
 #include <memory>
+#include <optional>
 #include <string>
 #include "common/common_types.h"
 #include "core/custom_tex_cache.h"
@@ -50,6 +51,11 @@ class RendererBase;
 namespace Core {
 
 class Timing;
+
+struct DeliveryArgument {
+    std::vector<u8> parameter;
+    std::vector<u8> hmac;
+};
 
 class System {
 public:
@@ -229,6 +235,8 @@ public:
 
     bool frontend_paused = false;
     bool rpc_paused = false;
+
+    std::optional<DeliveryArgument> delivery_arg;
 
 private:
     /**

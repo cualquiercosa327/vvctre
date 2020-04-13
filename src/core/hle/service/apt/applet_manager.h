@@ -14,7 +14,7 @@
 
 namespace Core {
 class System;
-}
+} // namespace Core
 
 namespace Service::APT {
 
@@ -144,6 +144,8 @@ public:
     ResultCode PrepareToDoApplicationJump(u64 title_id, FS::MediaType media_type,
                                           ApplicationJumpFlags flags);
     ResultCode DoApplicationJump();
+    ResultCode PrepareToStartApplication(u64 title_id, FS::MediaType media_type);
+    ResultCode StartApplication(std::vector<u8> parameter, std::vector<u8> hmac);
 
     struct AppletInfo {
         u64 title_id;
@@ -165,6 +167,15 @@ public:
 
     ApplicationJumpParameters GetApplicationJumpParameters() const {
         return app_jump_parameters;
+    }
+
+    struct ApplicationStartParameters {
+        u64 next_title_id;
+        FS::MediaType next_media_type;
+    };
+
+    ApplicationStartParameters GetApplicationStartParameters() const {
+        return app_start_parameters;
     }
 
 private:
@@ -202,6 +213,7 @@ private:
     };
 
     ApplicationJumpParameters app_jump_parameters{};
+    ApplicationStartParameters app_start_parameters{};
 
     // Holds data about the concurrently running applets in the system.
     std::array<AppletSlotData, NumAppletSlot> applet_slots = {};
@@ -209,6 +221,8 @@ private:
     // This overload returns nullptr if no applet with the specified id has been started.
     AppletSlotData* GetAppletSlotData(AppletId id);
     AppletSlotData* GetAppletSlotData(AppletAttributes attributes);
+
+    void SetDeliveryArg(std::vector<u8> parameter, std::vector<u8> hmac);
 
     // Command that will be sent to the application when a library applet calls CloseLibraryApplet.
     SignalType library_applet_closing_command;

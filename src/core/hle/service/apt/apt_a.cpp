@@ -35,7 +35,7 @@ APT_A::APT_A(std::shared_ptr<Module> apt)
         {0x00180040, &APT_A::PrepareToStartLibraryApplet, "PrepareToStartLibraryApplet"},
         {0x00190040, nullptr, "PrepareToStartSystemApplet"},
         {0x001A0000, nullptr, "PrepareToStartNewestHomeMenu"},
-        {0x001B00C4, nullptr, "StartApplication"},
+        {0x001B00C4, &APT_A::StartApplication, "StartApplication"},
         {0x001C0000, nullptr, "WakeupApplication"},
         {0x001D0000, nullptr, "CancelApplication"},
         {0x001E0084, &APT_A::StartLibraryApplet, "StartLibraryApplet"},

@@ -352,24 +352,16 @@ void MemorySystem::RasterizerMarkRegionCached(PAddr start, u32 size, bool cached
                 if (cached) {
                     // Switch page type to cached if now cached
                     switch (page_type) {
-                    case PageType::Unmapped:
-                        // It is not necessary for a process to have this region mapped into its
-                        // address space, for example, a system module need not have a VRAM mapping.
-                        break;
                     case PageType::Memory:
                         page_table->SetRasterizerCachedMemory(vaddr);
                         impl->fastmem_mapper.Unmap(*page_table, vaddr, PAGE_SIZE);
                         break;
                     default:
-                        UNREACHABLE();
+                        break;
                     }
                 } else {
                     // Switch page type to uncached if now uncached
                     switch (page_type) {
-                    case PageType::Unmapped:
-                        // It is not necessary for a process to have this region mapped into its
-                        // address space, for example, a system module need not have a VRAM mapping.
-                        break;
                     case PageType::RasterizerCachedMemory: {
                         u8* ptr = GetPointerForRasterizerCache(vaddr & ~PAGE_MASK);
                         page_table->SetMemory(vaddr, ptr);
@@ -377,7 +369,7 @@ void MemorySystem::RasterizerMarkRegionCached(PAddr start, u32 size, bool cached
                         break;
                     }
                     default:
-                        UNREACHABLE();
+                        break;
                     }
                 }
             }

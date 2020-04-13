@@ -535,7 +535,14 @@ ResultCode Module::FormatConfig() {
         return res;
     }
 
+    // 0x000F0004 - Console model
     res = CreateConfigInfoBlk(ConsoleModelBlockID, sizeof(CONSOLE_MODEL), 0xC, &CONSOLE_MODEL);
+    if (!res.IsSuccess()) {
+        return res;
+    }
+
+    // 0x00F0006 - Unknown
+    res = CreateConfigInfoBlk(0x00F0006, 0x28, 0xC, zero_buffer);
     if (!res.IsSuccess()) {
         return res;
     }

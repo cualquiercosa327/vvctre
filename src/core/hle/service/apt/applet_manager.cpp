@@ -520,6 +520,42 @@ ResultCode AppletManager::DoApplicationJump() {
     return RESULT_SUCCESS;
 }
 
+ResultCode AppletManager::PrepareToStartApplication(u64 title_id, FS::MediaType media_type) {
+    // TODO(Subv): This should check that the current applet is of System type and return 0xc8a0cc04
+    // if not.
+
+    // TODO(Subv): This should return 0xc8a0cff0 if the applet preparation state is already set
+
+    const auto& application_slot = applet_slots[static_cast<size_t>(AppletSlot::Application)];
+
+    if (application_slot.registered) {
+        // TODO(Subv): Return 0xc8a0cffc
+        return ResultCode(-1);
+    }
+
+    app_start_parameters.next_title_id = title_id;
+    app_start_parameters.next_media_type = media_type;
+
+    return RESULT_SUCCESS;
+}
+
+ResultCode AppletManager::StartApplication(std::vector<u8> parameter, std::vector<u8> hmac) {
+    // The delivery argument is always unconditionally set.
+    SetDeliveryArg(std::move(parameter), std::move(hmac));
+
+    system.SetResetFilePath(Service::AM::GetTitleContentPath(app_start_parameters.next_media_type,
+                                                             app_start_parameters.next_title_id));
+    system.RequestReset();
+
+    return RESULT_SUCCESS;
+}
+
+void AppletManager::SetDeliveryArg(std::vector<u8> parameter, std::vector<u8> hmac) {
+    auto& argument = system.delivery_arg.emplace();
+    argument.parameter = std::move(parameter);
+    argument.hmac = std::move(hmac);
+}
+
 AppletManager::AppletManager(Core::System& system) : system(system) {
     for (std::size_t slot = 0; slot < applet_slots.size(); ++slot) {
         auto& slot_data = applet_slots[slot];
