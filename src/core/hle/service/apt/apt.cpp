@@ -901,6 +901,10 @@ Module::APTInterface::APTInterface(std::shared_ptr<Module> apt, const char* name
 
 Module::APTInterface::~APTInterface() = default;
 
+std::shared_ptr<Module> Module::APTInterface::GetModule() {
+    return apt;
+}
+
 Module::Module(Core::System& system) : system(system) {
     applet_manager = std::make_shared<AppletManager>(system);
 

@@ -119,7 +119,9 @@ void InitialSettings::Run() {
 
                     ImGui::Text("File:");
                     ImGui::SameLine();
+                    ImGui::PushItemWidth(335);
                     ImGui::InputText("##file", &Settings::values.file_path);
+                    ImGui::PopItemWidth();
                     ImGui::SameLine();
                     if (ImGui::Button("Browse...##file")) {
                         const std::vector<std::string> result =
@@ -133,6 +135,7 @@ void InitialSettings::Run() {
                             Settings::values.file_path = result[0];
                         }
                     }
+
                     ImGui::SameLine();
                     if (ImGui::Button("Install CIA")) {
                         const std::vector<std::string> files =
@@ -168,6 +171,26 @@ void InitialSettings::Run() {
                                 pfd::message("vvctre", fmt::format("{} is encrypted", file),
                                              pfd::choice::ok, pfd::icon::error);
                                 break;
+                            }
+                        }
+                    }
+
+                    ImGui::SameLine();
+                    if (ImGui::Button("HOME Menu")) {
+                        if (Settings::values.region_value == Settings::REGION_VALUE_AUTO_SELECT) {
+                            pfd::message("vvctre", "Region is Auto-select", pfd::choice::ok,
+                                         pfd::icon::error);
+                        } else {
+                            const u64 title_id = Service::APT::GetTitleIdForApplet(
+                                Service::APT::AppletId::HomeMenu,
+                                static_cast<u32>(Settings::values.region_value));
+                            const std::string path = Service::AM::GetTitleContentPath(
+                                Service::FS::MediaType::NAND, title_id);
+                            if (FileUtil::Exists(path)) {
+                                Settings::values.file_path = path;
+                            } else {
+                                pfd::message("vvctre", "HOME Menu not installed", pfd::choice::ok,
+                                             pfd::icon::error);
                             }
                         }
                     }
@@ -1996,6 +2019,16 @@ void InitialSettings::Run() {
                              "##ButtonGPIO14")
                                 .c_str())) {
                         Settings::values.buttons[Settings::NativeButton::Gpio14] =
+                            GetInput(InputCommon::Polling::DeviceType::Button);
+                    }
+
+                    ImGui::Text("HOME:");
+                    ImGui::SameLine();
+                    if (ImGui::Button(
+                            (ButtonToText(Settings::values.buttons[Settings::NativeButton::Home]) +
+                             "##ButtonHome")
+                                .c_str())) {
+                        Settings::values.buttons[Settings::NativeButton::Home] =
                             GetInput(InputCommon::Polling::DeviceType::Button);
                     }
                     ImGui::EndGroup();

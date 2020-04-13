@@ -77,6 +77,8 @@ public:
         APTInterface(std::shared_ptr<Module> apt, const char* name, u32 max_session);
         ~APTInterface();
 
+        std::shared_ptr<Module> GetModule();
+
     protected:
         void Initialize(Kernel::HLERequestContext& ctx);
         void GetSharedFont(Kernel::HLERequestContext& ctx);

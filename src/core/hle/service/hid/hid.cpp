@@ -4,6 +4,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include "common/file_util.h"
 #include "common/logging/log.h"
 #include "core/3ds.h"
 #include "core/core.h"
@@ -13,6 +14,8 @@
 #include "core/hle/kernel/handle_table.h"
 #include "core/hle/kernel/shared_memory.h"
 #include "core/hle/kernel/shared_page.h"
+#include "core/hle/service/am/am.h"
+#include "core/hle/service/apt/applet_manager.h"
 #include "core/hle/service/hid/hid.h"
 #include "core/hle/service/hid/hid_spvr.h"
 #include "core/hle/service/hid/hid_user.h"
@@ -69,15 +72,34 @@ void Module::LoadInputDevices() {
         Settings::values.analogs[Settings::NativeAnalog::CirclePad]);
     motion_device = Input::CreateDevice<Input::MotionDevice>(Settings::values.motion_device);
     touch_device = Input::CreateDevice<Input::TouchDevice>(Settings::values.touch_device);
+    home_button = Input::CreateDevice<Input::ButtonDevice>(
+        Settings::values.buttons[Settings::NativeButton::Home]);
 }
 
 void Module::UpdatePadCallback(u64 userdata, s64 cycles_late) {
-    SharedMem* mem = reinterpret_cast<SharedMem*>(shared_mem->GetPointer());
-
     if (is_device_reload_pending.exchange(false)) {
         LoadInputDevices();
     }
 
+    if (home_button->GetStatus()) {
+        if (Settings::values.region_value == Settings::REGION_VALUE_AUTO_SELECT) {
+            LOG_ERROR(Service_HID, "Can't open HOME Menu because region is Auto-select");
+        } else {
+            const u64 title_id = Service::APT::GetTitleIdForApplet(
+                Service::APT::AppletId::HomeMenu, static_cast<u32>(Settings::values.region_value));
+            const std::string path =
+                Service::AM::GetTitleContentPath(Service::FS::MediaType::NAND, title_id);
+            if (FileUtil::Exists(path)) {
+                system.SetResetFilePath(path);
+                system.RequestReset();
+                return;
+            } else {
+                LOG_ERROR(Service_HID, "HOME Menu not installed");
+            }
+        }
+    }
+
+    SharedMem* mem = reinterpret_cast<SharedMem*>(shared_mem->GetPointer());
     PadState state = GetPadState();
 
     // Get current circle pad position and update circle pad direction

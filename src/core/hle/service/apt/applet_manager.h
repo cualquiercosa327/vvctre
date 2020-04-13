@@ -230,4 +230,6 @@ private:
     Core::System& system;
 };
 
+u64 GetTitleIdForApplet(AppletId id, u32 region_value);
+
 } // namespace Service::APT
