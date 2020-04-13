@@ -724,10 +724,9 @@ void GSP_GPU::StoreDataCache(Kernel::HLERequestContext& ctx) {
 
 void GSP_GPU::SetLedForceOff(Kernel::HLERequestContext& ctx) {
     IPC::RequestParser rp(ctx, 0x1C, 1, 0);
+    const u8 state = rp.Pop<u8>();
 
-    u8 state = rp.Pop<u8>();
-
-    system.Kernel().GetSharedPageHandler().Set3DLed(state);
+    system.Kernel().GetSharedPageHandler().GetSharedPage().ledstate_3d = state;
 
     IPC::RequestBuilder rb = rp.MakeBuilder(1, 0);
     rb.Push(RESULT_SUCCESS);

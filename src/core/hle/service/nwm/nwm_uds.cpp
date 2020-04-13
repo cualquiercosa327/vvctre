@@ -505,7 +505,6 @@ void NWM_UDS::OnWifiPacketReceived(const WifiPacket& packet) {
     case WifiPacket::PacketType::MacAddress:
         std::memcpy(&system.Kernel().GetSharedPageHandler().GetSharedPage().wifi_macaddr[0],
                     &packet.data[0], sizeof(MacAddress));
-        system.Kernel().GetSharedPageHandler().SetWifiLinkLevel(SharedPage::WifiLinkLevel::BEST);
         break;
     }
 }
@@ -538,6 +537,8 @@ void NWM_UDS::Shutdown(Kernel::HLERequestContext& ctx) {
         loop_thread->join();
         loop_thread.reset();
         client.reset();
+        system.Kernel().GetSharedPageHandler().GetSharedPage().network_state =
+            static_cast<u8>(SharedPage::NetworkState::Internet);
     }
 
     for (auto bind_node : channel_data) {
@@ -628,6 +629,9 @@ ResultVal<std::shared_ptr<Kernel::Event>> NWM_UDS::Initialize(
     initialized = client != nullptr;
 
     if (initialized) {
+        system.Kernel().GetSharedPageHandler().GetSharedPage().network_state =
+            static_cast<u8>(SharedPage::NetworkState::Local);
+
         loop_thread = std::make_unique<std::thread>([&] {
             while (initialized) {
                 client->poll();

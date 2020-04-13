@@ -40,7 +40,9 @@ static std::chrono::seconds GetInitTime() {
 Handler::Handler(Core::Timing& timing) : timing(timing) {
     std::memset(&shared_page, 0, sizeof(shared_page));
 
-    shared_page.running_hw = 0x1; // product
+    shared_page.running_hw = 0x1; // Product
+    shared_page.wifi_link_level = static_cast<u8>(WifiLinkLevel::Best);
+    shared_page.network_state = static_cast<u8>(NetworkState::Internet);
 
     // Some games wait until this value becomes 0x1, before asking running_hw
     shared_page.unknown_value = 0x1;
@@ -102,24 +104,8 @@ void Handler::UpdateTimeCallback(u64 userdata, int cycles_late) {
 
     ++shared_page.date_time_counter;
 
-    // system time is updated hourly
+    // System time is updated hourly
     timing.ScheduleEvent(msToCycles(60 * 60 * 1000) - cycles_late, update_time_event);
-}
-
-void Handler::SetMacAddress(const MacAddress& addr) {
-    std::memcpy(shared_page.wifi_macaddr, addr.data(), sizeof(MacAddress));
-}
-
-void Handler::SetWifiLinkLevel(WifiLinkLevel level) {
-    shared_page.wifi_link_level = static_cast<u8>(level);
-}
-
-void Handler::Set3DLed(u8 state) {
-    shared_page.ledstate_3d = state;
-}
-
-void Handler::Set3DSlider(float sliderstate) {
-    shared_page.sliderstate_3d = static_cast<float_le>(sliderstate);
 }
 
 SharedPageDef& Handler::GetSharedPage() {

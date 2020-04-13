@@ -90,12 +90,9 @@ void Module::Interface::GetCloseResult(Kernel::HLERequestContext& ctx) {
 void Module::Interface::GetWifiStatus(Kernel::HLERequestContext& ctx) {
     IPC::RequestParser rp(ctx, 0xD, 0, 0);
 
-    // TODO(purpasmart96): This function is only a stub,
-    // it returns a valid result without implementing full functionality.
-
     IPC::RequestBuilder rb = rp.MakeBuilder(2, 0);
     rb.Push(RESULT_SUCCESS);
-    rb.Push<u32>(0); // Connection type set to none
+    rb.Push<u32>(1); // Connected
 
     LOG_WARNING(Service_AC, "(STUBBED) called");
 }
