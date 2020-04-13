@@ -78,7 +78,7 @@ public:
 
     // Visual Studio would try to allocate these on compile time if they are std::array, which would
     // exceed the memory limit.
-    Common::BackingMemory fcram = fastmem_mapper.Allocate(Memory::FCRAM_N3DS_SIZE);
+    Common::BackingMemory fcram = fastmem_mapper.Allocate(Memory::FCRAM_SIZE);
     Common::BackingMemory vram = fastmem_mapper.Allocate(Memory::VRAM_SIZE);
 
     PageTable* current_page_table = nullptr;
@@ -666,7 +666,7 @@ u32 MemorySystem::GetFCRAMOffset(u8* pointer) {
 }
 
 u8* MemorySystem::GetFCRAMPointer(u32 offset) {
-    ASSERT(offset <= Memory::FCRAM_N3DS_SIZE);
+    ASSERT(offset <= Memory::FCRAM_SIZE);
     return impl->fcram.Get() + offset;
 }
 
