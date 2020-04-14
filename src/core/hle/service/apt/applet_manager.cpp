@@ -533,27 +533,44 @@ ResultCode AppletManager::PrepareToStartApplication(u64 title_id, FS::MediaType 
         return ResultCode(-1);
     }
 
-    app_start_parameters.next_title_id = title_id;
-    app_start_parameters.next_media_type = media_type;
+    ASSERT_MSG(!app_start_parameters,
+               "Trying to prepare an application when another is already prepared");
+
+    app_start_parameters.emplace();
+    app_start_parameters->next_title_id = title_id;
+    app_start_parameters->next_media_type = media_type;
 
     return RESULT_SUCCESS;
 }
 
 ResultCode AppletManager::StartApplication(std::vector<u8> parameter, std::vector<u8> hmac) {
     // The delivery argument is always unconditionally set.
-    SetDeliveryArg(std::move(parameter), std::move(hmac));
+    SetDeliveryArg(parameter, hmac);
 
-    system.SetResetFilePath(Service::AM::GetTitleContentPath(app_start_parameters.next_media_type,
-                                                             app_start_parameters.next_title_id));
+    // Note: APT first checks if we can launch the application via AM::CheckDemoLaunchRights and
+    // returns 0xc8a12403 if we can't. We intentionally do not implement that check.
+
+    // TODO(Subv): The APT service performs several checks here related to the exheader flags of the
+    // process we're launching and other things like title id blacklists. We do not yet implement
+    // any of that.
+
+    // TODO(Subv): The real APT service doesn't seem to check whether the titleid to launch is set
+    // or not, it either launches NATIVE_FIRM if some internal state is set, or fails when calling
+    // PM::LaunchTitle. We should research more about that.
+    ASSERT_MSG(app_start_parameters, "Trying to start an application without preparing it first.");
+
+    system.SetResetFilePath(Service::AM::GetTitleContentPath(app_start_parameters->next_media_type,
+                                                             app_start_parameters->next_title_id));
     system.RequestReset();
 
     return RESULT_SUCCESS;
 }
 
-void AppletManager::SetDeliveryArg(std::vector<u8> parameter, std::vector<u8> hmac) {
+void AppletManager::SetDeliveryArg(const std::vector<u8>& parameter, const std::vector<u8>& hmac) {
+    // TODO(Subv): This argument is retrieved via ReceiveDeliveryArg, that is not yet implemented.
     auto& argument = system.delivery_arg.emplace();
-    argument.parameter = std::move(parameter);
-    argument.hmac = std::move(hmac);
+    argument.parameter = parameter;
+    argument.hmac = hmac;
 }
 
 AppletManager::AppletManager(Core::System& system) : system(system) {

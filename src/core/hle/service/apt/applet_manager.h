@@ -174,10 +174,6 @@ public:
         FS::MediaType next_media_type;
     };
 
-    ApplicationStartParameters GetApplicationStartParameters() const {
-        return app_start_parameters;
-    }
-
 private:
     /// Parameter data to be returned in the next call to Glance/ReceiveParameter.
     std::optional<MessageParameter> next_parameter;
@@ -213,7 +209,7 @@ private:
     };
 
     ApplicationJumpParameters app_jump_parameters{};
-    ApplicationStartParameters app_start_parameters{};
+    std::optional<ApplicationStartParameters> app_start_parameters;
 
     // Holds data about the concurrently running applets in the system.
     std::array<AppletSlotData, NumAppletSlot> applet_slots = {};
@@ -222,7 +218,7 @@ private:
     AppletSlotData* GetAppletSlotData(AppletId id);
     AppletSlotData* GetAppletSlotData(AppletAttributes attributes);
 
-    void SetDeliveryArg(std::vector<u8> parameter, std::vector<u8> hmac);
+    void SetDeliveryArg(const std::vector<u8>& parameter, const std::vector<u8>& hmac);
 
     // Command that will be sent to the application when a library applet calls CloseLibraryApplet.
     SignalType library_applet_closing_command;

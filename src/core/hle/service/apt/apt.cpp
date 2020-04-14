@@ -473,7 +473,7 @@ void Module::APTInterface::StartApplication(Kernel::HLERequestContext& ctx) {
     IPC::RequestParser rp(ctx, 0x1B, 3, 4); // 0x001B00C4
     u32 parameter_size = rp.Pop<u32>();
     u32 hmac_size = rp.Pop<u32>();
-    u8 paused = rp.Pop<u8>();
+    bool paused = rp.Pop<bool>();
     std::vector<u8> parameter = rp.PopStaticBuffer();
     std::vector<u8> hmac = rp.PopStaticBuffer();
 
