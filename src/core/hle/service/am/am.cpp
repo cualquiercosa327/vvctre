@@ -985,13 +985,14 @@ void Module::Interface::DeleteTicket(Kernel::HLERequestContext& ctx) {
 }
 
 void Module::Interface::GetNumTickets(Kernel::HLERequestContext& ctx) {
-    IPC::RequestParser rp(ctx, 0x0008, 0, 0); // 0x00080000
-    u32 ticket_count = 0;
+    u32 count = 0;
+    for (const auto& list : am->am_title_list) {
+        count += list.size();
+    }
 
-    IPC::RequestBuilder rb = rp.MakeBuilder(2, 0);
+    IPC::RequestBuilder rb(ctx, 0x0008, 2, 0);
     rb.Push(RESULT_SUCCESS);
-    rb.Push(ticket_count);
-    LOG_WARNING(Service_AM, "(STUBBED) called ticket_count=0x{:08x}", ticket_count);
+    rb.Push(count);
 }
 
 void Module::Interface::GetTicketList(Kernel::HLERequestContext& ctx) {
@@ -1000,12 +1001,25 @@ void Module::Interface::GetTicketList(Kernel::HLERequestContext& ctx) {
     u32 ticket_index = rp.Pop<u32>();
     auto& ticket_tids_out = rp.PopMappedBuffer();
 
+    std::vector<u64> all;
+    for (const auto& list : am->am_title_list) {
+        for (const auto& id : list) {
+            all.push_back(id);
+        }
+    }
+
+    u32 tickets_read = std::min<u32>(ticket_list_count, static_cast<u32>(all.size()));
+
+    std::size_t offset = 0;
+    for (u32 i = ticket_index; i < tickets_read; ++i) {
+        ticket_tids_out.Write(&all[static_cast<std::size_t>(i)], offset, sizeof(u64));
+        offset += sizeof(u64);
+    }
+
     IPC::RequestBuilder rb = rp.MakeBuilder(2, 2);
     rb.Push(RESULT_SUCCESS);
-    rb.Push(ticket_list_count);
+    rb.Push(tickets_read);
     rb.PushMappedBuffer(ticket_tids_out);
-    LOG_WARNING(Service_AM, "(STUBBED) ticket_list_count=0x{:08x}, ticket_index=0x{:08x}",
-                ticket_list_count, ticket_index);
 }
 
 void Module::Interface::QueryAvailableTitleDatabase(Kernel::HLERequestContext& ctx) {

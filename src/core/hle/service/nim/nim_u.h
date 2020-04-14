@@ -22,6 +22,7 @@ private:
     void CheckForSysUpdateEvent(Kernel::HLERequestContext& ctx);
     void CheckSysUpdateAvailable(Kernel::HLERequestContext& ctx);
     void Unknown(Kernel::HLERequestContext& ctx);
+    void Unknown2(Kernel::HLERequestContext& ctx);
 
     std::shared_ptr<Kernel::Event> nim_system_update_event;
     std::shared_ptr<Kernel::Event> unknown_event;
