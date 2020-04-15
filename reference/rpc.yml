@@ -3094,7 +3094,13 @@ paths:
           content:
             text/plain:
               schema:
-                type: boolean
+                type: string
+                enum:
+                  - none
+                  - Anime4K Ultrafast
+                  - Bicubic
+                  - ScaleForce
+                  - xBRZ freescale
       operationId: get-texturefilter
       description: Get the texture filter
     post:
@@ -3109,7 +3115,13 @@ paths:
         content:
           application/json:
             schema:
-              type: boolean
+              type: string
+              enum:
+                - none
+                - Anime4K Ultrafast
+                - Bicubic
+                - ScaleForce
+                - xBRZ freescale
       description: Set the texture filter
   /usecustomcputicks:
     get:
