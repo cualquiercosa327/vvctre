@@ -74,10 +74,9 @@ void PageTable::Set(PageType page_type, VAddr vaddr, u8* backing_memory) {
 
 class MemorySystem::Impl {
 public:
-    Common::FastmemMapper fastmem_mapper{0x11000000};
+    static constexpr size_t required_backing_memory = Memory::FCRAM_SIZE + Memory::VRAM_SIZE;
+    Common::FastmemMapper fastmem_mapper{required_backing_memory};
 
-    // Visual Studio would try to allocate these on compile time if they are std::array, which would
-    // exceed the memory limit.
     Common::BackingMemory fcram = fastmem_mapper.Allocate(Memory::FCRAM_SIZE);
     Common::BackingMemory vram = fastmem_mapper.Allocate(Memory::VRAM_SIZE);
 
