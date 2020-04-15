@@ -1,5 +1,7 @@
 #version 330 core
 
+// from https://github.com/BreadFish64/ScaleFish/tree/master/scale_force
+
 // MIT License
 //
 // Copyright (c) 2020 BreadFish64
