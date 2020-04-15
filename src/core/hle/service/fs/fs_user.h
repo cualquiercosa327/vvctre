@@ -9,7 +9,7 @@
 
 namespace Core {
 class System;
-}
+} // namespace Core
 
 namespace Service::FS {
 
@@ -47,6 +47,8 @@ private:
     void FormatSaveData(Kernel::HLERequestContext& ctx);
     void FormatThisUserSaveData(Kernel::HLERequestContext& ctx);
     void GetFreeBytes(Kernel::HLERequestContext& ctx);
+    void GetSdmcArchiveResource(Kernel::HLERequestContext& ctx);
+    void GetNandArchiveResource(Kernel::HLERequestContext& ctx);
     void CreateExtSaveData(Kernel::HLERequestContext& ctx);
     void DeleteExtSaveData(Kernel::HLERequestContext& ctx);
     void CardSlotIsInserted(Kernel::HLERequestContext& ctx);
