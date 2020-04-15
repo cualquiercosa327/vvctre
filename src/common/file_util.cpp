@@ -752,8 +752,8 @@ std::string SanitizePath(std::string_view path_, DirectorySeparator directory_se
 
 IOFile::IOFile() {}
 
-IOFile::IOFile(const std::string& filename, const char openmode[], int flags) {
-    Open(filename, openmode, flags);
+IOFile::IOFile(const std::string& filename, const char openmode[]) {
+    Open(filename, openmode);
 }
 
 IOFile::~IOFile() {
@@ -774,17 +774,11 @@ void IOFile::Swap(IOFile& other) noexcept {
     std::swap(m_good, other.m_good);
 }
 
-bool IOFile::Open(const std::string& filename, const char openmode[], int flags) {
+bool IOFile::Open(const std::string& filename, const char openmode[]) {
     Close();
 #ifdef _WIN32
-    if (flags != 0) {
-        m_file = _wfsopen(Common::UTF8ToUTF16W(filename).c_str(),
-                          Common::UTF8ToUTF16W(openmode).c_str(), flags);
-        m_good = m_file != nullptr;
-    } else {
-        m_good = _wfopen_s(&m_file, Common::UTF8ToUTF16W(filename).c_str(),
-                           Common::UTF8ToUTF16W(openmode).c_str()) == 0;
-    }
+    m_good = _wfopen_s(&m_file, Common::UTF8ToUTF16W(filename).c_str(),
+                       Common::UTF8ToUTF16W(openmode).c_str()) == 0;
 #else
     m_file = std::fopen(filename.c_str(), openmode);
     m_good = m_file != nullptr;
@@ -827,6 +821,36 @@ bool IOFile::Flush() {
         m_good = false;
 
     return m_good;
+}
+
+std::size_t IOFile::ReadImpl(void* data, std::size_t length, std::size_t data_size) const {
+    if (!IsOpen()) {
+        m_good = false;
+        return std::numeric_limits<std::size_t>::max();
+    }
+
+    if (length == 0) {
+        return 0;
+    }
+
+    DEBUG_ASSERT(data != nullptr);
+
+    return std::fread(data, data_size, length, m_file);
+}
+
+std::size_t IOFile::WriteImpl(const void* data, std::size_t length, std::size_t data_size) {
+    if (!IsOpen()) {
+        m_good = false;
+        return std::numeric_limits<std::size_t>::max();
+    }
+
+    if (length == 0) {
+        return 0;
+    }
+
+    DEBUG_ASSERT(data != nullptr);
+
+    return std::fwrite(data, data_size, length, m_file);
 }
 
 bool IOFile::Resize(u64 size) {

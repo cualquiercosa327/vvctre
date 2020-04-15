@@ -189,17 +189,14 @@ enum class DirectorySeparator { ForwardSlash, BackwardSlash, PlatformDefault };
 std::string SanitizePath(std::string_view path,
                          DirectorySeparator directory_separator = DirectorySeparator::ForwardSlash);
 
-// simple wrapper for cstdlib file functions to
+// Simple wrapper for cstdlib file functions to
 // hopefully will make error checking easier
 // and make forgetting an fclose() harder
 class IOFile : public NonCopyable {
 public:
     IOFile();
 
-    // flags is used for Windows specific file open mode flags, which
-    // allows vvctre to open the logs in shared write mode, so that the file
-    // isn't considered "locked" while vvctre is open and people can open the log file and view it
-    IOFile(const std::string& filename, const char openmode[], int flags = 0);
+    IOFile(const std::string& filename, const char openmode[]);
 
     ~IOFile();
 
@@ -208,7 +205,7 @@ public:
 
     void Swap(IOFile& other) noexcept;
 
-    bool Open(const std::string& filename, const char openmode[], int flags = 0);
+    bool Open(const std::string& filename, const char openmode[]);
     bool Close();
 
     template <typename T>
@@ -216,12 +213,7 @@ public:
         static_assert(std::is_trivially_copyable_v<T>,
                       "Given array does not consist of trivially copyable objects");
 
-        if (!IsOpen()) {
-            m_good = false;
-            return std::numeric_limits<std::size_t>::max();
-        }
-
-        std::size_t items_read = std::fread(data, sizeof(T), length, m_file);
+        std::size_t items_read = ReadImpl(data, length, sizeof(T));
         if (items_read != length)
             m_good = false;
 
@@ -233,12 +225,7 @@ public:
         static_assert(std::is_trivially_copyable_v<T>,
                       "Given array does not consist of trivially copyable objects");
 
-        if (!IsOpen()) {
-            m_good = false;
-            return std::numeric_limits<std::size_t>::max();
-        }
-
-        std::size_t items_written = std::fwrite(data, sizeof(T), length, m_file);
+        std::size_t items_written = WriteImpl(data, length, sizeof(T));
         if (items_written != length)
             m_good = false;
 
@@ -285,13 +272,16 @@ public:
     bool Resize(u64 size);
     bool Flush();
 
-    // clear error state
+    // Clear error state
     void Clear() {
         m_good = true;
         std::clearerr(m_file);
     }
 
 private:
+    std::size_t ReadImpl(void* data, std::size_t length, std::size_t data_size) const;
+    std::size_t WriteImpl(const void* data, std::size_t length, std::size_t data_size);
+
     std::FILE* m_file = nullptr;
     bool m_good = true;
 };
