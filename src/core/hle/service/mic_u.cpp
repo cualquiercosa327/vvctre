@@ -54,7 +54,7 @@ constexpr u32 GetSampleRateInHz(SampleRate sample_rate) {
 // The 3DS hardware was tested to write to the sharedmem every 15 samples regardless of sample_rate.
 // So we can just divide the sample rate by 16 and that'll give the correct timing for the event
 constexpr u64 GetBufferUpdatePeriod(SampleRate sample_rate) {
-    return usToCycles(1000000 / static_cast<int>(GetSampleRateInHz(sample_rate)));
+    return BASE_CLOCK_RATE_ARM11 / GetSampleRateInHz(sample_rate);
 }
 
 // Variables holding the current mic buffer writing state
