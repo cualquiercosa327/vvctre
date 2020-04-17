@@ -351,9 +351,7 @@ void InitialSettings::Run() {
 
                     if (Settings::values.use_frame_limit) {
                         ImGui::SameLine();
-                        ImGui::Spacing();
-                        ImGui::SameLine();
-                        ImGui::Text("Limit:");
+                        ImGui::Text("To");
                         ImGui::SameLine();
                         ImGui::PushItemWidth(45);
                         ImGui::InputScalar("##speedlimit", ImGuiDataType_U16,

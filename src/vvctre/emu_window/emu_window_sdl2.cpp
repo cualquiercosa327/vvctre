@@ -333,9 +333,7 @@ void EmuWindow_SDL2::SwapBuffers() {
 
                     if (Settings::values.use_frame_limit) {
                         ImGui::SameLine();
-                        ImGui::Spacing();
-                        ImGui::SameLine();
-                        ImGui::Text("Limit:");
+                        ImGui::Text("To");
                         ImGui::SameLine();
                         ImGui::PushItemWidth(45);
                         if (ImGui::InputScalar("##speedlimit", ImGuiDataType_U16,
