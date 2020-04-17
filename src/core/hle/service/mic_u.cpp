@@ -53,8 +53,8 @@ constexpr u32 GetSampleRateInHz(SampleRate sample_rate) {
 
 // The 3DS hardware was tested to write to the sharedmem every 15 samples regardless of sample_rate.
 // So we can just divide the sample rate by 16 and that'll give the correct timing for the event
-constexpr u64 GetBufferUpdateRate(SampleRate sample_rate) {
-    return GetSampleRateInHz(sample_rate) / 16;
+constexpr u64 GetBufferUpdatePeriod(SampleRate sample_rate) {
+    return usToCycles(1000000 / static_cast<int>(GetSampleRateInHz(sample_rate)));
 }
 
 // Variables holding the current mic buffer writing state
@@ -148,14 +148,23 @@ struct MIC_U::Impl {
         }
 
         // schedule next run
-        timing.ScheduleEvent(GetBufferUpdateRate(state.sample_rate) - cycles_late,
+        timing.ScheduleEvent(GetBufferUpdatePeriod(state.sample_rate) - cycles_late,
                              buffer_write_event);
+    }
+
+    void StartSampling() {
+        auto sign = encoding == Encoding::PCM8Signed || encoding == Encoding::PCM16Signed
+                        ? Frontend::Mic::Signedness::Signed
+                        : Frontend::Mic::Signedness::Unsigned;
+        mic->StartSampling({sign, state.sample_size, state.looped_buffer,
+                            GetSampleRateInHz(state.sample_rate), state.initial_offset,
+                            static_cast<u32>(state.size)});
     }
 
     void StartSampling(Kernel::HLERequestContext& ctx) {
         IPC::RequestParser rp{ctx, 0x03, 5, 0};
 
-        Encoding encoding = rp.PopEnum<Encoding>();
+        encoding = rp.PopEnum<Encoding>();
         SampleRate sample_rate = rp.PopEnum<SampleRate>();
         u32 audio_buffer_offset = rp.PopRaw<u32>();
         u32 audio_buffer_size = rp.Pop<u32>();
@@ -167,9 +176,6 @@ struct MIC_U::Impl {
             mic->StopSampling();
         }
 
-        auto sign = encoding == Encoding::PCM8Signed || encoding == Encoding::PCM16Signed
-                        ? Frontend::Mic::Signedness::Signed
-                        : Frontend::Mic::Signedness::Unsigned;
         u8 sample_size = encoding == Encoding::PCM8Signed || encoding == Encoding::PCM8 ? 8 : 16;
         state.offset = state.initial_offset = audio_buffer_offset;
         state.sample_rate = sample_rate;
@@ -177,10 +183,9 @@ struct MIC_U::Impl {
         state.looped_buffer = audio_buffer_loop;
         state.size = audio_buffer_size;
 
-        mic->StartSampling({sign, sample_size, audio_buffer_loop, GetSampleRateInHz(sample_rate),
-                            audio_buffer_offset, audio_buffer_size});
+        StartSampling();
 
-        timing.ScheduleEvent(GetBufferUpdateRate(state.sample_rate), buffer_write_event);
+        timing.ScheduleEvent(GetBufferUpdatePeriod(state.sample_rate), buffer_write_event);
 
         IPC::RequestBuilder rb = rp.MakeBuilder(1, 0);
         rb.Push(RESULT_SUCCESS);
@@ -363,6 +368,7 @@ struct MIC_U::Impl {
     std::unique_ptr<Frontend::Mic::Interface> mic;
     Core::Timing& timing;
     State state{};
+    Encoding encoding{};
 };
 
 void MIC_U::MapSharedMem(Kernel::HLERequestContext& ctx) {

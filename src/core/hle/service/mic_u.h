@@ -5,12 +5,11 @@
 #pragma once
 
 #include <memory>
-
 #include "core/hle/service/service.h"
 
 namespace Core {
 class System;
-}
+} // namespace Core
 
 namespace Service::MIC {
 
