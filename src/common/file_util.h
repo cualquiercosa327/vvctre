@@ -226,8 +226,9 @@ public:
                       "Given array does not consist of trivially copyable objects");
 
         std::size_t items_written = WriteImpl(data, length, sizeof(T));
-        if (items_written != length)
+        if (items_written != length) {
             m_good = false;
+        }
 
         return items_written;
     }
@@ -279,7 +280,7 @@ public:
     }
 
 private:
-    std::size_t ReadImpl(void* data, std::size_t length, std::size_t data_size) const;
+    std::size_t ReadImpl(void* data, std::size_t length, std::size_t data_size);
     std::size_t WriteImpl(const void* data, std::size_t length, std::size_t data_size);
 
     std::FILE* m_file = nullptr;

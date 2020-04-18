@@ -823,7 +823,7 @@ bool IOFile::Flush() {
     return m_good;
 }
 
-std::size_t IOFile::ReadImpl(void* data, std::size_t length, std::size_t data_size) const {
+std::size_t IOFile::ReadImpl(void* data, std::size_t length, std::size_t data_size) {
     if (!IsOpen()) {
         m_good = false;
         return std::numeric_limits<std::size_t>::max();
