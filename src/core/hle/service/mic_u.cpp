@@ -53,7 +53,7 @@ constexpr u32 GetSampleRateInHz(SampleRate sample_rate) {
 
 // The 3DS hardware was tested to write to the sharedmem every 15 samples regardless of sample_rate.
 constexpr u64 GetBufferUpdatePeriod(SampleRate sample_rate) {
-    return (BASE_CLOCK_RATE_ARM11 / GetSampleRateInHz(sample_rate)) * 15;
+    return 15 * BASE_CLOCK_RATE_ARM11 / GetSampleRateInHz(sample_rate);
 }
 
 // Variables holding the current mic buffer writing state
