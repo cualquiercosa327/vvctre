@@ -11,12 +11,6 @@
 #include <regex>
 #include <thread>
 #include <vector>
-#ifdef _WIN32
-#include <share.h>   // For _SH_DENYWR
-#include <windows.h> // For OutputDebugStringW
-#else
-#define _SH_DENYWR 0
-#endif
 #include "common/assert.h"
 #include "common/logging/backend.h"
 #include "common/logging/log.h"
@@ -70,8 +64,9 @@ public:
         const auto it =
             std::find_if(backends.begin(), backends.end(),
                          [&backend_name](const auto& i) { return backend_name == i->GetName(); });
-        if (it == backends.end())
+        if (it == backends.end()) {
             return nullptr;
+        }
         return it->get();
     }
 
@@ -142,30 +137,6 @@ void ConsoleBackend::Write(const Entry& entry) {
 
 void ColorConsoleBackend::Write(const Entry& entry) {
     PrintColoredMessage(entry);
-}
-
-// _SH_DENYWR allows read only access to the file for other programs.
-// It is #defined to 0 on other platforms
-FileBackend::FileBackend(const std::string& filename)
-    : file(filename, "w", _SH_DENYWR), bytes_written(0) {}
-
-void FileBackend::Write(const Entry& entry) {
-    // prevent logs from going over the maximum size (in case its spamming and the user doesn't
-    // know)
-    constexpr std::size_t MAX_BYTES_WRITTEN = 50 * 1024L * 1024L;
-    if (!file.IsOpen() || bytes_written > MAX_BYTES_WRITTEN) {
-        return;
-    }
-    bytes_written += file.WriteString(FormatLogMessage(entry).append(1, '\n'));
-    if (entry.log_level >= Level::Error) {
-        file.Flush();
-    }
-}
-
-void DebuggerBackend::Write(const Entry& entry) {
-#ifdef _WIN32
-    ::OutputDebugStringW(Common::UTF8ToUTF16W(FormatLogMessage(entry).append(1, '\n')).c_str());
-#endif
 }
 
 /// Macro listing all log classes. Code should define CLS and SUB as desired before invoking this.

@@ -8,7 +8,6 @@
 #include <memory>
 #include <string>
 #include <string_view>
-#include "common/file_util.h"
 #include "common/logging/filter.h"
 #include "common/logging/log.h"
 
@@ -83,42 +82,6 @@ public:
     void Write(const Entry& entry) override;
 };
 
-/**
- * Backend that writes to a file passed into the constructor
- */
-class FileBackend : public Backend {
-public:
-    explicit FileBackend(const std::string& filename);
-
-    static const char* Name() {
-        return "file";
-    }
-
-    const char* GetName() const override {
-        return Name();
-    }
-
-    void Write(const Entry& entry) override;
-
-private:
-    FileUtil::IOFile file;
-    std::size_t bytes_written;
-};
-
-/**
- * Backend that writes to Visual Studio's output window
- */
-class DebuggerBackend : public Backend {
-public:
-    static const char* Name() {
-        return "debugger";
-    }
-    const char* GetName() const override {
-        return Name();
-    }
-    void Write(const Entry& entry) override;
-};
-
 void AddBackend(std::unique_ptr<Backend> backend);
 
 void RemoveBackend(std::string_view backend_name);
@@ -142,4 +105,5 @@ const char* GetLevelName(Level log_level);
  * never get the message
  */
 void SetGlobalFilter(const Filter& filter);
+
 } // namespace Log
