@@ -132,7 +132,7 @@ struct TimingEventType {
     const std::string* name;
 };
 
-constexpr int MAX_SLICE_LENGTH = 20000;
+constexpr int MAX_SLICE_LENGTH = BASE_CLOCK_RATE_ARM11 / 234 / 10;
 
 class Timing {
 public:
