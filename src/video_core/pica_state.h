@@ -154,13 +154,13 @@ struct State {
     PrimitiveAssembler<Shader::OutputVertex> primitive_assembler;
 
     int vs_float_regs_counter = 0;
-    u32 vs_uniform_write_buffer[4]{};
+    std::array<u32, 4> vs_uniform_write_buffer{};
 
     int gs_float_regs_counter = 0;
-    u32 gs_uniform_write_buffer[4]{};
+    std::array<u32, 4> gs_uniform_write_buffer{};
 
     int default_attr_counter = 0;
-    u32 default_attr_write_buffer[3]{};
+    std::array<u32, 3> default_attr_write_buffer{};
 };
 
 extern State g_state; ///< Current Pica state
