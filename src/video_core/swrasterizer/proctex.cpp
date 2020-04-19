@@ -154,7 +154,7 @@ static float CombineAndMap(float u, float v, ProcTexCombiner combiner,
     return LookupLUT(map_table, f);
 }
 
-Common::Vec4<u8> ProcTex(float u, float v, TexturingRegs regs, State::ProcTex state) {
+Common::Vec4<u8> ProcTex(float u, float v, const TexturingRegs& regs, State::ProcTex state) {
     u = std::abs(u);
     v = std::abs(v);
 
