@@ -15,13 +15,6 @@ jobs:
     strategy:
       matrix:
         os: [windows-latest, ubuntu-latest]
-        include:
-          - os: windows-latest
-            os_lowercase: windows
-            options: "-DVVCTRE_USE_BUNDLED_SDL2=ON -DENABLE_MF=ON"
-          - os: ubuntu-latest
-            os_lowercase: linux
-            options: ""
     steps:
       - name: Install Dependencies
         if: matrix.os == 'ubuntu-latest'
@@ -35,19 +28,19 @@ jobs:
         with:
           filePath: ${{github.workspace}}/src/core/settings.h
           encodedString: ${{github.event.client_payload.header}}
-      - name: Show settings.h contents
+      - name: Show Changes
         if: github.event_name == 'repository_dispatch'
         shell: bash
         run: |
           cd $GITHUB_WORKSPACE
-          cat ./src/core/settings.h
+          git diff HEAD
       - run: git submodule update --init --recursive
       - name: Configure CMake
         shell: bash
         run: |
           cd $GITHUB_WORKSPACE
           mkdir build && cd build
-          cmake .. -DCMAKE_BUILD_TYPE=Release ${{matrix.options}}
+          cmake .. -DCMAKE_BUILD_TYPE=Release
       - name: Build
         working-directory: ./build
         shell: bash
@@ -74,7 +67,7 @@ jobs:
           fi
           export VERSION=${GITHUB_REF:10}
           echo ::set-env name=VERSION::$VERSION
-          7z a vvctre-$VERSION-${{matrix.os_lowercase}}.7z ./build/bin/*
+          7z a vvctre-$VERSION-${{runner.os}}.7z ./build/bin/*
       - name: Prepare to upload (repository dispatch)
         if: github.event_name == 'repository_dispatch'
         shell: bash
@@ -90,7 +83,7 @@ jobs:
             rm -rf ./build/bin/Release
           fi
           git diff HEAD > ./build/bin/changes.diff
-          7z a vvctre-custom-build-${{github.run_number}}-${{matrix.os_lowercase}}.7z ./build/bin/*
+          7z a vvctre-custom-build-${{github.run_number}}-${{runner.os}}.7z ./build/bin/*
       - name: Prepare to upload (pull request)
         if: github.event_name == 'pull_request'
         shell: bash
@@ -110,15 +103,15 @@ jobs:
         uses: svenstaro/upload-release-action@v1-release
         with:
           repo_token: ${{secrets.GITHUB_TOKEN}}
-          file: vvctre-${{env.VERSION}}-${{matrix.os_lowercase}}.7z
-          asset_name: vvctre-${{env.VERSION}}-${{matrix.os_lowercase}}.7z
+          file: vvctre-${{env.VERSION}}-${{runner.os}}.7z
+          asset_name: vvctre-${{env.VERSION}}-${{runner.os}}.7z
           tag: ${{github.ref}}
           overwrite: true
       - name: Upload (pull request)
         if: github.event_name == 'pull_request'
         uses: actions/upload-artifact@v1
         with:
-          name: vvctre-${{matrix.os_lowercase}}
+          name: vvctre-${{runner.os}}
           path: build/bin
       - name: Upload (repository dispatch)
         if: github.event_name == 'repository_dispatch'
@@ -126,7 +119,7 @@ jobs:
         with:
           url: ${{github.event.client_payload.discordWebhook}}
           forms: '{}'
-          fileForms: '{"file": "vvctre-custom-build-${{github.run_number}}-${{matrix.os_lowercase}}.7z"}'
+          fileForms: '{"file": "vvctre-custom-build-${{github.run_number}}-${{runner.os}}.7z"}'
       - name: Discord Success Notification (tag push)
         if: github.event_name == 'push'
         uses: rjstone/discord-webhook-notify@v1

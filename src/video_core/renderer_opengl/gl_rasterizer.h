@@ -31,11 +31,11 @@
 
 namespace Frontend {
 class EmuWindow;
-}
-
-class ShaderProgramManager;
+} // namespace Frontend
 
 namespace OpenGL {
+
+class ShaderProgramManager;
 
 class RasterizerOpenGL : public VideoCore::RasterizerInterface {
 public:

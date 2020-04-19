@@ -4,6 +4,7 @@
 
 #include <chrono>
 #include <cstring>
+#include "common/assert.h"
 #include "core/core.h"
 #include "core/core_timing.h"
 #include "core/hle/kernel/shared_page.h"
@@ -16,8 +17,8 @@
 namespace SharedPage {
 
 static std::chrono::seconds GetInitTime() {
-    u64 override_init_time = Core::Movie::GetInstance().GetOverrideInitTime();
-    if (override_init_time) {
+    const u64 override_init_time = Core::Movie::GetInstance().GetOverrideInitTime();
+    if (override_init_time != 0) {
         // Override the clock init time with the one in the movie
         return std::chrono::seconds(override_init_time);
     }
@@ -34,6 +35,9 @@ static std::chrono::seconds GetInitTime() {
     }
     case Settings::InitClock::FixedTime:
         return std::chrono::seconds(Settings::values.init_time);
+    default:
+        UNREACHABLE_MSG("Invalid InitClock value ({})",
+                        static_cast<u32>(Settings::values.init_clock));
     }
 }
 

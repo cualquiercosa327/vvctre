@@ -874,7 +874,7 @@ void Module::Interface::GetLatestVsyncTiming(Kernel::HLERequestContext& ctx) {
             break;
         }
     }
-    rb.PushStaticBuffer(out, 0);
+    rb.PushStaticBuffer(std::move(out), 0);
 }
 
 void Module::Interface::GetStereoCameraCalibrationData(Kernel::HLERequestContext& ctx) {

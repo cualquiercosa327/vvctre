@@ -489,6 +489,11 @@ void EmuWindow_SDL2::SwapBuffers() {
                         Settings::LogSettings();
                     }
 
+                    if (ImGui::Checkbox("Enable Linear Filtering", &Settings::values.filter_mode)) {
+                        Settings::Apply();
+                        Settings::LogSettings();
+                    }
+
                     ImGui::Text("Resolution:");
                     ImGui::SameLine();
                     const u16 min = 0;

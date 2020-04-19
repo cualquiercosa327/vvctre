@@ -15,7 +15,7 @@
 
 namespace Core {
 class System;
-}
+} // namespace Core
 
 namespace OpenGL {
 

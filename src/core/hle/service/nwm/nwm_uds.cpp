@@ -541,7 +541,7 @@ void NWM_UDS::Shutdown(Kernel::HLERequestContext& ctx) {
             static_cast<u8>(SharedPage::NetworkState::Internet);
     }
 
-    for (auto bind_node : channel_data) {
+    for (auto& bind_node : channel_data) {
         bind_node.second.event->Signal();
     }
 
@@ -1027,7 +1027,7 @@ void NWM_UDS::DestroyNetwork(Kernel::HLERequestContext& ctx) {
 
     IPC::RequestBuilder rb = rp.MakeBuilder(1, 0);
 
-    for (auto bind_node : channel_data) {
+    for (auto& bind_node : channel_data) {
         bind_node.second.event->Signal();
     }
     channel_data.clear();
@@ -1072,7 +1072,7 @@ void NWM_UDS::DisconnectNetwork(Kernel::HLERequestContext& ctx) {
 
     SendPacket(deauth);
 
-    for (auto bind_node : channel_data) {
+    for (auto& bind_node : channel_data) {
         bind_node.second.event->Signal();
     }
     channel_data.clear();
@@ -1186,12 +1186,12 @@ void NWM_UDS::PullPacket(Kernel::HLERequestContext& ctx) {
     }
 
     if (channel->second.received_packets.empty()) {
-        std::vector<u8> output_buffer(buff_size, 0);
+        std::vector<u8> output_buffer(buff_size);
         IPC::RequestBuilder rb = rp.MakeBuilder(3, 2);
         rb.Push(RESULT_SUCCESS);
         rb.Push<u32>(0);
         rb.Push<u16>(0);
-        rb.PushStaticBuffer(output_buffer, 0);
+        rb.PushStaticBuffer(std::move(output_buffer), 0);
         return;
     }
 
@@ -1209,7 +1209,7 @@ void NWM_UDS::PullPacket(Kernel::HLERequestContext& ctx) {
 
     IPC::RequestBuilder rb = rp.MakeBuilder(3, 2);
 
-    std::vector<u8> output_buffer(buff_size, 0);
+    std::vector<u8> output_buffer(buff_size);
     // Write the actual data.
     std::memcpy(output_buffer.data(),
                 next_packet.data() + sizeof(LLCHeader) + sizeof(SecureDataHeader), data_size);
@@ -1217,7 +1217,7 @@ void NWM_UDS::PullPacket(Kernel::HLERequestContext& ctx) {
     rb.Push(RESULT_SUCCESS);
     rb.Push<u32>(data_size);
     rb.Push<u16>(secure_data.src_node_id);
-    rb.PushStaticBuffer(output_buffer, 0);
+    rb.PushStaticBuffer(std::move(output_buffer), 0);
 
     channel->second.received_packets.pop_front();
 }
@@ -1381,9 +1381,9 @@ void NWM_UDS::DecryptBeaconData(Kernel::HLERequestContext& ctx, u16 command_id) 
     IPC::RequestBuilder rb = rp.MakeBuilder(1, 2);
     rb.Push(RESULT_SUCCESS);
 
-    std::vector<u8> output_buffer(sizeof(NodeInfo) * UDSMaxNodes, 0);
+    std::vector<u8> output_buffer(sizeof(NodeInfo) * UDSMaxNodes);
     std::memcpy(output_buffer.data(), nodes.data(), sizeof(NodeInfo) * nodes.size());
-    rb.PushStaticBuffer(output_buffer, 0);
+    rb.PushStaticBuffer(std::move(output_buffer), 0);
 }
 
 template <u16 command_id>

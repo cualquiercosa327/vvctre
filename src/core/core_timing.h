@@ -174,7 +174,8 @@ public:
     void RemoveEvent(const TimingEventType* event_type);
     void RemoveNormalAndThreadsafeEvent(const TimingEventType* event_type);
 
-    /** Advance must be called at the beginning of dispatcher loops, not the end. Advance() ends
+    /**
+     * Advance must be called at the beginning of dispatcher loops, not the end. Advance() ends
      * the previous timing slice and begins the next one, you must Advance from the previous
      * slice to the current one before executing any cycles. CoreTiming starts in slice -1 so an
      * Advance() is required to initialize the slice length before the first cycle of emulated
@@ -202,8 +203,6 @@ private:
         bool operator>(const Event& right) const;
         bool operator<(const Event& right) const;
     };
-
-    static constexpr int MAX_SLICE_LENGTH = 20000;
 
     s64 global_timer = 0;
     s64 slice_length = MAX_SLICE_LENGTH;
