@@ -6,7 +6,7 @@
 
 namespace AudioCore::HLE {
 
-enum_le<DecoderSampleRate> GetSampleRateEnum(u32 sample_rate) {
+DecoderSampleRate GetSampleRateEnum(u32 sample_rate) {
     switch (sample_rate) {
     case 48000:
         return DecoderSampleRate::Rate48000;
