@@ -149,7 +149,7 @@ std::vector<std::string> GetPostProcessingShaderList(bool anaglyph) {
     return shader_names;
 }
 
-std::string GetPostProcessingShaderCode(const bool anaglyph, const std::string shader) {
+std::string GetPostProcessingShaderCode(const bool anaglyph, std::string_view shader) {
     std::string shader_dir = FileUtil::GetUserPath(FileUtil::UserPath::ShaderDir);
     std::string shader_path;
 
