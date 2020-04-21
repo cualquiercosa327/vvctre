@@ -1687,7 +1687,7 @@ bool RasterizerCacheOpenGL::IntervalHasInvalidPixelFormat(SurfaceParams& params,
     for (const auto& set : RangeFromInterval(surface_cache, interval))
         for (const auto& surface : set.second)
             if (surface->pixel_format == PixelFormat::Invalid) {
-                LOG_WARNING(Render_OpenGL, "Surface found with invalid pixel format");
+                LOG_DEBUG(Render_OpenGL, "Surface found with invalid pixel format");
                 return true;
             }
     return false;

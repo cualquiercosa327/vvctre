@@ -288,7 +288,7 @@ u8* MemorySystem::GetPhysicalPointer(PAddr address) {
         });
 
     if (area == std::end(memory_areas)) {
-        LOG_ERROR(HW_Memory, "unknown GetPhysicalPointer @ 0x{:08X} at PC 0x{:08X}", address,
+        LOG_DEBUG(HW_Memory, "unknown GetPhysicalPointer @ 0x{:08X} at PC 0x{:08X}", address,
                   Core::System::GetInstance().CPU().GetPC());
         return nullptr;
     }
