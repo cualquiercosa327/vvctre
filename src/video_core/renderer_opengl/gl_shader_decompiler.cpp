@@ -564,7 +564,7 @@ private:
                 } else if (op_x != op_y) {
                     shader.AddLine("conditional_code.x = {}.x {} {}.x;", src1,
                                    cmp_ops.find(op_x)->second.first, src2);
-                    shader.AddLine("conditional_code.y = {}.y {} {}.y", src1,
+                    shader.AddLine("conditional_code.y = {}.y {} {}.y;", src1,
                                    cmp_ops.find(op_y)->second.first, src2);
                 } else {
                     shader.AddLine("conditional_code = {}(vec2({}), vec2({}));",
