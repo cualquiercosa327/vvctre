@@ -28,7 +28,7 @@ using Service::DSP::DSP_DSP;
 
 namespace AudioCore {
 
-static constexpr u64 audio_frame_ticks_full_speed = 1310252ull; ///< Units: ARM11 cycles
+static constexpr u64 audio_frame_ticks_full_speed = 1310252ull; ///< ARM11 cycles
 
 struct DspHle::Impl final {
 public:
