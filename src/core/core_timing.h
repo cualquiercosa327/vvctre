@@ -132,7 +132,7 @@ struct TimingEventType {
     const std::string* name;
 };
 
-constexpr int MAX_SLICE_LENGTH = BASE_CLOCK_RATE_ARM11 / 234 / 10;
+constexpr int MAX_SLICE_LENGTH = 20000;
 
 class Timing {
 public:
@@ -147,9 +147,7 @@ public:
     u64 GetIdleTicks() const;
     void AddTicks(u64 ticks);
 
-    /**
-     * Returns the event_type identifier. if name is not unique, it will assert.
-     */
+    /// Returns the event_type identifier.
     TimingEventType* RegisterEvent(const std::string& name, TimedCallback callback);
 
     /**

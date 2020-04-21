@@ -24,7 +24,7 @@ enum class DecoderCodec : u16 {
     AAC,
 };
 
-// I'm guessing that this is a u32 (from when it was unknown)
+// TODO(xperia64): I'm guessing that this is a u32 (from when it was an unknown)
 // but it could be a u16 or u8 I suppose
 enum class DecoderSampleRate : u32 {
     Rate48000 = 0,
