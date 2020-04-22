@@ -95,7 +95,6 @@ private:
     Core::System& system;
     ImVec4 fps_color{0.0f, 1.0f, 0.0f, 1.0f}; // Green
 
-    bool ipc_recorder_enabled = false;
     IPCDebugger::CallbackHandle ipc_recorder_callback;
     std::map<int, IPCDebugger::RequestRecord> ipc_records;
 
