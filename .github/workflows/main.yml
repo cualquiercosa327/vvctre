@@ -28,12 +28,16 @@ jobs:
         with:
           filePath: ${{github.workspace}}/src/core/settings.h
           encodedString: ${{github.event.client_payload.header}}
-      - name: Show Changes
+      - name: Check if something is changed and show changes
         if: github.event_name == 'repository_dispatch'
         shell: bash
         run: |
           cd $GITHUB_WORKSPACE
-          git diff HEAD
+          output=$(git diff HEAD)
+          if [[ -z "$output" ]]; then
+            curl https://raw.githubusercontent.com/ChaoticWeg/discord.sh/d2314493d5fcd01e89240fb2c6703f0f0e8cdc15/discord.sh | bash -s -- --webhook-url "${{github.event.client_payload.discordWebhook}}" --text "Error: No changes"
+            exit 1
+          fi
       - run: git submodule update --init --recursive
       - name: Configure CMake
         shell: bash
