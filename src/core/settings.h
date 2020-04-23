@@ -365,7 +365,7 @@ struct Values {
 
     // Used by the frontend
 
-    /// If you're making a custom build and you use Windows,
+    /// If you're making a custom build, want to change the default file path, and you use Windows,
     /// this needs to be a full path with double backslash
     std::string file_path;
 
