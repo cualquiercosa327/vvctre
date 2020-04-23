@@ -604,6 +604,8 @@ public:
 
   std::shared_ptr<Response> Head(const char *path, const Headers &headers);
 
+  std::shared_ptr<Response> Post(const char *path);
+
   std::shared_ptr<Response> Post(const char *path, const std::string &body,
                                  const char *content_type);
 
@@ -630,6 +632,8 @@ public:
 
   std::shared_ptr<Response> Post(const char *path, const Headers &headers,
                                  const MultipartFormDataItems &items);
+
+  std::shared_ptr<Response> Put(const char *path);
 
   std::shared_ptr<Response> Put(const char *path, const std::string &body,
                                 const char *content_type);
@@ -831,7 +835,7 @@ inline void Post(std::vector<Request> &requests, const char *path,
   req.method = "POST";
   req.path = path;
   req.headers = headers;
-  req.headers.emplace("Content-Type", content_type);
+  if (content_type) { req.headers.emplace("Content-Type", content_type); }
   req.body = body;
   requests.emplace_back(std::move(req));
 }
@@ -884,7 +888,7 @@ public:
 
   long get_openssl_verify_result() const;
 
-  SSL_CTX *ssl_context() const noexcept;
+  SSL_CTX *ssl_context() const;
 
 private:
   bool process_and_close_socket(
@@ -1889,9 +1893,16 @@ inline bool read_content_chunked(Stream &strm, ContentReceiver out) {
 
   if (!line_reader.getline()) { return false; }
 
-  auto chunk_len = std::stoul(line_reader.ptr(), 0, 16);
+  unsigned long chunk_len;
+  while (true) {
+    char *end_ptr;
 
-  while (chunk_len > 0) {
+    chunk_len = std::strtoul(line_reader.ptr(), &end_ptr, 16);
+
+    if (end_ptr == line_reader.ptr()) { return false; }
+
+    if (chunk_len == 0) { break; }
+
     if (!read_content_with_length(strm, chunk_len, nullptr, out)) {
       return false;
     }
@@ -1901,8 +1912,6 @@ inline bool read_content_chunked(Stream &strm, ContentReceiver out) {
     if (strcmp(line_reader.ptr(), "\r\n")) { break; }
 
     if (!line_reader.getline()) { return false; }
-
-    chunk_len = std::stoul(line_reader.ptr(), 0, 16);
   }
 
   if (chunk_len == 0) {
@@ -3885,34 +3894,42 @@ inline bool Client::redirect(const Request &req, Response &res) {
   if (location.empty()) { return false; }
 
   const static std::regex re(
-      R"(^(?:([^:/?#]+):)?(?://([^/?#]*))?([^?#]*(?:\?[^#]*)?)(?:#.*)?)");
+      R"(^(?:(https?):)?(?://([^:/?#]*)(?::(\d+))?)?([^?#]*(?:\?[^#]*)?)(?:#.*)?)");
 
   std::smatch m;
-  if (!regex_match(location, m, re)) { return false; }
+  if (!std::regex_match(location, m, re)) { return false; }
 
   auto scheme = is_ssl() ? "https" : "http";
 
   auto next_scheme = m[1].str();
   auto next_host = m[2].str();
-  auto next_path = m[3].str();
-  if (next_scheme.empty()) { next_scheme = scheme; }
+  auto port_str = m[3].str();
+  auto next_path = m[4].str();
+
+  auto next_port = port_;
+  if (!port_str.empty()) {
+    next_port = std::stoi(port_str);
+  } else if (!next_scheme.empty()) {
+    next_port = next_scheme == "https" ? 443 : 80;
+  }
+
   if (next_scheme.empty()) { next_scheme = scheme; }
   if (next_host.empty()) { next_host = host_; }
   if (next_path.empty()) { next_path = "/"; }
 
-  if (next_scheme == scheme && next_host == host_) {
+  if (next_scheme == scheme && next_host == host_ && next_port == port_) {
     return detail::redirect(*this, req, res, next_path);
   } else {
     if (next_scheme == "https") {
 #ifdef CPPHTTPLIB_OPENSSL_SUPPORT
-      SSLClient cli(next_host.c_str());
+      SSLClient cli(next_host.c_str(), next_port);
       cli.copy_settings(*this);
       return detail::redirect(cli, req, res, next_path);
 #else
       return false;
 #endif
     } else {
-      Client cli(next_host.c_str());
+      Client cli(next_host.c_str(), next_port);
       cli.copy_settings(*this);
       return detail::redirect(cli, req, res, next_path);
     }
@@ -4022,7 +4039,7 @@ inline std::shared_ptr<Response> Client::send_with_content_provider(
   req.headers = headers;
   req.path = path;
 
-  req.headers.emplace("Content-Type", content_type);
+  if (content_type) { req.headers.emplace("Content-Type", content_type); }
 
 #ifdef CPPHTTPLIB_ZLIB_SUPPORT
   if (compress_) {
@@ -4214,6 +4231,10 @@ inline std::shared_ptr<Response> Client::Head(const char *path,
   return send(req, *res) ? res : nullptr;
 }
 
+inline std::shared_ptr<Response> Client::Post(const char *path) {
+  return Post(path, std::string(), nullptr);
+}
+
 inline std::shared_ptr<Response> Client::Post(const char *path,
                                               const std::string &body,
                                               const char *content_type) {
@@ -4284,6 +4305,10 @@ Client::Post(const char *path, const Headers &headers,
 
   std::string content_type = "multipart/form-data; boundary=" + boundary;
   return Post(path, headers, body, content_type.c_str());
+}
+
+inline std::shared_ptr<Response> Client::Put(const char *path) {
+  return Put(path, std::string(), nullptr);
 }
 
 inline std::shared_ptr<Response> Client::Put(const char *path,
@@ -4768,7 +4793,7 @@ inline long SSLClient::get_openssl_verify_result() const {
   return verify_result_;
 }
 
-inline SSL_CTX *SSLClient::ssl_context() const noexcept { return ctx_; }
+inline SSL_CTX *SSLClient::ssl_context() const { return ctx_; }
 
 inline bool SSLClient::process_and_close_socket(
     socket_t sock, size_t request_count,
@@ -4958,6 +4983,63 @@ inline bool SSLClient::check_host_name(const char *pattern,
   return true;
 }
 #endif
+
+namespace url {
+
+struct Options {
+  // TODO: support more options...
+  bool follow_location = false;
+  std::string client_cert_path;
+  std::string client_key_path;
+
+  std::string ca_cert_file_path;
+  std::string ca_cert_dir_path;
+  bool server_certificate_verification = false;
+};
+
+inline std::shared_ptr<Response> Get(const char *url, Options &options) {
+  const static std::regex re(
+      R"(^(https?)://([^:/?#]+)(?::(\d+))?([^?#]*(?:\?[^#]*)?)(?:#.*)?)");
+
+  std::cmatch m;
+  if (!std::regex_match(url, m, re)) { return nullptr; }
+
+  auto next_scheme = m[1].str();
+  auto next_host = m[2].str();
+  auto port_str = m[3].str();
+  auto next_path = m[4].str();
+
+  auto next_port = !port_str.empty() ? std::stoi(port_str)
+                                     : (next_scheme == "https" ? 443 : 80);
+
+  if (next_path.empty()) { next_path = "/"; }
+
+  if (next_scheme == "https") {
+#ifdef CPPHTTPLIB_OPENSSL_SUPPORT
+    SSLClient cli(next_host.c_str(), next_port, options.client_cert_path,
+                  options.client_key_path);
+    cli.set_follow_location(options.follow_location);
+    cli.set_ca_cert_path(options.ca_cert_file_path.c_str(), options.ca_cert_dir_path.c_str());
+    cli.enable_server_certificate_verification(
+        options.server_certificate_verification);
+    return cli.Get(next_path.c_str());
+#else
+    return nullptr;
+#endif
+  } else {
+    Client cli(next_host.c_str(), next_port, options.client_cert_path,
+               options.client_key_path);
+    cli.set_follow_location(options.follow_location);
+    return cli.Get(next_path.c_str());
+  }
+}
+
+inline std::shared_ptr<Response> Get(const char *url) {
+  Options options;
+  return Get(url, options);
+}
+
+} // namespace url
 
 // ----------------------------------------------------------------------------
 
