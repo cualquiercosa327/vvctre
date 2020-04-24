@@ -21,7 +21,14 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install --yes libsdl2-dev libpng-dev
-      - uses: actions/checkout@v1
+      - name: Checkout (not repository dispatch)
+        uses: actions/checkout@v1
+        if: github.event_name != 'repository_dispatch'
+      - name: Checkout (repository dispatch)
+        uses: actions/checkout@v1
+        if: github.event_name == 'repository_dispatch'
+        with:
+          ref: refs/tags/${{github.event.client_payload.checkout}}
       - name: Write settings.h
         if: github.event_name == 'repository_dispatch'
         uses: RollyPeres/base64-to-path@v1
