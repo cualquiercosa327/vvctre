@@ -45,6 +45,7 @@ jobs:
             curl https://raw.githubusercontent.com/ChaoticWeg/discord.sh/d2314493d5fcd01e89240fb2c6703f0f0e8cdc15/discord.sh | bash -s -- --webhook-url "${{github.event.client_payload.discordWebhook}}" --text "Error: No changes"
             exit 1
           fi
+          git diff HEAD
       - run: git submodule update --init --recursive
       - name: Configure CMake
         shell: bash
