@@ -18,7 +18,6 @@
 
 #define SDL_MAIN_HANDLED
 #include <SDL.h>
-#include <indicators/progress_bar.hpp>
 #include <portable-file-dialogs.h>
 #include "common/common_paths.h"
 #include "common/detached_tasks.h"

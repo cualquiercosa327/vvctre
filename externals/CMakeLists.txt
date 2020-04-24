@@ -111,4 +111,3 @@ target_include_directories(clip INTERFACE ./clip)
 
 add_subdirectory(semver)
 add_subdirectory(easywsclient)
-add_subdirectory(indicators)

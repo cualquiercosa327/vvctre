@@ -34,9 +34,6 @@
 [submodule "semver"]
     path = externals/semver
     url = https://github.com/Neargye/semver.git
-[submodule "indicators"]
-    path = externals/indicators
-    url = https://github.com/p-ranav/indicators.git
 [submodule "imgui"]
     path = externals/imgui
     url = https://github.com/ocornut/imgui.git
