@@ -1387,4 +1387,3 @@ int gladLoadGLLoader(GLADloadproc load) {
 	load_GL_KHR_debug(load);
 	return GLVersion.major != 0 || GLVersion.minor != 0;
 }
-
