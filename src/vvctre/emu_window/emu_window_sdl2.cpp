@@ -243,11 +243,6 @@ void EmuWindow_SDL2::SwapBuffers() {
                             .result();
 
                     if (!files.empty()) {
-                        const std::vector<std::string> files =
-                            pfd::open_file("Install CIA", ".", {"CTR Importable Archive", "*.cia"},
-                                           true)
-                                .result();
-
                         auto am = Service::AM::GetModule(system);
 
                         for (const auto& file : files) {
