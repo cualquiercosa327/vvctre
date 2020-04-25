@@ -350,13 +350,6 @@ void EmuWindow_SDL2::SwapBuffers() {
                         Settings::LogSettings();
                     }
 
-                    ImGui::Text("Speed:");
-                    ImGui::SameLine();
-                    if (ImGui::SliderFloat("##speed", &Settings::values.audio_speed, 0.001f,
-                                           5.0f)) {
-                        Settings::LogSettings();
-                    }
-
                     ImGui::Text("Sink:");
                     ImGui::SameLine();
                     if (ImGui::BeginCombo("##sink", Settings::values.sink_id.c_str())) {

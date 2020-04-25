@@ -396,10 +396,6 @@ void InitialSettings::Run() {
                     ImGui::SameLine();
                     ImGui::SliderFloat("##volume", &Settings::values.volume, 0.0f, 1.0f);
 
-                    ImGui::Text("Speed:");
-                    ImGui::SameLine();
-                    ImGui::SliderFloat("##speed", &Settings::values.audio_speed, 0.001f, 5.0f);
-
                     ImGui::Text("Sink:");
                     ImGui::SameLine();
                     if (ImGui::BeginCombo("##sink", Settings::values.sink_id.c_str())) {

@@ -40,7 +40,7 @@ namespace AudioCore {
 // When the value is set to 1310740, all three games are playable
 // The audio track only drifts ~1ms over a 4+ minute song compared to hardware
 // and the button presses match as well as I can determine by playing the game/recording
-static constexpr u64 audio_frame_ticks_full_speed = 1310740ull; ///< Units: ARM11 cycles
+static constexpr u64 audio_frame_ticks = 1310740ull; ///< Units: ARM11 cycles
 
 struct DspHle::Impl final {
 public:
@@ -116,7 +116,7 @@ DspHle::Impl::Impl(DspHle& parent_, Memory::MemorySystem& memory) : parent(paren
     tick_event =
         timing.RegisterEvent("AudioCore::DspHle::tick_event",
                              [this](u64, s64 cycles_late) { AudioTickCallback(cycles_late); });
-    timing.ScheduleEvent(audio_frame_ticks_full_speed / Settings::values.audio_speed, tick_event);
+    timing.ScheduleEvent(audio_frame_ticks, tick_event);
 }
 
 DspHle::Impl::~Impl() {
@@ -417,7 +417,7 @@ void DspHle::Impl::AudioTickCallback(s64 cycles_late) {
     // Reschedule recurrent event
     Core::Timing& timing = Core::System::GetInstance().CoreTiming();
     timing.ScheduleEvent(
-        (audio_frame_ticks_full_speed / Settings::values.audio_speed) - cycles_late, tick_event);
+       audio_frame_ticks- cycles_late, tick_event);
 }
 
 DspHle::DspHle(Memory::MemorySystem& memory) : impl(std::make_unique<Impl>(*this, memory)) {}
