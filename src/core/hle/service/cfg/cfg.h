@@ -116,6 +116,7 @@ public:
         void SetConfigInfoBlk4(Kernel::HLERequestContext& ctx, u16 id);
         void UpdateConfigNANDSavegame(Kernel::HLERequestContext& ctx, u16 id);
         void FormatConfig(Kernel::HLERequestContext& ctx);
+        void IsFangateSupported(Kernel::HLERequestContext& ctx);
 
         /// A helper function for dispatching service functions that have multiple IDs
         template <void (Interface::*function)(Kernel::HLERequestContext& ctx, u16 id), u16 id>

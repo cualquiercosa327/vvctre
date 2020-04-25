@@ -19,7 +19,7 @@ CFG_U::CFG_U(std::shared_ptr<Module> cfg) : Module::Interface(std::move(cfg), "c
         {0x00080080, nullptr, "GoThroughTable"},
         {0x00090040, &CFG_U::GetCountryCodeString, "GetCountryCodeString"},
         {0x000A0040, &CFG_U::GetCountryCodeID, "GetCountryCodeID"},
-        {0x000B0000, nullptr, "IsFangateSupported"},
+        {0x000B0000, &CFG_U::IsFangateSupported, "IsFangateSupported"},
     };
     RegisterHandlers(functions);
 }
