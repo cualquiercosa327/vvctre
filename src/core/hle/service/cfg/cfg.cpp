@@ -303,6 +303,12 @@ void Module::Interface::FormatConfig(Kernel::HLERequestContext& ctx) {
     rb.Push(cfg->FormatConfig());
 }
 
+void Module::Interface::IsFangateSupported(Kernel::HLERequestContext& ctx) {
+    IPC::RequestBuilder rb(ctx, 0xB, 2, 0);
+    rb.Push(RESULT_SUCCESS);
+    rb.Push(true);
+}
+
 ResultVal<void*> Module::GetConfigInfoBlockPointer(u32 block_id, u32 size, u32 flag) {
     // Read the header
     SaveFileConfig* config = reinterpret_cast<SaveFileConfig*>(cfg_config_file_buffer.data());
