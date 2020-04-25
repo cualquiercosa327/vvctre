@@ -974,7 +974,7 @@ paths:
                 type: object
                 properties:
                   resolution:
-                    type: string
+                    type: number
                 required:
                   - resolution
       operationId: get-resolution
