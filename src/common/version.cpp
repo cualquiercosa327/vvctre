@@ -5,6 +5,6 @@
 #include "common/version.h"
 
 namespace version {
-const semver::version vvctre{25, 18, 0};
+const semver::version vvctre{26, 0, 0};
 const u8 movie = 2;
 } // namespace version

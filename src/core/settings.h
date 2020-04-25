@@ -301,7 +301,6 @@ struct Values {
     MicInputType mic_input_type = MicInputType::None;
 
     std::string mic_input_device;
-    float audio_speed = 1.0f;
 
     // Camera
     std::array<std::string, Service::CAM::NumCameras> camera_name{
