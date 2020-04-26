@@ -29,18 +29,13 @@ using Service::DSP::DSP_DSP;
 namespace AudioCore {
 
 // TODO(xperia64): The value below is the "perfect" mathematical ratio
-// of ARM11 cycles per audio frame. As per merry, this was calculated to be
-// (ARM11 freq)*(samples per frame)/(sample rate)
-// = (268,111,855.956 Hz) * (160 samples)/(32,728 Hz)
-// = (1310739.946008311...) ~ 1310740
+// of ARM11 cycles per audio frame, as per merry's suggestion
+// samples per frame * teaklite cycles per sample * 2 ARM11 cycles/teaklite cycle
+// (160 * 4096 * 2) = (1310720)
 //
-// This value was originally set to 1310252, which was determined by measuring it on hardware
-// However, as of when this was written, Project Mirai 1/2/DX desync on HLE
-// such that the music track runs ahead of the gameplay.
-// When the value is set to 1310740, all three games are playable
-// The audio track only drifts ~1ms over a 4+ minute song compared to hardware
-// and the button presses match as well as I can determine by playing the game/recording
-static constexpr u64 audio_frame_ticks = 1310740ull; ///< Units: ARM11 cycles
+// As per merry, it may be useful to verify this on hardware with the more recently
+// discovered "correct" ARM11 frequency of 268111856 as opposed to 268123480
+static constexpr u64 audio_frame_ticks = 160 * 4096 * 2ull; ///< Units: ARM11 cycles
 
 struct DspHle::Impl final {
 public:
@@ -416,8 +411,7 @@ void DspHle::Impl::AudioTickCallback(s64 cycles_late) {
 
     // Reschedule recurrent event
     Core::Timing& timing = Core::System::GetInstance().CoreTiming();
-    timing.ScheduleEvent(
-       audio_frame_ticks- cycles_late, tick_event);
+    timing.ScheduleEvent(audio_frame_ticks - cycles_late, tick_event);
 }
 
 DspHle::DspHle(Memory::MemorySystem& memory) : impl(std::make_unique<Impl>(*this, memory)) {}

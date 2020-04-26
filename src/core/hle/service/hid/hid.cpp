@@ -104,7 +104,10 @@ void Module::UpdatePadCallback(u64 userdata, s64 cycles_late) {
 
     // Get current circle pad position and update circle pad direction
     const auto [circle_pad_x_f, circle_pad_y_f] = GetCirclePadState();
-    constexpr int MAX_CIRCLEPAD_POS = 0x9C; // Max value for a circle pad position
+    // TODO(xperia64): The old value of 0x9C didn't work in Theatrhythm
+    //                 it dropped up/left presses. This is the maximum value
+    //                 found to still work in FF Theatrhythm CC
+    constexpr int MAX_CIRCLEPAD_POS = 0x90; // Max value for a circle pad position
     s16 circle_pad_x = static_cast<s16>(circle_pad_x_f * MAX_CIRCLEPAD_POS);
     s16 circle_pad_y = static_cast<s16>(circle_pad_y_f * MAX_CIRCLEPAD_POS);
 
