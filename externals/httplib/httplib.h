@@ -134,6 +134,7 @@ using socket_t = int;
 #include <array>
 #include <atomic>
 #include <cassert>
+#include <climits>
 #include <condition_variable>
 #include <errno.h>
 #include <fcntl.h>
@@ -174,7 +175,6 @@ inline const unsigned char *ASN1_STRING_get0_data(const ASN1_STRING *asn1) {
 #ifdef CPPHTTPLIB_ZLIB_SUPPORT
 #include <zlib.h>
 #endif
-
 /*
  * Declaration
  */
@@ -261,6 +261,9 @@ struct Request {
   std::string path;
   Headers headers;
   std::string body;
+
+  std::string remote_addr;
+  int remote_port = -1;
 
   // for server
   std::string version;
@@ -352,7 +355,7 @@ public:
 
   virtual ssize_t read(char *ptr, size_t size) = 0;
   virtual ssize_t write(const char *ptr, size_t size) = 0;
-  virtual std::string get_remote_addr() const = 0;
+  virtual void get_remote_ip_and_port(std::string &ip, int &port) const = 0;
 
   template <typename... Args>
   ssize_t write_format(const char *fmt, const Args &... args);
@@ -364,8 +367,11 @@ class TaskQueue {
 public:
   TaskQueue() = default;
   virtual ~TaskQueue() = default;
+
   virtual void enqueue(std::function<void()> fn) = 0;
   virtual void shutdown() = 0;
+
+  virtual void on_idle(){};
 };
 
 class ThreadPool : public TaskQueue {
@@ -692,6 +698,8 @@ public:
   bool send(const std::vector<Request> &requests,
             std::vector<Response> &responses);
 
+  void stop();
+
   void set_timeout_sec(time_t timeout_sec);
 
   void set_read_timeout(time_t sec, time_t usec);
@@ -723,6 +731,8 @@ public:
 protected:
   bool process_request(Stream &strm, const Request &req, Response &res,
                        bool last_connection, bool &connection_close);
+
+  std::atomic<socket_t> sock_;
 
   const std::string host_;
   const int port_;
@@ -1283,7 +1293,7 @@ public:
   bool is_writable() const override;
   ssize_t read(char *ptr, size_t size) override;
   ssize_t write(const char *ptr, size_t size) override;
-  std::string get_remote_addr() const override;
+  void get_remote_ip_and_port(std::string &ip, int &port) const override;
 
 private:
   socket_t sock_;
@@ -1302,7 +1312,7 @@ public:
   bool is_writable() const override;
   ssize_t read(char *ptr, size_t size) override;
   ssize_t write(const char *ptr, size_t size) override;
-  std::string get_remote_addr() const override;
+  void get_remote_ip_and_port(std::string &ip, int &port) const override;
 
 private:
   socket_t sock_;
@@ -1321,7 +1331,7 @@ public:
   bool is_writable() const override;
   ssize_t read(char *ptr, size_t size) override;
   ssize_t write(const char *ptr, size_t size) override;
-  std::string get_remote_addr() const override;
+  void get_remote_ip_and_port(std::string &ip, int &port) const override;
 
   const std::string &get_buffer() const;
 
@@ -1554,21 +1564,32 @@ inline socket_t create_client_socket(const char *host, int port,
       });
 }
 
-inline std::string get_remote_addr(socket_t sock) {
-  struct sockaddr_storage addr;
-  socklen_t len = sizeof(addr);
-
-  if (!getpeername(sock, reinterpret_cast<struct sockaddr *>(&addr), &len)) {
-    std::array<char, NI_MAXHOST> ipstr{};
-
-    if (!getnameinfo(reinterpret_cast<struct sockaddr *>(&addr), len,
-                     ipstr.data(), static_cast<socklen_t>(ipstr.size()),
-                     nullptr, 0, NI_NUMERICHOST)) {
-      return ipstr.data();
-    }
+inline void get_remote_ip_and_port(const struct sockaddr_storage &addr,
+                                   socklen_t addr_len, std::string &ip,
+                                   int &port) {
+  if (addr.ss_family == AF_INET) {
+    port = ntohs(reinterpret_cast<const struct sockaddr_in *>(&addr)->sin_port);
+  } else if (addr.ss_family == AF_INET6) {
+    port =
+        ntohs(reinterpret_cast<const struct sockaddr_in6 *>(&addr)->sin6_port);
   }
 
-  return std::string();
+  std::array<char, NI_MAXHOST> ipstr{};
+  if (!getnameinfo(reinterpret_cast<const struct sockaddr *>(&addr), addr_len,
+                   ipstr.data(), static_cast<socklen_t>(ipstr.size()), nullptr,
+                   0, NI_NUMERICHOST)) {
+    ip = ipstr.data();
+  }
+}
+
+inline void get_remote_ip_and_port(socket_t sock, std::string &ip, int &port) {
+  struct sockaddr_storage addr;
+  socklen_t addr_len = sizeof(addr);
+
+  if (!getpeername(sock, reinterpret_cast<struct sockaddr *>(&addr),
+                   &addr_len)) {
+    get_remote_ip_and_port(addr, addr_len, ip, port);
+  }
 }
 
 inline const char *
@@ -1900,6 +1921,7 @@ inline bool read_content_chunked(Stream &strm, ContentReceiver out) {
     chunk_len = std::strtoul(line_reader.ptr(), &end_ptr, 16);
 
     if (end_ptr == line_reader.ptr()) { return false; }
+    if (chunk_len == ULONG_MAX) { return false; }
 
     if (chunk_len == 0) { break; }
 
@@ -2909,25 +2931,42 @@ inline SocketStream::SocketStream(socket_t sock, time_t read_timeout_sec,
 inline SocketStream::~SocketStream() {}
 
 inline bool SocketStream::is_readable() const {
-  return detail::select_read(sock_, read_timeout_sec_, read_timeout_usec_) > 0;
+  return select_read(sock_, read_timeout_sec_, read_timeout_usec_) > 0;
 }
 
 inline bool SocketStream::is_writable() const {
-  return detail::select_write(sock_, 0, 0) > 0;
+  return select_write(sock_, 0, 0) > 0;
 }
 
 inline ssize_t SocketStream::read(char *ptr, size_t size) {
-  if (is_readable()) { return recv(sock_, ptr, size, 0); }
-  return -1;
+  if (!is_readable()) { return -1; }
+
+#ifdef _WIN32
+  if (size > static_cast<size_t>(std::numeric_limits<int>::max())) {
+    return -1;
+  }
+  return recv(sock_, ptr, static_cast<int>(size), 0);
+#else
+  return recv(sock_, ptr, size, 0);
+#endif
 }
 
 inline ssize_t SocketStream::write(const char *ptr, size_t size) {
-  if (is_writable()) { return send(sock_, ptr, size, 0); }
-  return -1;
+  if (!is_writable()) { return -1; }
+
+#ifdef _WIN32
+  if (size > static_cast<size_t>(std::numeric_limits<int>::max())) {
+    return -1;
+  }
+  return send(sock_, ptr, static_cast<int>(size), 0);
+#else
+  return send(sock_, ptr, size, 0);
+#endif
 }
 
-inline std::string SocketStream::get_remote_addr() const {
-  return detail::get_remote_addr(sock_);
+inline void SocketStream::get_remote_ip_and_port(std::string &ip,
+                                                 int &port) const {
+  return detail::get_remote_ip_and_port(sock_, ip, port);
 }
 
 // Buffer stream implementation
@@ -2950,7 +2989,8 @@ inline ssize_t BufferStream::write(const char *ptr, size_t size) {
   return static_cast<ssize_t>(size);
 }
 
-inline std::string BufferStream::get_remote_addr() const { return ""; }
+inline void BufferStream::get_remote_ip_and_port(std::string & /*ip*/,
+                                                 int & /*port*/) const {}
 
 inline const std::string &BufferStream::get_buffer() const { return buffer; }
 
@@ -3430,17 +3470,16 @@ inline int Server::bind_internal(const char *host, int port, int socket_flags) {
   if (svr_sock_ == INVALID_SOCKET) { return -1; }
 
   if (port == 0) {
-    struct sockaddr_storage address;
-    socklen_t len = sizeof(address);
-    if (getsockname(svr_sock_, reinterpret_cast<struct sockaddr *>(&address),
-                    &len) == -1) {
+    struct sockaddr_storage addr;
+    socklen_t addr_len = sizeof(addr);
+    if (getsockname(svr_sock_, reinterpret_cast<struct sockaddr *>(&addr),
+                    &addr_len) == -1) {
       return -1;
     }
-    if (address.ss_family == AF_INET) {
-      return ntohs(reinterpret_cast<struct sockaddr_in *>(&address)->sin_port);
-    } else if (address.ss_family == AF_INET6) {
-      return ntohs(
-          reinterpret_cast<struct sockaddr_in6 *>(&address)->sin6_port);
+    if (addr.ss_family == AF_INET) {
+      return ntohs(reinterpret_cast<struct sockaddr_in *>(&addr)->sin_port);
+    } else if (addr.ss_family == AF_INET6) {
+      return ntohs(reinterpret_cast<struct sockaddr_in6 *>(&addr)->sin6_port);
     } else {
       return -1;
     }
@@ -3465,6 +3504,7 @@ inline bool Server::listen_internal() {
       auto val = detail::select_read(svr_sock_, 0, 100000);
 
       if (val == 0) { // Timeout
+        task_queue->on_idle();
         continue;
       }
 
@@ -3645,7 +3685,9 @@ Server::process_request(Stream &strm, bool last_connection,
     connection_close = true;
   }
 
-  req.set_header("REMOTE_ADDR", strm.get_remote_addr());
+  strm.get_remote_ip_and_port(req.remote_addr, req.remote_port);
+  req.set_header("REMOTE_ADDR", req.remote_addr);
+  req.set_header("REMOTE_PORT", std::to_string(req.remote_port));
 
   if (req.has_header("Range")) {
     const auto &range_header_value = req.get_header_value("Range");
@@ -3696,7 +3738,7 @@ inline bool Server::process_and_close_socket(socket_t sock) {
 inline Client::Client(const std::string &host, int port,
                       const std::string &client_cert_path,
                       const std::string &client_key_path)
-    : host_(host), port_(port),
+    : sock_(INVALID_SOCKET), host_(host), port_(port),
       host_and_port_(host_ + ":" + std::to_string(port_)),
       client_cert_path_(client_cert_path), client_key_path_(client_key_path) {}
 
@@ -3732,18 +3774,19 @@ inline bool Client::read_response_line(Stream &strm, Response &res) {
 }
 
 inline bool Client::send(const Request &req, Response &res) {
-  auto sock = create_client_socket();
-  if (sock == INVALID_SOCKET) { return false; }
+  sock_ = create_client_socket();
+  if (sock_ == INVALID_SOCKET) { return false; }
 
 #ifdef CPPHTTPLIB_OPENSSL_SUPPORT
   if (is_ssl() && !proxy_host_.empty()) {
     bool error;
-    if (!connect(sock, res, error)) { return error; }
+    if (!connect(sock_, res, error)) { return error; }
   }
 #endif
 
   return process_and_close_socket(
-      sock, 1, [&](Stream &strm, bool last_connection, bool &connection_close) {
+      sock_, 1,
+      [&](Stream &strm, bool last_connection, bool &connection_close) {
         return handle_request(strm, req, res, last_connection,
                               connection_close);
       });
@@ -3753,18 +3796,18 @@ inline bool Client::send(const std::vector<Request> &requests,
                          std::vector<Response> &responses) {
   size_t i = 0;
   while (i < requests.size()) {
-    auto sock = create_client_socket();
-    if (sock == INVALID_SOCKET) { return false; }
+    sock_ = create_client_socket();
+    if (sock_ == INVALID_SOCKET) { return false; }
 
 #ifdef CPPHTTPLIB_OPENSSL_SUPPORT
     if (is_ssl() && !proxy_host_.empty()) {
       Response res;
       bool error;
-      if (!connect(sock, res, error)) { return false; }
+      if (!connect(sock_, res, error)) { return false; }
     }
 #endif
 
-    if (!process_and_close_socket(sock, requests.size() - i,
+    if (!process_and_close_socket(sock_, requests.size() - i,
                                   [&](Stream &strm, bool last_connection,
                                       bool &connection_close) -> bool {
                                     auto &req = requests[i++];
@@ -4428,6 +4471,14 @@ inline std::shared_ptr<Response> Client::Options(const char *path,
   return send(req, *res) ? res : nullptr;
 }
 
+inline void Client::stop() {
+  if (sock_ != INVALID_SOCKET) {
+    std::atomic<socket_t> sock(sock_.exchange(INVALID_SOCKET));
+    detail::shutdown_socket(sock);
+    detail::close_socket(sock);
+  }
+}
+
 inline void Client::set_timeout_sec(time_t timeout_sec) {
   timeout_sec_ = timeout_sec;
 }
@@ -4526,8 +4577,8 @@ inline bool process_and_close_socket_ssl(
       auto count = keep_alive_max_count;
       while (count > 0 &&
              (is_client_request ||
-              detail::select_read(sock, CPPHTTPLIB_KEEPALIVE_TIMEOUT_SECOND,
-                                  CPPHTTPLIB_KEEPALIVE_TIMEOUT_USECOND) > 0)) {
+              select_read(sock, CPPHTTPLIB_KEEPALIVE_TIMEOUT_SECOND,
+                          CPPHTTPLIB_KEEPALIVE_TIMEOUT_USECOND) > 0)) {
         SSLSocketStream strm(sock, ssl, read_timeout_sec, read_timeout_usec);
         auto last_connection = count == 1;
         auto connection_close = false;
@@ -4638,8 +4689,9 @@ inline ssize_t SSLSocketStream::write(const char *ptr, size_t size) {
   return -1;
 }
 
-inline std::string SSLSocketStream::get_remote_addr() const {
-  return detail::get_remote_addr(sock_);
+inline void SSLSocketStream::get_remote_ip_and_port(std::string &ip,
+                                                    int &port) const {
+  detail::get_remote_ip_and_port(sock_, ip, port);
 }
 
 static SSLInit sslinit_;
@@ -5019,7 +5071,8 @@ inline std::shared_ptr<Response> Get(const char *url, Options &options) {
     SSLClient cli(next_host.c_str(), next_port, options.client_cert_path,
                   options.client_key_path);
     cli.set_follow_location(options.follow_location);
-    cli.set_ca_cert_path(options.ca_cert_file_path.c_str(), options.ca_cert_dir_path.c_str());
+    cli.set_ca_cert_path(options.ca_cert_file_path.c_str(),
+                         options.ca_cert_dir_path.c_str());
     cli.enable_server_certificate_verification(
         options.server_certificate_verification);
     return cli.Get(next_path.c_str());
