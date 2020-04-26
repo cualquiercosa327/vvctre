@@ -145,7 +145,9 @@ int main(int, char**) {
     RPC::Server rpc_server(system, Settings::values.rpc_server_port);
 
     if (!Settings::values.play_movie.empty()) {
-        Core::Movie::GetInstance().StartPlayback(Settings::values.play_movie);
+        Core::Movie::GetInstance().StartPlayback(Settings::values.play_movie, [&] {
+            pfd::message("vvctre", "Playback finished", pfd::choice::ok);
+        });
     }
 
     if (!Settings::values.record_movie.empty()) {
