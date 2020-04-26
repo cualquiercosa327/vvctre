@@ -974,7 +974,7 @@ paths:
                 type: object
                 properties:
                   resolution:
-                    type: string
+                    type: number
                 required:
                   - resolution
       operationId: get-resolution
@@ -1761,25 +1761,6 @@ paths:
         description: ''
       description: Set the audio volume
   /audiospeed:
-    get:
-      summary: Get the audio speed
-      tags:
-        - Settings
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  value:
-                    description: float
-                    type: number
-                required:
-                  - value
-      operationId: get-audiospeed
-      description: Get the audio speed
     post:
       summary: Set the audio speed
       tags:
