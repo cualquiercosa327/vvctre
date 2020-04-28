@@ -24,6 +24,7 @@
 #include "common/logging/log.h"
 #include "common/stb_image_write.h"
 #include "common/string_util.h"
+#include "common/texture.h"
 #include "core/3ds.h"
 #include "core/cheats/cheat_base.h"
 #include "core/cheats/cheats.h"
@@ -2117,25 +2118,6 @@ void EmuWindow_SDL2::SwapBuffers() {
                                     std::memcpy(v.data(), data, v.size());
                                     delete[] data;
 
-                                    const auto rotate =
-                                        [](const std::vector<u8>& input,
-                                           const Layout::FramebufferLayout& layout) {
-                                            std::vector<u8> output(input.size());
-
-                                            for (std::size_t i = 0; i < layout.height; i++) {
-                                                for (std::size_t j = 0; j < layout.width; j++) {
-                                                    for (std::size_t k = 0; k < 4; k++) {
-                                                        output[i * (layout.width * 4) + j * 4 + k] =
-                                                            input[(layout.height - i - 1) *
-                                                                      (layout.width * 4) +
-                                                                  j * 4 + k];
-                                                    }
-                                                }
-                                            }
-
-                                            return output;
-                                        };
-
                                     const auto convert_bgra_to_rgba =
                                         [](const std::vector<u8>& input,
                                            const Layout::FramebufferLayout& layout) {
@@ -2156,7 +2138,9 @@ void EmuWindow_SDL2::SwapBuffers() {
                                             return output;
                                         };
 
-                                    v = convert_bgra_to_rgba(rotate(v, layout), layout);
+                                    v = convert_bgra_to_rgba(v, layout);
+                                    Common::FlipRGBA8Texture(v, static_cast<u64>(layout.width),
+                                                             static_cast<u64>(layout.height));
 
                                     stbi_write_png(filename.c_str(), layout.width, layout.height, 4,
                                                    v.data(), layout.width * 4);
@@ -2677,22 +2661,6 @@ void EmuWindow_SDL2::CopyScreenshot() {
                 std::memcpy(v.data(), data, v.size());
                 delete[] data;
 
-                const auto rotate = [](const std::vector<u8>& input,
-                                       const Layout::FramebufferLayout& layout) {
-                    std::vector<u8> output(input.size());
-
-                    for (std::size_t i = 0; i < layout.height; i++) {
-                        for (std::size_t j = 0; j < layout.width; j++) {
-                            for (std::size_t k = 0; k < 4; k++) {
-                                output[i * (layout.width * 4) + j * 4 + k] =
-                                    input[(layout.height - i - 1) * (layout.width * 4) + j * 4 + k];
-                            }
-                        }
-                    }
-
-                    return output;
-                };
-
                 const auto convert_bgra_to_rgba = [](const std::vector<u8>& input,
                                                      const Layout::FramebufferLayout& layout) {
                     int offset = 0;
@@ -2712,7 +2680,9 @@ void EmuWindow_SDL2::CopyScreenshot() {
                     return output;
                 };
 
-                v = convert_bgra_to_rgba(rotate(v, layout), layout);
+                v = convert_bgra_to_rgba(v, layout);
+                Common::FlipRGBA8Texture(v, static_cast<u64>(layout.width),
+                                         static_cast<u64>(layout.height));
 
                 clip::image_spec spec;
                 spec.width = layout.width;

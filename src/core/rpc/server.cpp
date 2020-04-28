@@ -8,6 +8,7 @@
 #include "common/logging/backend.h"
 #include "common/logging/filter.h"
 #include "common/stb_image_write.h"
+#include "common/texture.h"
 #include "common/thread.h"
 #include "core/arm/arm_interface.h"
 #include "core/cheats/cheat_base.h"
@@ -400,22 +401,6 @@ Server::Server(Core::System& system, const std::string& vvctre_version) {
         }
         done.Wait();
 
-        const auto rotate = [](const std::vector<u8>& input,
-                               const Layout::FramebufferLayout& layout) {
-            std::vector<u8> output(input.size());
-
-            for (std::size_t i = 0; i < layout.height; i++) {
-                for (std::size_t j = 0; j < layout.width; j++) {
-                    for (std::size_t k = 0; k < 4; k++) {
-                        output[i * (layout.width * 4) + j * 4 + k] =
-                            input[(layout.height - i - 1) * (layout.width * 4) + j * 4 + k];
-                    }
-                }
-            }
-
-            return output;
-        };
-
         const auto convert_bgra_to_rgba = [](const std::vector<u8>& input,
                                              const Layout::FramebufferLayout& layout) {
             int offset = 0;
@@ -435,7 +420,9 @@ Server::Server(Core::System& system, const std::string& vvctre_version) {
             return output;
         };
 
-        data = convert_bgra_to_rgba(rotate(data, layout), layout);
+        data = convert_bgra_to_rgba(data, layout);
+        Common::FlipRGBA8Texture(data, static_cast<u64>(layout.width),
+                                 static_cast<u64>(layout.height));
 
         std::vector<u8> out;
         stbi_write_func* f = [](void* context, void* data, int size) {
@@ -477,22 +464,6 @@ Server::Server(Core::System& system, const std::string& vvctre_version) {
             }
             done.Wait();
 
-            const auto rotate = [](const std::vector<u8>& input,
-                                   const Layout::FramebufferLayout& layout) {
-                std::vector<u8> output(input.size());
-
-                for (std::size_t i = 0; i < layout.height; i++) {
-                    for (std::size_t j = 0; j < layout.width; j++) {
-                        for (std::size_t k = 0; k < 4; k++) {
-                            output[i * (layout.width * 4) + j * 4 + k] =
-                                input[(layout.height - i - 1) * (layout.width * 4) + j * 4 + k];
-                        }
-                    }
-                }
-
-                return output;
-            };
-
             const auto convert_bgra_to_rgba = [](const std::vector<u8>& input,
                                                  const Layout::FramebufferLayout& layout) {
                 int offset = 0;
@@ -512,7 +483,9 @@ Server::Server(Core::System& system, const std::string& vvctre_version) {
                 return output;
             };
 
-            data = convert_bgra_to_rgba(rotate(data, layout), layout);
+            data = convert_bgra_to_rgba(data, layout);
+            Common::FlipRGBA8Texture(data, static_cast<u64>(layout.width),
+                                     static_cast<u64>(layout.height));
 
             std::vector<u8> out;
             stbi_write_func* f = [](void* context, void* data, int size) {
