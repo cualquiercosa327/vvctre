@@ -28,7 +28,6 @@
 #include "common/param_package.h"
 #include "common/scope_exit.h"
 #include "common/string_util.h"
-#include "common/version.h"
 #include "core/core.h"
 #include "core/hle/service/am/am.h"
 #include "core/hle/service/cfg/cfg.h"
@@ -55,6 +54,8 @@ extern "C" {
 __declspec(dllexport) unsigned long NvOptimusEnablement = 0x00000001;
 }
 #endif
+
+static const std::string vvctre_version = "26.0.5";
 
 static void InitializeLogging() {
     Log::Filter log_filter(Log::Level::Debug);
@@ -83,7 +84,7 @@ int main(int, char**) {
     SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 8);
     SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, 0);
 
-    InitialSettings().Run();
+    InitialSettings(vvctre_version).Run();
 
     InitializeLogging();
 
@@ -99,7 +100,8 @@ int main(int, char**) {
 
     Core::System& system = Core::System::GetInstance();
 
-    std::unique_ptr<EmuWindow_SDL2> emu_window = std::make_unique<EmuWindow_SDL2>(system);
+    std::unique_ptr<EmuWindow_SDL2> emu_window =
+        std::make_unique<EmuWindow_SDL2>(system, vvctre_version);
 
     // Register frontend applets
     system.RegisterSoftwareKeyboard(std::make_shared<Frontend::SDL2_SoftwareKeyboard>(*emu_window));
@@ -142,7 +144,7 @@ int main(int, char**) {
         break;
     }
 
-    RPC::Server rpc_server(system, Settings::values.rpc_server_port);
+    RPC::Server rpc_server(system, Settings::values.rpc_server_port, vvctre_version);
 
     if (!Settings::values.play_movie.empty()) {
         Core::Movie::GetInstance().StartPlayback(Settings::values.play_movie, [&] {

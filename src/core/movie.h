@@ -27,6 +27,8 @@ enum class PlayMode;
 
 class Movie {
 public:
+    static const u8 Version = 2;
+
     enum class ValidationResult {
         OK,
         GameDismatch,

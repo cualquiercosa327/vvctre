@@ -13,7 +13,6 @@
 #include "common/string_util.h"
 #include "common/swap.h"
 #include "common/timer.h"
-#include "common/version.h"
 #include "core/core.h"
 #include "core/hle/service/hid/hid.h"
 #include "core/hle/service/ir/extra_hid.h"
@@ -98,7 +97,7 @@ struct ControllerState {
 static_assert(sizeof(ControllerState) == 7, "ControllerState should be 7 bytes");
 #pragma pack(pop)
 
-const std::array<u8, 4> header_magic_bytes{{'V', 'C', 'M', version::movie}};
+constexpr std::array<u8, 4> header_magic_bytes{{'V', 'C', 'M', Movie::Version}};
 
 #pragma pack(push, 1)
 struct VCMHeader {

@@ -31,9 +31,6 @@
 [submodule "teakra"]
     path = externals/teakra
     url = https://github.com/wwylele/teakra.git
-[submodule "semver"]
-    path = externals/semver
-    url = https://github.com/Neargye/semver.git
 [submodule "imgui"]
     path = externals/imgui
     url = https://github.com/ocornut/imgui.git

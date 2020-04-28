@@ -21,7 +21,7 @@ class System;
 
 class EmuWindow_SDL2 : public Frontend::EmuWindow {
 public:
-    explicit EmuWindow_SDL2(Core::System& system);
+    explicit EmuWindow_SDL2(Core::System& system, const std::string& version);
     ~EmuWindow_SDL2();
 
     /// Swap buffers to display the next frame

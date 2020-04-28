@@ -41,8 +41,6 @@ add_library(common STATIC
     timer.cpp
     timer.h
     vector_math.h
-    version.cpp
-    version.h
     stb_image.cpp
     stb_image.h
     stb_image_write.cpp
@@ -70,7 +68,7 @@ endif()
 
 create_target_directory_groups(common)
 
-target_link_libraries(common PUBLIC fmt semver ${PLATFORM_LIBRARIES})
+target_link_libraries(common PUBLIC fmt ${PLATFORM_LIBRARIES})
 
 if (ARCHITECTURE_x86_64)
     target_link_libraries(common PRIVATE xbyak)

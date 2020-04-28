@@ -24,7 +24,6 @@
 #include "common/logging/log.h"
 #include "common/stb_image_write.h"
 #include "common/string_util.h"
-#include "common/version.h"
 #include "core/3ds.h"
 #include "core/cheats/cheat_base.h"
 #include "core/cheats/cheats.h"
@@ -142,8 +141,8 @@ void EmuWindow_SDL2::ToggleFullscreen() {
     }
 }
 
-EmuWindow_SDL2::EmuWindow_SDL2(Core::System& system) : system(system) {
-    const std::string window_title = fmt::format("vvctre {}", version::vvctre.to_string());
+EmuWindow_SDL2::EmuWindow_SDL2(Core::System& system, const std::string& version) : system(system) {
+    const std::string window_title = fmt::format("vvctre {}", version);
 
     render_window =
         SDL_CreateWindow(window_title.c_str(),
@@ -182,8 +181,8 @@ EmuWindow_SDL2::EmuWindow_SDL2(Core::System& system) : system(system) {
 
     OnResize();
     SDL_PumpEvents();
-    LOG_INFO(Frontend, "Version: {}", version::vvctre.to_string());
-    LOG_INFO(Frontend, "Movie version: {}", version::movie);
+    LOG_INFO(Frontend, "Version: {}", version);
+    LOG_INFO(Frontend, "Movie version: {}", Core::Movie::Version);
     Settings::LogSettings();
 
     IMGUI_CHECKVERSION();

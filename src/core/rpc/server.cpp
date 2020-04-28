@@ -10,7 +10,6 @@
 #include "common/logging/log.h"
 #include "common/stb_image_write.h"
 #include "common/thread.h"
-#include "common/version.h"
 #include "core/arm/arm_interface.h"
 #include "core/cheats/cheat_base.h"
 #include "core/cheats/cheats.h"
@@ -95,14 +94,14 @@ void from_json(const nlohmann::json& json, Layout::FramebufferLayout& layout) {
 
 namespace RPC {
 
-Server::Server(Core::System& system, const int port) {
+Server::Server(Core::System& system, const int port, const std::string& vvctre_version) {
     server = std::make_unique<httplib::Server>();
 
     server->Get("/version", [&](const httplib::Request& req, httplib::Response& res) {
         res.set_content(
             nlohmann::json{
-                {"vvctre", version::vvctre.to_string()},
-                {"movie", version::movie},
+                {"vvctre", vvctre_version},
+                {"movie", Core::Movie::Version},
             }
                 .dump(),
             "application/json");

@@ -24,7 +24,6 @@
 #include "common/logging/log.h"
 #include "common/param_package.h"
 #include "common/string_util.h"
-#include "common/version.h"
 #include "core/core.h"
 #include "core/hle/service/am/am.h"
 #include "core/hle/service/cfg/cfg.h"
@@ -36,9 +35,8 @@
 #include "video_core/renderer_opengl/texture_filters/texture_filterer.h"
 #include "vvctre/initial_settings.h"
 
-InitialSettings::InitialSettings() {
-    const std::string window_title =
-        fmt::format("vvctre {} - Initial Settings", version::vvctre.to_string());
+InitialSettings::InitialSettings(const std::string& version) {
+    const std::string window_title = fmt::format("vvctre {} - Initial Settings", version);
 
     render_window = SDL_CreateWindow(
         window_title.c_str(),

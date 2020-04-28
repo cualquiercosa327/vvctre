@@ -12,7 +12,7 @@ struct SDL_Window;
 
 class InitialSettings {
 public:
-    InitialSettings();
+    explicit InitialSettings(const std::string& version);
     ~InitialSettings();
 
     void Run();

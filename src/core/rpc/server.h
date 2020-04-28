@@ -19,7 +19,7 @@ namespace RPC {
 
 class Server {
 public:
-    Server(Core::System& system, const int port);
+    Server(Core::System& system, const int port, const std::string& vvctre_version);
     ~Server();
 
     bool paused = false;
