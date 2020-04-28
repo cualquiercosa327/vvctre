@@ -500,14 +500,14 @@ void LogSettings() {
             LOG_INFO(Settings, "\t[ ] Use Hardware Renderer");
         }
         if (values.use_hw_shader) {
-            LOG_INFO(Settings, "\t[x] Use Hardware Shader");
+            LOG_INFO(Settings, "\t\t[x] Use Hardware Shader");
             if (values.shaders_accurate_mul) {
-                LOG_INFO(Settings, "\t[x] Accurate Multiplication");
+                LOG_INFO(Settings, "\t\t\t[x] Accurate Multiplication");
             } else {
-                LOG_INFO(Settings, "\t[ ] Accurate Multiplication");
+                LOG_INFO(Settings, "\t\t\t[ ] Accurate Multiplication");
             }
         } else {
-            LOG_INFO(Settings, "\t[ ] Use Hardware Shader");
+            LOG_INFO(Settings, "\t\t[ ] Use Hardware Shader");
         }
         if (values.use_shader_jit) {
             LOG_INFO(Settings, "\t[x] Use Shader JIT");
@@ -545,8 +545,9 @@ void LogSettings() {
             LOG_INFO(Settings, "\t[ ] Sharper Distant Objects");
         }
         LOG_INFO(Settings, "\tResolution: {}x", values.resolution_factor);
-        LOG_INFO(Settings, "\tBackground Color: #{:02x}{:02x}{:02x}", values.bg_red * 255,
-                 values.bg_green * 255, values.bg_blue * 255);
+        LOG_INFO(Settings, "\tBackground Color: #{:02x}{:02x}{:02x}",
+                 static_cast<int>(values.bg_red * 255), static_cast<int>(values.bg_green * 255),
+                 static_cast<int>(values.bg_blue * 255));
         LOG_INFO(Settings, "\tPost Processing Shader: {}", values.pp_shader_name);
         LOG_INFO(Settings, "\tTexture Filter: {}", values.texture_filter_name);
         LOG_INFO(
