@@ -122,6 +122,120 @@ static const std::array<const char*, NumAnalogs> mapping = {{
 static constexpr int REGION_VALUE_AUTO_SELECT = -1;
 
 struct Values {
+    // Start
+
+    /// If you're making a custom build, want to change the default file path, and you use Windows,
+    /// this needs to be a full path with double backslash
+    std::string file_path;
+
+    std::string play_movie;
+    std::string record_movie;
+
+    /**
+     * Valid values:
+     *  -1: Auto-select
+     *   0: Japan
+     *   1: USA
+     *   2: Europe
+     *   3: Australia
+     *   4: China
+     *   5: Korea
+     *   6: Taiwan
+     */
+    int region_value = REGION_VALUE_AUTO_SELECT;
+
+    std::string log_filter = "*:Info";
+    int rpc_server_port = 47889;
+    std::string multiplayer_url = "ws://vvctre-multiplayer.glitch.me";
+
+    /**
+     * Valid values:
+     * - InitClock::SystemTime
+     * - InitClock::FixedTime
+     */
+    InitClock init_clock = InitClock::SystemTime;
+
+    u64 init_time = 0; // Unix timestamp
+
+    bool use_virtual_sd = true;
+    bool start_in_fullscreen_mode = false;
+
+    bool record_frame_times = false;
+    bool use_gdbstub = false;
+    u16 gdbstub_port = 24689;
+
+    // General
+    bool use_cpu_jit = true;
+    bool use_frame_limit = true;
+    u16 frame_limit = 100;
+    bool use_custom_cpu_ticks = false;
+    u64 custom_cpu_ticks = 77;
+    u32 cpu_clock_percentage = 100;
+
+    // Audio
+    bool enable_dsp_lle = false;
+    bool enable_dsp_lle_multithread = false;
+    float volume = 1.0f;
+    std::string sink_id = "auto";
+    std::string audio_device_id = "auto";
+
+    /**
+     * Valid values:
+     *  - MicInputType::None
+     *  - MicInputType::Real
+     *  - MicInputType::Static
+     */
+    MicInputType mic_input_type = MicInputType::None;
+
+    std::string mic_input_device;
+
+    // Camera
+    std::array<std::string, Service::CAM::NumCameras> camera_name{
+        "blank",
+        "blank",
+        "blank",
+    };
+    std::array<std::string, Service::CAM::NumCameras> camera_config;
+    std::array<int, Service::CAM::NumCameras> camera_flip;
+
+    // Graphics
+    bool use_hw_renderer = true;
+    bool use_hw_shader = true;
+    bool shaders_accurate_mul = false;
+    bool use_shader_jit = true;
+    bool enable_vsync = false;
+    bool dump_textures = false;
+    bool custom_textures = false;
+    bool preload_textures = false;
+    bool filter_mode = true;
+    bool sharper_distant_objects = false;
+    u16 resolution_factor = 1;
+    float bg_red = 0.0f;
+    float bg_green = 0.0f;
+    float bg_blue = 0.0f;
+    std::string pp_shader_name = "none (builtin)";
+
+    /**
+     * Valid values:
+     *  - "none"
+     *  - "Anime4K Ultrafast"
+     *  - "Bicubic"
+     *  - "ScaleForce"
+     *  - "xBRZ freescale"
+     */
+    std::string texture_filter_name = "none";
+
+    /**
+     * Valid values:
+     *  - StereoRenderOption::Off
+     *  - StereoRenderOption::SideBySide
+     *  - StereoRenderOption::Anaglyph
+     *  - StereoRenderOption::Interlaced
+     */
+    StereoRenderOption render_3d = StereoRenderOption::Off;
+
+    std::atomic<u8> factor_3d{0};
+
     // Controls
     std::array<std::string, NativeButton::NumButtons> buttons = {
         // All the code below can be changed to JSON buttons
@@ -184,78 +298,6 @@ struct Values {
     /// JSON udp_pad_index
     u8 udp_pad_index = 0;
 
-    // Core
-    bool use_cpu_jit = true;
-    std::string multiplayer_url = "ws://vvctre-multiplayer.glitch.me";
-    bool use_custom_cpu_ticks = false;
-    u64 custom_cpu_ticks = 77;
-    u32 cpu_clock_percentage = 100;
-
-    // Data Storage
-    bool use_virtual_sd = true;
-
-    // System
-
-    /**
-     * Valid values:
-     *  -1: Auto-select
-     *   0: Japan
-     *   1: USA
-     *   2: Europe
-     *   3: Australia
-     *   4: China
-     *   5: Korea
-     *   6: Taiwan
-     */
-    int region_value = REGION_VALUE_AUTO_SELECT;
-
-    /**
-     * Valid values:
-     * - InitClock::SystemTime
-     * - InitClock::FixedTime
-     */
-    InitClock init_clock = InitClock::SystemTime;
-
-    u64 init_time = 0; // Unix timestamp
-
-    // Renderer
-    bool use_hw_renderer = true;
-    bool use_hw_shader = true;
-    bool shaders_accurate_mul = false;
-    bool use_shader_jit = true;
-    u16 resolution_factor = 1;
-    bool use_frame_limit = true;
-    u16 frame_limit = 100;
-
-    /**
-     * Valid values:
-     *  - "none"
-     *  - "Anime4K Ultrafast"
-     *  - "Bicubic"
-     *  - "ScaleForce"
-     *  - "xBRZ freescale"
-     */
-    std::string texture_filter_name = "none";
-
-    float bg_red = 0.0f;
-    float bg_green = 0.0f;
-    float bg_blue = 0.0f;
-
-    /**
-     * Valid values:
-     *  - StereoRenderOption::Off
-     *  - StereoRenderOption::SideBySide
-     *  - StereoRenderOption::Anaglyph
-     *  - StereoRenderOption::Interlaced
-     */
-    StereoRenderOption render_3d = StereoRenderOption::Off;
-
-    std::atomic<u8> factor_3d{0};
-    bool filter_mode = true;
-    std::string pp_shader_name = "none (builtin)";
-    bool enable_vsync = false;
-    bool sharper_distant_objects = false;
-
     // Layout
 
     /**
@@ -280,44 +322,7 @@ struct Values {
     u16 custom_bottom_right = 360;
     u16 custom_bottom_bottom = 480;
 
-    // Utility
-    bool dump_textures = false;
-    bool custom_textures = false;
-    bool preload_textures = false;
-
-    // Audio
-    bool enable_dsp_lle = false;
-    bool enable_dsp_lle_multithread = false;
-    std::string sink_id = "auto";
-    std::string audio_device_id = "auto";
-    float volume = 1.0f;
-
-    /**
-     * Valid values:
-     *  - MicInputType::None
-     *  - MicInputType::Real
-     *  - MicInputType::Static
-     */
-    MicInputType mic_input_type = MicInputType::None;
-
-    std::string mic_input_device;
-
-    // Camera
-    std::array<std::string, Service::CAM::NumCameras> camera_name{
-        "blank",
-        "blank",
-        "blank",
-    };
-    std::array<std::string, Service::CAM::NumCameras> camera_config;
-    std::array<int, Service::CAM::NumCameras> camera_flip;
-
-    // Miscellaneous
-    std::string log_filter = "*:Info";
-
-    // Debugging
-    bool record_frame_times = false;
-    bool use_gdbstub = false;
-    u16 gdbstub_port = 24689;
+    // LLE Modules
     std::unordered_map<std::string, bool> lle_modules = {
         {"FS", false},
         {"PM", false},
@@ -361,17 +366,6 @@ struct Values {
         {"PDN", false},
         {"SPI", false},
     };
-
-    // Used by the frontend
-
-    /// If you're making a custom build, want to change the default file path, and you use Windows,
-    /// this needs to be a full path with double backslash
-    std::string file_path;
-
-    bool start_in_fullscreen_mode = false;
-    int rpc_server_port = 47889;
-    std::string play_movie;
-    std::string record_movie;
 } extern values;
 
 void Apply();
