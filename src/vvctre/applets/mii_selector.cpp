@@ -2,10 +2,12 @@
 // Licensed under GPLv2 or any later version
 // Refer to the license.txt file included.
 
+#include <SDL.h>
 #include "common/file_util.h"
 #include "core/file_sys/archive_extsavedata.h"
 #include "core/file_sys/file_backend.h"
 #include "core/hle/service/ptm/ptm.h"
+#include "core/settings.h"
 #include "video_core/renderer_opengl/renderer_opengl.h"
 #include "vvctre/applets/mii_selector.h"
 
@@ -55,12 +57,15 @@ void SDL2_MiiSelector::Setup(const MiiSelectorConfig& config) {
     emu_window.mii_selector_code = &code;
     emu_window.mii_selector_selected_mii = &selected_mii;
 
+    SDL_GL_SetSwapInterval(1);
+
     while (emu_window.IsOpen() && emu_window.mii_selector_config != nullptr &&
            emu_window.mii_selector_miis != nullptr && emu_window.mii_selector_code != nullptr &&
            emu_window.mii_selector_selected_mii != nullptr) {
         VideoCore::g_renderer->SwapBuffers();
     }
 
+    SDL_GL_SetSwapInterval(Settings::values.enable_vsync ? 1 : 0);
     Finalize(code, selected_mii);
 }
 

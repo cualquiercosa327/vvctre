@@ -2,7 +2,9 @@
 // Licensed under GPLv2 or any later version
 // Refer to the license.txt file included.
 
+#include <SDL.h>
 #include <portable-file-dialogs.h>
+#include "core/settings.h"
 #include "video_core/renderer_opengl/renderer_opengl.h"
 #include "vvctre/applets/swkbd.h"
 #include "vvctre/emu_window/emu_window_sdl2.h"
@@ -21,11 +23,14 @@ void SDL2_SoftwareKeyboard::Execute(const KeyboardConfig& config) {
     emu_window.swkbd_code = &code;
     emu_window.swkbd_text = &text;
 
+    SDL_GL_SetSwapInterval(1);
+
     while (emu_window.IsOpen() && emu_window.swkbd_config != nullptr &&
            emu_window.swkbd_code != nullptr && emu_window.swkbd_text != nullptr) {
         VideoCore::g_renderer->SwapBuffers();
     }
 
+    SDL_GL_SetSwapInterval(Settings::values.enable_vsync ? 1 : 0);
     Finalize(text, code);
 }
 
