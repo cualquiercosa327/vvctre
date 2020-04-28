@@ -167,7 +167,7 @@ void LogSettings() {
             cfg = std::make_shared<Service::CFG::Module>();
         }
         LOG_INFO(Settings, "System:");
-        LOG_INFO(Settings, "\tUsername: {}", cfg->GetUsername());
+        LOG_INFO(Settings, "\tUsername: {}", Common::UTF16ToUTF8(cfg->GetUsername()));
         auto [month, day] = cfg->GetBirthday();
         LOG_INFO(Settings, "\tBirthday: {:02}/{:02}", day, month);
         LOG_INFO(Settings, "\tLanguage: {}", [&] {
