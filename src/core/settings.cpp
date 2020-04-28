@@ -112,9 +112,9 @@ void LogSettings() {
             LOG_INFO(Settings, "\t[ ] Record Frame Times");
         }
         if (values.use_gdbstub) {
-            LOG_INFO(Settings, "[x] Enable GDB Stub\tPort: {}", values.gdbstub_port);
+            LOG_INFO(Settings, "\t[x] Enable GDB Stub\tPort: {}", values.gdbstub_port);
         } else {
-            LOG_INFO(Settings, "[ ] Enable GDB Stub");
+            LOG_INFO(Settings, "\t[ ] Enable GDB Stub");
         }
     }
     {
@@ -744,9 +744,9 @@ void LogSettings() {
         LOG_INFO(Settings, "LLE Modules:");
         for (const auto& module : values.lle_modules) {
             if (module.second) {
-                LOG_INFO(Settings, "[x] {}", module.first);
+                LOG_INFO(Settings, "\t[x] {}", module.first);
             } else {
-                LOG_INFO(Settings, "[ ] {}", module.first);
+                LOG_INFO(Settings, "\t[ ] {}", module.first);
             }
         }
     }
