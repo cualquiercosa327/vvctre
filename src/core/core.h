@@ -233,9 +233,6 @@ public:
         return registered_swkbd;
     }
 
-    bool frontend_paused = false;
-    bool rpc_paused = false;
-
     std::optional<DeliveryArgument> delivery_arg;
 
 private:

@@ -220,7 +220,7 @@ void EmuWindow_SDL2::SwapBuffers() {
         ImGui::SetWindowPos(ImVec2(), ImGuiCond_Once);
         ImGui::TextColored(fps_color, "%d FPS", static_cast<int>(io.Framerate));
         if (ImGui::BeginPopupContextItem(nullptr, ImGuiMouseButton_Right)) {
-            system.frontend_paused = true;
+            paused = true;
 
             if (ImGui::BeginMenu("File")) {
                 if (ImGui::MenuItem("Load File")) {
@@ -2242,7 +2242,7 @@ void EmuWindow_SDL2::SwapBuffers() {
 
             ImGui::EndPopup();
         } else {
-            system.frontend_paused = false;
+            paused = false;
         }
     }
     ImGui::End();

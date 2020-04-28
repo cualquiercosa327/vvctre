@@ -22,6 +22,8 @@ public:
     Server(Core::System& system, const int port);
     ~Server();
 
+    bool paused = false;
+
 private:
     std::unique_ptr<httplib::Server> server;
     std::thread request_handler_thread;

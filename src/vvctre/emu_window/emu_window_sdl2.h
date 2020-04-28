@@ -50,6 +50,8 @@ public:
     u32* mii_selector_code = nullptr;
     HLE::Applets::MiiData* mii_selector_selected_mii = nullptr;
 
+    bool paused = false;
+
 private:
     /// Called by PollEvents when a key is pressed or released.
     void OnKeyEvent(int key, u8 state);

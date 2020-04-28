@@ -1625,7 +1625,7 @@ Server::Server(Core::System& system, const int port) {
             return;
         }
 
-        system.rpc_paused = true;
+        paused = true;
         res.status = 204;
     });
 
@@ -1636,7 +1636,7 @@ Server::Server(Core::System& system, const int port) {
             return;
         }
 
-        system.rpc_paused = false;
+        paused = false;
         res.status = 204;
     });
 
