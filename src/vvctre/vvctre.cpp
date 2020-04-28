@@ -54,7 +54,7 @@ __declspec(dllexport) unsigned long NvOptimusEnablement = 0x00000001;
 }
 #endif
 
-static const std::string vvctre_version = "26.0.5";
+static const std::string vvctre_version = "26.1.0";
 
 static void InitializeLogging() {
     Log::Filter log_filter(Log::Level::Debug);
