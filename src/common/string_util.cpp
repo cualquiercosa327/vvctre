@@ -8,7 +8,6 @@
 #include <cstdlib>
 #include <locale>
 #include <sstream>
-#include "common/common_paths.h"
 #include "common/logging/log.h"
 #include "common/string_util.h"
 

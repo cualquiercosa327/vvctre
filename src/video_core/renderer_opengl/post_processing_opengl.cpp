@@ -5,7 +5,6 @@
 #include <sstream>
 #include <string>
 #include <vector>
-#include "common/common_paths.h"
 #include "common/file_util.h"
 #include "common/string_util.h"
 #include "video_core/renderer_opengl/post_processing_opengl.h"

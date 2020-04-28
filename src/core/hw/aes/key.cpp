@@ -10,7 +10,6 @@
 #include <cryptopp/modes.h>
 #include <cryptopp/sha.h>
 #include <fmt/format.h>
-#include "common/common_paths.h"
 #include "common/file_util.h"
 #include "common/logging/log.h"
 #include "common/string_util.h"
@@ -159,7 +158,8 @@ void LoadBootromKeys() {
     // by other applications e.g. process9. These normal keys thus aren't used by any application
     // and have no value for emulation
 
-    const std::string filepath = FileUtil::GetUserPath(FileUtil::UserPath::SysDataDir) + BOOTROM9;
+    const std::string filepath =
+        FileUtil::GetUserPath(FileUtil::UserPath::SysDataDir) + "boot9.bin";
     auto file = FileUtil::IOFile(filepath, "rb");
     if (!file) {
         return;
@@ -307,7 +307,8 @@ void LoadSafeModeNativeFirmKeys() {
 }
 
 void LoadPresetKeys() {
-    const std::string filepath = FileUtil::GetUserPath(FileUtil::UserPath::SysDataDir) + AES_KEYS;
+    const std::string filepath =
+        FileUtil::GetUserPath(FileUtil::UserPath::SysDataDir) + "aes_keys.txt";
     FileUtil::CreateFullPath(filepath); // Create path if not already created
     std::ifstream file;
     OpenFStream(file, filepath, std::ios_base::in);

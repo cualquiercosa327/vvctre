@@ -6,7 +6,6 @@
 #include <cstring>
 #include "common/alignment.h"
 #include "common/assert.h"
-#include "common/common_paths.h"
 #include "common/file_util.h"
 #include "common/string_util.h"
 #include "common/swap.h"

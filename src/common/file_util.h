@@ -19,6 +19,10 @@
 #include "common/string_util.h"
 #endif
 
+#ifndef MAX_PATH
+#define MAX_PATH 260
+#endif
+
 namespace FileUtil {
 
 // User paths for GetUserPath

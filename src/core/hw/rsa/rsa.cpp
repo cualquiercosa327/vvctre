@@ -8,7 +8,6 @@
 #include <cryptopp/nbtheory.h>
 #include <cryptopp/sha.h>
 #include <fmt/format.h>
-#include "common/common_paths.h"
 #include "common/file_util.h"
 #include "common/logging/log.h"
 #include "core/hw/rsa/rsa.h"
@@ -42,7 +41,8 @@ void InitSlots() {
         return;
     initialized = true;
 
-    const std::string filepath = FileUtil::GetUserPath(FileUtil::UserPath::SysDataDir) + BOOTROM9;
+    const std::string filepath =
+        FileUtil::GetUserPath(FileUtil::UserPath::SysDataDir) + "boot9.bin";
     FileUtil::IOFile file(filepath, "rb");
     if (!file) {
         return;

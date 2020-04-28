@@ -19,7 +19,6 @@
 #define SDL_MAIN_HANDLED
 #include <SDL.h>
 #include <portable-file-dialogs.h>
-#include "common/common_paths.h"
 #include "common/detached_tasks.h"
 #include "common/file_util.h"
 #include "common/logging/backend.h"

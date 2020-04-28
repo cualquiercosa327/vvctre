@@ -2,7 +2,6 @@
 // Licensed under GPLv2 or any later version
 // Refer to the license.txt file included.
 
-#include "common/common_paths.h"
 #include "core/core.h"
 #include "core/hle/applets/applet.h"
 #include "core/hle/service/am/am.h"

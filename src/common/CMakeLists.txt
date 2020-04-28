@@ -9,7 +9,6 @@ add_library(common STATIC
     cityhash.h
     color.h
     common_funcs.h
-    common_paths.h
     common_types.h
     fastmem_mapper.h
     file_util.cpp

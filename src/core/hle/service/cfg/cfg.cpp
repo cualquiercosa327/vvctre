@@ -6,7 +6,6 @@
 #include <tuple>
 #include <cryptopp/osrng.h>
 #include <cryptopp/sha.h>
-#include "common/common_paths.h"
 #include "common/file_util.h"
 #include "common/logging/log.h"
 #include "common/string_util.h"

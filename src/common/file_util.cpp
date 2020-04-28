@@ -9,7 +9,6 @@
 #include <unordered_map>
 #include "common/assert.h"
 #include "common/common_funcs.h"
-#include "common/common_paths.h"
 #include "common/file_util.h"
 #include "common/logging/log.h"
 
@@ -574,19 +573,19 @@ static void InitUserPaths() {
     std::string& user_path = g_paths[UserPath::UserDir];
 
 #ifdef _WIN32
-    user_path = GetExeDirectory() + "/" USERDATA_DIR "/";
+    user_path = GetExeDirectory() + "/user/";
 #else
-    user_path = ROOT_DIR "/" USERDATA_DIR "/";
+    user_path = "./user/";
 #endif
 
-    g_paths[UserPath::SDMCDir] = user_path + SDMC_DIR "/";
-    g_paths[UserPath::NANDDir] = user_path + NAND_DIR "/";
-    g_paths[UserPath::SysDataDir] = user_path + SYSDATA_DIR "/";
-    g_paths[UserPath::LogDir] = user_path + LOG_DIR "/";
-    g_paths[UserPath::CheatsDir] = user_path + CHEATS_DIR "/";
-    g_paths[UserPath::ShaderDir] = user_path + SHADER_DIR "/";
-    g_paths[UserPath::DumpDir] = user_path + DUMP_DIR "/";
-    g_paths[UserPath::LoadDir] = user_path + LOAD_DIR "/";
+    g_paths[UserPath::SDMCDir] = user_path + "sdmc/";
+    g_paths[UserPath::NANDDir] = user_path + "nand/";
+    g_paths[UserPath::SysDataDir] = user_path + "sysdata/";
+    g_paths[UserPath::LogDir] = user_path + "log/";
+    g_paths[UserPath::CheatsDir] = user_path + "cheats/";
+    g_paths[UserPath::ShaderDir] = user_path + "shaders/";
+    g_paths[UserPath::DumpDir] = user_path + "dump/";
+    g_paths[UserPath::LoadDir] = user_path + "load/";
 }
 
 const std::string& GetUserPath(UserPath path) {
