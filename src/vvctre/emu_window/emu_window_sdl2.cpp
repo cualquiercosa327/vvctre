@@ -458,15 +458,18 @@ void EmuWindow_SDL2::SwapBuffers() {
                         Settings::Apply();
                         Settings::LogSettings();
                     }
-                    ImGui::Indent();
+                    if (Settings::values.shaders_accurate_mul) {
+                        ImGui::Indent();
 
-                    if (ImGui::Checkbox("Use Accurate Multiplication",
-                                        &Settings::values.shaders_accurate_mul)) {
-                        Settings::Apply();
-                        Settings::LogSettings();
+                        if (ImGui::Checkbox("Use Accurate Multiplication",
+                                            &Settings::values.shaders_accurate_mul)) {
+                            Settings::Apply();
+                            Settings::LogSettings();
+                        }
+
+                        ImGui::Unindent();
                     }
 
-                    ImGui::Unindent();
                     ImGui::Unindent();
 
                     if (ImGui::Checkbox("Use Shader JIT", &Settings::values.use_shader_jit)) {
