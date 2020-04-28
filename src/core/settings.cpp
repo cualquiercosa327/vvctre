@@ -5,6 +5,7 @@
 #include <utility>
 #include "audio_core/dsp_interface.h"
 #include "common/param_package.h"
+#include "common/string_util.h"
 #include "core/core.h"
 #include "core/gdbstub/gdbstub.h"
 #include "core/hle/kernel/shared_page.h"
