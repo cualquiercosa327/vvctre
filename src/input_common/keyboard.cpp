@@ -49,8 +49,9 @@ public:
     void ChangeKeyStatus(int key_code, bool pressed) {
         std::lock_guard guard{mutex};
         for (const KeyButtonPair& pair : list) {
-            if (pair.key_code == key_code)
+            if (pair.key_code == key_code) {
                 pair.key_button->status.store(pressed);
+            }
         }
     }
 

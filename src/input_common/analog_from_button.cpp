@@ -20,16 +20,20 @@ public:
         constexpr float SQRT_HALF = 0.707106781f;
         int x = 0, y = 0;
 
-        if (right->GetStatus())
+        if (right->GetStatus()) {
             ++x;
-        if (left->GetStatus())
+        }
+        if (left->GetStatus()) {
             --x;
-        if (up->GetStatus())
+        }
+        if (up->GetStatus()) {
             ++y;
-        if (down->GetStatus())
+        }
+        if (down->GetStatus()) {
             --y;
+        }
 
-        float coef = modifier->GetStatus() ? modifier_scale : 1.0f;
+        const float coef = modifier->GetStatus() ? modifier_scale : 1.0f;
         return std::make_tuple(x * coef * (y == 0 ? 1.0f : SQRT_HALF),
                                y * coef * (x == 0 ? 1.0f : SQRT_HALF));
     }
