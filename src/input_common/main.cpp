@@ -4,6 +4,7 @@
 
 #include <memory>
 #include <thread>
+#include <SDL.h>
 #include "common/param_package.h"
 #include "input_common/analog_from_button.h"
 #include "input_common/keyboard.h"
@@ -75,6 +76,55 @@ void ReloadInputDevices() {
     if (udp) {
         udp->ReloadUDPClient();
     }
+}
+
+std::string ButtonToText(const std::string& params_string) {
+    const Common::ParamPackage params(params_string);
+
+    if (params.Get("engine", "") == "keyboard") {
+        return std::string(
+            SDL_GetScancodeName(static_cast<SDL_Scancode>(params.Get("code", SDL_SCANCODE_A))));
+    }
+
+    if (params.Get("engine", "") == "sdl") {
+        if (params.Has("hat")) {
+            return fmt::format("Hat {} {}", params.Get("hat", ""), params.Get("direction", ""));
+        }
+
+        if (params.Has("axis")) {
+            return fmt::format("Axis {}{}", params.Get("axis", ""), params.Get("direction", ""));
+        }
+
+        if (params.Has("button")) {
+            return fmt::format("Button {}", params.Get("button", ""));
+        }
+    }
+
+    return std::string("[unknown]");
+}
+
+std::string AnalogToText(const std::string& params_string, const std::string& dir) {
+    const Common::ParamPackage params(params_string);
+
+    if (params.Get("engine", "") == "analog_from_button") {
+        return ButtonToText(params.Get(dir, ""));
+    }
+
+    if (params.Get("engine", "") == "sdl") {
+        if (dir == "modifier") {
+            return std::string("[unused]");
+        }
+
+        if (dir == "left" || dir == "right") {
+            return fmt::format("Axis {}", params.Get("axis_x", ""));
+        }
+
+        if (dir == "up" || dir == "down") {
+            return fmt::format("Axis {}", params.Get("axis_y", ""));
+        }
+    }
+
+    return std::string("[unknown]");
 }
 
 namespace Polling {

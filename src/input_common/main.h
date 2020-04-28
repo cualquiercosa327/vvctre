@@ -10,7 +10,7 @@
 
 namespace Common {
 class ParamPackage;
-}
+} // namespace Common
 
 namespace InputCommon {
 
@@ -39,6 +39,9 @@ std::string GenerateAnalogParamFromKeys(int key_up, int key_down, int key_left, 
 
 /// Reloads the input devices
 void ReloadInputDevices();
+
+std::string ButtonToText(const std::string& params_string);
+std::string AnalogToText(const std::string& params_string, const std::string& dir);
 
 namespace Polling {
 
