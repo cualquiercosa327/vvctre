@@ -126,6 +126,7 @@ void LogSettings() {
     for (const auto& module : values.lle_modules) {
         LogSetting(fmt::format("lle_modules[\"{}\"]", module.first), module.second);
     }
+    LogSetting("rpc_server_port",values.rpc_server_port);
 }
 
 } // namespace Settings

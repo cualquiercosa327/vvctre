@@ -144,7 +144,7 @@ int main(int, char**) {
         break;
     }
 
-    RPC::Server rpc_server(system, Settings::values.rpc_server_port, vvctre_version);
+    RPC::Server rpc_server(system, vvctre_version);
 
     if (!Settings::values.play_movie.empty()) {
         Core::Movie::GetInstance().StartPlayback(Settings::values.play_movie, [&] {

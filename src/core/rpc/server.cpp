@@ -7,7 +7,6 @@
 #include <json.hpp>
 #include "common/logging/backend.h"
 #include "common/logging/filter.h"
-#include "common/logging/log.h"
 #include "common/stb_image_write.h"
 #include "common/thread.h"
 #include "core/arm/arm_interface.h"
@@ -94,7 +93,7 @@ void from_json(const nlohmann::json& json, Layout::FramebufferLayout& layout) {
 
 namespace RPC {
 
-Server::Server(Core::System& system, const int port, const std::string& vvctre_version) {
+Server::Server(Core::System& system, const std::string& vvctre_version) {
     server = std::make_unique<httplib::Server>();
 
     server->Get("/version", [&](const httplib::Request& req, httplib::Response& res) {
@@ -1978,14 +1977,13 @@ Server::Server(Core::System& system, const int port, const std::string& vvctre_v
         res.status = 204;
     });
 
-    request_handler_thread = std::thread([this, port] { server->listen("0.0.0.0", port); });
-    LOG_INFO(RPC_Server, "RPC server running on port {}", port);
+    request_handler_thread =
+        std::thread([this] { server->listen("0.0.0.0", Settings::values.rpc_server_port); });
 }
 
 Server::~Server() {
     server->stop();
     request_handler_thread.join();
-    LOG_INFO(RPC_Server, "RPC server stopped");
 }
 
 } // namespace RPC
