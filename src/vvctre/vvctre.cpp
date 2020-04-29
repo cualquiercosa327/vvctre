@@ -2,6 +2,7 @@
 // Licensed under GPLv2 or any later version
 // Refer to the license.txt file included.
 
+#pragma optimize("", off)
 #include <iostream>
 #include <memory>
 #include <string>
@@ -32,7 +33,6 @@
 #include "core/hle/service/cfg/cfg.h"
 #include "core/loader/loader.h"
 #include "core/movie.h"
-#include "core/rpc/server.h"
 #include "core/settings.h"
 #include "input_common/main.h"
 #include "video_core/renderer_base.h"
@@ -40,8 +40,10 @@
 #include "vvctre/applets/mii_selector.h"
 #include "vvctre/applets/swkbd.h"
 #include "vvctre/camera/image.h"
+#include "vvctre/common.h"
 #include "vvctre/emu_window/emu_window_sdl2.h"
 #include "vvctre/initial_settings.h"
+#include "vvctre/plugins.h"
 
 #ifndef _MSC_VER
 #include <unistd.h>
@@ -53,8 +55,6 @@ extern "C" {
 __declspec(dllexport) unsigned long NvOptimusEnablement = 0x00000001;
 }
 #endif
-
-static const std::string vvctre_version = "26.1.2";
 
 static void InitializeLogging() {
     Log::Filter log_filter(Log::Level::Debug);
@@ -83,7 +83,12 @@ int main(int, char**) {
     SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 8);
     SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, 0);
 
-    InitialSettings(vvctre_version).Run();
+    Core::System& system = Core::System::GetInstance();
+    PluginManager plugin_manager(static_cast<void*>(&system));
+
+    plugin_manager.InitialSettingsOpening();
+    InitialSettings().Run();
+    plugin_manager.InitialSettingsOkPressed();
 
     InitializeLogging();
 
@@ -97,10 +102,8 @@ int main(int, char**) {
         Core::Movie::GetInstance().PrepareForPlayback(Settings::values.play_movie);
     }
 
-    Core::System& system = Core::System::GetInstance();
-
     std::unique_ptr<EmuWindow_SDL2> emu_window =
-        std::make_unique<EmuWindow_SDL2>(system, vvctre_version);
+        std::make_unique<EmuWindow_SDL2>(system, plugin_manager);
 
     // Register frontend applets
     system.RegisterSoftwareKeyboard(std::make_shared<Frontend::SDL2_SoftwareKeyboard>(*emu_window));
@@ -109,8 +112,12 @@ int main(int, char**) {
     // Register camera implementations
     Camera::RegisterFactory("image", std::make_unique<Camera::ImageCameraFactory>());
 
+    plugin_manager.BeforeLoading();
+
     const Core::System::ResultStatus load_result =
         system.Load(*emu_window, Settings::values.file_path);
+
+    plugin_manager.EmulationStarting();
 
     switch (load_result) {
     case Core::System::ResultStatus::ErrorNotInitialized:
@@ -143,8 +150,6 @@ int main(int, char**) {
         break;
     }
 
-    RPC::Server rpc_server(system, vvctre_version);
-
     if (!Settings::values.play_movie.empty()) {
         Core::Movie::GetInstance().StartPlayback(Settings::values.play_movie, [&] {
             pfd::message("vvctre", "Playback finished", pfd::choice::ok);
@@ -156,8 +161,8 @@ int main(int, char**) {
     }
 
     while (emu_window->IsOpen()) {
-        if (emu_window->paused || rpc_server.paused) {
-            while (emu_window->IsOpen() && (emu_window->paused || rpc_server.paused)) {
+        if (emu_window->paused) {
+            while (emu_window->IsOpen() && emu_window->paused) {
                 VideoCore::g_renderer->SwapBuffers();
                 SDL_GL_SetSwapInterval(1);
             }
@@ -171,6 +176,7 @@ int main(int, char**) {
         case Core::System::ResultStatus::FatalError: {
             pfd::message("vvctre", "Fatal error.\nCheck the console window for more details.",
                          pfd::choice::ok, pfd::icon::error);
+            plugin_manager.FatalError();
             system.SetStatus(Core::System::ResultStatus::Success);
             break;
         }
@@ -186,8 +192,8 @@ int main(int, char**) {
 
     Core::Movie::GetInstance().Shutdown();
     system.Shutdown();
-
     detached_tasks.WaitForAllTasks();
+    plugin_manager.EmulatorClosing();
 
     return 0;
 }

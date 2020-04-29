@@ -4,15 +4,11 @@
 
 #pragma once
 
-#include <string>
-#include <vector>
-#include <imgui.h>
-
 struct SDL_Window;
 
 class InitialSettings {
 public:
-    explicit InitialSettings(const std::string& version);
+    InitialSettings();
     ~InitialSettings();
 
     void Run();

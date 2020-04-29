@@ -43,7 +43,9 @@
 #include "video_core/renderer_opengl/post_processing_opengl.h"
 #include "video_core/renderer_opengl/texture_filters/texture_filterer.h"
 #include "video_core/video_core.h"
+#include "vvctre/common.h"
 #include "vvctre/emu_window/emu_window_sdl2.h"
+#include "vvctre/plugins.h"
 
 static std::string IPC_Recorder_GetStatusString(IPCDebugger::RequestStatus status) {
     switch (status) {
@@ -142,8 +144,9 @@ void EmuWindow_SDL2::ToggleFullscreen() {
     }
 }
 
-EmuWindow_SDL2::EmuWindow_SDL2(Core::System& system, const std::string& version) : system(system) {
-    const std::string window_title = fmt::format("vvctre {}", version);
+EmuWindow_SDL2::EmuWindow_SDL2(Core::System& system, PluginManager& plugin_manager)
+    : system(system), plugin_manager(plugin_manager) {
+    const std::string window_title = fmt::format("vvctre {}", vvctre_version);
 
     render_window =
         SDL_CreateWindow(window_title.c_str(),
@@ -182,7 +185,7 @@ EmuWindow_SDL2::EmuWindow_SDL2(Core::System& system, const std::string& version)
 
     OnResize();
     SDL_PumpEvents();
-    LOG_INFO(Frontend, "Version: {}", version);
+    LOG_INFO(Frontend, "Version: {}", vvctre_version);
     LOG_INFO(Frontend, "Movie version: {}", Core::Movie::Version);
     Settings::LogSettings();
 
@@ -210,6 +213,8 @@ void EmuWindow_SDL2::SwapBuffers() {
     ImGui_ImplSDL2_NewFrame(render_window);
     ImGui::NewFrame();
     ImGuiIO& io = ImGui::GetIO();
+
+    plugin_manager.BeforeDrawingFPS();
 
     if (ImGui::Begin("FPS and Menu", nullptr,
                      ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoSavedSettings |
@@ -2226,6 +2231,8 @@ void EmuWindow_SDL2::SwapBuffers() {
                 ImGui::EndMenu();
             }
 
+            plugin_manager.AddMenus();
+
             ImGui::EndPopup();
         } else {
             paused = false;
@@ -2553,6 +2560,8 @@ void EmuWindow_SDL2::SwapBuffers() {
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
     SDL_GL_SwapWindow(render_window);
+
+    plugin_manager.AfterSwapWindow();
 }
 
 void EmuWindow_SDL2::PollEvents() {

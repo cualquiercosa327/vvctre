@@ -16,7 +16,7 @@ struct TimingEventType;
 
 namespace CoreTiming {
 struct EventType;
-}
+} // namespace CoreTiming
 
 namespace Cheats {
 

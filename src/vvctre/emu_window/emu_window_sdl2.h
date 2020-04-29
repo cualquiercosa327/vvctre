@@ -13,6 +13,7 @@
 #include "core/frontend/emu_window.h"
 #include "core/hle/kernel/ipc_debugger/recorder.h"
 
+class PluginManager;
 struct SDL_Window;
 
 namespace Core {
@@ -21,7 +22,7 @@ class System;
 
 class EmuWindow_SDL2 : public Frontend::EmuWindow {
 public:
-    explicit EmuWindow_SDL2(Core::System& system, const std::string& version);
+    explicit EmuWindow_SDL2(Core::System& system, PluginManager& plugin_manager);
     ~EmuWindow_SDL2();
 
     /// Swap buffers to display the next frame
@@ -102,4 +103,6 @@ private:
 
     bool show_cheats_window = false;
     bool show_ipc_recorder_window = false;
+
+    PluginManager& plugin_manager;
 };

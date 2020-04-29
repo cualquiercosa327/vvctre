@@ -3,6 +3,7 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PROJECT_SOURCE_DIR}/CMakeModules)
 add_executable(${PROJECT_NAME}
     ${PROJECT_NAME}.cpp
     ${PROJECT_NAME}.rc
+    common.h
     emu_window/emu_window_sdl2.cpp
     emu_window/emu_window_sdl2.h
     resource.h
@@ -16,6 +17,9 @@ add_executable(${PROJECT_NAME}
     camera/util.h
     initial_settings.cpp
     initial_settings.h
+    plugin_functions.h
+    plugins.cpp
+    plugins.h
 )
 
 create_target_directory_groups(${PROJECT_NAME})

@@ -145,7 +145,6 @@ struct Values {
     int region_value = REGION_VALUE_AUTO_SELECT;
 
     std::string log_filter = "*:Info";
-    int rpc_server_port = 47889;
     std::string multiplayer_url = "ws://vvctre-multiplayer.glitch.me";
 
     /**

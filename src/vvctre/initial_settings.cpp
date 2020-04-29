@@ -33,10 +33,11 @@
 #include "input_common/main.h"
 #include "video_core/renderer_opengl/post_processing_opengl.h"
 #include "video_core/renderer_opengl/texture_filters/texture_filterer.h"
+#include "vvctre/common.h"
 #include "vvctre/initial_settings.h"
 
-InitialSettings::InitialSettings(const std::string& version) {
-    const std::string window_title = fmt::format("vvctre {} - Initial Settings", version);
+InitialSettings::InitialSettings() {
+    const std::string window_title = fmt::format("vvctre {} - Initial Settings", vvctre_version);
 
     render_window = SDL_CreateWindow(
         window_title.c_str(),
@@ -278,10 +279,6 @@ void InitialSettings::Run() {
                     ImGui::Text("Log Filter:");
                     ImGui::SameLine();
                     ImGui::InputText("##logfilter", &Settings::values.log_filter);
-
-                    ImGui::Text("RPC Server Port:");
-                    ImGui::SameLine();
-                    ImGui::InputInt("##rpcserverport", &Settings::values.rpc_server_port, 0);
 
                     ImGui::Text("Multiplayer Server URL:");
                     ImGui::SameLine();

@@ -95,7 +95,6 @@ void LogSettings() {
             return "Invalid";
         }());
         LOG_INFO(Settings, "\tLog Filter: {}", values.log_filter);
-        LOG_INFO(Settings, "\tRPC Server Port: {}", values.rpc_server_port);
         LOG_INFO(Settings, "\tMultiplayer Server URL: {}", values.multiplayer_url);
         if (values.use_virtual_sd) {
             LOG_INFO(Settings, "\t[x] Use Virtual SD Card");
