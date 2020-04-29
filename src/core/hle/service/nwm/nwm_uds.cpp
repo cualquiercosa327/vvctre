@@ -50,14 +50,11 @@ std::list<WifiPacket> NWM_UDS::GetReceivedBeacons(const MacAddress& sender, u32 
     std::list<WifiPacket> filtered_list;
     const auto beacon = std::find_if(
         received_beacons.begin(), received_beacons.end(), [&](const WifiPacket& packet) {
-            struct {
-                BeaconFrameHeader header;
-                TagHeader ssid_header;
-                std::array<u8, UDSBeaconSSIDSize> ssid;
-                DummyTag dummy;
-                NetworkInfoTag network_info;
-            } decrypted_beacon;
+            if (packet.data.size() < sizeof(DecryptedBeacon)) {
+                return false;
+            }
 
+            DecryptedBeacon decrypted_beacon;
             std::memcpy(&decrypted_beacon, packet.data.data(), sizeof(decrypted_beacon));
 
             NetworkInfo beacon_network_info{};

@@ -126,6 +126,14 @@ struct BeaconData {
 
 static_assert(sizeof(BeaconData) == 0x12, "BeaconData has incorrect size.");
 
+struct DecryptedBeacon {
+    BeaconFrameHeader header;
+    TagHeader ssid_header;
+    std::array<u8, UDSBeaconSSIDSize> ssid;
+    DummyTag dummy;
+    NetworkInfoTag network_info;
+};
+
 /**
  * Decrypts the beacon data buffer for the network described by `network_info`.
  */
