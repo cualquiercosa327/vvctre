@@ -234,7 +234,7 @@ void Module::Interface::GetSystemModel(Kernel::HLERequestContext& ctx) {
     rb.Push(cfg->GetConfigInfoBlock(ConsoleModelBlockID, 4, 0x8, reinterpret_cast<u8*>(&data)));
     ConsoleModelInfo model;
     std::memcpy(&model, &data, 4);
-    model.model = NEW_NINTENDO_3DS_XL;
+    model.model = NINTENDO_3DS;
     std::memcpy(&data, &model, 4);
     rb.Push<u8>(data & 0xFF);
 }
