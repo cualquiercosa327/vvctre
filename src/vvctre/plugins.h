@@ -12,15 +12,15 @@
 
 namespace PluginImportedFunctions {
 using PluginLoaded = void (*)(void* core, void* plugin_manager); // required
-using InitialSettingsOpening = void (*)();
-using InitialSettingsOkPressed = void (*)();
-using BeforeLoading = void (*)();
-using EmulationStarting = void (*)();
-using EmulatorClosing = void (*)();
-using FatalError = void (*)();
-using BeforeDrawingFPS = void (*)();
-using AddMenu = void (*)();
-using AfterSwapWindow = void (*)();
+using InitialSettingsOpening = void (*)();                       // optional
+using InitialSettingsOkPressed = void (*)();                     // optional
+using BeforeLoading = void (*)();                                // optional
+using EmulationStarting = void (*)();                            // optional
+using EmulatorClosing = void (*)();                              // optional
+using FatalError = void (*)();                                   // optional
+using BeforeDrawingFPS = void (*)();                             // optional
+using AddMenu = void (*)();                                      // optional
+using AfterSwapWindow = void (*)();                              // optional
 } // namespace PluginImportedFunctions
 
 class PluginManager {

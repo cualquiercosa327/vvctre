@@ -13,6 +13,10 @@
 #include "core/cheats/cheats.h"
 #include "core/cheats/gateway_cheat.h"
 #include "core/core.h"
+#include "core/hle/service/am/am.h"
+#include "core/hle/service/cam/cam.h"
+#include "core/hle/service/nfc/nfc.h"
+#include "core/memory.h"
 #include "vvctre/common.h"
 #include "vvctre/plugins.h"
 
@@ -199,12 +203,77 @@ VVCTRE_PLUGIN_FUNCTION void vvctre_load_file(void* core, const char* path) {
     static_cast<Core::System*>(core)->RequestReset();
 }
 
+VVCTRE_PLUGIN_FUNCTION bool vvctre_install_cia(const char* path) {
+    return Service::AM::InstallCIA(std::string(path)) == Service::AM::InstallStatus::Success;
+}
+
+VVCTRE_PLUGIN_FUNCTION bool vvctre_load_amiibo(void* core, const char* path) {
+    FileUtil::IOFile file(std::string(path), "rb");
+    Service::NFC::AmiiboData data;
+
+    if (file.ReadArray(&data, 1) == 1) {
+        std::shared_ptr<Service::NFC::Module::Interface> nfc =
+            static_cast<Core::System*>(core)
+                ->ServiceManager()
+                .GetService<Service::NFC::Module::Interface>("nfc:u");
+        if (nfc != nullptr) {
+            nfc->LoadAmiibo(data);
+            return true;
+        }
+    }
+
+    return false;
+}
+
+VVCTRE_PLUGIN_FUNCTION void vvctre_remove_amiibo(void* core) {
+    std::shared_ptr<Service::NFC::Module::Interface> nfc =
+        static_cast<Core::System*>(core)
+            ->ServiceManager()
+            .GetService<Service::NFC::Module::Interface>("nfc:u");
+    if (nfc != nullptr) {
+        nfc->RemoveAmiibo();
+    }
+}
+
 VVCTRE_PLUGIN_FUNCTION void vvctre_restart(void* core) {
     static_cast<Core::System*>(core)->Reset();
 }
 
 VVCTRE_PLUGIN_FUNCTION void vvctre_set_paused(void* plugin_manager, bool paused) {
     static_cast<PluginManager*>(plugin_manager)->paused = paused;
+}
+
+// Memory
+VVCTRE_PLUGIN_FUNCTION u8 vvctre_read_u8(void* core, VAddr address) {
+    return static_cast<Core::System*>(core)->Memory().Read8(address);
+}
+
+VVCTRE_PLUGIN_FUNCTION void vvctre_write_u8(void* core, VAddr address, u8 value) {
+    static_cast<Core::System*>(core)->Memory().Write8(address, value);
+}
+
+VVCTRE_PLUGIN_FUNCTION u16 vvctre_read_u16(void* core, VAddr address) {
+    return static_cast<Core::System*>(core)->Memory().Read16(address);
+}
+
+VVCTRE_PLUGIN_FUNCTION void vvctre_write_u16(void* core, VAddr address, u16 value) {
+    static_cast<Core::System*>(core)->Memory().Write16(address, value);
+}
+
+VVCTRE_PLUGIN_FUNCTION u32 vvctre_read_u32(void* core, VAddr address) {
+    return static_cast<Core::System*>(core)->Memory().Read32(address);
+}
+
+VVCTRE_PLUGIN_FUNCTION void vvctre_write_u32(void* core, VAddr address, u32 value) {
+    static_cast<Core::System*>(core)->Memory().Write32(address, value);
+}
+
+VVCTRE_PLUGIN_FUNCTION u64 vvctre_read_u64(void* core, VAddr address) {
+    return static_cast<Core::System*>(core)->Memory().Read64(address);
+}
+
+VVCTRE_PLUGIN_FUNCTION void vvctre_write_u64(void* core, VAddr address, u64 value) {
+    static_cast<Core::System*>(core)->Memory().Write64(address, value);
 }
 
 // Debugging
@@ -300,6 +369,14 @@ VVCTRE_PLUGIN_FUNCTION void vvctre_update_gateway_cheat(void* core, int index, c
     static_cast<Core::System*>(core)->CheatEngine().UpdateCheat(
         index, std::make_shared<Cheats::GatewayCheat>(std::string(name), std::string(code),
                                                       std::string(comments)));
+}
+
+// Camera
+VVCTRE_PLUGIN_FUNCTION void vvctre_reload_camera_images(void* core) {
+    auto cam = Service::CAM::GetModule(*static_cast<Core::System*>(core));
+    if (cam != nullptr) {
+        cam->ReloadCameraDevices();
+    }
 }
 
 // Other

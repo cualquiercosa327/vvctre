@@ -2,10 +2,29 @@
 // Licensed under GPLv2 or any later version
 // Refer to the license.txt file included.
 
-// File, Emulation
+// File
 VVCTRE_PLUGIN_FUNCTION void vvctre_load_file(void* core, const char* path);
+VVCTRE_PLUGIN_FUNCTION void vvctre_install_cia(const char* path);
+
+VVCTRE_PLUGIN_FUNCTION void vvctre_load_amiibo(void* core, const char* path);
+VVCTRE_PLUGIN_FUNCTION void vvctre_remove_amiibo(void* core);
+
+// Emulation
 VVCTRE_PLUGIN_FUNCTION void vvctre_restart(void* core);
 VVCTRE_PLUGIN_FUNCTION void vvctre_set_paused(void* plugin_manager, bool paused);
+
+// Memory
+VVCTRE_PLUGIN_FUNCTION u8 vvctre_read_u8(void* core, VAddr address);
+VVCTRE_PLUGIN_FUNCTION void vvctre_write_u8(void* core, VAddr address, u8 value);
+
+VVCTRE_PLUGIN_FUNCTION u16 vvctre_read_u16(void* core, VAddr address);
+VVCTRE_PLUGIN_FUNCTION void vvctre_write_u16(void* core, VAddr address, u16 value);
+
+VVCTRE_PLUGIN_FUNCTION u32 vvctre_read_u32(void* core, VAddr address);
+VVCTRE_PLUGIN_FUNCTION void vvctre_write_u32(void* core, VAddr address, u32 value);
+
+VVCTRE_PLUGIN_FUNCTION u64 vvctre_read_u64(void* core, VAddr address);
+VVCTRE_PLUGIN_FUNCTION void vvctre_write_u64(void* core, VAddr address, u64 value);
 
 // Debugging
 VVCTRE_PLUGIN_FUNCTION void vvctre_set_pc(void* core, u32 addr);
@@ -40,6 +59,9 @@ VVCTRE_PLUGIN_FUNCTION void vvctre_remove_cheat(void* core, int index);
 VVCTRE_PLUGIN_FUNCTION void vvctre_update_gateway_cheat(void* core, int index, const char* name,
                                                         const char* code, const char* comments);
 
+// Camera
+VVCTRE_PLUGIN_FUNCTION void vvctre_reload_camera_images(void* core);
+
 // Other
 VVCTRE_PLUGIN_FUNCTION const char* vvctre_get_version();
 
@@ -59,10 +81,6 @@ VVCTRE_PLUGIN_FUNCTION bool vvctre_gui_menu_item(const char* name);
 // - Settings
 // - TAS
 // - Remote Control
-// - Memory
-// - Install CIA
-// - Load/remove amiibo
-// - Reload camera images
 // - Frametime recording
-// - HLE service function hooks
 // - Custom logging backends
+// - Create & poll button devices
