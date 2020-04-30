@@ -12,6 +12,7 @@ VVCTRE_PLUGIN_FUNCTION void vvctre_remove_amiibo(void* core);
 // Emulation
 VVCTRE_PLUGIN_FUNCTION void vvctre_restart(void* core);
 VVCTRE_PLUGIN_FUNCTION void vvctre_set_paused(void* plugin_manager, bool paused);
+VVCTRE_PLUGIN_FUNCTION bool vvctre_get_paused(void* plugin_manager);
 
 // Memory
 VVCTRE_PLUGIN_FUNCTION u8 vvctre_read_u8(void* core, VAddr address);
@@ -79,12 +80,25 @@ VVCTRE_PLUGIN_FUNCTION void* vvctre_button_device_new(void* plugin_manager, cons
 VVCTRE_PLUGIN_FUNCTION void vvctre_button_device_delete(void* plugin_manager, void* device);
 VVCTRE_PLUGIN_FUNCTION bool vvctre_button_device_get_state(void* device);
 
+// TAS
+VVCTRE_PLUGIN_FUNCTION void vvctre_movie_prepare_for_playback(const char* path);
+VVCTRE_PLUGIN_FUNCTION void vvctre_movie_prepare_for_recording();
+VVCTRE_PLUGIN_FUNCTION void vvctre_movie_play(const char* path);
+VVCTRE_PLUGIN_FUNCTION void vvctre_movie_record(const char* path);
+VVCTRE_PLUGIN_FUNCTION bool vvctre_movie_is_playing();
+VVCTRE_PLUGIN_FUNCTION bool vvctre_movie_is_recording();
+VVCTRE_PLUGIN_FUNCTION void vvctre_movie_stop();
+
+VVCTRE_PLUGIN_FUNCTION void vvctre_set_frame_advancing_enabled(void* core, bool enabled);
+VVCTRE_PLUGIN_FUNCTION bool vvctre_get_frame_advancing_enabled(void* core);
+VVCTRE_PLUGIN_FUNCTION void vvctre_advance_frame(void* core);
+
+// Settings
+
+// Remote control
+
+// Custom logging backends
+
 // Other
 VVCTRE_PLUGIN_FUNCTION const char* vvctre_get_version();
-
-// TODO:
-// - Settings
-// - TAS
-// - Remote Control
-// - Frametime recording
-// - Custom logging backends
+VVCTRE_PLUGIN_FUNCTION bool vvctre_emulation_running(void* core);

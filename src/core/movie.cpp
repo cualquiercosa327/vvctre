@@ -3,9 +3,9 @@
 // Refer to the license.txt file included.
 
 #include <cstring>
+#include <optional>
 #include <string>
 #include <vector>
-#include <boost/optional.hpp>
 #include "common/bit_field.h"
 #include "common/common_types.h"
 #include "common/file_util.h"
@@ -387,19 +387,19 @@ void Movie::StartRecording(const std::string& movie_file) {
     record_movie_file = movie_file;
 }
 
-static boost::optional<VCMHeader> ReadHeader(const std::string& movie_file) {
+static std::optional<VCMHeader> ReadHeader(const std::string& movie_file) {
     FileUtil::IOFile save_record(movie_file, "rb");
     const u64 size = save_record.GetSize();
 
     if (!save_record || size <= sizeof(VCMHeader)) {
-        return boost::none;
+        return std::nullopt;
     }
 
     VCMHeader header;
     save_record.ReadArray(&header, 1);
 
     if (header_magic_bytes != header.filetype) {
-        return boost::none;
+        return std::nullopt;
     }
 
     return header;
@@ -407,8 +407,9 @@ static boost::optional<VCMHeader> ReadHeader(const std::string& movie_file) {
 
 void Movie::PrepareForPlayback(const std::string& movie_file) {
     auto header = ReadHeader(movie_file);
-    if (header == boost::none)
+    if (header == std::nullopt) {
         return;
+    }
 
     init_time = header.value().clock_init_time;
 }
@@ -422,7 +423,7 @@ void Movie::PrepareForRecording() {
 Movie::ValidationResult Movie::ValidateMovie(const std::string& movie_file, u64 program_id) const {
     LOG_INFO(Movie, "Validating Movie file '{}'", movie_file);
     auto header = ReadHeader(movie_file);
-    if (header == boost::none) {
+    if (header == std::nullopt) {
         return ValidationResult::Invalid;
     }
 
@@ -431,7 +432,7 @@ Movie::ValidationResult Movie::ValidateMovie(const std::string& movie_file, u64 
 
 u64 Movie::GetMovieProgramID(const std::string& movie_file) const {
     auto header = ReadHeader(movie_file);
-    if (header == boost::none) {
+    if (header == std::nullopt) {
         return 0;
     }
 

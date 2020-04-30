@@ -2,7 +2,6 @@
 // Licensed under GPLv2 or any later version
 // Refer to the license.txt file included.
 
-#pragma optimize("", off)
 #include <utility>
 #include <fmt/format.h>
 #include <imgui.h>
@@ -17,6 +16,7 @@
 #include "core/hle/service/cam/cam.h"
 #include "core/hle/service/nfc/nfc.h"
 #include "core/memory.h"
+#include "core/movie.h"
 #include "vvctre/common.h"
 #include "vvctre/plugins.h"
 
@@ -256,6 +256,10 @@ VVCTRE_PLUGIN_FUNCTION void vvctre_set_paused(void* plugin_manager, bool paused)
     static_cast<PluginManager*>(plugin_manager)->paused = paused;
 }
 
+VVCTRE_PLUGIN_FUNCTION bool vvctre_get_paused(void* plugin_manager) {
+    return static_cast<PluginManager*>(plugin_manager)->paused;
+}
+
 // Memory
 VVCTRE_PLUGIN_FUNCTION u8 vvctre_read_u8(void* core, VAddr address) {
     return static_cast<Core::System*>(core)->Memory().Read8(address);
@@ -436,7 +440,52 @@ VVCTRE_PLUGIN_FUNCTION bool vvctre_button_device_get_state(void* device) {
     return static_cast<Input::ButtonDevice*>(device)->GetStatus();
 }
 
+// TAS
+VVCTRE_PLUGIN_FUNCTION void vvctre_movie_prepare_for_playback(const char* path) {
+    Core::Movie::GetInstance().PrepareForPlayback(path);
+}
+
+VVCTRE_PLUGIN_FUNCTION void vvctre_movie_prepare_for_recording() {
+    Core::Movie::GetInstance().PrepareForRecording();
+}
+
+VVCTRE_PLUGIN_FUNCTION void vvctre_movie_play(const char* path) {
+    Core::Movie::GetInstance().StartPlayback(std::string(path));
+}
+
+VVCTRE_PLUGIN_FUNCTION void vvctre_movie_record(const char* path) {
+    Core::Movie::GetInstance().StartRecording(std::string(path));
+}
+
+VVCTRE_PLUGIN_FUNCTION bool vvctre_movie_is_playing() {
+    return Core::Movie::GetInstance().IsPlayingInput();
+}
+
+VVCTRE_PLUGIN_FUNCTION bool vvctre_movie_is_recording() {
+    return Core::Movie::GetInstance().IsRecordingInput();
+}
+
+VVCTRE_PLUGIN_FUNCTION void vvctre_movie_stop() {
+    Core::Movie::GetInstance().Shutdown();
+}
+
+VVCTRE_PLUGIN_FUNCTION void vvctre_set_frame_advancing_enabled(void* core, bool enabled) {
+    static_cast<Core::System*>(core)->frame_limiter.SetFrameAdvancing(enabled);
+}
+
+VVCTRE_PLUGIN_FUNCTION bool vvctre_get_frame_advancing_enabled(void* core) {
+    return static_cast<Core::System*>(core)->frame_limiter.FrameAdvancingEnabled();
+}
+
+VVCTRE_PLUGIN_FUNCTION void vvctre_advance_frame(void* core) {
+    static_cast<Core::System*>(core)->frame_limiter.AdvanceFrame();
+}
+
 // Other
 VVCTRE_PLUGIN_FUNCTION const char* vvctre_get_version() {
     return vvctre_version.c_str();
+}
+
+VVCTRE_PLUGIN_FUNCTION bool vvctre_emulation_running(void* core) {
+    return static_cast<Core::System*>(core)->IsPoweredOn();
 }
