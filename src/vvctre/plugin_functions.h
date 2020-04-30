@@ -77,10 +77,14 @@ VVCTRE_PLUGIN_FUNCTION void vvctre_gui_end_menu();
 
 VVCTRE_PLUGIN_FUNCTION bool vvctre_gui_menu_item(const char* name);
 
+// Button devices
+VVCTRE_PLUGIN_FUNCTION void* vvctre_button_device_new(void* plugin_manager, const char* params);
+VVCTRE_PLUGIN_FUNCTION void vvctre_button_device_delete(void* plugin_manager, void* device);
+VVCTRE_PLUGIN_FUNCTION bool vvctre_button_device_get_state(void* device);
+
 // TODO:
 // - Settings
 // - TAS
 // - Remote Control
 // - Frametime recording
 // - Custom logging backends
-// - Create & poll button devices

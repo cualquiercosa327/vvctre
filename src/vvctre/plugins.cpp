@@ -2,8 +2,8 @@
 // Licensed under GPLv2 or any later version
 // Refer to the license.txt file included.
 
+#pragma optimize("", off)
 #include <utility>
-#include <vector>
 #include <fmt/format.h>
 #include <imgui.h>
 #include "common/common_funcs.h"
@@ -187,6 +187,19 @@ void PluginManager::AfterSwapWindow() {
         }
     }
 #endif
+}
+
+void* PluginManager::NewButtonDevice(const char* params) {
+    auto& b = buttons.emplace_back(Input::CreateDevice<Input::ButtonDevice>(std::string(params)));
+    return static_cast<void*>(b.get());
+}
+
+void PluginManager::DeleteButtonDevice(void* device) {
+    auto itr = std::find_if(std::begin(buttons), std::end(buttons),
+                            [device](auto& b) { return b.get() == device; });
+    if (itr != buttons.end()) {
+        buttons.erase(itr);
+    }
 }
 
 // Exports
@@ -411,4 +424,19 @@ VVCTRE_PLUGIN_FUNCTION void vvctre_gui_end_menu() {
 
 VVCTRE_PLUGIN_FUNCTION bool vvctre_gui_menu_item(const char* name) {
     return ImGui::MenuItem(name);
+}
+
+// Button devices
+VVCTRE_PLUGIN_FUNCTION void* vvctre_button_device_new(void* plugin_manager, const char* params) {
+    PluginManager* pm = static_cast<PluginManager*>(plugin_manager);
+    return pm->NewButtonDevice(params);
+}
+
+VVCTRE_PLUGIN_FUNCTION void vvctre_button_device_delete(void* plugin_manager, void* device) {
+    PluginManager* pm = static_cast<PluginManager*>(plugin_manager);
+    pm->DeleteButtonDevice(device);
+}
+
+VVCTRE_PLUGIN_FUNCTION bool vvctre_button_device_get_state(void* device) {
+    return static_cast<Input::ButtonDevice*>(device)->GetStatus();
 }

@@ -4,7 +4,8 @@
 
 #pragma once
 
-#include <unordered_map>
+#include <vector>
+#include "core/frontend/input.h"
 
 #ifdef _WIN32
 #include <windows.h>
@@ -38,6 +39,8 @@ public:
     void BeforeDrawingFPS();
     void AddMenus();
     void AfterSwapWindow();
+    void* NewButtonDevice(const char* params);
+    void DeleteButtonDevice(void* device);
 
     // DLLs can change this
     bool paused = false;
@@ -46,11 +49,12 @@ private:
 #ifdef _WIN32
     struct Plugin {
         HMODULE handle;
-        PluginImportedFunctions::BeforeDrawingFPS before_drawing_fps;
-        PluginImportedFunctions::AddMenu add_menu;
-        PluginImportedFunctions::AfterSwapWindow after_swap_window;
+        PluginImportedFunctions::BeforeDrawingFPS before_drawing_fps = nullptr;
+        PluginImportedFunctions::AddMenu add_menu = nullptr;
+        PluginImportedFunctions::AfterSwapWindow after_swap_window = nullptr;
     };
 
     std::vector<Plugin> plugins;
+    std::vector<std::unique_ptr<Input::ButtonDevice>> buttons;
 #endif
 };
