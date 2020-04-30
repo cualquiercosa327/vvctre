@@ -57,6 +57,7 @@ private:
     };
 
     std::vector<Plugin> plugins;
-    std::vector<std::unique_ptr<Input::ButtonDevice>> buttons;
 #endif
+
+    std::vector<std::unique_ptr<Input::ButtonDevice>> buttons;
 };
