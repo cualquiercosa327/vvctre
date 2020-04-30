@@ -97,8 +97,6 @@ VVCTRE_PLUGIN_FUNCTION void vvctre_advance_frame(void* core);
 
 // Remote control
 
-// Custom logging backends
-
 // Other
 VVCTRE_PLUGIN_FUNCTION const char* vvctre_get_version();
 VVCTRE_PLUGIN_FUNCTION bool vvctre_emulation_running(void* core);

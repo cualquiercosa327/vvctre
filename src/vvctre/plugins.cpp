@@ -57,6 +57,12 @@ PluginManager::PluginManager(void* core) {
                     plugin.after_swap_window =
                         (PluginImportedFunctions::AfterSwapWindow)GetProcAddress(handle,
                                                                                  "AfterSwapWindow");
+                    PluginImportedFunctions::Log log =
+                        (PluginImportedFunctions::Log)GetProcAddress(handle, "Log");
+                    if (log != nullptr) {
+                        Log::AddBackend(std::make_unique<Log::FunctionLogger>(
+                            log, fmt::format("Plugin {}", entry.virtualName)));
+                    }
                     plugins.push_back(std::move(plugin));
 
                     f(core, static_cast<void*>(this));

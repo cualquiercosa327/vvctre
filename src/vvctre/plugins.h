@@ -6,6 +6,7 @@
 
 #include <vector>
 #include "core/frontend/input.h"
+#include "vvctre/function_logger.h"
 
 #ifdef _WIN32
 #include <windows.h>
@@ -22,6 +23,7 @@ using FatalError = void (*)();                                   // optional
 using BeforeDrawingFPS = void (*)();                             // optional
 using AddMenu = void (*)();                                      // optional
 using AfterSwapWindow = void (*)();                              // optional
+using Log = Log::FunctionLogger::Function;
 } // namespace PluginImportedFunctions
 
 class PluginManager {

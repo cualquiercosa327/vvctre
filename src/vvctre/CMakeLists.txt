@@ -15,6 +15,8 @@ add_executable(${PROJECT_NAME}
     camera/image.h
     camera/util.cpp
     camera/util.h
+    function_logger.cpp
+    function_logger.h
     initial_settings.cpp
     initial_settings.h
     plugin_functions.h
