@@ -62,9 +62,6 @@ VVCTRE_PLUGIN_FUNCTION void vvctre_update_gateway_cheat(void* core, int index, c
 // Camera
 VVCTRE_PLUGIN_FUNCTION void vvctre_reload_camera_images(void* core);
 
-// Other
-VVCTRE_PLUGIN_FUNCTION const char* vvctre_get_version();
-
 // GUI
 VVCTRE_PLUGIN_FUNCTION void vvctre_gui_text(const char* text);
 VVCTRE_PLUGIN_FUNCTION bool vvctre_gui_button(const char* text);
@@ -81,6 +78,9 @@ VVCTRE_PLUGIN_FUNCTION bool vvctre_gui_menu_item(const char* name);
 VVCTRE_PLUGIN_FUNCTION void* vvctre_button_device_new(void* plugin_manager, const char* params);
 VVCTRE_PLUGIN_FUNCTION void vvctre_button_device_delete(void* plugin_manager, void* device);
 VVCTRE_PLUGIN_FUNCTION bool vvctre_button_device_get_state(void* device);
+
+// Other
+VVCTRE_PLUGIN_FUNCTION const char* vvctre_get_version();
 
 // TODO:
 // - Settings
