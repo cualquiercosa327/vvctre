@@ -17,7 +17,7 @@
 
 namespace Core {
 class System;
-}
+} // namespace Core
 
 namespace Kernel {
 class KernelSystem;
@@ -30,7 +30,7 @@ namespace Service {
 
 namespace SM {
 class ServiceManager;
-}
+} // namespace SM
 
 static const int kMaxPortSize = 8; ///< Maximum size of a port name (8 characters)
 /// Arbitrary default number of maximum connections to an HLE service.
