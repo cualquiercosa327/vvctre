@@ -949,9 +949,9 @@ static constexpr MatchFlags operator|(MatchFlags lhs, MatchFlags rhs) {
 
 /// Get the best surface match (and its match type) for the given flags
 template <MatchFlags find_flags>
-Surface FindMatch(const SurfaceCache& surface_cache, const SurfaceParams& params,
-                  ScaleMatch match_scale_type,
-                  std::optional<SurfaceInterval> validate_interval = std::nullopt) {
+static Surface FindMatch(const SurfaceCache& surface_cache, const SurfaceParams& params,
+                         ScaleMatch match_scale_type,
+                         std::optional<SurfaceInterval> validate_interval = std::nullopt) {
     Surface match_surface = nullptr;
     bool match_valid = false;
     u32 match_scale = 0;
