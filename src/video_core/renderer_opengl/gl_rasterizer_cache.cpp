@@ -634,12 +634,11 @@ void CachedSurface::FlushGLBuffer(PAddr flush_start, PAddr flush_end) {
 }
 
 bool CachedSurface::LoadCustomTexture(u64 tex_hash, Core::CustomTexInfo& tex_info) {
-    bool result = false;
     Core::CustomTexCache& custom_tex_cache = Core::System::GetInstance().CustomTexCache();
 
     if (custom_tex_cache.IsTextureCached(tex_hash)) {
         tex_info = custom_tex_cache.LookupTexture(tex_hash);
-        result = true;
+        return true;
     } else if (custom_tex_cache.CustomTextureExists(tex_hash)) {
         const Core::CustomTexPathInfo& path_info = custom_tex_cache.LookupTexturePathInfo(tex_hash);
         unsigned char* image =
@@ -658,7 +657,7 @@ bool CachedSurface::LoadCustomTexture(u64 tex_hash, Core::CustomTexInfo& tex_inf
                 Common::FlipRGBA8Texture(tex_info.tex, tex_info.width, tex_info.height);
                 custom_tex_cache.CacheTexture(path_info.hash, tex_info.tex, tex_info.width,
                                               tex_info.height);
-                result = true;
+                return true;
             } else {
                 LOG_ERROR(Render_OpenGL, "Texture {} size is not a power of 2", path_info.path);
             }
@@ -667,7 +666,7 @@ bool CachedSurface::LoadCustomTexture(u64 tex_hash, Core::CustomTexInfo& tex_inf
         }
     }
 
-    return result;
+    return false;
 }
 
 void CachedSurface::DumpTexture(GLuint target_tex, u64 tex_hash) {
