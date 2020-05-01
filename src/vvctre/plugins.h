@@ -13,16 +13,18 @@
 #endif
 
 namespace PluginImportedFunctions {
-using PluginLoaded = void (*)(void* core, void* plugin_manager); // required
-using InitialSettingsOpening = void (*)();                       // optional
-using InitialSettingsOkPressed = void (*)();                     // optional
-using BeforeLoading = void (*)();                                // optional
-using EmulationStarting = void (*)();                            // optional
-using EmulatorClosing = void (*)();                              // optional
-using FatalError = void (*)();                                   // optional
-using BeforeDrawingFPS = void (*)();                             // optional
-using AddMenu = void (*)();                                      // optional
-using AfterSwapWindow = void (*)();                              // optional
+using GetRequiredFunctionCount = int (*)();                                         // required
+using GetRequiredFunctionNames = const char** (*)();                                // required
+using PluginLoaded = void (*)(void* core, void* plugin_manager, void* functions[]); // required
+using InitialSettingsOpening = void (*)();                                          // optional
+using InitialSettingsOkPressed = void (*)();                                        // optional
+using BeforeLoading = void (*)();                                                   // optional
+using EmulationStarting = void (*)();                                               // optional
+using EmulatorClosing = void (*)();                                                 // optional
+using FatalError = void (*)();                                                      // optional
+using BeforeDrawingFPS = void (*)();                                                // optional
+using AddMenu = void (*)();                                                         // optional
+using AfterSwapWindow = void (*)();                                                 // optional
 using Log = Log::FunctionLogger::Function;
 } // namespace PluginImportedFunctions
 

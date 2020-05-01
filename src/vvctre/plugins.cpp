@@ -2,6 +2,7 @@
 // Licensed under GPLv2 or any later version
 // Refer to the license.txt file included.
 
+#include <unordered_map>
 #include <utility>
 #include <fmt/format.h>
 #include <imgui.h>
@@ -30,6 +31,223 @@
 #include <dlfcn.h>
 #define GetProcAddress dlsym
 #endif
+
+std::unordered_map<const char*, void*> function_map = {
+    {"vvctre_load_file", &vvctre_load_file},
+    {"vvctre_install_cia", &vvctre_install_cia},
+    {"vvctre_load_amiibo", &vvctre_load_amiibo},
+    {"vvctre_remove_amiibo", &vvctre_remove_amiibo},
+    {"vvctre_restart", &vvctre_restart},
+    {"vvctre_set_paused", &vvctre_set_paused},
+    {"vvctre_get_paused", &vvctre_get_paused},
+    {"vvctre_read_u8", &vvctre_read_u8},
+    {"vvctre_write_u8", &vvctre_write_u8},
+    {"vvctre_read_u16", &vvctre_read_u16},
+    {"vvctre_write_u16", &vvctre_write_u16},
+    {"vvctre_read_u32", &vvctre_read_u32},
+    {"vvctre_write_u32", &vvctre_write_u32},
+    {"vvctre_read_u64", &vvctre_read_u64},
+    {"vvctre_write_u64", &vvctre_write_u64},
+    {"vvctre_set_pc", &vvctre_set_pc},
+    {"vvctre_get_pc", &vvctre_get_pc},
+    {"vvctre_set_register", &vvctre_set_register},
+    {"vvctre_get_register", &vvctre_get_register},
+    {"vvctre_set_vfp_register", &vvctre_set_vfp_register},
+    {"vvctre_get_vfp_register", &vvctre_get_vfp_register},
+    {"vvctre_set_vfp_system_register", &vvctre_set_vfp_system_register},
+    {"vvctre_get_vfp_system_register", &vvctre_get_vfp_system_register},
+    {"vvctre_set_cp15_register", &vvctre_set_cp15_register},
+    {"vvctre_get_cp15_register", &vvctre_get_cp15_register},
+    {"vvctre_cheat_count", &vvctre_cheat_count},
+    {"vvctre_get_cheat", &vvctre_get_cheat},
+    {"vvctre_get_cheat_name", &vvctre_get_cheat_name},
+    {"vvctre_get_cheat_comments", &vvctre_get_cheat_comments},
+    {"vvctre_get_cheat_type", &vvctre_get_cheat_type},
+    {"vvctre_get_cheat_code", &vvctre_get_cheat_code},
+    {"vvctre_set_cheat_enabled", &vvctre_set_cheat_enabled},
+    {"vvctre_add_gateway_cheat", &vvctre_add_gateway_cheat},
+    {"vvctre_remove_cheat", &vvctre_remove_cheat},
+    {"vvctre_update_gateway_cheat", &vvctre_update_gateway_cheat},
+    {"vvctre_reload_camera_images", &vvctre_reload_camera_images},
+    {"vvctre_gui_text", &vvctre_gui_text},
+    {"vvctre_gui_button", &vvctre_gui_button},
+    {"vvctre_gui_begin", &vvctre_gui_begin},
+    {"vvctre_gui_end", &vvctre_gui_end},
+    {"vvctre_gui_begin_menu", &vvctre_gui_begin_menu},
+    {"vvctre_gui_end_menu", &vvctre_gui_end_menu},
+    {"vvctre_gui_menu_item", &vvctre_gui_menu_item},
+    {"vvctre_button_device_new", &vvctre_button_device_new},
+    {"vvctre_button_device_delete", &vvctre_button_device_delete},
+    {"vvctre_button_device_get_state", &vvctre_button_device_get_state},
+    {"vvctre_movie_prepare_for_playback", &vvctre_movie_prepare_for_playback},
+    {"vvctre_movie_prepare_for_recording", &vvctre_movie_prepare_for_recording},
+    {"vvctre_movie_play", &vvctre_movie_play},
+    {"vvctre_movie_record", &vvctre_movie_record},
+    {"vvctre_movie_is_playing", &vvctre_movie_is_playing},
+    {"vvctre_movie_is_recording", &vvctre_movie_is_recording},
+    {"vvctre_movie_stop", &vvctre_movie_stop},
+    {"vvctre_set_frame_advancing_enabled", &vvctre_set_frame_advancing_enabled},
+    {"vvctre_get_frame_advancing_enabled", &vvctre_get_frame_advancing_enabled},
+    {"vvctre_advance_frame", &vvctre_advance_frame},
+    {"vvctre_set_custom_pad_state", &vvctre_set_custom_pad_state},
+    {"vvctre_use_real_pad_state", &vvctre_use_real_pad_state},
+    {"vvctre_set_custom_circle_pad_state", &vvctre_set_custom_circle_pad_state},
+    {"vvctre_use_real_circle_pad_state", &vvctre_use_real_circle_pad_state},
+    {"vvctre_set_custom_touch_state", &vvctre_set_custom_touch_state},
+    {"vvctre_use_real_touch_state", &vvctre_use_real_touch_state},
+    {"vvctre_set_custom_motion_state", &vvctre_set_custom_motion_state},
+    {"vvctre_use_real_motion_state", &vvctre_use_real_motion_state},
+    {"vvctre_settings_apply", &vvctre_settings_apply},
+    {"vvctre_settings_log", &vvctre_settings_log},
+    {"vvctre_settings_set_file_path", &vvctre_settings_set_file_path},
+    {"vvctre_settings_get_file_path", &vvctre_settings_get_file_path},
+    {"vvctre_settings_set_play_movie", &vvctre_settings_set_play_movie},
+    {"vvctre_settings_get_play_movie", &vvctre_settings_get_play_movie},
+    {"vvctre_settings_set_record_movie", &vvctre_settings_set_record_movie},
+    {"vvctre_settings_get_record_movie", &vvctre_settings_get_record_movie},
+    {"vvctre_settings_set_region_value", &vvctre_settings_set_region_value},
+    {"vvctre_settings_get_region_value", &vvctre_settings_get_region_value},
+    {"vvctre_settings_set_log_filter", &vvctre_settings_set_log_filter},
+    {"vvctre_settings_get_log_filter", &vvctre_settings_get_log_filter},
+    {"vvctre_settings_set_multiplayer_url", &vvctre_settings_set_multiplayer_url},
+    {"vvctre_settings_get_multiplayer_url", &vvctre_settings_get_multiplayer_url},
+    {"vvctre_settings_set_initial_clock", &vvctre_settings_set_initial_clock},
+    {"vvctre_settings_get_initial_clock", &vvctre_settings_get_initial_clock},
+    {"vvctre_settings_set_unix_timestamp", &vvctre_settings_set_unix_timestamp},
+    {"vvctre_settings_get_unix_timestamp", &vvctre_settings_get_unix_timestamp},
+    {"vvctre_settings_set_use_virtual_sd", &vvctre_settings_set_use_virtual_sd},
+    {"vvctre_settings_get_use_virtual_sd", &vvctre_settings_get_use_virtual_sd},
+    {"vvctre_settings_set_start_in_fullscreen_mode", &vvctre_settings_set_start_in_fullscreen_mode},
+    {"vvctre_settings_get_start_in_fullscreen_mode", &vvctre_settings_get_start_in_fullscreen_mode},
+    {"vvctre_settings_set_record_frame_times", &vvctre_settings_set_record_frame_times},
+    {"vvctre_settings_get_record_frame_times", &vvctre_settings_get_record_frame_times},
+    {"vvctre_settings_enable_gdbstub", &vvctre_settings_enable_gdbstub},
+    {"vvctre_settings_disable_gdbstub", &vvctre_settings_disable_gdbstub},
+    {"vvctre_settings_is_gdb_stub_enabled", &vvctre_settings_is_gdb_stub_enabled},
+    {"vvctre_settings_get_gdb_stub_port", &vvctre_settings_get_gdb_stub_port},
+    {"vvctre_settings_set_use_cpu_jit", &vvctre_settings_set_use_cpu_jit},
+    {"vvctre_settings_get_use_cpu_jit", &vvctre_settings_get_use_cpu_jit},
+    {"vvctre_settings_set_limit_speed", &vvctre_settings_set_limit_speed},
+    {"vvctre_settings_get_limit_speed", &vvctre_settings_get_limit_speed},
+    {"vvctre_settings_set_speed_limit", &vvctre_settings_set_speed_limit},
+    {"vvctre_settings_get_speed_limit", &vvctre_settings_get_speed_limit},
+    {"vvctre_settings_set_use_custom_cpu_ticks", &vvctre_settings_set_use_custom_cpu_ticks},
+    {"vvctre_settings_get_use_custom_cpu_ticks", &vvctre_settings_get_use_custom_cpu_ticks},
+    {"vvctre_settings_set_custom_cpu_ticks", &vvctre_settings_set_custom_cpu_ticks},
+    {"vvctre_settings_get_custom_cpu_ticks", &vvctre_settings_get_custom_cpu_ticks},
+    {"vvctre_settings_set_cpu_clock_percentage", &vvctre_settings_set_cpu_clock_percentage},
+    {"vvctre_settings_get_cpu_clock_percentage", &vvctre_settings_get_cpu_clock_percentage},
+    {"vvctre_settings_set_enable_dsp_lle", &vvctre_settings_set_enable_dsp_lle},
+    {"vvctre_settings_get_enable_dsp_lle", &vvctre_settings_get_enable_dsp_lle},
+    {"vvctre_settings_set_enable_dsp_lle_multithread",
+     &vvctre_settings_set_enable_dsp_lle_multithread},
+    {"vvctre_settings_get_enable_dsp_lle_multithread",
+     &vvctre_settings_get_enable_dsp_lle_multithread},
+    {"vvctre_settings_set_audio_volume", &vvctre_settings_set_audio_volume},
+    {"vvctre_settings_get_audio_volume", &vvctre_settings_get_audio_volume},
+    {"vvctre_settings_set_audio_sink_id", &vvctre_settings_set_audio_sink_id},
+    {"vvctre_settings_get_audio_sink_id", &vvctre_settings_get_audio_sink_id},
+    {"vvctre_settings_set_audio_device_id", &vvctre_settings_set_audio_device_id},
+    {"vvctre_settings_get_audio_device_id", &vvctre_settings_get_audio_device_id},
+    {"vvctre_settings_set_microphone_input_type", &vvctre_settings_set_microphone_input_type},
+    {"vvctre_settings_get_microphone_input_type", &vvctre_settings_get_microphone_input_type},
+    {"vvctre_settings_set_microphone_device", &vvctre_settings_set_microphone_device},
+    {"vvctre_settings_get_microphone_device", &vvctre_settings_get_microphone_device},
+    {"vvctre_settings_set_camera_engine", &vvctre_settings_set_camera_engine},
+    {"vvctre_settings_get_camera_engine", &vvctre_settings_get_camera_engine},
+    {"vvctre_settings_set_camera_parameter", &vvctre_settings_set_camera_parameter},
+    {"vvctre_settings_get_camera_parameter", &vvctre_settings_get_camera_parameter},
+    {"vvctre_settings_set_camera_flip", &vvctre_settings_set_camera_flip},
+    {"vvctre_settings_get_camera_flip", &vvctre_settings_get_camera_flip},
+    {"vvctre_settings_set_use_hardware_renderer", &vvctre_settings_set_use_hardware_renderer},
+    {"vvctre_settings_get_use_hardware_renderer", &vvctre_settings_get_use_hardware_renderer},
+    {"vvctre_settings_set_use_hardware_shader", &vvctre_settings_set_use_hardware_shader},
+    {"vvctre_settings_get_use_hardware_shader", &vvctre_settings_get_use_hardware_shader},
+    {"vvctre_settings_set_hardware_shader_accurate_multiplication",
+     &vvctre_settings_set_hardware_shader_accurate_multiplication},
+    {"vvctre_settings_get_hardware_shader_accurate_multiplication",
+     &vvctre_settings_get_hardware_shader_accurate_multiplication},
+    {"vvctre_settings_set_use_shader_jit", &vvctre_settings_set_use_shader_jit},
+    {"vvctre_settings_get_use_shader_jit", &vvctre_settings_get_use_shader_jit},
+    {"vvctre_settings_set_enable_vsync", &vvctre_settings_set_enable_vsync},
+    {"vvctre_settings_get_enable_vsync", &vvctre_settings_get_enable_vsync},
+    {"vvctre_settings_set_dump_textures", &vvctre_settings_set_dump_textures},
+    {"vvctre_settings_get_dump_textures", &vvctre_settings_get_dump_textures},
+    {"vvctre_settings_set_custom_textures", &vvctre_settings_set_custom_textures},
+    {"vvctre_settings_get_custom_textures", &vvctre_settings_get_custom_textures},
+    {"vvctre_settings_set_preload_textures", &vvctre_settings_set_preload_textures},
+    {"vvctre_settings_get_preload_textures", &vvctre_settings_get_preload_textures},
+    {"vvctre_settings_set_enable_linear_filtering", &vvctre_settings_set_enable_linear_filtering},
+    {"vvctre_settings_get_enable_linear_filtering", &vvctre_settings_get_enable_linear_filtering},
+    {"vvctre_settings_set_sharper_distant_objects", &vvctre_settings_set_sharper_distant_objects},
+    {"vvctre_settings_get_sharper_distant_objects", &vvctre_settings_get_sharper_distant_objects},
+    {"vvctre_settings_set_resolution", &vvctre_settings_set_resolution},
+    {"vvctre_settings_get_resolution", &vvctre_settings_get_resolution},
+    {"vvctre_settings_set_background_color_red", &vvctre_settings_set_background_color_red},
+    {"vvctre_settings_get_background_color_red", &vvctre_settings_get_background_color_red},
+    {"vvctre_settings_set_background_color_green", &vvctre_settings_set_background_color_green},
+    {"vvctre_settings_get_background_color_green", &vvctre_settings_get_background_color_green},
+    {"vvctre_settings_set_background_color_blue", &vvctre_settings_set_background_color_blue},
+    {"vvctre_settings_get_background_color_blue", &vvctre_settings_get_background_color_blue},
+    {"vvctre_settings_set_post_processing_shader", &vvctre_settings_set_post_processing_shader},
+    {"vvctre_settings_get_post_processing_shader", &vvctre_settings_get_post_processing_shader},
+    {"vvctre_settings_set_texture_filter", &vvctre_settings_set_texture_filter},
+    {"vvctre_settings_get_texture_filter", &vvctre_settings_get_texture_filter},
+    {"vvctre_settings_set_render_3d", &vvctre_settings_set_render_3d},
+    {"vvctre_settings_get_render_3d", &vvctre_settings_get_render_3d},
+    {"vvctre_settings_set_factor_3d", &vvctre_settings_set_factor_3d},
+    {"vvctre_settings_get_factor_3d", &vvctre_settings_get_factor_3d},
+    {"vvctre_settings_set_button", &vvctre_settings_set_button},
+    {"vvctre_settings_get_button", &vvctre_settings_get_button},
+    {"vvctre_settings_set_analog", &vvctre_settings_set_analog},
+    {"vvctre_settings_get_analog", &vvctre_settings_get_analog},
+    {"vvctre_settings_set_motion_device", &vvctre_settings_set_motion_device},
+    {"vvctre_settings_get_motion_device", &vvctre_settings_get_motion_device},
+    {"vvctre_settings_set_touch_device", &vvctre_settings_set_touch_device},
+    {"vvctre_settings_get_touch_device", &vvctre_settings_get_touch_device},
+    {"vvctre_settings_set_cemuhookudp_address", &vvctre_settings_set_cemuhookudp_address},
+    {"vvctre_settings_get_cemuhookudp_address", &vvctre_settings_get_cemuhookudp_address},
+    {"vvctre_settings_set_cemuhookudp_port", &vvctre_settings_set_cemuhookudp_port},
+    {"vvctre_settings_get_cemuhookudp_port", &vvctre_settings_get_cemuhookudp_port},
+    {"vvctre_settings_set_cemuhookudp_pad_index", &vvctre_settings_set_cemuhookudp_pad_index},
+    {"vvctre_settings_get_cemuhookudp_pad_index", &vvctre_settings_get_cemuhookudp_pad_index},
+    {"vvctre_settings_set_layout", &vvctre_settings_set_layout},
+    {"vvctre_settings_get_layout", &vvctre_settings_get_layout},
+    {"vvctre_settings_set_swap_screens", &vvctre_settings_set_swap_screens},
+    {"vvctre_settings_get_swap_screens", &vvctre_settings_get_swap_screens},
+    {"vvctre_settings_set_upright_screens", &vvctre_settings_set_upright_screens},
+    {"vvctre_settings_get_upright_screens", &vvctre_settings_get_upright_screens},
+    {"vvctre_settings_set_use_custom_layout", &vvctre_settings_set_use_custom_layout},
+    {"vvctre_settings_get_use_custom_layout", &vvctre_settings_get_use_custom_layout},
+    {"vvctre_settings_set_custom_layout_top_left", &vvctre_settings_set_custom_layout_top_left},
+    {"vvctre_settings_get_custom_layout_top_left", &vvctre_settings_get_custom_layout_top_left},
+    {"vvctre_settings_set_custom_layout_top_top", &vvctre_settings_set_custom_layout_top_top},
+    {"vvctre_settings_get_custom_layout_top_top", &vvctre_settings_get_custom_layout_top_top},
+    {"vvctre_settings_set_custom_layout_top_right", &vvctre_settings_set_custom_layout_top_right},
+    {"vvctre_settings_get_custom_layout_top_right", &vvctre_settings_get_custom_layout_top_right},
+    {"vvctre_settings_set_custom_layout_top_bottom", &vvctre_settings_set_custom_layout_top_bottom},
+    {"vvctre_settings_get_custom_layout_top_bottom", &vvctre_settings_get_custom_layout_top_bottom},
+    {"vvctre_settings_set_custom_layout_bottom_left",
+     &vvctre_settings_set_custom_layout_bottom_left},
+    {"vvctre_settings_get_custom_layout_bottom_left",
+     &vvctre_settings_get_custom_layout_bottom_left},
+    {"vvctre_settings_set_custom_layout_bottom_top", &vvctre_settings_set_custom_layout_bottom_top},
+    {"vvctre_settings_get_custom_layout_bottom_top", &vvctre_settings_get_custom_layout_bottom_top},
+    {"vvctre_settings_set_custom_layout_bottom_right",
+     &vvctre_settings_set_custom_layout_bottom_right},
+    {"vvctre_settings_get_custom_layout_bottom_right",
+     &vvctre_settings_get_custom_layout_bottom_right},
+    {"vvctre_settings_set_custom_layout_bottom_bottom",
+     &vvctre_settings_set_custom_layout_bottom_bottom},
+    {"vvctre_settings_get_custom_layout_bottom_bottom",
+     &vvctre_settings_get_custom_layout_bottom_bottom},
+    {"vvctre_settings_set_use_lle_module", &vvctre_settings_set_use_lle_module},
+    {"vvctre_settings_get_use_lle_module", &vvctre_settings_get_use_lle_module},
+    {"vvctre_get_version", &vvctre_get_version},
+    {"vvctre_emulation_running", &vvctre_emulation_running},
+    {"vvctre_set_play_coins", &vvctre_set_play_coins},
+    {"vvctre_get_play_coins", &vvctre_get_play_coins},
+};
 
 bool has_suffix(const std::string& str, const std::string& suffix) {
     return str.size() >= suffix.size() &&
@@ -69,10 +287,17 @@ PluginManager::PluginManager(void* core) {
 #endif
                 );
             } else {
-                PluginImportedFunctions::PluginLoaded f =
+                PluginImportedFunctions::GetRequiredFunctionCount GetRequiredFunctionCount =
+                    (PluginImportedFunctions::GetRequiredFunctionCount)GetProcAddress(
+                        handle, "GetRequiredFunctionCount");
+                PluginImportedFunctions::GetRequiredFunctionNames GetRequiredFunctionNames =
+                    (PluginImportedFunctions::GetRequiredFunctionNames)GetProcAddress(
+                        handle, "GetRequiredFunctionNames");
+                PluginImportedFunctions::PluginLoaded PluginLoaded =
                     (PluginImportedFunctions::PluginLoaded)GetProcAddress(handle, "PluginLoaded");
-                if (f == nullptr) {
-                    fmt::print("Plugin {} failed to load: PluginLoaded is nullptr\n",
+                if (GetRequiredFunctionCount == nullptr || GetRequiredFunctionNames == nullptr ||
+                    PluginLoaded == nullptr) {
+                    fmt::print("Plugin {} failed to load: a required function is nullptr\n",
                                entry.virtualName);
                 } else {
                     Plugin plugin;
@@ -91,10 +316,16 @@ PluginManager::PluginManager(void* core) {
                         Log::AddBackend(std::make_unique<Log::FunctionLogger>(
                             log, fmt::format("Plugin {}", entry.virtualName)));
                     }
+
+                    int count = GetRequiredFunctionCount();
+                    const char** required_function_names = GetRequiredFunctionNames();
+                    std::vector<void*> required_functions(count);
+                    for (int i = 0; i < count; ++i) {
+                        required_functions[i] = function_map[required_function_names[i]];
+                    }
+                    PluginLoaded(core, static_cast<void*>(this), required_functions.data());
+
                     plugins.push_back(std::move(plugin));
-
-                    f(core, static_cast<void*>(this));
-
                     fmt::print("Plugin {} loaded\n", entry.virtualName);
                 }
             }
