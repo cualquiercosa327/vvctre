@@ -461,11 +461,11 @@ void InitialSettings::Run() {
                         ImGui::SameLine();
 
                         if (ImGui::BeginCombo("##microphonedevice",
-                                              Settings::values.microphone_input_device.c_str())) {
+                                              Settings::values.microphone_device.c_str())) {
 #ifdef HAVE_CUBEB
                             for (const auto& device : AudioCore::ListCubebInputDevices()) {
                                 if (ImGui::Selectable(device.c_str())) {
-                                    Settings::values.microphone_input_device = device;
+                                    Settings::values.microphone_device = device;
                                 }
                             }
 #endif

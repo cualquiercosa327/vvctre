@@ -717,26 +717,61 @@ VVCTRE_PLUGIN_FUNCTION u32 vvctre_settings_get_cpu_clock_percentage() {
 }
 
 // Audio Settings
-VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_enable_dsp_lle(bool value);
-VVCTRE_PLUGIN_FUNCTION bool vvctre_settings_get_enable_dsp_lle();
+VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_enable_dsp_lle(bool value) {
+    Settings::values.enable_dsp_lle = value;
+}
 
-VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_enable_dsp_lle_multithread(bool value);
-VVCTRE_PLUGIN_FUNCTION bool vvctre_settings_get_enable_dsp_lle_multithread();
+VVCTRE_PLUGIN_FUNCTION bool vvctre_settings_get_enable_dsp_lle() {
+    return Settings::values.enable_dsp_lle;
+}
 
-VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_audio_volume(float value);
-VVCTRE_PLUGIN_FUNCTION float vvctre_settings_get_audio_volume();
+VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_enable_dsp_lle_multithread(bool value) {
+    Settings::values.enable_dsp_lle_multithread = value;
+}
 
-VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_audio_sink_id(const char* value);
-VVCTRE_PLUGIN_FUNCTION const char* vvctre_settings_get_audio_sink_id();
+VVCTRE_PLUGIN_FUNCTION bool vvctre_settings_get_enable_dsp_lle_multithread() {
+    return Settings::values.enable_dsp_lle_multithread;
+}
 
-VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_audio_device_id(const char* value);
-VVCTRE_PLUGIN_FUNCTION const char* vvctre_settings_get_audio_device_id();
+VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_audio_volume(float value) {
+    Settings::values.audio_volume = value;
+}
 
-VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_microphone_input_type(int value);
-VVCTRE_PLUGIN_FUNCTION int vvctre_settings_get_microphone_input_type();
+VVCTRE_PLUGIN_FUNCTION float vvctre_settings_get_audio_volume() {
+    return Settings::values.audio_volume;
+}
 
-VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_microphone_input_device(const char* value);
-VVCTRE_PLUGIN_FUNCTION const char* vvctre_settings_get_microphone_input_device();
+VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_audio_sink_id(const char* value) {
+    Settings::values.audio_sink_id = std::string(value);
+}
+
+VVCTRE_PLUGIN_FUNCTION const char* vvctre_settings_get_audio_sink_id() {
+    return Settings::values.audio_sink_id.c_str();
+}
+
+VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_audio_device_id(const char* value) {
+    Settings::values.audio_device_id = std::string(value);
+}
+
+VVCTRE_PLUGIN_FUNCTION const char* vvctre_settings_get_audio_device_id() {
+    return Settings::values.audio_device_id.c_str();
+}
+
+VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_microphone_input_type(int value) {
+    Settings::values.microphone_input_type = static_cast<Settings::MicrophoneInputType>(value);
+}
+
+VVCTRE_PLUGIN_FUNCTION int vvctre_settings_get_microphone_input_type() {
+    return static_cast<int>(Settings::values.microphone_input_type);
+}
+
+VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_microphone_device(const char* value) {
+    Settings::values.microphone_device = std::string(value);
+}
+
+VVCTRE_PLUGIN_FUNCTION const char* vvctre_settings_get_microphone_device() {
+    return Settings::values.microphone_device.c_str();
+}
 
 // Camera Settings
 VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_camera_engine(int index, const char* value);

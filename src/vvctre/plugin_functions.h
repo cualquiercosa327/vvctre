@@ -202,8 +202,8 @@ VVCTRE_PLUGIN_FUNCTION const char* vvctre_settings_get_audio_device_id();
 VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_microphone_input_type(int value);
 VVCTRE_PLUGIN_FUNCTION int vvctre_settings_get_microphone_input_type();
 
-VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_microphone_input_device(const char* value);
-VVCTRE_PLUGIN_FUNCTION const char* vvctre_settings_get_microphone_input_device();
+VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_microphone_device(const char* value);
+VVCTRE_PLUGIN_FUNCTION const char* vvctre_settings_get_microphone_device();
 
 // Camera Settings
 VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_camera_engine(int index, const char* value);

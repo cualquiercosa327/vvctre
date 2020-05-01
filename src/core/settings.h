@@ -152,7 +152,7 @@ struct Values {
     std::string audio_sink_id = "auto";
     std::string audio_device_id = "auto";
     MicrophoneInputType microphone_input_type = MicrophoneInputType::None;
-    std::string microphone_input_device;
+    std::string microphone_device;
 
     // Camera
     std::array<std::string, Service::CAM::NumCameras> camera_engine{
