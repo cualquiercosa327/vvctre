@@ -2,7 +2,6 @@
 // Licensed under GPLv2 or any later version
 // Refer to the license.txt file included.
 
-#include <unordered_map>
 #include <utility>
 #include <fmt/format.h>
 #include <imgui.h>
