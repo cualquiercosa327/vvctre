@@ -999,25 +999,24 @@ void AppendProcTexShiftOffset(std::string& out, std::string_view v, ProcTexShift
 void AppendProcTexClamp(std::string& out, std::string_view var, ProcTexClamp mode) {
     switch (mode) {
     case ProcTexClamp::ToZero:
-        out += fmt::format("{} = {} > 1.0 ? 0 : {};\n", var, var, var);
+        out += fmt::format("{0} = {0} > 1.0 ? 0 : {0};\n", var);
         break;
     case ProcTexClamp::ToEdge:
-        out += fmt::format("{} = min({}, 1.0);\n", var, var);
+        out += fmt::format("{0} = min({0}, 1.0);\n", var);
         break;
     case ProcTexClamp::SymmetricalRepeat:
-        out += fmt::format("{} = fract({});\n", var, var);
+        out += fmt::format("{0} = fract({0});\n", var);
         break;
     case ProcTexClamp::MirroredRepeat: {
-        out += fmt::format("{} = int({}) % 2 == 0 ? fract({}) : 1.0 - fract({});\n", var, var, var,
-                           var);
+        out += fmt::format("{0} = int({0}) % 2 == 0 ? fract({0}) : 1.0 - fract({0});\n", var);
         break;
     }
     case ProcTexClamp::Pulse:
-        out += fmt::format("{} = {} > 0.5 ? 1.0 : 0.0;\n", var, var);
+        out += fmt::format("{0} = {0} > 0.5 ? 1.0 : 0.0;\n", var);
         break;
     default:
         LOG_CRITICAL(HW_GPU, "Unknown clamp mode {}", static_cast<u32>(mode));
-        out += fmt::format("{} = min({}, 1.0);\n", var, var);
+        out += fmt::format("{0} = min({0}, 1.0);\n", var);
         break;
     }
 }
