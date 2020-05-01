@@ -25,6 +25,9 @@
 
 #ifdef _WIN32
 #include <windows.h>
+#else
+#include <dlfcn.h>
+#define GetProcAddress dlsym
 #endif
 
 bool has_suffix(const std::string& str, const std::string& suffix) {
@@ -33,21 +36,36 @@ bool has_suffix(const std::string& str, const std::string& suffix) {
 }
 
 PluginManager::PluginManager(void* core) {
-#ifdef _WIN32
     FileUtil::FSTEntry parent;
-    FileUtil::ScanDirectoryTree(FileUtil::GetExeDirectory(), parent);
+    FileUtil::ScanDirectoryTree(
+#ifdef _WIN32
+        FileUtil::GetExeDirectory()
+#else
+        "."
+#endif
+            ,
+        parent);
     for (const auto& entry : parent.children) {
-        if (!entry.isDirectory && entry.virtualName != "SDL2.dll" &&
-            has_suffix(entry.virtualName, fmt::format("{}.dll", vvctre_version_major))) {
+        if (!entry.isDirectory &&
+#ifdef _WIN32
+            entry.virtualName != "SDL2.dll" &&
+            has_suffix(entry.virtualName, fmt::format("{}.dll", vvctre_version_major))
+#else
+            has_suffix(entry.virtualName, fmt::format("{}.so", vvctre_version_major))
+#endif
+        ) {
+#ifdef _WIN32
             HMODULE handle = LoadLibraryA(entry.virtualName.c_str());
+#else
+            void* handle = dlopen(fmt::format("./{}", entry.virtualName).c_str(), RTLD_LAZY);
+#endif
             if (handle == NULL) {
                 fmt::print("Plugin {} failed to load: {}\n", entry.virtualName, GetLastErrorMsg());
             } else {
                 PluginImportedFunctions::PluginLoaded f =
                     (PluginImportedFunctions::PluginLoaded)GetProcAddress(handle, "PluginLoaded");
                 if (f == nullptr) {
-                    fmt::print("Plugin {} failed to load: PluginLoaded "
-                               "function not found\n",
+                    fmt::print("Plugin {} failed to load: PluginLoaded is nullptr\n",
                                entry.virtualName);
                 } else {
                     Plugin plugin;
@@ -75,11 +93,9 @@ PluginManager::PluginManager(void* core) {
             }
         }
     }
-#endif
 }
 
 PluginManager::~PluginManager() {
-#ifdef _WIN32
     for (const auto& plugin : plugins) {
         PluginImportedFunctions::EmulatorClosing f =
             (PluginImportedFunctions::EmulatorClosing)GetProcAddress(plugin.handle,
@@ -87,13 +103,15 @@ PluginManager::~PluginManager() {
         if (f != nullptr) {
             f();
         }
+#ifdef _WIN32
         FreeLibrary(plugin.handle);
-    }
+#else
+        dlclose(plugin.handle);
 #endif
+    }
 }
 
 void PluginManager::InitialSettingsOpening() {
-#ifdef _WIN32
     for (const auto& plugin : plugins) {
         PluginImportedFunctions::InitialSettingsOpening f =
             (PluginImportedFunctions::InitialSettingsOpening)GetProcAddress(
@@ -102,11 +120,9 @@ void PluginManager::InitialSettingsOpening() {
             f();
         }
     }
-#endif
 }
 
 void PluginManager::InitialSettingsOkPressed() {
-#ifdef _WIN32
     for (const auto& plugin : plugins) {
         PluginImportedFunctions::InitialSettingsOkPressed f =
             (PluginImportedFunctions::InitialSettingsOkPressed)GetProcAddress(
@@ -115,11 +131,9 @@ void PluginManager::InitialSettingsOkPressed() {
             f();
         }
     }
-#endif
 }
 
 void PluginManager::BeforeLoading() {
-#ifdef _WIN32
     for (const auto& plugin : plugins) {
         PluginImportedFunctions::BeforeLoading f =
             (PluginImportedFunctions::BeforeLoading)GetProcAddress(plugin.handle, "BeforeLoading");
@@ -127,11 +141,9 @@ void PluginManager::BeforeLoading() {
             f();
         }
     }
-#endif
 }
 
 void PluginManager::EmulationStarting() {
-#ifdef _WIN32
     for (const auto& plugin : plugins) {
         PluginImportedFunctions::EmulationStarting f =
             (PluginImportedFunctions::EmulationStarting)GetProcAddress(plugin.handle,
@@ -140,11 +152,9 @@ void PluginManager::EmulationStarting() {
             f();
         }
     }
-#endif
 }
 
 void PluginManager::EmulatorClosing() {
-#ifdef _WIN32
     for (const auto& plugin : plugins) {
         PluginImportedFunctions::EmulatorClosing f =
             (PluginImportedFunctions::EmulatorClosing)GetProcAddress(plugin.handle,
@@ -153,11 +163,9 @@ void PluginManager::EmulatorClosing() {
             f();
         }
     }
-#endif
 }
 
 void PluginManager::FatalError() {
-#ifdef _WIN32
     for (const auto& plugin : plugins) {
         PluginImportedFunctions::FatalError f =
             (PluginImportedFunctions::FatalError)GetProcAddress(plugin.handle, "FatalError");
@@ -165,37 +173,30 @@ void PluginManager::FatalError() {
             f();
         }
     }
-#endif
 }
 
 void PluginManager::BeforeDrawingFPS() {
-#ifdef _WIN32
     for (const auto& plugin : plugins) {
         if (plugin.before_drawing_fps != nullptr) {
             plugin.before_drawing_fps();
         }
     }
-#endif
 }
 
 void PluginManager::AddMenus() {
-#ifdef _WIN32
     for (const auto& plugin : plugins) {
         if (plugin.add_menu != nullptr) {
             plugin.add_menu();
         }
     }
-#endif
 }
 
 void PluginManager::AfterSwapWindow() {
-#ifdef _WIN32
     for (const auto& plugin : plugins) {
         if (plugin.after_swap_window != nullptr) {
             plugin.after_swap_window();
         }
     }
-#endif
 }
 
 void* PluginManager::NewButtonDevice(const char* params) {
@@ -216,7 +217,7 @@ void PluginManager::DeleteButtonDevice(void* device) {
 #ifdef _WIN32
 #define VVCTRE_PLUGIN_FUNCTION extern "C" __declspec(dllexport)
 #else
-#define VVCTRE_PLUGIN_FUNCTION
+#define VVCTRE_PLUGIN_FUNCTION extern "C"
 #endif
 
 #include "vvctre/plugin_functions.h"

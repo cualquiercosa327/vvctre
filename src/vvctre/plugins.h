@@ -48,16 +48,17 @@ public:
     bool paused = false;
 
 private:
-#ifdef _WIN32
     struct Plugin {
+#ifdef _WIN32
         HMODULE handle;
+#else
+        void* handle;
+#endif
         PluginImportedFunctions::BeforeDrawingFPS before_drawing_fps = nullptr;
         PluginImportedFunctions::AddMenu add_menu = nullptr;
         PluginImportedFunctions::AfterSwapWindow after_swap_window = nullptr;
     };
 
     std::vector<Plugin> plugins;
-#endif
-
     std::vector<std::unique_ptr<Input::ButtonDevice>> buttons;
 };
