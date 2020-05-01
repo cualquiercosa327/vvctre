@@ -467,7 +467,7 @@ void EmuWindow_SDL2::SwapBuffers() {
                         Settings::Apply();
                         Settings::LogSettings();
                     }
-                    if (Settings::values.hardware_shader_accurate_multiplication) {
+                    if (Settings::values.use_hardware_shader) {
                         ImGui::Indent();
 
                         if (ImGui::Checkbox(
