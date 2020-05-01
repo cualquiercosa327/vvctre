@@ -445,16 +445,49 @@ void vvctre_reload_camera_images(void* core) {
 }
 
 // GUI
+void vvctre_gui_same_line() {
+    ImGui::SameLine();
+}
+
+void vvctre_gui_new_line() {
+    ImGui::NewLine();
+}
+
+void vvctre_gui_bullet() {
+    ImGui::Bullet();
+}
+
+void vvctre_gui_indent() {
+    ImGui::Indent();
+}
+
+void vvctre_gui_unindent() {
+    ImGui::Unindent();
+}
+
 void vvctre_gui_text(const char* text) {
-    ImGui::Text("%s", text);
+    ImGui::TextUnformatted(text);
 }
 
-bool vvctre_gui_button(const char* text) {
-    return ImGui::Button(text);
+void vvctre_gui_text_colored(float red, float green, float blue, float alpha, const char* text) {
+    ImGui::TextColored(ImVec4(red, green, blue, alpha), "%s", text);
 }
 
-bool vvctre_gui_checkbox(const char* text, bool* checked) {
-    return ImGui::Checkbox(text, checked);
+bool vvctre_gui_button(const char* label) {
+    return ImGui::Button(label);
+}
+
+bool vvctre_gui_small_button(const char* label) {
+    return ImGui::SmallButton(label);
+}
+
+bool vvctre_gui_color_button(const char* tooltip, float red, float green, float blue, float alpha,
+                             int flags) {
+    return ImGui::ColorButton(tooltip, ImVec4(red, green, blue, alpha), flags);
+}
+
+bool vvctre_gui_checkbox(const char* label, bool* checked) {
+    return ImGui::Checkbox(label, checked);
 }
 
 bool vvctre_gui_begin(const char* name) {
@@ -465,20 +498,73 @@ void vvctre_gui_end() {
     ImGui::End();
 }
 
-bool vvctre_gui_begin_menu(const char* name) {
-    return ImGui::BeginMenu(name);
+bool vvctre_gui_begin_menu(const char* label) {
+    return ImGui::BeginMenu(label);
 }
 
 void vvctre_gui_end_menu() {
     ImGui::EndMenu();
 }
 
-bool vvctre_gui_menu_item(const char* name) {
-    return ImGui::MenuItem(name);
+bool vvctre_gui_menu_item(const char* label) {
+    return ImGui::MenuItem(label);
 }
 
-bool vvctre_gui_menu_item_with_check_mark(const char* name, bool* checked) {
-    return ImGui::MenuItem(name, nullptr, checked);
+bool vvctre_gui_menu_item_with_check_mark(const char* label, bool* checked) {
+    return ImGui::MenuItem(label, nullptr, checked);
+}
+
+bool vvctre_gui_begin_listbox(const char* label) {
+    return ImGui::ListBoxHeader(label);
+}
+
+bool vvctre_gui_selectable(const char* label) {
+    return ImGui::Selectable(label);
+}
+
+bool vvctre_gui_selectable_with_selected(const char* label, bool* selected) {
+    return ImGui::Selectable(label, selected);
+}
+
+void vvctre_gui_end_listbox() {
+    ImGui::ListBoxFooter();
+}
+
+bool vvctre_gui_text_input(const char* label, char* buffer, std::size_t buffer_size) {
+    return ImGui::InputText(label, buffer, buffer_size);
+}
+
+bool vvctre_gui_text_input_multiline(const char* label, char* buffer, std::size_t buffer_size) {
+    return ImGui::InputTextMultiline(label, buffer, buffer_size);
+}
+
+bool vvctre_gui_text_input_with_hint(const char* label, const char* hint, char* buffer,
+                                     std::size_t buffer_size) {
+    return ImGui::InputTextWithHint(label, hint, buffer, buffer_size);
+}
+
+bool vvctre_gui_int_input(const char* label, int* value, int step, int step_fast) {
+    return ImGui::InputInt(label, value, step, step_fast);
+}
+
+bool vvctre_gui_float_input(const char* label, float* value, float step, float step_fast) {
+    return ImGui::InputFloat(label, value, step, step_fast);
+}
+
+bool vvctre_gui_double_input(const char* label, double* value, double step, double step_fast) {
+    return ImGui::InputDouble(label, value, step, step_fast);
+}
+
+bool vvctre_gui_color_edit(const char* label, float* color, int flags) {
+    return ImGui::ColorEdit4(label, color, flags);
+}
+
+bool vvctre_gui_color_picker(const char* label, float* color, int flags) {
+    return ImGui::ColorPicker4(label, color, flags);
+}
+
+void vvctre_gui_progress_bar(float value, const char* overlay) {
+    ImGui::ProgressBar(value, ImVec2(-1, 0), overlay);
 }
 
 // Button devices
@@ -1312,8 +1398,16 @@ std::unordered_map<std::string, void*> PluginManager::function_map = {
     // Camera
     {"vvctre_reload_camera_images", (void*)&vvctre_reload_camera_images},
     // GUI
+    {"vvctre_gui_same_line", (void*)&vvctre_gui_same_line},
+    {"vvctre_gui_new_line", (void*)&vvctre_gui_new_line},
+    {"vvctre_gui_bullet", (void*)&vvctre_gui_bullet},
+    {"vvctre_gui_indent", (void*)&vvctre_gui_indent},
+    {"vvctre_gui_unindent", (void*)&vvctre_gui_unindent},
     {"vvctre_gui_text", (void*)&vvctre_gui_text},
+    {"vvctre_gui_text_colored", (void*)&vvctre_gui_text_colored},
     {"vvctre_gui_button", (void*)&vvctre_gui_button},
+    {"vvctre_gui_small_button", (void*)&vvctre_gui_small_button},
+    {"vvctre_gui_color_button", (void*)&vvctre_gui_color_button},
     {"vvctre_gui_checkbox", (void*)&vvctre_gui_checkbox},
     {"vvctre_gui_begin", (void*)&vvctre_gui_begin},
     {"vvctre_gui_end", (void*)&vvctre_gui_end},
@@ -1321,6 +1415,19 @@ std::unordered_map<std::string, void*> PluginManager::function_map = {
     {"vvctre_gui_end_menu", (void*)&vvctre_gui_end_menu},
     {"vvctre_gui_menu_item", (void*)&vvctre_gui_menu_item},
     {"vvctre_gui_menu_item_with_check_mark", (void*)&vvctre_gui_menu_item_with_check_mark},
+    {"vvctre_gui_begin_listbox", (void*)&vvctre_gui_begin_listbox},
+    {"vvctre_gui_selectable", (void*)&vvctre_gui_selectable},
+    {"vvctre_gui_selectable_with_selected", (void*)&vvctre_gui_selectable_with_selected},
+    {"vvctre_gui_end_listbox", (void*)&vvctre_gui_end_listbox},
+    {"vvctre_gui_text_input", (void*)&vvctre_gui_text_input},
+    {"vvctre_gui_text_input_multiline", (void*)&vvctre_gui_text_input},
+    {"vvctre_gui_text_input_with_hint", (void*)&vvctre_gui_text_input},
+    {"vvctre_gui_int_input", (void*)&vvctre_gui_int_input},
+    {"vvctre_gui_float_input", (void*)&vvctre_gui_float_input},
+    {"vvctre_gui_double_input", (void*)&vvctre_gui_double_input},
+    {"vvctre_gui_color_edit", (void*)&vvctre_gui_color_edit},
+    {"vvctre_gui_color_picker", (void*)&vvctre_gui_color_picker},
+    {"vvctre_gui_progress_bar", (void*)&vvctre_gui_progress_bar},
     // Button devices
     {"vvctre_button_device_new", (void*)&vvctre_button_device_new},
     {"vvctre_button_device_delete", (void*)&vvctre_button_device_delete},
