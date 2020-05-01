@@ -949,9 +949,9 @@ static constexpr MatchFlags operator|(MatchFlags lhs, MatchFlags rhs) {
 
 /// Get the best surface match (and its match type) for the given flags
 template <MatchFlags find_flags>
-Surface FindMatch(const SurfaceCache& surface_cache, const SurfaceParams& params,
-                  ScaleMatch match_scale_type,
-                  std::optional<SurfaceInterval> validate_interval = std::nullopt) {
+static Surface FindMatch(const SurfaceCache& surface_cache, const SurfaceParams& params,
+                         ScaleMatch match_scale_type,
+                         std::optional<SurfaceInterval> validate_interval = std::nullopt) {
     Surface match_surface = nullptr;
     bool match_valid = false;
     u32 match_scale = 0;
@@ -963,7 +963,7 @@ Surface FindMatch(const SurfaceCache& surface_cache, const SurfaceParams& params
                                                ? (params.res_scale == surface->res_scale)
                                                : (params.res_scale <= surface->res_scale);
             // validity will be checked in GetCopyableInterval
-            const bool is_valid =
+            bool is_valid =
                 find_flags & MatchFlags::Copy
                     ? true
                     : surface->IsRegionValid(validate_interval.value_or(params.GetInterval()));
