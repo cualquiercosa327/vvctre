@@ -325,17 +325,18 @@ struct MIC_U::Impl {
     void CreateMic() {
         std::unique_ptr<Frontend::Mic::Interface> new_mic;
         switch (Settings::values.microphone_input_type) {
-        case Settings::MicInputType::None:
+        case Settings::MicrophoneInputType::None:
             new_mic = std::make_unique<Frontend::Mic::NullMic>();
             break;
-        case Settings::MicInputType::Real:
+        case Settings::MicrophoneInputType::Real:
 #if HAVE_CUBEB
-            new_mic = std::make_unique<AudioCore::CubebInput>(Settings::values.microphone_input_device);
+            new_mic =
+                std::make_unique<AudioCore::CubebInput>(Settings::values.microphone_input_device);
 #else
             new_mic = std::make_unique<Frontend::Mic::NullMic>();
 #endif
             break;
-        case Settings::MicInputType::Static:
+        case Settings::MicrophoneInputType::Static:
             new_mic = std::make_unique<Frontend::Mic::StaticMic>();
             break;
         default:

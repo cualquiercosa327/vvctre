@@ -401,11 +401,11 @@ void EmuWindow_SDL2::SwapBuffers() {
                     ImGui::SameLine();
                     if (ImGui::BeginCombo("##microphone_input_type", [] {
                             switch (Settings::values.microphone_input_type) {
-                            case Settings::MicInputType::None:
+                            case Settings::MicrophoneInputType::None:
                                 return "Disabled";
-                            case Settings::MicInputType::Real:
+                            case Settings::MicrophoneInputType::Real:
                                 return "Real Device";
-                            case Settings::MicInputType::Static:
+                            case Settings::MicrophoneInputType::Static:
                                 return "Static Noise";
                             default:
                                 break;
@@ -414,24 +414,28 @@ void EmuWindow_SDL2::SwapBuffers() {
                             return "Invalid";
                         }())) {
                         if (ImGui::Selectable("Disabled")) {
-                            Settings::values.microphone_input_type = Settings::MicInputType::None;
+                            Settings::values.microphone_input_type =
+                                Settings::MicrophoneInputType::None;
                             Settings::Apply();
                             Settings::LogSettings();
                         }
                         if (ImGui::Selectable("Real Device")) {
-                            Settings::values.microphone_input_type = Settings::MicInputType::Real;
+                            Settings::values.microphone_input_type =
+                                Settings::MicrophoneInputType::Real;
                             Settings::Apply();
                             Settings::LogSettings();
                         }
                         if (ImGui::Selectable("Static Noise")) {
-                            Settings::values.microphone_input_type = Settings::MicInputType::Static;
+                            Settings::values.microphone_input_type =
+                                Settings::MicrophoneInputType::Static;
                             Settings::Apply();
                             Settings::LogSettings();
                         }
                         ImGui::EndCombo();
                     }
 
-                    if (Settings::values.microphone_input_type == Settings::MicInputType::Real) {
+                    if (Settings::values.microphone_input_type ==
+                        Settings::MicrophoneInputType::Real) {
                         ImGui::Text("Microphone Device:");
                         ImGui::SameLine();
 

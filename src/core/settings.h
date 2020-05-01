@@ -30,7 +30,7 @@ enum class Layout {
     MediumScreen,
 };
 
-enum class MicInputType {
+enum class MicrophoneInputType {
     None,
     Real,
     Static,
@@ -151,7 +151,7 @@ struct Values {
     float audio_volume = 1.0f;
     std::string audio_sink_id = "auto";
     std::string audio_device_id = "auto";
-    MicInputType microphone_input_type = MicInputType::None;
+    MicrophoneInputType microphone_input_type = MicrophoneInputType::None;
     std::string microphone_input_device;
 
     // Camera
