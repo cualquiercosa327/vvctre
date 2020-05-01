@@ -423,7 +423,7 @@ void vvctre_reload_camera_images(void* core) {
 
 // GUI
 void vvctre_gui_text(const char* text) {
-    ImGui::Text(text);
+    ImGui::Text("%s", text);
 }
 
 bool vvctre_gui_button(const char* text) {
