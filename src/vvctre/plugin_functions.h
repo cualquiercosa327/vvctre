@@ -139,9 +139,11 @@ VVCTRE_PLUGIN_FUNCTION const char* vvctre_settings_get_log_filter();
 VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_multiplayer_url(const char* value);
 VVCTRE_PLUGIN_FUNCTION const char* vvctre_settings_get_multiplayer_url();
 
-VVCTRE_PLUGIN_FUNCTION void vvctre_settings_use_system_time();
-VVCTRE_PLUGIN_FUNCTION void vvctre_settings_use_unix_timestamp(u64 timestamp);
-VVCTRE_PLUGIN_FUNCTION int vvctre_settings_clock();
+VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_initial_clock(int value);
+VVCTRE_PLUGIN_FUNCTION int vvctre_settings_get_initial_clock();
+
+VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_unix_timestamp(u64 value);
+VVCTRE_PLUGIN_FUNCTION u64 vvctre_settings_get_unix_timestamp();
 
 VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_use_virtual_sd(bool value);
 VVCTRE_PLUGIN_FUNCTION bool vvctre_settings_get_use_virtual_sd();

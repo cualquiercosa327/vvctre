@@ -601,12 +601,21 @@ VVCTRE_PLUGIN_FUNCTION const char* vvctre_settings_get_multiplayer_url() {
     return Settings::values.multiplayer_url.c_str();
 }
 
-VVCTRE_PLUGIN_FUNCTION void vvctre_settings_use_system_time() {
-    Settings::values.initial_clock = Settings::InitialClock::FixedTime;
+VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_initial_clock(int value) {
+    Settings::values.initial_clock = static_cast<Settings::InitialClock>(value);
 }
 
-VVCTRE_PLUGIN_FUNCTION void vvctre_settings_use_unix_timestamp(u64 timestamp);
-VVCTRE_PLUGIN_FUNCTION int vvctre_settings_clock();
+VVCTRE_PLUGIN_FUNCTION int vvctre_settings_get_initial_clock() {
+    return static_cast<int>(Settings::values.initial_clock);
+}
+
+VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_unix_timestamp(u64 value) {
+    Settings::values.unix_timestamp = value;
+}
+
+VVCTRE_PLUGIN_FUNCTION u64 vvctre_settings_get_unix_timestamp() {
+    return Settings::values.unix_timestamp;
+}
 
 VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_use_virtual_sd(bool value);
 VVCTRE_PLUGIN_FUNCTION bool vvctre_settings_get_use_virtual_sd();
