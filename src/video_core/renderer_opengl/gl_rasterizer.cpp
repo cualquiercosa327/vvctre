@@ -378,13 +378,14 @@ bool RasterizerOpenGL::SetupVertexShader() {
 
 bool RasterizerOpenGL::SetupGeometryShader() {
     const auto& regs = Pica::g_state.regs;
-    if (regs.pipeline.use_gs == Pica::PipelineRegs::UseGS::No) {
-        shader_program_manager->UseFixedGeometryShader(regs);
-        return true;
-    } else {
+
+    if (regs.pipeline.use_gs != Pica::PipelineRegs::UseGS::No) {
         LOG_ERROR(Render_OpenGL, "Accelerate draw doesn't support geometry shader");
+        return false;
     }
-    return false;
+
+    shader_program_manager->UseFixedGeometryShader(regs);
+    return true;
 }
 
 bool RasterizerOpenGL::AccelerateDrawBatch(bool is_indexed) {
