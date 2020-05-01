@@ -1206,7 +1206,7 @@ inline int select_read(socket_t sock, time_t sec, time_t usec) {
 
   auto timeout = static_cast<int>(sec * 1000 + usec / 1000);
 
-  return poll(&pfd_read, 1, timeout);
+  return HANDLE_EINTR(poll, &pfd_read, 1, timeout);
 #else
   fd_set fds;
   FD_ZERO(&fds);
@@ -1228,7 +1228,7 @@ inline int select_write(socket_t sock, time_t sec, time_t usec) {
 
   auto timeout = static_cast<int>(sec * 1000 + usec / 1000);
 
-  return poll(&pfd_read, 1, timeout);
+  return HANDLE_EINTR(poll, &pfd_read, 1, timeout);
 #else
   fd_set fds;
   FD_ZERO(&fds);
@@ -1250,13 +1250,13 @@ inline bool wait_until_socket_is_ready(socket_t sock, time_t sec, time_t usec) {
 
   auto timeout = static_cast<int>(sec * 1000 + usec / 1000);
 
-  if (poll(&pfd_read, 1, timeout) > 0 &&
-      pfd_read.revents & (POLLIN | POLLOUT)) {
+  int poll_res = HANDLE_EINTR(poll, &pfd_read, 1, timeout);
+  if (poll_res > 0 && pfd_read.revents & (POLLIN | POLLOUT)) {
     int error = 0;
     socklen_t len = sizeof(error);
-    return getsockopt(sock, SOL_SOCKET, SO_ERROR,
-                      reinterpret_cast<char *>(&error), &len) >= 0 &&
-           !error;
+    auto res = getsockopt(sock, SOL_SOCKET, SO_ERROR,
+                      reinterpret_cast<char *>(&error), &len);
+    return res >= 0 && !error;
   }
   return false;
 #else
@@ -1515,8 +1515,8 @@ inline bool bind_ip_address(socket_t sock, const char *host) {
   return ret;
 }
 
-inline std::string if2ip(const std::string &ifn) {
 #ifndef _WIN32
+inline std::string if2ip(const std::string &ifn) {
   struct ifaddrs *ifap;
   getifaddrs(&ifap);
   for (auto ifa = ifap; ifa; ifa = ifa->ifa_next) {
@@ -1532,9 +1532,9 @@ inline std::string if2ip(const std::string &ifn) {
     }
   }
   freeifaddrs(ifap);
-#endif
   return std::string();
 }
+#endif
 
 inline socket_t create_client_socket(const char *host, int port,
                                      time_t timeout_sec,
@@ -1542,9 +1542,11 @@ inline socket_t create_client_socket(const char *host, int port,
   return create_socket(
       host, port, [&](socket_t sock, struct addrinfo &ai) -> bool {
         if (!intf.empty()) {
+#ifndef _WIN32
           auto ip = if2ip(intf);
           if (ip.empty()) { ip = intf; }
           if (!bind_ip_address(sock, ip.c_str())) { return false; }
+#endif
         }
 
         set_nonblocking(sock, true);
@@ -2615,6 +2617,21 @@ inline std::string SHA_512(const std::string &s) {
 }
 #endif
 
+template <typename T>
+inline ssize_t handle_EINTR(T fn) {
+  ssize_t res = false;
+  while (true) {
+    res = fn();
+    if (res < 0 && errno == EINTR) {
+      continue;
+    }
+    break;
+  }
+  return res;
+}
+
+#define HANDLE_EINTR(method, ...) (handle_EINTR([&]() { return method(__VA_ARGS__); }))
+
 #ifdef _WIN32
 class WSInit {
 public:
@@ -2834,11 +2851,11 @@ inline void Response::set_header(const char *key, const std::string &val) {
   }
 }
 
-inline void Response::set_redirect(const char *url, int status) {
+inline void Response::set_redirect(const char *url, int stat) {
   if (!detail::has_crlf(url)) {
     set_header("Location", url);
-    if (300 <= status && status < 400) {
-      this->status = status;
+    if (300 <= stat && stat < 400) {
+      this->status = stat;
     } else {
       this->status = 302;
     }
@@ -2947,7 +2964,7 @@ inline ssize_t SocketStream::read(char *ptr, size_t size) {
   }
   return recv(sock_, ptr, static_cast<int>(size), 0);
 #else
-  return recv(sock_, ptr, size, 0);
+  return HANDLE_EINTR(recv, sock_, ptr, size, 0);
 #endif
 }
 
@@ -5093,6 +5110,12 @@ inline std::shared_ptr<Response> Get(const char *url) {
 }
 
 } // namespace url
+
+namespace detail {
+
+#undef HANDLE_EINTR
+
+} // namespace detail
 
 // ----------------------------------------------------------------------------
 
