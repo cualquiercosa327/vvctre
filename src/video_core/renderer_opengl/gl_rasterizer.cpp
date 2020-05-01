@@ -162,7 +162,7 @@ RasterizerOpenGL::RasterizerOpenGL()
     SyncEntireState();
 }
 
-RasterizerOpenGL::~RasterizerOpenGL() {}
+RasterizerOpenGL::~RasterizerOpenGL() = default;
 
 void RasterizerOpenGL::SyncEntireState() {
     // Sync fixed function OpenGL state
