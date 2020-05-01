@@ -21,6 +21,7 @@
 #include "core/movie.h"
 #include "core/settings.h"
 #include "vvctre/common.h"
+#include "vvctre/plugin_functions.h"
 #include "vvctre/plugins.h"
 
 #ifdef _WIN32
@@ -218,27 +219,19 @@ void PluginManager::DeleteButtonDevice(void* device) {
     }
 }
 
-// Exports
-
-#ifdef _WIN32
-#define VVCTRE_PLUGIN_FUNCTION extern "C" __declspec(dllexport)
-#else
-#define VVCTRE_PLUGIN_FUNCTION extern "C"
-#endif
-
-#include "vvctre/plugin_functions.h"
+// Functions plugins can use
 
 // File, Emulation
-VVCTRE_PLUGIN_FUNCTION void vvctre_load_file(void* core, const char* path) {
+void vvctre_load_file(void* core, const char* path) {
     static_cast<Core::System*>(core)->SetResetFilePath(std::string(path));
     static_cast<Core::System*>(core)->RequestReset();
 }
 
-VVCTRE_PLUGIN_FUNCTION bool vvctre_install_cia(const char* path) {
+bool vvctre_install_cia(const char* path) {
     return Service::AM::InstallCIA(std::string(path)) == Service::AM::InstallStatus::Success;
 }
 
-VVCTRE_PLUGIN_FUNCTION bool vvctre_load_amiibo(void* core, const char* path) {
+bool vvctre_load_amiibo(void* core, const char* path) {
     FileUtil::IOFile file(std::string(path), "rb");
     Service::NFC::AmiiboData data;
 
@@ -256,7 +249,7 @@ VVCTRE_PLUGIN_FUNCTION bool vvctre_load_amiibo(void* core, const char* path) {
     return false;
 }
 
-VVCTRE_PLUGIN_FUNCTION void vvctre_remove_amiibo(void* core) {
+void vvctre_remove_amiibo(void* core) {
     std::shared_ptr<Service::NFC::Module::Interface> nfc =
         static_cast<Core::System*>(core)
             ->ServiceManager()
@@ -266,110 +259,110 @@ VVCTRE_PLUGIN_FUNCTION void vvctre_remove_amiibo(void* core) {
     }
 }
 
-VVCTRE_PLUGIN_FUNCTION void vvctre_restart(void* core) {
+void vvctre_restart(void* core) {
     static_cast<Core::System*>(core)->Reset();
 }
 
-VVCTRE_PLUGIN_FUNCTION void vvctre_set_paused(void* plugin_manager, bool paused) {
+void vvctre_set_paused(void* plugin_manager, bool paused) {
     static_cast<PluginManager*>(plugin_manager)->paused = paused;
 }
 
-VVCTRE_PLUGIN_FUNCTION bool vvctre_get_paused(void* plugin_manager) {
+bool vvctre_get_paused(void* plugin_manager) {
     return static_cast<PluginManager*>(plugin_manager)->paused;
 }
 
 // Memory
-VVCTRE_PLUGIN_FUNCTION u8 vvctre_read_u8(void* core, VAddr address) {
+u8 vvctre_read_u8(void* core, VAddr address) {
     return static_cast<Core::System*>(core)->Memory().Read8(address);
 }
 
-VVCTRE_PLUGIN_FUNCTION void vvctre_write_u8(void* core, VAddr address, u8 value) {
+void vvctre_write_u8(void* core, VAddr address, u8 value) {
     static_cast<Core::System*>(core)->Memory().Write8(address, value);
 }
 
-VVCTRE_PLUGIN_FUNCTION u16 vvctre_read_u16(void* core, VAddr address) {
+u16 vvctre_read_u16(void* core, VAddr address) {
     return static_cast<Core::System*>(core)->Memory().Read16(address);
 }
 
-VVCTRE_PLUGIN_FUNCTION void vvctre_write_u16(void* core, VAddr address, u16 value) {
+void vvctre_write_u16(void* core, VAddr address, u16 value) {
     static_cast<Core::System*>(core)->Memory().Write16(address, value);
 }
 
-VVCTRE_PLUGIN_FUNCTION u32 vvctre_read_u32(void* core, VAddr address) {
+u32 vvctre_read_u32(void* core, VAddr address) {
     return static_cast<Core::System*>(core)->Memory().Read32(address);
 }
 
-VVCTRE_PLUGIN_FUNCTION void vvctre_write_u32(void* core, VAddr address, u32 value) {
+void vvctre_write_u32(void* core, VAddr address, u32 value) {
     static_cast<Core::System*>(core)->Memory().Write32(address, value);
 }
 
-VVCTRE_PLUGIN_FUNCTION u64 vvctre_read_u64(void* core, VAddr address) {
+u64 vvctre_read_u64(void* core, VAddr address) {
     return static_cast<Core::System*>(core)->Memory().Read64(address);
 }
 
-VVCTRE_PLUGIN_FUNCTION void vvctre_write_u64(void* core, VAddr address, u64 value) {
+void vvctre_write_u64(void* core, VAddr address, u64 value) {
     static_cast<Core::System*>(core)->Memory().Write64(address, value);
 }
 
 // Debugging
-VVCTRE_PLUGIN_FUNCTION void vvctre_set_pc(void* core, u32 addr) {
+void vvctre_set_pc(void* core, u32 addr) {
     static_cast<Core::System*>(core)->CPU().SetPC(addr);
 }
 
-VVCTRE_PLUGIN_FUNCTION u32 vvctre_get_pc(void* core) {
+u32 vvctre_get_pc(void* core) {
     return static_cast<Core::System*>(core)->CPU().GetPC();
 }
 
-VVCTRE_PLUGIN_FUNCTION void vvctre_set_register(void* core, int index, u32 value) {
+void vvctre_set_register(void* core, int index, u32 value) {
     static_cast<Core::System*>(core)->CPU().SetReg(index, value);
 }
 
-VVCTRE_PLUGIN_FUNCTION u32 vvctre_get_register(void* core, int index) {
+u32 vvctre_get_register(void* core, int index) {
     return static_cast<Core::System*>(core)->CPU().GetReg(index);
 }
 
-VVCTRE_PLUGIN_FUNCTION void vvctre_set_vfp_register(void* core, int index, u32 value) {
+void vvctre_set_vfp_register(void* core, int index, u32 value) {
     static_cast<Core::System*>(core)->CPU().SetVFPReg(index, value);
 }
 
-VVCTRE_PLUGIN_FUNCTION u32 vvctre_get_vfp_register(void* core, int index) {
+u32 vvctre_get_vfp_register(void* core, int index) {
     return static_cast<Core::System*>(core)->CPU().GetVFPReg(index);
 }
 
-VVCTRE_PLUGIN_FUNCTION void vvctre_set_vfp_system_register(void* core, int index, u32 value) {
+void vvctre_set_vfp_system_register(void* core, int index, u32 value) {
     static_cast<Core::System*>(core)->CPU().SetVFPSystemReg(static_cast<VFPSystemRegister>(index),
                                                             value);
 }
 
-VVCTRE_PLUGIN_FUNCTION u32 vvctre_get_vfp_system_register(void* core, int index) {
+u32 vvctre_get_vfp_system_register(void* core, int index) {
     return static_cast<Core::System*>(core)->CPU().GetVFPSystemReg(
         static_cast<VFPSystemRegister>(index));
 }
 
-VVCTRE_PLUGIN_FUNCTION void vvctre_set_cp15_register(void* core, int index, u32 value) {
+void vvctre_set_cp15_register(void* core, int index, u32 value) {
     static_cast<Core::System*>(core)->CPU().SetCP15Register(static_cast<CP15Register>(index),
                                                             value);
 }
 
-VVCTRE_PLUGIN_FUNCTION u32 vvctre_get_cp15_register(void* core, int index) {
+u32 vvctre_get_cp15_register(void* core, int index) {
     return static_cast<Core::System*>(core)->CPU().GetCP15Register(
         static_cast<CP15Register>(index));
 }
 
 // Cheats
-VVCTRE_PLUGIN_FUNCTION int vvctre_cheat_count(void* core) {
+int vvctre_cheat_count(void* core) {
     return static_cast<int>(static_cast<Core::System*>(core)->CheatEngine().GetCheats().size());
 }
 
-VVCTRE_PLUGIN_FUNCTION const char* vvctre_get_cheat(void* core, int index) {
+const char* vvctre_get_cheat(void* core, int index) {
     return static_cast<Core::System*>(core)->CheatEngine().GetCheats()[index]->ToString().c_str();
 }
 
-VVCTRE_PLUGIN_FUNCTION const char* vvctre_get_cheat_name(void* core, int index) {
+const char* vvctre_get_cheat_name(void* core, int index) {
     return static_cast<Core::System*>(core)->CheatEngine().GetCheats()[index]->GetName().c_str();
 }
 
-VVCTRE_PLUGIN_FUNCTION const char* vvctre_get_cheat_comments(void* core, int index) {
+const char* vvctre_get_cheat_comments(void* core, int index) {
     return static_cast<Core::System*>(core)
         ->CheatEngine()
         .GetCheats()[index]
@@ -377,37 +370,37 @@ VVCTRE_PLUGIN_FUNCTION const char* vvctre_get_cheat_comments(void* core, int ind
         .c_str();
 }
 
-VVCTRE_PLUGIN_FUNCTION const char* vvctre_get_cheat_type(void* core, int index) {
+const char* vvctre_get_cheat_type(void* core, int index) {
     return static_cast<Core::System*>(core)->CheatEngine().GetCheats()[index]->GetType().c_str();
 }
 
-VVCTRE_PLUGIN_FUNCTION const char* vvctre_get_cheat_code(void* core, int index) {
+const char* vvctre_get_cheat_code(void* core, int index) {
     return static_cast<Core::System*>(core)->CheatEngine().GetCheats()[index]->GetCode().c_str();
 }
 
-VVCTRE_PLUGIN_FUNCTION void vvctre_set_cheat_enabled(void* core, int index, bool enabled) {
+void vvctre_set_cheat_enabled(void* core, int index, bool enabled) {
     static_cast<Core::System*>(core)->CheatEngine().GetCheats()[index]->SetEnabled(enabled);
 }
 
-VVCTRE_PLUGIN_FUNCTION void vvctre_add_gateway_cheat(void* core, const char* name, const char* code,
-                                                     const char* comments) {
+void vvctre_add_gateway_cheat(void* core, const char* name, const char* code,
+                              const char* comments) {
     static_cast<Core::System*>(core)->CheatEngine().AddCheat(std::make_shared<Cheats::GatewayCheat>(
         std::string(name), std::string(code), std::string(comments)));
 }
 
-VVCTRE_PLUGIN_FUNCTION void vvctre_remove_cheat(void* core, int index) {
+void vvctre_remove_cheat(void* core, int index) {
     static_cast<Core::System*>(core)->CheatEngine().RemoveCheat(index);
 }
 
-VVCTRE_PLUGIN_FUNCTION void vvctre_update_gateway_cheat(void* core, int index, const char* name,
-                                                        const char* code, const char* comments) {
+void vvctre_update_gateway_cheat(void* core, int index, const char* name, const char* code,
+                                 const char* comments) {
     static_cast<Core::System*>(core)->CheatEngine().UpdateCheat(
         index, std::make_shared<Cheats::GatewayCheat>(std::string(name), std::string(code),
                                                       std::string(comments)));
 }
 
 // Camera
-VVCTRE_PLUGIN_FUNCTION void vvctre_reload_camera_images(void* core) {
+void vvctre_reload_camera_images(void* core) {
     auto cam = Service::CAM::GetModule(*static_cast<Core::System*>(core));
     if (cam != nullptr) {
         cam->ReloadCameraDevices();
@@ -415,136 +408,134 @@ VVCTRE_PLUGIN_FUNCTION void vvctre_reload_camera_images(void* core) {
 }
 
 // GUI
-VVCTRE_PLUGIN_FUNCTION void vvctre_gui_text(const char* text) {
+void vvctre_gui_text(const char* text) {
     ImGui::Text(text);
 }
 
-VVCTRE_PLUGIN_FUNCTION bool vvctre_gui_button(const char* text) {
+bool vvctre_gui_button(const char* text) {
     return ImGui::Button(text);
 }
 
-VVCTRE_PLUGIN_FUNCTION bool vvctre_gui_begin(const char* name) {
+bool vvctre_gui_begin(const char* name) {
     return ImGui::Begin(name);
 }
 
-VVCTRE_PLUGIN_FUNCTION void vvctre_gui_end() {
+void vvctre_gui_end() {
     ImGui::End();
 }
 
-VVCTRE_PLUGIN_FUNCTION bool vvctre_gui_begin_menu(const char* name) {
+bool vvctre_gui_begin_menu(const char* name) {
     return ImGui::BeginMenu(name);
 }
 
-VVCTRE_PLUGIN_FUNCTION void vvctre_gui_end_menu() {
+void vvctre_gui_end_menu() {
     ImGui::EndMenu();
 }
 
-VVCTRE_PLUGIN_FUNCTION bool vvctre_gui_menu_item(const char* name) {
+bool vvctre_gui_menu_item(const char* name) {
     return ImGui::MenuItem(name);
 }
 
 // Button devices
-VVCTRE_PLUGIN_FUNCTION void* vvctre_button_device_new(void* plugin_manager, const char* params) {
+void* vvctre_button_device_new(void* plugin_manager, const char* params) {
     PluginManager* pm = static_cast<PluginManager*>(plugin_manager);
     return pm->NewButtonDevice(params);
 }
 
-VVCTRE_PLUGIN_FUNCTION void vvctre_button_device_delete(void* plugin_manager, void* device) {
+void vvctre_button_device_delete(void* plugin_manager, void* device) {
     PluginManager* pm = static_cast<PluginManager*>(plugin_manager);
     pm->DeleteButtonDevice(device);
 }
 
-VVCTRE_PLUGIN_FUNCTION bool vvctre_button_device_get_state(void* device) {
+bool vvctre_button_device_get_state(void* device) {
     return static_cast<Input::ButtonDevice*>(device)->GetStatus();
 }
 
 // TAS
-VVCTRE_PLUGIN_FUNCTION void vvctre_movie_prepare_for_playback(const char* path) {
+void vvctre_movie_prepare_for_playback(const char* path) {
     Core::Movie::GetInstance().PrepareForPlayback(path);
 }
 
-VVCTRE_PLUGIN_FUNCTION void vvctre_movie_prepare_for_recording() {
+void vvctre_movie_prepare_for_recording() {
     Core::Movie::GetInstance().PrepareForRecording();
 }
 
-VVCTRE_PLUGIN_FUNCTION void vvctre_movie_play(const char* path) {
+void vvctre_movie_play(const char* path) {
     Core::Movie::GetInstance().StartPlayback(std::string(path));
 }
 
-VVCTRE_PLUGIN_FUNCTION void vvctre_movie_record(const char* path) {
+void vvctre_movie_record(const char* path) {
     Core::Movie::GetInstance().StartRecording(std::string(path));
 }
 
-VVCTRE_PLUGIN_FUNCTION bool vvctre_movie_is_playing() {
+bool vvctre_movie_is_playing() {
     return Core::Movie::GetInstance().IsPlayingInput();
 }
 
-VVCTRE_PLUGIN_FUNCTION bool vvctre_movie_is_recording() {
+bool vvctre_movie_is_recording() {
     return Core::Movie::GetInstance().IsRecordingInput();
 }
 
-VVCTRE_PLUGIN_FUNCTION void vvctre_movie_stop() {
+void vvctre_movie_stop() {
     Core::Movie::GetInstance().Shutdown();
 }
 
-VVCTRE_PLUGIN_FUNCTION void vvctre_set_frame_advancing_enabled(void* core, bool enabled) {
+void vvctre_set_frame_advancing_enabled(void* core, bool enabled) {
     static_cast<Core::System*>(core)->frame_limiter.SetFrameAdvancing(enabled);
 }
 
-VVCTRE_PLUGIN_FUNCTION bool vvctre_get_frame_advancing_enabled(void* core) {
+bool vvctre_get_frame_advancing_enabled(void* core) {
     return static_cast<Core::System*>(core)->frame_limiter.FrameAdvancingEnabled();
 }
 
-VVCTRE_PLUGIN_FUNCTION void vvctre_advance_frame(void* core) {
+void vvctre_advance_frame(void* core) {
     static_cast<Core::System*>(core)->frame_limiter.AdvanceFrame();
 }
 
 // Remote control
-VVCTRE_PLUGIN_FUNCTION void vvctre_set_custom_pad_state(void* core, u32 state) {
+void vvctre_set_custom_pad_state(void* core, u32 state) {
     std::shared_ptr<Service::HID::Module> hid =
         Service::HID::GetModule(*static_cast<Core::System*>(core));
 
     hid->SetCustomPadState(Service::HID::PadState{state});
 }
 
-VVCTRE_PLUGIN_FUNCTION void vvctre_use_real_pad_state(void* core) {
+void vvctre_use_real_pad_state(void* core) {
     std::shared_ptr<Service::HID::Module> hid =
         Service::HID::GetModule(*static_cast<Core::System*>(core));
 
     hid->SetCustomPadState(std::nullopt);
 }
 
-VVCTRE_PLUGIN_FUNCTION void vvctre_set_custom_circle_pad_state(void* core, float x, float y) {
+void vvctre_set_custom_circle_pad_state(void* core, float x, float y) {
     std::shared_ptr<Service::HID::Module> hid =
         Service::HID::GetModule(*static_cast<Core::System*>(core));
 
     hid->SetCustomCirclePadState(std::make_tuple(x, y));
 }
 
-VVCTRE_PLUGIN_FUNCTION void vvctre_use_real_circle_pad_state(void* core) {
+void vvctre_use_real_circle_pad_state(void* core) {
     std::shared_ptr<Service::HID::Module> hid =
         Service::HID::GetModule(*static_cast<Core::System*>(core));
 
     hid->SetCustomCirclePadState(std::nullopt);
 }
 
-VVCTRE_PLUGIN_FUNCTION void vvctre_set_custom_touch_state(void* core, float x, float y,
-                                                          bool pressed) {
+void vvctre_set_custom_touch_state(void* core, float x, float y, bool pressed) {
     std::shared_ptr<Service::HID::Module> hid =
         Service::HID::GetModule(*static_cast<Core::System*>(core));
 
     hid->SetCustomTouchState(std::make_tuple(x, y, pressed));
 }
 
-VVCTRE_PLUGIN_FUNCTION void vvctre_use_real_touch_state(void* core) {
+void vvctre_use_real_touch_state(void* core) {
     std::shared_ptr<Service::HID::Module> hid =
         Service::HID::GetModule(*static_cast<Core::System*>(core));
 
     hid->SetCustomTouchState(std::nullopt);
 }
 
-VVCTRE_PLUGIN_FUNCTION void vvctre_set_custom_motion_state(void* core, float accelerometer[3],
-                                                           float gyroscope[3]) {
+void vvctre_set_custom_motion_state(void* core, float accelerometer[3], float gyroscope[3]) {
     std::shared_ptr<Service::HID::Module> hid =
         Service::HID::GetModule(*static_cast<Core::System*>(core));
 
@@ -553,7 +544,7 @@ VVCTRE_PLUGIN_FUNCTION void vvctre_set_custom_motion_state(void* core, float acc
                         Common::Vec3f(gyroscope[0], gyroscope[1], gyroscope[2])));
 }
 
-VVCTRE_PLUGIN_FUNCTION void vvctre_use_real_motion_state(void* core) {
+void vvctre_use_real_motion_state(void* core) {
     std::shared_ptr<Service::HID::Module> hid =
         Service::HID::GetModule(*static_cast<Core::System*>(core));
 
@@ -561,574 +552,573 @@ VVCTRE_PLUGIN_FUNCTION void vvctre_use_real_motion_state(void* core) {
 }
 
 // Settings
-VVCTRE_PLUGIN_FUNCTION void vvctre_settings_apply() {
+void vvctre_settings_apply() {
     Settings::Apply();
 }
 
-VVCTRE_PLUGIN_FUNCTION void vvctre_settings_log() {
+void vvctre_settings_log() {
     Settings::LogSettings();
 }
 
 // Start Settings
-VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_file_path(const char* value) {
+void vvctre_settings_set_file_path(const char* value) {
     Settings::values.file_path = std::string(value);
 }
 
-VVCTRE_PLUGIN_FUNCTION const char* vvctre_settings_get_file_path() {
+const char* vvctre_settings_get_file_path() {
     return Settings::values.file_path.c_str();
 }
 
-VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_play_movie(const char* value) {
+void vvctre_settings_set_play_movie(const char* value) {
     Settings::values.play_movie = std::string(value);
 }
 
-VVCTRE_PLUGIN_FUNCTION const char* vvctre_settings_get_play_movie() {
+const char* vvctre_settings_get_play_movie() {
     return Settings::values.play_movie.c_str();
 }
 
-VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_record_movie(const char* value) {
+void vvctre_settings_set_record_movie(const char* value) {
     Settings::values.record_movie = std::string(value);
 }
 
-VVCTRE_PLUGIN_FUNCTION const char* vvctre_settings_get_record_movie() {
+const char* vvctre_settings_get_record_movie() {
     return Settings::values.record_movie.c_str();
 }
 
-VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_region_value(int value) {
+void vvctre_settings_set_region_value(int value) {
     Settings::values.region_value = value;
 }
 
-VVCTRE_PLUGIN_FUNCTION int vvctre_settings_get_region_value() {
+int vvctre_settings_get_region_value() {
     return Settings::values.region_value;
 }
 
-VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_log_filter(const char* value) {
+void vvctre_settings_set_log_filter(const char* value) {
     Settings::values.log_filter = std::string(value);
 }
 
-VVCTRE_PLUGIN_FUNCTION const char* vvctre_settings_get_log_filter() {
+const char* vvctre_settings_get_log_filter() {
     return Settings::values.log_filter.c_str();
 }
 
-VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_multiplayer_url(const char* value) {
+void vvctre_settings_set_multiplayer_url(const char* value) {
     Settings::values.multiplayer_url = std::string(value);
 }
 
-VVCTRE_PLUGIN_FUNCTION const char* vvctre_settings_get_multiplayer_url() {
+const char* vvctre_settings_get_multiplayer_url() {
     return Settings::values.multiplayer_url.c_str();
 }
 
-VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_initial_clock(int value) {
+void vvctre_settings_set_initial_clock(int value) {
     Settings::values.initial_clock = static_cast<Settings::InitialClock>(value);
 }
 
-VVCTRE_PLUGIN_FUNCTION int vvctre_settings_get_initial_clock() {
+int vvctre_settings_get_initial_clock() {
     return static_cast<int>(Settings::values.initial_clock);
 }
 
-VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_unix_timestamp(u64 value) {
+void vvctre_settings_set_unix_timestamp(u64 value) {
     Settings::values.unix_timestamp = value;
 }
 
-VVCTRE_PLUGIN_FUNCTION u64 vvctre_settings_get_unix_timestamp() {
+u64 vvctre_settings_get_unix_timestamp() {
     return Settings::values.unix_timestamp;
 }
 
-VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_use_virtual_sd(bool value) {
+void vvctre_settings_set_use_virtual_sd(bool value) {
     Settings::values.use_virtual_sd = value;
 }
 
-VVCTRE_PLUGIN_FUNCTION bool vvctre_settings_get_use_virtual_sd() {
+bool vvctre_settings_get_use_virtual_sd() {
     return Settings::values.use_virtual_sd;
 }
 
-VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_start_in_fullscreen_mode(bool value) {
+void vvctre_settings_set_start_in_fullscreen_mode(bool value) {
     Settings::values.start_in_fullscreen_mode = value;
 }
 
-VVCTRE_PLUGIN_FUNCTION bool vvctre_settings_get_start_in_fullscreen_mode() {
+bool vvctre_settings_get_start_in_fullscreen_mode() {
     return Settings::values.start_in_fullscreen_mode;
 }
 
-VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_record_frame_times(bool value) {
+void vvctre_settings_set_record_frame_times(bool value) {
     Settings::values.record_frame_times = value;
 }
 
-VVCTRE_PLUGIN_FUNCTION bool vvctre_settings_get_record_frame_times() {
+bool vvctre_settings_get_record_frame_times() {
     return Settings::values.record_frame_times;
 }
 
-VVCTRE_PLUGIN_FUNCTION void vvctre_settings_enable_gdbstub(u16 port) {
+void vvctre_settings_enable_gdbstub(u16 port) {
     Settings::values.use_gdbstub = true;
     Settings::values.gdbstub_port = port;
 }
 
-VVCTRE_PLUGIN_FUNCTION void vvctre_settings_disable_gdbstub() {
+void vvctre_settings_disable_gdbstub() {
     Settings::values.use_gdbstub = false;
 }
 
-VVCTRE_PLUGIN_FUNCTION bool vvctre_settings_is_gdb_stub_enabled() {
+bool vvctre_settings_is_gdb_stub_enabled() {
     return Settings::values.use_gdbstub;
 }
 
-VVCTRE_PLUGIN_FUNCTION u16 vvctre_settings_get_gdb_stub_port() {
+u16 vvctre_settings_get_gdb_stub_port() {
     return Settings::values.use_gdbstub;
 }
 
 // General Settings
-VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_use_cpu_jit(bool value) {
+void vvctre_settings_set_use_cpu_jit(bool value) {
     Settings::values.use_cpu_jit = value;
 }
 
-VVCTRE_PLUGIN_FUNCTION bool vvctre_settings_get_use_cpu_jit() {
+bool vvctre_settings_get_use_cpu_jit() {
     return Settings::values.use_cpu_jit;
 }
 
-VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_limit_speed(bool value) {
+void vvctre_settings_set_limit_speed(bool value) {
     Settings::values.limit_speed = value;
 }
 
-VVCTRE_PLUGIN_FUNCTION bool vvctre_settings_get_limit_speed() {
+bool vvctre_settings_get_limit_speed() {
     return Settings::values.limit_speed;
 }
 
-VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_speed_limit(u16 value) {
+void vvctre_settings_set_speed_limit(u16 value) {
     Settings::values.speed_limit = value;
 }
 
-VVCTRE_PLUGIN_FUNCTION u16 vvctre_settings_get_speed_limit() {
+u16 vvctre_settings_get_speed_limit() {
     return Settings::values.speed_limit;
 }
 
-VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_use_custom_cpu_ticks(bool value) {
+void vvctre_settings_set_use_custom_cpu_ticks(bool value) {
     Settings::values.use_custom_cpu_ticks = value;
 }
 
-VVCTRE_PLUGIN_FUNCTION bool vvctre_settings_get_use_custom_cpu_ticks() {
+bool vvctre_settings_get_use_custom_cpu_ticks() {
     return Settings::values.use_custom_cpu_ticks;
 }
 
-VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_custom_cpu_ticks(u64 value) {
+void vvctre_settings_set_custom_cpu_ticks(u64 value) {
     Settings::values.custom_cpu_ticks = value;
 }
 
-VVCTRE_PLUGIN_FUNCTION u64 vvctre_settings_get_custom_cpu_ticks() {
+u64 vvctre_settings_get_custom_cpu_ticks() {
     return Settings::values.custom_cpu_ticks;
 }
 
-VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_cpu_clock_percentage(u32 value) {
+void vvctre_settings_set_cpu_clock_percentage(u32 value) {
     Settings::values.cpu_clock_percentage = value;
 }
 
-VVCTRE_PLUGIN_FUNCTION u32 vvctre_settings_get_cpu_clock_percentage() {
+u32 vvctre_settings_get_cpu_clock_percentage() {
     return Settings::values.cpu_clock_percentage;
 }
 
 // Audio Settings
-VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_enable_dsp_lle(bool value) {
+void vvctre_settings_set_enable_dsp_lle(bool value) {
     Settings::values.enable_dsp_lle = value;
 }
 
-VVCTRE_PLUGIN_FUNCTION bool vvctre_settings_get_enable_dsp_lle() {
+bool vvctre_settings_get_enable_dsp_lle() {
     return Settings::values.enable_dsp_lle;
 }
 
-VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_enable_dsp_lle_multithread(bool value) {
+void vvctre_settings_set_enable_dsp_lle_multithread(bool value) {
     Settings::values.enable_dsp_lle_multithread = value;
 }
 
-VVCTRE_PLUGIN_FUNCTION bool vvctre_settings_get_enable_dsp_lle_multithread() {
+bool vvctre_settings_get_enable_dsp_lle_multithread() {
     return Settings::values.enable_dsp_lle_multithread;
 }
 
-VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_audio_volume(float value) {
+void vvctre_settings_set_audio_volume(float value) {
     Settings::values.audio_volume = value;
 }
 
-VVCTRE_PLUGIN_FUNCTION float vvctre_settings_get_audio_volume() {
+float vvctre_settings_get_audio_volume() {
     return Settings::values.audio_volume;
 }
 
-VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_audio_sink_id(const char* value) {
+void vvctre_settings_set_audio_sink_id(const char* value) {
     Settings::values.audio_sink_id = std::string(value);
 }
 
-VVCTRE_PLUGIN_FUNCTION const char* vvctre_settings_get_audio_sink_id() {
+const char* vvctre_settings_get_audio_sink_id() {
     return Settings::values.audio_sink_id.c_str();
 }
 
-VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_audio_device_id(const char* value) {
+void vvctre_settings_set_audio_device_id(const char* value) {
     Settings::values.audio_device_id = std::string(value);
 }
 
-VVCTRE_PLUGIN_FUNCTION const char* vvctre_settings_get_audio_device_id() {
+const char* vvctre_settings_get_audio_device_id() {
     return Settings::values.audio_device_id.c_str();
 }
 
-VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_microphone_input_type(int value) {
+void vvctre_settings_set_microphone_input_type(int value) {
     Settings::values.microphone_input_type = static_cast<Settings::MicrophoneInputType>(value);
 }
 
-VVCTRE_PLUGIN_FUNCTION int vvctre_settings_get_microphone_input_type() {
+int vvctre_settings_get_microphone_input_type() {
     return static_cast<int>(Settings::values.microphone_input_type);
 }
 
-VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_microphone_device(const char* value) {
+void vvctre_settings_set_microphone_device(const char* value) {
     Settings::values.microphone_device = std::string(value);
 }
 
-VVCTRE_PLUGIN_FUNCTION const char* vvctre_settings_get_microphone_device() {
+const char* vvctre_settings_get_microphone_device() {
     return Settings::values.microphone_device.c_str();
 }
 
 // Camera Settings
-VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_camera_engine(int index, const char* value) {
+void vvctre_settings_set_camera_engine(int index, const char* value) {
     Settings::values.camera_engine[index] = std::string(value);
 }
 
-VVCTRE_PLUGIN_FUNCTION const char* vvctre_settings_get_camera_engine(int index) {
+const char* vvctre_settings_get_camera_engine(int index) {
     return Settings::values.camera_engine[index].c_str();
 }
 
-VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_camera_parameter(int index, const char* value) {
+void vvctre_settings_set_camera_parameter(int index, const char* value) {
     Settings::values.camera_parameter[index] = std::string(value);
 }
 
-VVCTRE_PLUGIN_FUNCTION const char* vvctre_settings_get_camera_parameter(int index) {
+const char* vvctre_settings_get_camera_parameter(int index) {
     return Settings::values.camera_parameter[index].c_str();
 }
 
-VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_camera_flip(int index, int value) {
+void vvctre_settings_set_camera_flip(int index, int value) {
     Settings::values.camera_flip[index] = static_cast<Service::CAM::Flip>(value);
 }
 
-VVCTRE_PLUGIN_FUNCTION int vvctre_settings_get_camera_flip(int index) {
+int vvctre_settings_get_camera_flip(int index) {
     return static_cast<int>(Settings::values.camera_flip[index]);
 }
 
 // Graphics Settings
-VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_use_hardware_renderer(bool value) {
+void vvctre_settings_set_use_hardware_renderer(bool value) {
     Settings::values.use_hardware_renderer = value;
 }
 
-VVCTRE_PLUGIN_FUNCTION bool vvctre_settings_get_use_hardware_renderer() {
+bool vvctre_settings_get_use_hardware_renderer() {
     return Settings::values.use_hardware_renderer;
 }
 
-VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_use_hardware_shader(bool value) {
+void vvctre_settings_set_use_hardware_shader(bool value) {
     Settings::values.use_hardware_shader = value;
 }
 
-VVCTRE_PLUGIN_FUNCTION bool vvctre_settings_get_use_hardware_shader() {
+bool vvctre_settings_get_use_hardware_shader() {
     return Settings::values.use_hardware_shader;
 }
 
-VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_hardware_shader_accurate_multiplication(
-    bool value) {
+void vvctre_settings_set_hardware_shader_accurate_multiplication(bool value) {
     Settings::values.hardware_shader_accurate_multiplication = value;
 }
 
-VVCTRE_PLUGIN_FUNCTION bool vvctre_settings_get_hardware_shader_accurate_multiplication() {
+bool vvctre_settings_get_hardware_shader_accurate_multiplication() {
     return Settings::values.hardware_shader_accurate_multiplication;
 }
 
-VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_use_shader_jit(bool value) {
+void vvctre_settings_set_use_shader_jit(bool value) {
     Settings::values.use_shader_jit = value;
 }
 
-VVCTRE_PLUGIN_FUNCTION bool vvctre_settings_get_use_shader_jit() {
+bool vvctre_settings_get_use_shader_jit() {
     return Settings::values.use_shader_jit;
 }
 
-VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_enable_vsync(bool value) {
+void vvctre_settings_set_enable_vsync(bool value) {
     Settings::values.enable_vsync = value;
 }
 
-VVCTRE_PLUGIN_FUNCTION bool vvctre_settings_get_enable_vsync() {
+bool vvctre_settings_get_enable_vsync() {
     return Settings::values.enable_vsync;
 }
 
-VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_dump_textures(bool value) {
+void vvctre_settings_set_dump_textures(bool value) {
     Settings::values.dump_textures = value;
 }
 
-VVCTRE_PLUGIN_FUNCTION bool vvctre_settings_get_dump_textures() {
+bool vvctre_settings_get_dump_textures() {
     return Settings::values.dump_textures;
 }
 
-VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_custom_textures(bool value) {
+void vvctre_settings_set_custom_textures(bool value) {
     Settings::values.custom_textures = value;
 }
 
-VVCTRE_PLUGIN_FUNCTION bool vvctre_settings_get_custom_textures() {
+bool vvctre_settings_get_custom_textures() {
     return Settings::values.custom_textures;
 }
 
-VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_preload_textures(bool value) {
+void vvctre_settings_set_preload_textures(bool value) {
     Settings::values.preload_textures = value;
 }
 
-VVCTRE_PLUGIN_FUNCTION bool vvctre_settings_get_preload_textures() {
+bool vvctre_settings_get_preload_textures() {
     return Settings::values.preload_textures;
 }
 
-VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_enable_linear_filtering(bool value) {
+void vvctre_settings_set_enable_linear_filtering(bool value) {
     Settings::values.enable_linear_filtering = value;
 }
 
-VVCTRE_PLUGIN_FUNCTION bool vvctre_settings_get_enable_linear_filtering() {
+bool vvctre_settings_get_enable_linear_filtering() {
     return Settings::values.enable_linear_filtering;
 }
 
-VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_sharper_distant_objects(bool value) {
+void vvctre_settings_set_sharper_distant_objects(bool value) {
     Settings::values.sharper_distant_objects = value;
 }
 
-VVCTRE_PLUGIN_FUNCTION bool vvctre_settings_get_sharper_distant_objects() {
+bool vvctre_settings_get_sharper_distant_objects() {
     return Settings::values.sharper_distant_objects;
 }
 
-VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_resolution(u16 value) {
+void vvctre_settings_set_resolution(u16 value) {
     Settings::values.resolution = value;
 }
 
-VVCTRE_PLUGIN_FUNCTION u16 vvctre_settings_get_resolution() {
+u16 vvctre_settings_get_resolution() {
     return Settings::values.resolution;
 }
 
-VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_background_color_red(float value) {
+void vvctre_settings_set_background_color_red(float value) {
     Settings::values.background_color_red = value;
 }
 
-VVCTRE_PLUGIN_FUNCTION float vvctre_settings_get_background_color_red() {
+float vvctre_settings_get_background_color_red() {
     return Settings::values.background_color_red;
 }
 
-VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_background_color_green(float value) {
+void vvctre_settings_set_background_color_green(float value) {
     Settings::values.background_color_green = value;
 }
 
-VVCTRE_PLUGIN_FUNCTION float vvctre_settings_get_background_color_green() {
+float vvctre_settings_get_background_color_green() {
     return Settings::values.background_color_green;
 }
 
-VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_background_color_blue(float value) {
+void vvctre_settings_set_background_color_blue(float value) {
     Settings::values.background_color_blue = value;
 }
 
-VVCTRE_PLUGIN_FUNCTION float vvctre_settings_get_background_color_blue() {
+float vvctre_settings_get_background_color_blue() {
     return Settings::values.background_color_blue;
 }
 
-VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_post_processing_shader(const char* value) {
+void vvctre_settings_set_post_processing_shader(const char* value) {
     Settings::values.post_processing_shader = std::string(value);
 }
 
-VVCTRE_PLUGIN_FUNCTION const char* vvctre_settings_get_post_processing_shader() {
+const char* vvctre_settings_get_post_processing_shader() {
     return Settings::values.post_processing_shader.c_str();
 }
 
-VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_texture_filter(const char* value) {
+void vvctre_settings_set_texture_filter(const char* value) {
     Settings::values.texture_filter = std::string(value);
 }
 
-VVCTRE_PLUGIN_FUNCTION const char* vvctre_settings_get_texture_filter() {
+const char* vvctre_settings_get_texture_filter() {
     return Settings::values.texture_filter.c_str();
 }
 
-VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_render_3d(int value) {
+void vvctre_settings_set_render_3d(int value) {
     Settings::values.render_3d = static_cast<Settings::StereoRenderOption>(value);
 }
 
-VVCTRE_PLUGIN_FUNCTION int vvctre_settings_get_render_3d() {
+int vvctre_settings_get_render_3d() {
     return static_cast<int>(Settings::values.render_3d);
 }
 
-VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_factor_3d(u8 value) {
+void vvctre_settings_set_factor_3d(u8 value) {
     Settings::values.factor_3d = value;
 }
 
-VVCTRE_PLUGIN_FUNCTION u8 vvctre_settings_get_factor_3d() {
+u8 vvctre_settings_get_factor_3d() {
     return Settings::values.factor_3d.load();
 }
 
 // Controls Settings
-VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_button(int index, const char* params) {
+void vvctre_settings_set_button(int index, const char* params) {
     Settings::values.buttons[index] = std::string(params);
 }
 
-VVCTRE_PLUGIN_FUNCTION const char* vvctre_settings_get_button(int index) {
+const char* vvctre_settings_get_button(int index) {
     return Settings::values.buttons[index].c_str();
 }
 
-VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_analog(int index, const char* params) {
+void vvctre_settings_set_analog(int index, const char* params) {
     Settings::values.analogs[index] = std::string(params);
 }
 
-VVCTRE_PLUGIN_FUNCTION const char* vvctre_settings_get_analog(int index) {
+const char* vvctre_settings_get_analog(int index) {
     return Settings::values.analogs[index].c_str();
 }
 
-VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_motion_device(const char* params) {
+void vvctre_settings_set_motion_device(const char* params) {
     Settings::values.motion_device = std::string(params);
 }
 
-VVCTRE_PLUGIN_FUNCTION const char* vvctre_settings_get_motion_device() {
+const char* vvctre_settings_get_motion_device() {
     return Settings::values.motion_device.c_str();
 }
 
-VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_touch_device(const char* params) {
+void vvctre_settings_set_touch_device(const char* params) {
     Settings::values.touch_device = std::string(params);
 }
 
-VVCTRE_PLUGIN_FUNCTION const char* vvctre_settings_get_touch_device() {
+const char* vvctre_settings_get_touch_device() {
     return Settings::values.touch_device.c_str();
 }
 
-VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_cemuhookudp_address(const char* value) {
+void vvctre_settings_set_cemuhookudp_address(const char* value) {
     Settings::values.cemuhookudp_address = std::string(value);
 }
 
-VVCTRE_PLUGIN_FUNCTION const char* vvctre_settings_get_cemuhookudp_address() {
+const char* vvctre_settings_get_cemuhookudp_address() {
     return Settings::values.cemuhookudp_address.c_str();
 }
 
-VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_cemuhookudp_port(u16 value) {
+void vvctre_settings_set_cemuhookudp_port(u16 value) {
     Settings::values.cemuhookudp_port = value;
 }
 
-VVCTRE_PLUGIN_FUNCTION u16 vvctre_settings_get_cemuhookudp_port() {
+u16 vvctre_settings_get_cemuhookudp_port() {
     return Settings::values.cemuhookudp_port;
 }
 
-VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_cemuhookudp_pad_index(u8 value) {
+void vvctre_settings_set_cemuhookudp_pad_index(u8 value) {
     Settings::values.cemuhookudp_pad_index = value;
 }
 
-VVCTRE_PLUGIN_FUNCTION u8 vvctre_settings_get_cemuhookudp_pad_index() {
+u8 vvctre_settings_get_cemuhookudp_pad_index() {
     return Settings::values.cemuhookudp_pad_index;
 }
 
 // Layout Settings
-VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_layout(int value) {
+void vvctre_settings_set_layout(int value) {
     Settings::values.layout = static_cast<Settings::Layout>(value);
 }
 
-VVCTRE_PLUGIN_FUNCTION int vvctre_settings_get_layout() {
+int vvctre_settings_get_layout() {
     return static_cast<int>(Settings::values.layout);
 }
 
-VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_swap_screens(bool value) {
+void vvctre_settings_set_swap_screens(bool value) {
     Settings::values.swap_screens = value;
 }
 
-VVCTRE_PLUGIN_FUNCTION bool vvctre_settings_get_swap_screens() {
+bool vvctre_settings_get_swap_screens() {
     return Settings::values.swap_screens;
 }
 
-VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_upright_screens(bool value) {
+void vvctre_settings_set_upright_screens(bool value) {
     Settings::values.upright_screens = value;
 }
 
-VVCTRE_PLUGIN_FUNCTION bool vvctre_settings_get_upright_screens() {
+bool vvctre_settings_get_upright_screens() {
     return Settings::values.upright_screens;
 }
 
-VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_use_custom_layout(bool value) {
+void vvctre_settings_set_use_custom_layout(bool value) {
     Settings::values.use_custom_layout = value;
 }
 
-VVCTRE_PLUGIN_FUNCTION bool vvctre_settings_get_use_custom_layout() {
+bool vvctre_settings_get_use_custom_layout() {
     return Settings::values.use_custom_layout;
 }
 
-VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_custom_layout_top_left(u16 value) {
+void vvctre_settings_set_custom_layout_top_left(u16 value) {
     Settings::values.custom_layout_top_left = value;
 }
 
-VVCTRE_PLUGIN_FUNCTION u16 vvctre_settings_get_custom_layout_top_left() {
+u16 vvctre_settings_get_custom_layout_top_left() {
     return Settings::values.custom_layout_top_left;
 }
 
-VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_custom_layout_top_top(u16 value) {
+void vvctre_settings_set_custom_layout_top_top(u16 value) {
     Settings::values.custom_layout_top_top = value;
 }
 
-VVCTRE_PLUGIN_FUNCTION u16 vvctre_settings_get_custom_layout_top_top() {
+u16 vvctre_settings_get_custom_layout_top_top() {
     return Settings::values.custom_layout_top_top;
 }
 
-VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_custom_layout_top_right(u16 value) {
+void vvctre_settings_set_custom_layout_top_right(u16 value) {
     Settings::values.custom_layout_top_right = value;
 }
 
-VVCTRE_PLUGIN_FUNCTION u16 vvctre_settings_get_custom_layout_top_right() {
+u16 vvctre_settings_get_custom_layout_top_right() {
     return Settings::values.custom_layout_top_right;
 }
 
-VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_custom_layout_top_bottom(u16 value) {
+void vvctre_settings_set_custom_layout_top_bottom(u16 value) {
     Settings::values.custom_layout_top_bottom = value;
 }
 
-VVCTRE_PLUGIN_FUNCTION u16 vvctre_settings_get_custom_layout_top_bottom() {
+u16 vvctre_settings_get_custom_layout_top_bottom() {
     return Settings::values.custom_layout_top_bottom;
 }
 
-VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_custom_layout_bottom_left(u16 value) {
+void vvctre_settings_set_custom_layout_bottom_left(u16 value) {
     Settings::values.custom_layout_bottom_left = value;
 }
 
-VVCTRE_PLUGIN_FUNCTION u16 vvctre_settings_get_custom_layout_bottom_left() {
+u16 vvctre_settings_get_custom_layout_bottom_left() {
     return Settings::values.custom_layout_bottom_left;
 }
 
-VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_custom_layout_bottom_top(u16 value) {
+void vvctre_settings_set_custom_layout_bottom_top(u16 value) {
     Settings::values.custom_layout_bottom_top = value;
 }
 
-VVCTRE_PLUGIN_FUNCTION u16 vvctre_settings_get_custom_layout_bottom_top() {
+u16 vvctre_settings_get_custom_layout_bottom_top() {
     return Settings::values.custom_layout_bottom_top;
 }
 
-VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_custom_layout_bottom_right(u16 value) {
+void vvctre_settings_set_custom_layout_bottom_right(u16 value) {
     Settings::values.custom_layout_bottom_right = value;
 }
 
-VVCTRE_PLUGIN_FUNCTION u16 vvctre_settings_get_custom_layout_bottom_right() {
+u16 vvctre_settings_get_custom_layout_bottom_right() {
     return Settings::values.custom_layout_bottom_right;
 }
 
-VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_custom_layout_bottom_bottom(u16 value) {
+void vvctre_settings_set_custom_layout_bottom_bottom(u16 value) {
     Settings::values.custom_layout_bottom_bottom = value;
 }
 
-VVCTRE_PLUGIN_FUNCTION u16 vvctre_settings_get_custom_layout_bottom_bottom() {
+u16 vvctre_settings_get_custom_layout_bottom_bottom() {
     return Settings::values.custom_layout_bottom_bottom;
 }
 
 // LLE Modules Settings
-VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_use_lle_module(const char* name, bool value) {
+void vvctre_settings_set_use_lle_module(const char* name, bool value) {
     Settings::values.lle_modules[std::string(name)] = value;
 }
 
-VVCTRE_PLUGIN_FUNCTION bool vvctre_settings_get_use_lle_module(const char* name) {
+bool vvctre_settings_get_use_lle_module(const char* name) {
     return Settings::values.lle_modules[std::string(name)];
 }
 
 // Other
-VVCTRE_PLUGIN_FUNCTION const char* vvctre_get_version() {
+const char* vvctre_get_version() {
     return fmt::format("{}.{}.{}", vvctre_version_major, vvctre_version_minor, vvctre_version_patch)
         .c_str();
 }
 
-VVCTRE_PLUGIN_FUNCTION bool vvctre_emulation_running(void* core) {
+bool vvctre_emulation_running(void* core) {
     return static_cast<Core::System*>(core)->IsPoweredOn();
 }
 
-VVCTRE_PLUGIN_FUNCTION void vvctre_set_play_coins(u16 value) {
+void vvctre_set_play_coins(u16 value) {
     Service::PTM::Module::SetPlayCoins(value);
 }
 
-VVCTRE_PLUGIN_FUNCTION u16 vvctre_get_play_coins() {
+u16 vvctre_get_play_coins() {
     return Service::PTM::Module::GetPlayCoins();
 }
