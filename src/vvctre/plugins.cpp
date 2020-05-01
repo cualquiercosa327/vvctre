@@ -16,6 +16,7 @@
 #include "core/hle/service/cam/cam.h"
 #include "core/hle/service/hid/hid.h"
 #include "core/hle/service/nfc/nfc.h"
+#include "core/hle/service/ptm/ptm.h"
 #include "core/memory.h"
 #include "core/movie.h"
 #include "core/settings.h"
@@ -1002,58 +1003,110 @@ VVCTRE_PLUGIN_FUNCTION u8 vvctre_settings_get_cemuhookudp_pad_index() {
 }
 
 // Layout Settings
-VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_layout(int value);
+VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_layout(int value) {
+    Settings::values.layout = static_cast<Settings::Layout>(value);
+}
 
-VVCTRE_PLUGIN_FUNCTION int vvctre_settings_get_layout();
+VVCTRE_PLUGIN_FUNCTION int vvctre_settings_get_layout() {
+    return static_cast<int>(Settings::values.layout);
+}
 
-VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_swap_screens(bool value);
+VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_swap_screens(bool value) {
+    Settings::values.swap_screens = value;
+}
 
-VVCTRE_PLUGIN_FUNCTION bool vvctre_settings_get_swap_screens();
+VVCTRE_PLUGIN_FUNCTION bool vvctre_settings_get_swap_screens() {
+    return Settings::values.swap_screens;
+}
 
-VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_upright_screens(bool value);
+VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_upright_screens(bool value) {
+    Settings::values.upright_screens = value;
+}
 
-VVCTRE_PLUGIN_FUNCTION bool vvctre_settings_get_upright_screens();
+VVCTRE_PLUGIN_FUNCTION bool vvctre_settings_get_upright_screens() {
+    return Settings::values.upright_screens;
+}
 
-VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_use_custom_layout(bool value);
+VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_use_custom_layout(bool value) {
+    Settings::values.use_custom_layout = value;
+}
 
-VVCTRE_PLUGIN_FUNCTION bool vvctre_settings_get_use_custom_layout();
+VVCTRE_PLUGIN_FUNCTION bool vvctre_settings_get_use_custom_layout() {
+    return Settings::values.use_custom_layout;
+}
 
-VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_custom_layout_top_left(u16 value);
+VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_custom_layout_top_left(u16 value) {
+    Settings::values.custom_layout_top_left = value;
+}
 
-VVCTRE_PLUGIN_FUNCTION u16 vvctre_settings_get_custom_layout_top_left();
+VVCTRE_PLUGIN_FUNCTION u16 vvctre_settings_get_custom_layout_top_left() {
+    return Settings::values.custom_layout_top_left;
+}
 
-VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_custom_layout_top_top(u16 value);
+VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_custom_layout_top_top(u16 value) {
+    Settings::values.custom_layout_top_top = value;
+}
 
-VVCTRE_PLUGIN_FUNCTION u16 vvctre_settings_get_custom_layout_top_top();
+VVCTRE_PLUGIN_FUNCTION u16 vvctre_settings_get_custom_layout_top_top() {
+    return Settings::values.custom_layout_top_top;
+}
 
-VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_custom_layout_top_right(u16 value);
+VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_custom_layout_top_right(u16 value) {
+    Settings::values.custom_layout_top_right = value;
+}
 
-VVCTRE_PLUGIN_FUNCTION u16 vvctre_settings_get_custom_layout_top_right();
+VVCTRE_PLUGIN_FUNCTION u16 vvctre_settings_get_custom_layout_top_right() {
+    return Settings::values.custom_layout_top_right;
+}
 
-VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_custom_layout_top_bottom(u16 value);
+VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_custom_layout_top_bottom(u16 value) {
+    Settings::values.custom_layout_top_bottom = value;
+}
 
-VVCTRE_PLUGIN_FUNCTION u16 vvctre_settings_get_custom_layout_top_bottom();
+VVCTRE_PLUGIN_FUNCTION u16 vvctre_settings_get_custom_layout_top_bottom() {
+    return Settings::values.custom_layout_top_bottom;
+}
 
-VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_custom_layout_bottom_left(u16 value);
+VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_custom_layout_bottom_left(u16 value) {
+    Settings::values.custom_layout_bottom_left = value;
+}
 
-VVCTRE_PLUGIN_FUNCTION u16 vvctre_settings_get_custom_layout_bottom_left();
+VVCTRE_PLUGIN_FUNCTION u16 vvctre_settings_get_custom_layout_bottom_left() {
+    return Settings::values.custom_layout_bottom_left;
+}
 
-VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_custom_layout_bottom_top(u16 value);
+VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_custom_layout_bottom_top(u16 value) {
+    Settings::values.custom_layout_bottom_top = value;
+}
 
-VVCTRE_PLUGIN_FUNCTION u16 vvctre_settings_get_custom_layout_bottom_top();
+VVCTRE_PLUGIN_FUNCTION u16 vvctre_settings_get_custom_layout_bottom_top() {
+    return Settings::values.custom_layout_bottom_top;
+}
 
-VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_custom_layout_bottom_right(u16 value);
+VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_custom_layout_bottom_right(u16 value) {
+    Settings::values.custom_layout_bottom_right = value;
+}
 
-VVCTRE_PLUGIN_FUNCTION u16 vvctre_settings_get_custom_layout_bottom_right();
+VVCTRE_PLUGIN_FUNCTION u16 vvctre_settings_get_custom_layout_bottom_right() {
+    return Settings::values.custom_layout_bottom_right;
+}
 
-VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_custom_layout_bottom_bottom(u16 value);
+VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_custom_layout_bottom_bottom(u16 value) {
+    Settings::values.custom_layout_bottom_bottom = value;
+}
 
-VVCTRE_PLUGIN_FUNCTION u16 vvctre_settings_get_custom_layout_bottom_bottom();
+VVCTRE_PLUGIN_FUNCTION u16 vvctre_settings_get_custom_layout_bottom_bottom() {
+    return Settings::values.custom_layout_bottom_bottom;
+}
 
 // LLE Modules Settings
-VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_use_lle_module(const char* name, bool value);
+VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_use_lle_module(const char* name, bool value) {
+    Settings::values.lle_modules[std::string(name)] = value;
+}
 
-VVCTRE_PLUGIN_FUNCTION bool vvctre_settings_get_use_lle_module(const char* name);
+VVCTRE_PLUGIN_FUNCTION bool vvctre_settings_get_use_lle_module(const char* name) {
+    return Settings::values.lle_modules[std::string(name)];
+}
 
 // Other
 VVCTRE_PLUGIN_FUNCTION const char* vvctre_get_version() {
@@ -1065,6 +1118,10 @@ VVCTRE_PLUGIN_FUNCTION bool vvctre_emulation_running(void* core) {
     return static_cast<Core::System*>(core)->IsPoweredOn();
 }
 
-VVCTRE_PLUGIN_FUNCTION void vvctre_set_play_coins(u16 value);
+VVCTRE_PLUGIN_FUNCTION void vvctre_set_play_coins(u16 value) {
+    Service::PTM::Module::SetPlayCoins(value);
+}
 
-VVCTRE_PLUGIN_FUNCTION u16 vvctre_get_play_coins();
+VVCTRE_PLUGIN_FUNCTION u16 vvctre_get_play_coins() {
+    return Service::PTM::Module::GetPlayCoins();
+}
