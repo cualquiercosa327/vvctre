@@ -17,7 +17,7 @@ namespace HW::RSA {
 constexpr std::size_t SlotSize = 4;
 std::array<RsaSlot, SlotSize> rsa_slots;
 
-std::vector<u8> RsaSlot::GetSignature(const std::vector<u8>& message) {
+std::vector<u8> RsaSlot::GetSignature(const std::vector<u8>& message) const {
     CryptoPP::Integer sig =
         CryptoPP::ModularExponentiation(CryptoPP::Integer(message.data(), message.size()),
                                         CryptoPP::Integer(exponent.data(), exponent.size()),

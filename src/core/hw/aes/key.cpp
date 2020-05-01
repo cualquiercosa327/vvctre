@@ -223,7 +223,7 @@ void LoadNativeFirmKeys() {
         return;
     }
 
-    auto rsa = RSA::GetSlot(0);
+    const auto rsa = RSA::GetSlot(0);
     if (!rsa) {
         LOG_ERROR(HW_AES, "RSA slot is missing");
         return;
