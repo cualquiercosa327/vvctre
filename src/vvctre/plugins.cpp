@@ -14,6 +14,7 @@
 #include "core/core.h"
 #include "core/hle/service/am/am.h"
 #include "core/hle/service/cam/cam.h"
+#include "core/hle/service/hid/hid.h"
 #include "core/hle/service/nfc/nfc.h"
 #include "core/memory.h"
 #include "core/movie.h"
@@ -485,6 +486,67 @@ VVCTRE_PLUGIN_FUNCTION bool vvctre_get_frame_advancing_enabled(void* core) {
 
 VVCTRE_PLUGIN_FUNCTION void vvctre_advance_frame(void* core) {
     static_cast<Core::System*>(core)->frame_limiter.AdvanceFrame();
+}
+
+// Remote control
+VVCTRE_PLUGIN_FUNCTION void vvctre_set_custom_pad_state(void* core, u32 state) {
+    std::shared_ptr<Service::HID::Module> hid =
+        Service::HID::GetModule(*static_cast<Core::System*>(core));
+
+    hid->SetCustomPadState(Service::HID::PadState{state});
+}
+
+VVCTRE_PLUGIN_FUNCTION void vvctre_use_real_pad_state(void* core) {
+    std::shared_ptr<Service::HID::Module> hid =
+        Service::HID::GetModule(*static_cast<Core::System*>(core));
+
+    hid->SetCustomPadState(std::nullopt);
+}
+
+VVCTRE_PLUGIN_FUNCTION void vvctre_set_custom_circle_pad_state(void* core, float x, float y) {
+    std::shared_ptr<Service::HID::Module> hid =
+        Service::HID::GetModule(*static_cast<Core::System*>(core));
+
+    hid->SetCustomCirclePadState(std::make_tuple(x, y));
+}
+
+VVCTRE_PLUGIN_FUNCTION void vvctre_use_real_circle_pad_state(void* core) {
+    std::shared_ptr<Service::HID::Module> hid =
+        Service::HID::GetModule(*static_cast<Core::System*>(core));
+
+    hid->SetCustomCirclePadState(std::nullopt);
+}
+
+VVCTRE_PLUGIN_FUNCTION void vvctre_set_custom_touch_state(void* core, float x, float y,
+                                                          bool pressed) {
+    std::shared_ptr<Service::HID::Module> hid =
+        Service::HID::GetModule(*static_cast<Core::System*>(core));
+
+    hid->SetCustomTouchState(std::make_tuple(x, y, pressed));
+}
+
+VVCTRE_PLUGIN_FUNCTION void vvctre_use_real_touch_state(void* core) {
+    std::shared_ptr<Service::HID::Module> hid =
+        Service::HID::GetModule(*static_cast<Core::System*>(core));
+
+    hid->SetCustomTouchState(std::nullopt);
+}
+
+VVCTRE_PLUGIN_FUNCTION void vvctre_set_custom_motion_state(void* core, float accelerometer[3],
+                                                           float gyroscope[3]) {
+    std::shared_ptr<Service::HID::Module> hid =
+        Service::HID::GetModule(*static_cast<Core::System*>(core));
+
+    hid->SetCustomMotionState(
+        std::make_tuple(Common::Vec3f(accelerometer[0], accelerometer[1], accelerometer[2]),
+                        Common::Vec3f(gyroscope[0], gyroscope[1], gyroscope[2])));
+}
+
+VVCTRE_PLUGIN_FUNCTION void vvctre_use_real_motion_state(void* core) {
+    std::shared_ptr<Service::HID::Module> hid =
+        Service::HID::GetModule(*static_cast<Core::System*>(core));
+
+    hid->SetCustomPadState(std::nullopt);
 }
 
 // Other

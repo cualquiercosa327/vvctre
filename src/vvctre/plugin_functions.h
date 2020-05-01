@@ -4,7 +4,6 @@
 
 #pragma once
 
-#include <optional>
 #include "common/common_types.h"
 
 #define VVCTRE_PLUGIN_FUNCTION extern "C" __declspec(dllimport)
@@ -101,7 +100,19 @@ VVCTRE_PLUGIN_FUNCTION bool vvctre_get_frame_advancing_enabled(void* core);
 VVCTRE_PLUGIN_FUNCTION void vvctre_advance_frame(void* core);
 
 // Remote control
-VVCTRE_PLUGIN_FUNCTION void vvctre_set_custom_pad_state(std::optional<u32>);
+VVCTRE_PLUGIN_FUNCTION void vvctre_set_custom_pad_state(void* core, u32 state);
+VVCTRE_PLUGIN_FUNCTION void vvctre_use_real_pad_state(void* core);
+
+VVCTRE_PLUGIN_FUNCTION void vvctre_set_custom_circle_pad_state(void* core, float x, float y);
+VVCTRE_PLUGIN_FUNCTION void vvctre_use_real_circle_pad_state(void* core);
+
+VVCTRE_PLUGIN_FUNCTION void vvctre_set_custom_touch_state(void* core, float x, float y,
+                                                          bool pressed);
+VVCTRE_PLUGIN_FUNCTION void vvctre_use_real_touch_state(void* core);
+
+VVCTRE_PLUGIN_FUNCTION void vvctre_set_custom_motion_state(void* core, float accelerometer[3],
+                                                           float gyroscope[3]);
+VVCTRE_PLUGIN_FUNCTION void vvctre_use_real_motion_state(void* core);
 
 // Other
 VVCTRE_PLUGIN_FUNCTION const char* vvctre_get_version();
