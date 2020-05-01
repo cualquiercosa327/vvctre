@@ -168,8 +168,8 @@ VVCTRE_PLUGIN_FUNCTION u16 vvctre_settings_get_gdb_stub_port();
 VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_use_cpu_jit(bool value);
 VVCTRE_PLUGIN_FUNCTION bool vvctre_settings_get_use_cpu_jit();
 
-VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_use_speed_limit(bool value);
-VVCTRE_PLUGIN_FUNCTION bool vvctre_settings_get_use_speed_limit();
+VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_limit_speed(bool value);
+VVCTRE_PLUGIN_FUNCTION bool vvctre_settings_get_limit_speed();
 
 VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_speed_limit(u16 value);
 VVCTRE_PLUGIN_FUNCTION u16 vvctre_settings_get_speed_limit();
