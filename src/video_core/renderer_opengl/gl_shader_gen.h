@@ -235,7 +235,7 @@ std::string GenerateFragmentShader(const PicaFSConfig& config, bool separable_sh
 namespace std {
 template <>
 struct hash<OpenGL::PicaFSConfig> {
-    std::size_t operator()(const OpenGL::PicaFSConfig& k) const {
+    std::size_t operator()(const OpenGL::PicaFSConfig& k) const noexcept {
         return k.Hash();
     }
 };
