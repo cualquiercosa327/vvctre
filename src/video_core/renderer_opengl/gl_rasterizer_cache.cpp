@@ -730,7 +730,6 @@ void CachedSurface::UploadGLTexture(Common::Rectangle<u32> rect, GLuint read_fb_
 
     ASSERT(gl_buffer.size() == width * height * GetGLBytesPerPixel(pixel_format));
 
-    std::string dump_path; // Has to be declared here for logging later
     u64 tex_hash = 0;
 
     if (Settings::values.dump_textures || Settings::values.custom_textures) {
