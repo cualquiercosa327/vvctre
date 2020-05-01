@@ -19,7 +19,6 @@ add_executable(${PROJECT_NAME}
     function_logger.h
     initial_settings.cpp
     initial_settings.h
-    plugin_functions.h
     plugins.cpp
     plugins.h
 )
