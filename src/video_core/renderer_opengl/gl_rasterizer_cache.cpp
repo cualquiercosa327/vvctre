@@ -77,8 +77,8 @@ const FormatTuple& GetFormatTuple(PixelFormat pixel_format) {
  * Hack: obtain the pixels by attaching the texture to a framebuffer.
  * Originally from https://github.com/apitrace/apitrace/blob/master/retrace/glstate_images.cpp
  */
-static inline void GetTexImage(GLenum target, GLint level, GLenum format, GLenum type, GLint height,
-                               GLint width, GLint depth, GLubyte* pixels, GLuint size) {
+static void GetTexImage(GLenum target, GLint level, GLenum format, GLenum type, GLint height,
+                        GLint width, GLint depth, GLubyte* pixels, GLuint size) {
     std::memset(pixels, 0x80, size);
 
     OpenGLState cur_state = OpenGLState::GetCurState();
@@ -137,7 +137,7 @@ static inline void GetTexImage(GLenum target, GLint level, GLenum format, GLenum
 }
 
 template <typename Map, typename Interval>
-constexpr auto RangeFromInterval(Map& map, const Interval& interval) {
+static constexpr auto RangeFromInterval(Map& map, const Interval& interval) {
     return boost::make_iterator_range(map.equal_range(interval));
 }
 
@@ -944,15 +944,15 @@ enum MatchFlags {
     TexCopy = 1 << 5  // Surface that will match a display transfer "texture copy" parameters
 };
 
-constexpr MatchFlags operator|(MatchFlags lhs, MatchFlags rhs) {
+static constexpr MatchFlags operator|(MatchFlags lhs, MatchFlags rhs) {
     return static_cast<MatchFlags>(static_cast<int>(lhs) | static_cast<int>(rhs));
 }
 
 /// Get the best surface match (and its match type) for the given flags
 template <MatchFlags find_flags>
-Surface FindMatch(const SurfaceCache& surface_cache, const SurfaceParams& params,
-                  ScaleMatch match_scale_type,
-                  std::optional<SurfaceInterval> validate_interval = {}) {
+static Surface FindMatch(const SurfaceCache& surface_cache, const SurfaceParams& params,
+                         ScaleMatch match_scale_type,
+                         std::optional<SurfaceInterval> validate_interval = std::nullopt) {
     Surface match_surface = nullptr;
     bool match_valid = false;
     u32 match_scale = 0;
