@@ -118,5 +118,4 @@ VVCTRE_PLUGIN_FUNCTION void vvctre_use_real_motion_state(void* core);
 VVCTRE_PLUGIN_FUNCTION const char* vvctre_get_version();
 VVCTRE_PLUGIN_FUNCTION bool vvctre_emulation_running(void* core);
 
-// TODO: Translations
 // TODO: Settings
