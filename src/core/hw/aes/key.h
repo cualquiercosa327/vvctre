@@ -11,7 +11,6 @@
 namespace HW::AES {
 
 enum KeySlotID : std::size_t {
-
     // Used to decrypt the SSL client cert/private-key stored in ClCertA.
     SSLKey = 0x0D,
 
