@@ -31,7 +31,7 @@ public:
     explicit PluginManager(void* core);
     ~PluginManager();
 
-    // Calls the DLL functions
+    // Calls the plugin exported functions
     void InitialSettingsOpening();
     void InitialSettingsOkPressed();
     void BeforeLoading();
@@ -44,7 +44,7 @@ public:
     void* NewButtonDevice(const char* params);
     void DeleteButtonDevice(void* device);
 
-    // DLLs can change this
+    // Plugins can change this
     bool paused = false;
 
 private:
