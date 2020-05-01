@@ -6,6 +6,7 @@
 
 #include <unordered_map>
 #include <vector>
+#include "common/common_types.h"
 #include "core/frontend/input.h"
 #include "vvctre/function_logger.h"
 
@@ -26,6 +27,7 @@ using FatalError = void (*)();                                                  
 using BeforeDrawingFPS = void (*)();                                                // optional
 using AddMenu = void (*)();                                                         // optional
 using AfterSwapWindow = void (*)();                                                 // optional
+using ScreenshotCallback = void (*)(void* data);
 using Log = Log::FunctionLogger::Function;
 } // namespace PluginImportedFunctions
 
@@ -46,6 +48,7 @@ public:
     void AfterSwapWindow();
     void* NewButtonDevice(const char* params);
     void DeleteButtonDevice(void* device);
+    void CallScreenshotCallbacks(void* data);
 
     // Plugins can change this
     bool paused = false;
@@ -60,6 +63,7 @@ private:
         PluginImportedFunctions::BeforeDrawingFPS before_drawing_fps = nullptr;
         PluginImportedFunctions::AddMenu add_menu = nullptr;
         PluginImportedFunctions::AfterSwapWindow after_swap_window = nullptr;
+        PluginImportedFunctions::ScreenshotCallback screenshot_callback = nullptr;
     };
 
     std::vector<Plugin> plugins;

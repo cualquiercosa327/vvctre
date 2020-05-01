@@ -6,8 +6,9 @@
 #include <fmt/format.h>
 #include <imgui.h>
 #include "common/common_funcs.h"
-#include "common/common_types.h"
 #include "common/file_util.h"
+#include "common/texture.h"
+#include "core/3ds.h"
 #include "core/cheats/cheat_base.h"
 #include "core/cheats/cheats.h"
 #include "core/cheats/gateway_cheat.h"
@@ -20,6 +21,8 @@
 #include "core/memory.h"
 #include "core/movie.h"
 #include "core/settings.h"
+#include "video_core/renderer_base.h"
+#include "video_core/video_core.h"
 #include "vvctre/common.h"
 #include "vvctre/plugins.h"
 
@@ -91,6 +94,9 @@ PluginManager::PluginManager(void* core) {
                     plugin.after_swap_window =
                         (PluginImportedFunctions::AfterSwapWindow)GetProcAddress(handle,
                                                                                  "AfterSwapWindow");
+                    plugin.screenshot_callback =
+                        (PluginImportedFunctions::ScreenshotCallback)GetProcAddress(
+                            handle, "ScreenshotCallback");
                     PluginImportedFunctions::Log log =
                         (PluginImportedFunctions::Log)GetProcAddress(handle, "Log");
                     if (log != nullptr) {
@@ -232,9 +238,17 @@ void PluginManager::DeleteButtonDevice(void* device) {
     }
 }
 
+void PluginManager::CallScreenshotCallbacks(void* data) {
+    for (const auto& plugin : plugins) {
+        if (plugin.screenshot_callback != nullptr) {
+            plugin.screenshot_callback(data);
+        }
+    }
+}
+
 // Functions plugins can use
 
-// File, Emulation
+// File
 void vvctre_load_file(void* core, const char* path) {
     static_cast<Core::System*>(core)->SetResetFilePath(std::string(path));
     static_cast<Core::System*>(core)->RequestReset();
@@ -271,6 +285,8 @@ void vvctre_remove_amiibo(void* core) {
         nfc->RemoveAmiibo();
     }
 }
+
+// Emulation
 
 void vvctre_restart(void* core) {
     static_cast<Core::System*>(core)->Reset();
@@ -429,6 +445,10 @@ bool vvctre_gui_button(const char* text) {
     return ImGui::Button(text);
 }
 
+bool vvctre_gui_checkbox(const char* text, bool* checked) {
+    return ImGui::Checkbox(text, checked);
+}
+
 bool vvctre_gui_begin(const char* name) {
     return ImGui::Begin(name);
 }
@@ -447,6 +467,10 @@ void vvctre_gui_end_menu() {
 
 bool vvctre_gui_menu_item(const char* name) {
     return ImGui::MenuItem(name);
+}
+
+bool vvctre_gui_menu_item_with_check_mark(const char* name, bool* checked) {
+    return ImGui::MenuItem(name, nullptr, checked);
 }
 
 // Button devices
@@ -1109,6 +1133,14 @@ u16 vvctre_settings_get_custom_layout_bottom_bottom() {
     return Settings::values.custom_layout_bottom_bottom;
 }
 
+u32 vvctre_settings_get_layout_width() {
+    return VideoCore::g_renderer->GetRenderWindow().GetFramebufferLayout().width;
+}
+
+u32 vvctre_settings_get_layout_height() {
+    return VideoCore::g_renderer->GetRenderWindow().GetFramebufferLayout().height;
+}
+
 // LLE Modules Settings
 void vvctre_settings_set_use_lle_module(const char* name, bool value) {
     Settings::values.lle_modules[std::string(name)] = value;
@@ -1124,6 +1156,18 @@ const char* vvctre_get_version() {
         .c_str();
 }
 
+u8 vvctre_get_version_major() {
+    return vvctre_version_major;
+}
+
+u8 vvctre_get_version_minor() {
+    return vvctre_version_minor;
+}
+
+u8 vvctre_get_version_patch() {
+    return vvctre_version_patch;
+}
+
 bool vvctre_emulation_running(void* core) {
     return static_cast<Core::System*>(core)->IsPoweredOn();
 }
@@ -1136,14 +1180,103 @@ u16 vvctre_get_play_coins() {
     return Service::PTM::Module::GetPlayCoins();
 }
 
+bool vvctre_screenshot(void* plugin_manager, void* data) {
+    const Layout::FramebufferLayout& layout =
+        VideoCore::g_renderer->GetRenderWindow().GetFramebufferLayout();
+
+    return VideoCore::RequestScreenshot(
+        data,
+        [=] {
+            const auto convert_bgra_to_rgba = [](const std::vector<u8>& input,
+                                                 const Layout::FramebufferLayout& layout) {
+                int offset = 0;
+                std::vector<u8> output(input.size());
+
+                for (u32 y = 0; y < layout.height; ++y) {
+                    for (u32 x = 0; x < layout.width; ++x) {
+                        output[offset] = input[offset + 2];
+                        output[offset + 1] = input[offset + 1];
+                        output[offset + 2] = input[offset];
+                        output[offset + 3] = input[offset + 3];
+
+                        offset += 4;
+                    }
+                }
+
+                return output;
+            };
+
+            std::vector<u8> v(layout.width * layout.height * 4);
+            std::memcpy(v.data(), data, v.size());
+            v = convert_bgra_to_rgba(v, layout);
+            Common::FlipRGBA8Texture(v, static_cast<u64>(layout.width),
+                                     static_cast<u64>(layout.height));
+            std::memcpy(data, v.data(), v.size());
+
+            PluginManager* pm = static_cast<PluginManager*>(plugin_manager);
+            pm->CallScreenshotCallbacks(data);
+        },
+        layout);
+}
+
+bool vvctre_screenshot_default_layout(void* plugin_manager, void* data) {
+    const Layout::FramebufferLayout layout = Layout::DefaultFrameLayout(
+        Core::kScreenTopWidth, Core::kScreenTopHeight + Core::kScreenBottomHeight, false, false);
+
+    return VideoCore::RequestScreenshot(
+        data,
+        [=] {
+            const auto convert_bgra_to_rgba = [](const std::vector<u8>& input,
+                                                 const Layout::FramebufferLayout& layout) {
+                int offset = 0;
+                std::vector<u8> output(input.size());
+
+                for (u32 y = 0; y < layout.height; ++y) {
+                    for (u32 x = 0; x < layout.width; ++x) {
+                        output[offset] = input[offset + 2];
+                        output[offset + 1] = input[offset + 1];
+                        output[offset + 2] = input[offset];
+                        output[offset + 3] = input[offset + 3];
+
+                        offset += 4;
+                    }
+                }
+
+                return output;
+            };
+
+            std::vector<u8> v(layout.width * layout.height * 4);
+            std::memcpy(v.data(), data, v.size());
+            v = convert_bgra_to_rgba(v, layout);
+            Common::FlipRGBA8Texture(v, static_cast<u64>(layout.width),
+                                     static_cast<u64>(layout.height));
+            std::memcpy(data, v.data(), v.size());
+
+            PluginManager* pm = static_cast<PluginManager*>(plugin_manager);
+            pm->CallScreenshotCallbacks(data);
+        },
+        layout);
+}
+
+void* vvctre_malloc(std::size_t size) {
+    return std::malloc(size);
+}
+
+void vvctre_free(void* block) {
+    std::free(block);
+}
+
 std::unordered_map<std::string, void*> PluginManager::function_map = {
+    // File
     {"vvctre_load_file", (void*)&vvctre_load_file},
     {"vvctre_install_cia", (void*)&vvctre_install_cia},
     {"vvctre_load_amiibo", (void*)&vvctre_load_amiibo},
     {"vvctre_remove_amiibo", (void*)&vvctre_remove_amiibo},
+    // Emulation
     {"vvctre_restart", (void*)&vvctre_restart},
     {"vvctre_set_paused", (void*)&vvctre_set_paused},
     {"vvctre_get_paused", (void*)&vvctre_get_paused},
+    // Memory
     {"vvctre_read_u8", (void*)&vvctre_read_u8},
     {"vvctre_write_u8", (void*)&vvctre_write_u8},
     {"vvctre_read_u16", (void*)&vvctre_read_u16},
@@ -1152,6 +1285,7 @@ std::unordered_map<std::string, void*> PluginManager::function_map = {
     {"vvctre_write_u32", (void*)&vvctre_write_u32},
     {"vvctre_read_u64", (void*)&vvctre_read_u64},
     {"vvctre_write_u64", (void*)&vvctre_write_u64},
+    // Debugging
     {"vvctre_set_pc", (void*)&vvctre_set_pc},
     {"vvctre_get_pc", (void*)&vvctre_get_pc},
     {"vvctre_set_register", (void*)&vvctre_set_register},
@@ -1162,6 +1296,7 @@ std::unordered_map<std::string, void*> PluginManager::function_map = {
     {"vvctre_get_vfp_system_register", (void*)&vvctre_get_vfp_system_register},
     {"vvctre_set_cp15_register", (void*)&vvctre_set_cp15_register},
     {"vvctre_get_cp15_register", (void*)&vvctre_get_cp15_register},
+    // Cheats
     {"vvctre_cheat_count", (void*)&vvctre_cheat_count},
     {"vvctre_get_cheat", (void*)&vvctre_get_cheat},
     {"vvctre_get_cheat_name", (void*)&vvctre_get_cheat_name},
@@ -1172,17 +1307,23 @@ std::unordered_map<std::string, void*> PluginManager::function_map = {
     {"vvctre_add_gateway_cheat", (void*)&vvctre_add_gateway_cheat},
     {"vvctre_remove_cheat", (void*)&vvctre_remove_cheat},
     {"vvctre_update_gateway_cheat", (void*)&vvctre_update_gateway_cheat},
+    // Camera
     {"vvctre_reload_camera_images", (void*)&vvctre_reload_camera_images},
+    // GUI
     {"vvctre_gui_text", (void*)&vvctre_gui_text},
     {"vvctre_gui_button", (void*)&vvctre_gui_button},
+    {"vvctre_gui_checkbox", (void*)&vvctre_gui_checkbox},
     {"vvctre_gui_begin", (void*)&vvctre_gui_begin},
     {"vvctre_gui_end", (void*)&vvctre_gui_end},
     {"vvctre_gui_begin_menu", (void*)&vvctre_gui_begin_menu},
     {"vvctre_gui_end_menu", (void*)&vvctre_gui_end_menu},
     {"vvctre_gui_menu_item", (void*)&vvctre_gui_menu_item},
+    {"vvctre_gui_menu_item_with_check_mark", (void*)&vvctre_gui_menu_item_with_check_mark},
+    // Button devices
     {"vvctre_button_device_new", (void*)&vvctre_button_device_new},
     {"vvctre_button_device_delete", (void*)&vvctre_button_device_delete},
     {"vvctre_button_device_get_state", (void*)&vvctre_button_device_get_state},
+    // TAS
     {"vvctre_movie_prepare_for_playback", (void*)&vvctre_movie_prepare_for_playback},
     {"vvctre_movie_prepare_for_recording", (void*)&vvctre_movie_prepare_for_recording},
     {"vvctre_movie_play", (void*)&vvctre_movie_play},
@@ -1193,6 +1334,7 @@ std::unordered_map<std::string, void*> PluginManager::function_map = {
     {"vvctre_set_frame_advancing_enabled", (void*)&vvctre_set_frame_advancing_enabled},
     {"vvctre_get_frame_advancing_enabled", (void*)&vvctre_get_frame_advancing_enabled},
     {"vvctre_advance_frame", (void*)&vvctre_advance_frame},
+    // Remote control
     {"vvctre_set_custom_pad_state", (void*)&vvctre_set_custom_pad_state},
     {"vvctre_use_real_pad_state", (void*)&vvctre_use_real_pad_state},
     {"vvctre_set_custom_circle_pad_state", (void*)&vvctre_set_custom_circle_pad_state},
@@ -1201,8 +1343,10 @@ std::unordered_map<std::string, void*> PluginManager::function_map = {
     {"vvctre_use_real_touch_state", (void*)&vvctre_use_real_touch_state},
     {"vvctre_set_custom_motion_state", (void*)&vvctre_set_custom_motion_state},
     {"vvctre_use_real_motion_state", (void*)&vvctre_use_real_motion_state},
+    // Settings
     {"vvctre_settings_apply", (void*)&vvctre_settings_apply},
     {"vvctre_settings_log", (void*)&vvctre_settings_log},
+    // Start Settings
     {"vvctre_settings_set_file_path", (void*)&vvctre_settings_set_file_path},
     {"vvctre_settings_get_file_path", (void*)&vvctre_settings_get_file_path},
     {"vvctre_settings_set_play_movie", (void*)&vvctre_settings_set_play_movie},
@@ -1231,6 +1375,7 @@ std::unordered_map<std::string, void*> PluginManager::function_map = {
     {"vvctre_settings_disable_gdbstub", (void*)&vvctre_settings_disable_gdbstub},
     {"vvctre_settings_is_gdb_stub_enabled", (void*)&vvctre_settings_is_gdb_stub_enabled},
     {"vvctre_settings_get_gdb_stub_port", (void*)&vvctre_settings_get_gdb_stub_port},
+    // General Settings
     {"vvctre_settings_set_use_cpu_jit", (void*)&vvctre_settings_set_use_cpu_jit},
     {"vvctre_settings_get_use_cpu_jit", (void*)&vvctre_settings_get_use_cpu_jit},
     {"vvctre_settings_set_limit_speed", (void*)&vvctre_settings_set_limit_speed},
@@ -1243,6 +1388,7 @@ std::unordered_map<std::string, void*> PluginManager::function_map = {
     {"vvctre_settings_get_custom_cpu_ticks", (void*)&vvctre_settings_get_custom_cpu_ticks},
     {"vvctre_settings_set_cpu_clock_percentage", (void*)&vvctre_settings_set_cpu_clock_percentage},
     {"vvctre_settings_get_cpu_clock_percentage", (void*)&vvctre_settings_get_cpu_clock_percentage},
+    // Audio Settings
     {"vvctre_settings_set_enable_dsp_lle", (void*)&vvctre_settings_set_enable_dsp_lle},
     {"vvctre_settings_get_enable_dsp_lle", (void*)&vvctre_settings_get_enable_dsp_lle},
     {"vvctre_settings_set_enable_dsp_lle_multithread",
@@ -1261,6 +1407,7 @@ std::unordered_map<std::string, void*> PluginManager::function_map = {
      (void*)&vvctre_settings_get_microphone_input_type},
     {"vvctre_settings_set_microphone_device", (void*)&vvctre_settings_set_microphone_device},
     {"vvctre_settings_get_microphone_device", (void*)&vvctre_settings_get_microphone_device},
+    // Camera Settings
     {"vvctre_settings_set_camera_engine", (void*)&vvctre_settings_set_camera_engine},
     {"vvctre_settings_get_camera_engine", (void*)&vvctre_settings_get_camera_engine},
     {"vvctre_settings_set_camera_parameter", (void*)&vvctre_settings_set_camera_parameter},
@@ -1317,6 +1464,7 @@ std::unordered_map<std::string, void*> PluginManager::function_map = {
     {"vvctre_settings_get_render_3d", (void*)&vvctre_settings_get_render_3d},
     {"vvctre_settings_set_factor_3d", (void*)&vvctre_settings_set_factor_3d},
     {"vvctre_settings_get_factor_3d", (void*)&vvctre_settings_get_factor_3d},
+    // Controls Settings
     {"vvctre_settings_set_button", (void*)&vvctre_settings_set_button},
     {"vvctre_settings_get_button", (void*)&vvctre_settings_get_button},
     {"vvctre_settings_set_analog", (void*)&vvctre_settings_set_analog},
@@ -1333,6 +1481,7 @@ std::unordered_map<std::string, void*> PluginManager::function_map = {
      (void*)&vvctre_settings_set_cemuhookudp_pad_index},
     {"vvctre_settings_get_cemuhookudp_pad_index",
      (void*)&vvctre_settings_get_cemuhookudp_pad_index},
+    // Layout Settings
     {"vvctre_settings_set_layout", (void*)&vvctre_settings_set_layout},
     {"vvctre_settings_get_layout", (void*)&vvctre_settings_get_layout},
     {"vvctre_settings_set_swap_screens", (void*)&vvctre_settings_set_swap_screens},
@@ -1373,10 +1522,21 @@ std::unordered_map<std::string, void*> PluginManager::function_map = {
      (void*)&vvctre_settings_set_custom_layout_bottom_bottom},
     {"vvctre_settings_get_custom_layout_bottom_bottom",
      (void*)&vvctre_settings_get_custom_layout_bottom_bottom},
+    {"vvctre_settings_get_layout_width", (void*)&vvctre_settings_get_layout_width},
+    {"vvctre_settings_get_layout_height", (void*)&vvctre_settings_get_layout_height},
+    // LLE Modules Settings
     {"vvctre_settings_set_use_lle_module", (void*)&vvctre_settings_set_use_lle_module},
     {"vvctre_settings_get_use_lle_module", (void*)&vvctre_settings_get_use_lle_module},
+    // Other
     {"vvctre_get_version", (void*)&vvctre_get_version},
+    {"vvctre_get_version_major", (void*)&vvctre_get_version_major},
+    {"vvctre_get_version_minor", (void*)&vvctre_get_version_minor},
+    {"vvctre_get_version_patch", (void*)&vvctre_get_version_patch},
     {"vvctre_emulation_running", (void*)&vvctre_emulation_running},
     {"vvctre_set_play_coins", (void*)&vvctre_set_play_coins},
     {"vvctre_get_play_coins", (void*)&vvctre_get_play_coins},
+    {"vvctre_screenshot", (void*)&vvctre_screenshot},
+    {"vvctre_screenshot_default_layout", (void*)&vvctre_screenshot_default_layout},
+    {"vvctre_malloc", (void*)&vvctre_malloc},
+    {"vvctre_free", (void*)&vvctre_free},
 };
