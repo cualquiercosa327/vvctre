@@ -286,9 +286,9 @@ void InitialSettings::Run() {
                     ImGui::SameLine();
                     ImGui::InputText("##multiplayerserverurl", &Settings::values.multiplayer_url);
 
-                    ImGui::Text("Start Time:");
+                    ImGui::Text("Initial Time:");
                     ImGui::SameLine();
-                    if (ImGui::BeginCombo("##start_time", [] {
+                    if (ImGui::BeginCombo("##initial_clock", [] {
                             switch (Settings::values.initial_clock) {
                             case Settings::InitialClock::SystemTime:
                                 return "System";
@@ -312,7 +312,7 @@ void InitialSettings::Run() {
                     }
                     if (Settings::values.initial_clock == Settings::InitialClock::FixedTime) {
                         ImGui::SameLine();
-                        ImGui::InputScalar("##start_time_unix_timestamp", ImGuiDataType_U64,
+                        ImGui::InputScalar("##unix_timestamp", ImGuiDataType_U64,
                                            &Settings::values.unix_timestamp);
                     }
 
