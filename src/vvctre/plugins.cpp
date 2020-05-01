@@ -36,7 +36,7 @@ PluginManager::PluginManager(void* core) {
     FileUtil::ScanDirectoryTree(FileUtil::GetExeDirectory(), parent);
     for (const auto& entry : parent.children) {
         if (!entry.isDirectory && entry.virtualName != "SDL2.dll" &&
-            has_suffix(entry.virtualName, fmt::format("{}.dll", version_major))) {
+            has_suffix(entry.virtualName, fmt::format("{}.dll", vvctre_version_major))) {
             HMODULE handle = LoadLibraryA(entry.virtualName.c_str());
             if (handle == NULL) {
                 fmt::print("Plugin {} failed to load: {}\n", entry.virtualName, GetLastErrorMsg());

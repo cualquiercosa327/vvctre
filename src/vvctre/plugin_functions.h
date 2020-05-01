@@ -18,7 +18,7 @@
 VVCTRE_PLUGIN_FUNCTION void vvctre_load_file(void* core, const char* path);
 VVCTRE_PLUGIN_FUNCTION bool vvctre_install_cia(const char* path);
 
-VVCTRE_PLUGIN_FUNCTION void vvctre_load_amiibo(void* core, const char* path);
+VVCTRE_PLUGIN_FUNCTION bool vvctre_load_amiibo(void* core, const char* path);
 VVCTRE_PLUGIN_FUNCTION void vvctre_remove_amiibo(void* core);
 
 // Emulation
