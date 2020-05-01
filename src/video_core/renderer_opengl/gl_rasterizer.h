@@ -39,7 +39,7 @@ class ShaderProgramManager;
 
 class RasterizerOpenGL : public VideoCore::RasterizerInterface {
 public:
-    explicit RasterizerOpenGL(Frontend::EmuWindow& renderer);
+    explicit RasterizerOpenGL();
     ~RasterizerOpenGL() override;
 
     void AddTriangle(const Pica::Shader::OutputVertex& v0, const Pica::Shader::OutputVertex& v1,
@@ -265,11 +265,9 @@ private:
 
     RasterizerCacheOpenGL res_cache;
 
-    Frontend::EmuWindow& emu_window;
-
     std::vector<HardwareVertex> vertex_batch;
 
-    bool shader_dirty;
+    bool shader_dirty = true;
 
     struct {
         UniformData data;
