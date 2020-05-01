@@ -774,14 +774,29 @@ VVCTRE_PLUGIN_FUNCTION const char* vvctre_settings_get_microphone_device() {
 }
 
 // Camera Settings
-VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_camera_engine(int index, const char* value);
-VVCTRE_PLUGIN_FUNCTION const char* vvctre_settings_get_camera_engine(int index);
+VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_camera_engine(int index, const char* value) {
+    Settings::values.camera_engine[index] = std::string(value);
+}
 
-VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_camera_parameter(int index, const char* value);
-VVCTRE_PLUGIN_FUNCTION const char* vvctre_settings_get_camera_parameter(int index);
+VVCTRE_PLUGIN_FUNCTION const char* vvctre_settings_get_camera_engine(int index) {
+    return Settings::values.camera_engine[index].c_str();
+}
 
-VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_camera_flip(int index, int value);
-VVCTRE_PLUGIN_FUNCTION int vvctre_settings_get_camera_flip(int index);
+VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_camera_parameter(int index, const char* value) {
+    Settings::values.camera_parameter[index] = std::string(value);
+}
+
+VVCTRE_PLUGIN_FUNCTION const char* vvctre_settings_get_camera_parameter(int index) {
+    return Settings::values.camera_parameter[index].c_str();
+}
+
+VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_camera_flip(int index, int value) {
+    Settings::values.camera_flip[index] = static_cast<Service::CAM::Flip>(value);
+}
+
+VVCTRE_PLUGIN_FUNCTION int vvctre_settings_get_camera_flip(int index) {
+    return static_cast<int>(Settings::values.camera_flip[index]);
+}
 
 // Graphics Settings
 VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_use_hardware_renderer(bool value);
