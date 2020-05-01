@@ -254,8 +254,8 @@ void RendererOpenGL::LoadFBToScreenInfo(const GPU::Regs::FramebufferConfig& fram
             : (!right_eye ? framebuffer.address_left2 : framebuffer.address_right2);
 
     LOG_TRACE(Render_OpenGL, "0x{:08x} bytes from 0x{:08x}({}x{}), fmt {:x}",
-              framebuffer.stride * framebuffer.height, framebuffer_addr, (int)framebuffer.width,
-              (int)framebuffer.height, (int)framebuffer.format);
+              framebuffer.stride * framebuffer.height, framebuffer_addr, framebuffer.width.Value(),
+              framebuffer.height.Value(), framebuffer.format);
 
     int bpp = GPU::Regs::BytesPerPixel(framebuffer.color_format);
     std::size_t pixel_stride = framebuffer.stride / bpp;
@@ -520,11 +520,11 @@ void RendererOpenGL::DrawSingleScreenRotated(const ScreenInfo& screen_info, floa
     // As this is the "DrawSingleScreenRotated" function, the output resolution dimensions have been
     // swapped. If a non-rotated draw-screen function were to be added for book-mode games, those
     // should probably be set to the standard (w, h, 1.0 / w, 1.0 / h) ordering.
-    u16 scale_factor = VideoCore::GetResolutionScaleFactor();
-    glUniform4f(uniform_i_resolution, screen_info.texture.width * scale_factor,
-                screen_info.texture.height * scale_factor,
-                1.0 / (screen_info.texture.width * scale_factor),
-                1.0 / (screen_info.texture.height * scale_factor));
+    const u16 scale_factor = VideoCore::GetResolutionScaleFactor();
+    glUniform4f(uniform_i_resolution, static_cast<float>(screen_info.texture.width * scale_factor),
+                static_cast<float>(screen_info.texture.height * scale_factor),
+                1.0f / static_cast<float>(screen_info.texture.width * scale_factor),
+                1.0f / static_cast<float>(screen_info.texture.height * scale_factor));
     glUniform4f(uniform_o_resolution, h, w, 1.0f / h, 1.0f / w);
     state.texture_units[0].texture_2d = screen_info.display_texture;
     state.texture_units[0].sampler = filter_sampler.handle;
@@ -549,11 +549,11 @@ void RendererOpenGL::DrawSingleScreen(const ScreenInfo& screen_info, float x, fl
         ScreenRectVertex(x + w, y + h, texcoords.top, texcoords.left),
     }};
 
-    u16 scale_factor = VideoCore::GetResolutionScaleFactor();
-    glUniform4f(uniform_i_resolution, screen_info.texture.width * scale_factor,
-                screen_info.texture.height * scale_factor,
-                1.0 / (screen_info.texture.width * scale_factor),
-                1.0 / (screen_info.texture.height * scale_factor));
+    const u16 scale_factor = VideoCore::GetResolutionScaleFactor();
+    glUniform4f(uniform_i_resolution, static_cast<float>(screen_info.texture.width * scale_factor),
+                static_cast<float>(screen_info.texture.height * scale_factor),
+                1.0f / static_cast<float>(screen_info.texture.width * scale_factor),
+                1.0f / static_cast<float>(screen_info.texture.height * scale_factor));
     glUniform4f(uniform_o_resolution, w, h, 1.0f / w, 1.0f / h);
     state.texture_units[0].texture_2d = screen_info.display_texture;
     state.texture_units[0].sampler = filter_sampler.handle;
@@ -583,11 +583,12 @@ void RendererOpenGL::DrawSingleScreenStereoRotated(const ScreenInfo& screen_info
         ScreenRectVertex(x + w, y + h, texcoords.top, texcoords.right),
     }};
 
-    u16 scale_factor = VideoCore::GetResolutionScaleFactor();
-    glUniform4f(uniform_i_resolution, screen_info_l.texture.width * scale_factor,
-                screen_info_l.texture.height * scale_factor,
-                1.0 / (screen_info_l.texture.width * scale_factor),
-                1.0 / (screen_info_l.texture.height * scale_factor));
+    const u16 scale_factor = VideoCore::GetResolutionScaleFactor();
+    glUniform4f(uniform_i_resolution,
+                static_cast<float>(screen_info_l.texture.width * scale_factor),
+                static_cast<float>(screen_info_l.texture.height * scale_factor),
+                1.0f / static_cast<float>(screen_info_l.texture.width * scale_factor),
+                1.0f / static_cast<float>(screen_info_l.texture.height * scale_factor));
     glUniform4f(uniform_o_resolution, h, w, 1.0f / h, 1.0f / w);
     state.texture_units[0].texture_2d = screen_info_l.display_texture;
     state.texture_units[1].texture_2d = screen_info_r.display_texture;
@@ -617,11 +618,12 @@ void RendererOpenGL::DrawSingleScreenStereo(const ScreenInfo& screen_info_l,
         ScreenRectVertex(x + w, y + h, texcoords.top, texcoords.left),
     }};
 
-    u16 scale_factor = VideoCore::GetResolutionScaleFactor();
-    glUniform4f(uniform_i_resolution, screen_info_l.texture.width * scale_factor,
-                screen_info_l.texture.height * scale_factor,
-                1.0 / (screen_info_l.texture.width * scale_factor),
-                1.0 / (screen_info_l.texture.height * scale_factor));
+    const u16 scale_factor = VideoCore::GetResolutionScaleFactor();
+    glUniform4f(uniform_i_resolution,
+                static_cast<float>(screen_info_l.texture.width * scale_factor),
+                static_cast<float>(screen_info_l.texture.height * scale_factor),
+                1.0f / static_cast<float>(screen_info_l.texture.width * scale_factor),
+                1.0f / static_cast<float>(screen_info_l.texture.height * scale_factor));
     glUniform4f(uniform_o_resolution, w, h, 1.0f / w, 1.0f / h);
     state.texture_units[0].texture_2d = screen_info_l.display_texture;
     state.texture_units[1].texture_2d = screen_info_r.display_texture;
