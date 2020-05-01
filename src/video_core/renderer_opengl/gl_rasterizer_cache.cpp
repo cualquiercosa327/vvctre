@@ -957,13 +957,13 @@ static Surface FindMatch(const SurfaceCache& surface_cache, const SurfaceParams&
     u32 match_scale = 0;
     SurfaceInterval match_interval{};
 
-    for (auto& pair : RangeFromInterval(surface_cache, params.GetInterval())) {
-        for (auto& surface : pair.second) {
-            bool res_scale_matched = match_scale_type == ScaleMatch::Exact
-                                         ? (params.res_scale == surface->res_scale)
-                                         : (params.res_scale <= surface->res_scale);
+    for (const auto& pair : RangeFromInterval(surface_cache, params.GetInterval())) {
+        for (const auto& surface : pair.second) {
+            const bool res_scale_matched = match_scale_type == ScaleMatch::Exact
+                                               ? (params.res_scale == surface->res_scale)
+                                               : (params.res_scale <= surface->res_scale);
             // validity will be checked in GetCopyableInterval
-            bool is_valid =
+            const bool is_valid =
                 find_flags & MatchFlags::Copy
                     ? true
                     : surface->IsRegionValid(validate_interval.value_or(params.GetInterval()));
@@ -1573,12 +1573,12 @@ void RasterizerCacheOpenGL::DuplicateSurface(const Surface& src_surface,
     dest_surface->invalid_regions += src_surface->invalid_regions;
 
     SurfaceRegions regions;
-    for (auto& pair : RangeFromInterval(dirty_regions, src_surface->GetInterval())) {
+    for (const auto& pair : RangeFromInterval(dirty_regions, src_surface->GetInterval())) {
         if (pair.second == src_surface) {
             regions += pair.first;
         }
     }
-    for (auto& interval : regions) {
+    for (const auto& interval : regions) {
         dirty_regions.set({interval, dest_surface});
     }
 }
@@ -1797,8 +1797,8 @@ void RasterizerCacheOpenGL::InvalidateRegion(PAddr addr, u32 size, const Surface
         region_owner->invalid_regions.erase(invalid_interval);
     }
 
-    for (auto& pair : RangeFromInterval(surface_cache, invalid_interval)) {
-        for (auto& cached_surface : pair.second) {
+    for (const auto& pair : RangeFromInterval(surface_cache, invalid_interval)) {
+        for (const auto& cached_surface : pair.second) {
             if (cached_surface == region_owner)
                 continue;
 
@@ -1827,7 +1827,7 @@ void RasterizerCacheOpenGL::InvalidateRegion(PAddr addr, u32 size, const Surface
     else
         dirty_regions.erase(invalid_interval);
 
-    for (auto& remove_surface : remove_surfaces) {
+    for (const auto& remove_surface : remove_surfaces) {
         if (remove_surface == region_owner) {
             Surface expanded_surface = FindMatch<MatchFlags::SubRect | MatchFlags::Invalid>(
                 surface_cache, *region_owner, ScaleMatch::Ignore);
@@ -1889,7 +1889,7 @@ void RasterizerCacheOpenGL::UpdatePagesCachedCount(PAddr addr, u32 size, int del
     if (delta > 0)
         cached_pages.add({pages_interval, delta});
 
-    for (auto& pair : RangeFromInterval(cached_pages, pages_interval)) {
+    for (const auto& pair : RangeFromInterval(cached_pages, pages_interval)) {
         const auto interval = pair.first & pages_interval;
         const int count = pair.second;
 
