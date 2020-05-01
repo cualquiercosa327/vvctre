@@ -799,121 +799,260 @@ VVCTRE_PLUGIN_FUNCTION int vvctre_settings_get_camera_flip(int index) {
 }
 
 // Graphics Settings
-VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_use_hardware_renderer(bool value);
-VVCTRE_PLUGIN_FUNCTION bool vvctre_settings_get_use_hardware_renderer();
+VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_use_hardware_renderer(bool value) {
+    Settings::values.use_hardware_renderer = value;
+}
 
-VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_use_hardware_shader(bool value);
-VVCTRE_PLUGIN_FUNCTION bool vvctre_settings_get_use_hardware_shader();
+VVCTRE_PLUGIN_FUNCTION bool vvctre_settings_get_use_hardware_renderer() {
+    return Settings::values.use_hardware_renderer;
+}
 
-VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_hardware_shader_accurate_multiplication(bool value);
-VVCTRE_PLUGIN_FUNCTION bool vvctre_settings_get_hardware_shader_accurate_multiplication();
+VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_use_hardware_shader(bool value) {
+    Settings::values.use_hardware_shader = value;
+}
 
-VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_use_shader_jit(bool value);
-VVCTRE_PLUGIN_FUNCTION bool vvctre_settings_get_use_shader_jit();
+VVCTRE_PLUGIN_FUNCTION bool vvctre_settings_get_use_hardware_shader() {
+    return Settings::values.use_hardware_shader;
+}
 
-VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_enable_vsync(bool value);
-VVCTRE_PLUGIN_FUNCTION bool vvctre_settings_get_enable_vsync();
+VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_hardware_shader_accurate_multiplication(
+    bool value) {
+    Settings::values.hardware_shader_accurate_multiplication = value;
+}
 
-VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_dump_textures(bool value);
-VVCTRE_PLUGIN_FUNCTION bool vvctre_settings_get_dump_textures();
+VVCTRE_PLUGIN_FUNCTION bool vvctre_settings_get_hardware_shader_accurate_multiplication() {
+    return Settings::values.hardware_shader_accurate_multiplication;
+}
 
-VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_custom_textures(bool value);
-VVCTRE_PLUGIN_FUNCTION bool vvctre_settings_get_custom_textures();
+VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_use_shader_jit(bool value) {
+    Settings::values.use_shader_jit = value;
+}
 
-VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_preload_textures(bool value);
-VVCTRE_PLUGIN_FUNCTION bool vvctre_settings_get_preload_textures();
+VVCTRE_PLUGIN_FUNCTION bool vvctre_settings_get_use_shader_jit() {
+    return Settings::values.use_shader_jit;
+}
 
-VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_enable_linear_filtering(bool value);
-VVCTRE_PLUGIN_FUNCTION bool vvctre_settings_get_enable_linear_filtering();
+VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_enable_vsync(bool value) {
+    Settings::values.enable_vsync = value;
+}
 
-VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_sharper_distant_objects(bool value);
-VVCTRE_PLUGIN_FUNCTION bool vvctre_settings_get_sharper_distant_objects();
+VVCTRE_PLUGIN_FUNCTION bool vvctre_settings_get_enable_vsync() {
+    return Settings::values.enable_vsync;
+}
 
-VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_resolution(u16 value);
-VVCTRE_PLUGIN_FUNCTION u16 vvctre_settings_get_resolution();
+VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_dump_textures(bool value) {
+    Settings::values.dump_textures = value;
+}
 
-VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_background_color_red(float value);
-VVCTRE_PLUGIN_FUNCTION float vvctre_settings_get_background_color_red();
+VVCTRE_PLUGIN_FUNCTION bool vvctre_settings_get_dump_textures() {
+    return Settings::values.dump_textures;
+}
 
-VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_background_color_green(float value);
-VVCTRE_PLUGIN_FUNCTION float vvctre_settings_get_background_color_green();
+VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_custom_textures(bool value) {
+    Settings::values.custom_textures = value;
+}
 
-VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_background_color_blue(float value);
-VVCTRE_PLUGIN_FUNCTION float vvctre_settings_get_background_color_blue();
+VVCTRE_PLUGIN_FUNCTION bool vvctre_settings_get_custom_textures() {
+    return Settings::values.custom_textures;
+}
 
-VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_post_processing_shader(const char* value);
-VVCTRE_PLUGIN_FUNCTION const char* vvctre_settings_get_post_processing_shader();
+VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_preload_textures(bool value) {
+    Settings::values.preload_textures = value;
+}
 
-VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_texture_filter(const char* value);
-VVCTRE_PLUGIN_FUNCTION const char* vvctre_settings_get_texture_filter();
+VVCTRE_PLUGIN_FUNCTION bool vvctre_settings_get_preload_textures() {
+    return Settings::values.preload_textures;
+}
 
-VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_render_3d(int value);
-VVCTRE_PLUGIN_FUNCTION int vvctre_settings_get_render_3d();
+VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_enable_linear_filtering(bool value) {
+    Settings::values.enable_linear_filtering = value;
+}
 
-VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_factor_3d(u8 value);
-VVCTRE_PLUGIN_FUNCTION u8 vvctre_settings_get_factor_3d();
+VVCTRE_PLUGIN_FUNCTION bool vvctre_settings_get_enable_linear_filtering() {
+    return Settings::values.enable_linear_filtering;
+}
+
+VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_sharper_distant_objects(bool value) {
+    Settings::values.sharper_distant_objects = value;
+}
+
+VVCTRE_PLUGIN_FUNCTION bool vvctre_settings_get_sharper_distant_objects() {
+    return Settings::values.sharper_distant_objects;
+}
+
+VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_resolution(u16 value) {
+    Settings::values.resolution = value;
+}
+
+VVCTRE_PLUGIN_FUNCTION u16 vvctre_settings_get_resolution() {
+    return Settings::values.resolution;
+}
+
+VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_background_color_red(float value) {
+    Settings::values.background_color_red = value;
+}
+
+VVCTRE_PLUGIN_FUNCTION float vvctre_settings_get_background_color_red() {
+    return Settings::values.background_color_red;
+}
+
+VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_background_color_green(float value) {
+    Settings::values.background_color_green = value;
+}
+
+VVCTRE_PLUGIN_FUNCTION float vvctre_settings_get_background_color_green() {
+    return Settings::values.background_color_green;
+}
+
+VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_background_color_blue(float value) {
+    Settings::values.background_color_blue = value;
+}
+
+VVCTRE_PLUGIN_FUNCTION float vvctre_settings_get_background_color_blue() {
+    return Settings::values.background_color_blue;
+}
+
+VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_post_processing_shader(const char* value) {
+    Settings::values.post_processing_shader = std::string(value);
+}
+
+VVCTRE_PLUGIN_FUNCTION const char* vvctre_settings_get_post_processing_shader() {
+    return Settings::values.post_processing_shader.c_str();
+}
+
+VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_texture_filter(const char* value) {
+    Settings::values.texture_filter = std::string(value);
+}
+
+VVCTRE_PLUGIN_FUNCTION const char* vvctre_settings_get_texture_filter() {
+    return Settings::values.texture_filter.c_str();
+}
+
+VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_render_3d(int value) {
+    Settings::values.render_3d = static_cast<Settings::StereoRenderOption>(value);
+}
+
+VVCTRE_PLUGIN_FUNCTION int vvctre_settings_get_render_3d() {
+    return static_cast<int>(Settings::values.render_3d);
+}
+
+VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_factor_3d(u8 value) {
+    Settings::values.factor_3d = value;
+}
+
+VVCTRE_PLUGIN_FUNCTION u8 vvctre_settings_get_factor_3d() {
+    return Settings::values.factor_3d.load();
+}
 
 // Controls Settings
-VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_button(int index, const char* params);
-VVCTRE_PLUGIN_FUNCTION const char* vvctre_settings_get_button(int index);
+VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_button(int index, const char* params) {
+    Settings::values.buttons[index] = std::string(params);
+}
 
-VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_analog(int index, const char* params);
-VVCTRE_PLUGIN_FUNCTION const char* vvctre_settings_get_analog(int index);
+VVCTRE_PLUGIN_FUNCTION const char* vvctre_settings_get_button(int index) {
+    return Settings::values.buttons[index].c_str();
+}
 
-VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_motion_device(const char* params);
-VVCTRE_PLUGIN_FUNCTION const char* vvctre_settings_get_motion_device();
+VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_analog(int index, const char* params) {
+    Settings::values.analogs[index] = std::string(params);
+}
 
-VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_touch_device(const char* params);
-VVCTRE_PLUGIN_FUNCTION const char* vvctre_settings_get_touch_device();
+VVCTRE_PLUGIN_FUNCTION const char* vvctre_settings_get_analog(int index) {
+    return Settings::values.analogs[index].c_str();
+}
 
-VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_cemuhookudp_address(const char* value);
-VVCTRE_PLUGIN_FUNCTION const char* vvctre_settings_get_cemuhookudp_address();
+VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_motion_device(const char* params) {
+    Settings::values.motion_device = std::string(params);
+}
 
-VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_cemuhookudp_port(u16 value);
-VVCTRE_PLUGIN_FUNCTION u16 vvctre_settings_get_cemuhookudp_port();
+VVCTRE_PLUGIN_FUNCTION const char* vvctre_settings_get_motion_device() {
+    return Settings::values.motion_device.c_str();
+}
 
-VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_cemuhookudp_pad_index(u8 value);
-VVCTRE_PLUGIN_FUNCTION u8 vvctre_settings_get_cemuhookudp_pad_index();
+VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_touch_device(const char* params) {
+    Settings::values.touch_device = std::string(params);
+}
+
+VVCTRE_PLUGIN_FUNCTION const char* vvctre_settings_get_touch_device() {
+    return Settings::values.touch_device.c_str();
+}
+
+VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_cemuhookudp_address(const char* value) {
+    Settings::values.cemuhookudp_address = std::string(value);
+}
+
+VVCTRE_PLUGIN_FUNCTION const char* vvctre_settings_get_cemuhookudp_address() {
+    return Settings::values.cemuhookudp_address.c_str();
+}
+
+VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_cemuhookudp_port(u16 value) {
+    Settings::values.cemuhookudp_port = value;
+}
+
+VVCTRE_PLUGIN_FUNCTION u16 vvctre_settings_get_cemuhookudp_port() {
+    return Settings::values.cemuhookudp_port;
+}
+
+VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_cemuhookudp_pad_index(u8 value) {
+    Settings::values.cemuhookudp_pad_index = value;
+}
+
+VVCTRE_PLUGIN_FUNCTION u8 vvctre_settings_get_cemuhookudp_pad_index() {
+    return Settings::values.cemuhookudp_pad_index;
+}
 
 // Layout Settings
 VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_layout(int value);
+
 VVCTRE_PLUGIN_FUNCTION int vvctre_settings_get_layout();
 
 VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_swap_screens(bool value);
+
 VVCTRE_PLUGIN_FUNCTION bool vvctre_settings_get_swap_screens();
 
 VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_upright_screens(bool value);
+
 VVCTRE_PLUGIN_FUNCTION bool vvctre_settings_get_upright_screens();
 
 VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_use_custom_layout(bool value);
+
 VVCTRE_PLUGIN_FUNCTION bool vvctre_settings_get_use_custom_layout();
 
 VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_custom_layout_top_left(u16 value);
+
 VVCTRE_PLUGIN_FUNCTION u16 vvctre_settings_get_custom_layout_top_left();
 
 VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_custom_layout_top_top(u16 value);
+
 VVCTRE_PLUGIN_FUNCTION u16 vvctre_settings_get_custom_layout_top_top();
 
 VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_custom_layout_top_right(u16 value);
+
 VVCTRE_PLUGIN_FUNCTION u16 vvctre_settings_get_custom_layout_top_right();
 
 VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_custom_layout_top_bottom(u16 value);
+
 VVCTRE_PLUGIN_FUNCTION u16 vvctre_settings_get_custom_layout_top_bottom();
 
 VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_custom_layout_bottom_left(u16 value);
+
 VVCTRE_PLUGIN_FUNCTION u16 vvctre_settings_get_custom_layout_bottom_left();
 
 VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_custom_layout_bottom_top(u16 value);
+
 VVCTRE_PLUGIN_FUNCTION u16 vvctre_settings_get_custom_layout_bottom_top();
 
 VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_custom_layout_bottom_right(u16 value);
+
 VVCTRE_PLUGIN_FUNCTION u16 vvctre_settings_get_custom_layout_bottom_right();
 
 VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_custom_layout_bottom_bottom(u16 value);
+
 VVCTRE_PLUGIN_FUNCTION u16 vvctre_settings_get_custom_layout_bottom_bottom();
 
 // LLE Modules Settings
 VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_use_lle_module(const char* name, bool value);
+
 VVCTRE_PLUGIN_FUNCTION bool vvctre_settings_get_use_lle_module(const char* name);
 
 // Other
@@ -927,4 +1066,5 @@ VVCTRE_PLUGIN_FUNCTION bool vvctre_emulation_running(void* core) {
 }
 
 VVCTRE_PLUGIN_FUNCTION void vvctre_set_play_coins(u16 value);
+
 VVCTRE_PLUGIN_FUNCTION u16 vvctre_get_play_coins();
