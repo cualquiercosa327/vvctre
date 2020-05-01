@@ -78,7 +78,7 @@ const FormatTuple& GetFormatTuple(PixelFormat pixel_format) {
  * Originally from https://github.com/apitrace/apitrace/blob/master/retrace/glstate_images.cpp
  */
 static void GetTexImage(GLenum target, GLint level, GLenum format, GLenum type, GLint height,
-                        GLint width, GLint depth, GLubyte* pixels, GLuint size) {
+                        GLint width, GLint depth, GLubyte* pixels, std::size_t size) {
     std::memset(pixels, 0x80, size);
 
     OpenGLState cur_state = OpenGLState::GetCurState();
