@@ -1278,17 +1278,18 @@ Surface RasterizerCacheOpenGL::GetTextureSurface(const Pica::Texture::TextureInf
         state.draw.read_framebuffer = read_framebuffer.handle;
         state.draw.draw_framebuffer = draw_framebuffer.handle;
         state.ResetTexture(surface->texture.handle);
-        SurfaceParams params = *surface;
+        SurfaceParams surface_params = *surface;
         for (u32 level = 1; level <= max_level; ++level) {
             // In PICA all mipmap levels are stored next to each other
-            params.addr += params.width * params.height * params.GetFormatBpp() / 8;
-            params.width /= 2;
-            params.height /= 2;
-            params.stride = 0; // reset stride and let UpdateParams re-initialize it
-            params.UpdateParams();
+            surface_params.addr +=
+                surface_params.width * surface_params.height * surface_params.GetFormatBpp() / 8;
+            surface_params.width /= 2;
+            surface_params.height /= 2;
+            surface_params.stride = 0; // reset stride and let UpdateParams re-initialize it
+            surface_params.UpdateParams();
             auto& watcher = surface->level_watchers[level - 1];
             if (!watcher || !watcher->Get()) {
-                auto level_surface = GetSurface(params, ScaleMatch::Ignore, true);
+                auto level_surface = GetSurface(surface_params, ScaleMatch::Ignore, true);
                 if (level_surface) {
                     watcher = level_surface->CreateWatcher();
                 } else {
@@ -1315,7 +1316,7 @@ Surface RasterizerCacheOpenGL::GetTextureSurface(const Pica::Texture::TextureInf
                                            GL_TEXTURE_2D, 0, 0);
 
                     auto src_rect = level_surface->GetScaledRect();
-                    auto dst_rect = params.GetScaledRect();
+                    auto dst_rect = surface_params.GetScaledRect();
                     glBlitFramebuffer(src_rect.left, src_rect.bottom, src_rect.right, src_rect.top,
                                       dst_rect.left, dst_rect.bottom, dst_rect.right, dst_rect.top,
                                       GL_COLOR_BUFFER_BIT, GL_LINEAR);
