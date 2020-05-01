@@ -242,14 +242,14 @@ struct hash<OpenGL::PicaFSConfig> {
 
 template <>
 struct hash<OpenGL::PicaVSConfig> {
-    std::size_t operator()(const OpenGL::PicaVSConfig& k) const {
+    std::size_t operator()(const OpenGL::PicaVSConfig& k) const noexcept {
         return k.Hash();
     }
 };
 
 template <>
 struct hash<OpenGL::PicaFixedGSConfig> {
-    std::size_t operator()(const OpenGL::PicaFixedGSConfig& k) const {
+    std::size_t operator()(const OpenGL::PicaFixedGSConfig& k) const noexcept {
         return k.Hash();
     }
 };
