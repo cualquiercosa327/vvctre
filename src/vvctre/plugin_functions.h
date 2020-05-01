@@ -120,6 +120,10 @@ VVCTRE_PLUGIN_FUNCTION void vvctre_set_custom_motion_state(void* core, float acc
                                                            float gyroscope[3]);
 VVCTRE_PLUGIN_FUNCTION void vvctre_use_real_motion_state(void* core);
 
+// Settings
+VVCTRE_PLUGIN_FUNCTION void vvctre_settings_apply();
+VVCTRE_PLUGIN_FUNCTION void vvctre_settings_log();
+
 // Start Settings
 VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_file_path(const char* value);
 VVCTRE_PLUGIN_FUNCTION const char* vvctre_settings_get_file_path();

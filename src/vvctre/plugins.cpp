@@ -552,6 +552,15 @@ VVCTRE_PLUGIN_FUNCTION void vvctre_use_real_motion_state(void* core) {
     hid->SetCustomPadState(std::nullopt);
 }
 
+// Settings
+VVCTRE_PLUGIN_FUNCTION void vvctre_settings_apply() {
+    Settings::Apply();
+}
+
+VVCTRE_PLUGIN_FUNCTION void vvctre_settings_log() {
+    Settings::LogSettings();
+}
+
 // Start Settings
 VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_file_path(const char* value) {
     Settings::values.file_path = std::string(value);
@@ -617,16 +626,34 @@ VVCTRE_PLUGIN_FUNCTION u64 vvctre_settings_get_unix_timestamp() {
     return Settings::values.unix_timestamp;
 }
 
-VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_use_virtual_sd(bool value);
-VVCTRE_PLUGIN_FUNCTION bool vvctre_settings_get_use_virtual_sd();
+VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_use_virtual_sd(bool value) {
+    Settings::values.use_virtual_sd = value;
+}
 
-VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_start_in_fullscreen_mode(bool value);
-VVCTRE_PLUGIN_FUNCTION bool vvctre_settings_get_start_in_fullscreen_mode();
+VVCTRE_PLUGIN_FUNCTION bool vvctre_settings_get_use_virtual_sd() {
+    return Settings::values.use_virtual_sd;
+}
 
-VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_record_frame_times(bool value);
-VVCTRE_PLUGIN_FUNCTION bool vvctre_settings_get_record_frame_times();
+VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_start_in_fullscreen_mode(bool value) {
+    Settings::values.start_in_fullscreen_mode = value;
+}
 
-VVCTRE_PLUGIN_FUNCTION void vvctre_settings_enable_gdbstub(u16 port);
+VVCTRE_PLUGIN_FUNCTION bool vvctre_settings_get_start_in_fullscreen_mode() {
+    return Settings::values.start_in_fullscreen_mode;
+}
+
+VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_record_frame_times(bool value) {
+    Settings::values.record_frame_times = value;
+}
+
+VVCTRE_PLUGIN_FUNCTION bool vvctre_settings_get_record_frame_times() {
+    return Settings::values.record_frame_times;
+}
+
+VVCTRE_PLUGIN_FUNCTION void vvctre_settings_enable_gdbstub(u16 port) {
+    Settings::values.use_gdbstub = true;
+    Settings::values.gdbstub_port = port;
+}
 VVCTRE_PLUGIN_FUNCTION void vvctre_settings_disable_gdbstub();
 
 VVCTRE_PLUGIN_FUNCTION bool vvctre_settings_is_gdb_stub_enabled();
