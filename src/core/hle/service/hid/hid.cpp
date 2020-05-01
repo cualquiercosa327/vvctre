@@ -363,7 +363,7 @@ void Module::Interface::GetGyroscopeLowCalibrateParam(Kernel::HLERequestContext&
 void Module::Interface::GetSoundVolume(Kernel::HLERequestContext& ctx) {
     IPC::RequestParser rp{ctx, 0x17, 0, 0};
 
-    const u8 volume = static_cast<u8>(0x3F * Settings::values.volume);
+    const u8 volume = static_cast<u8>(0x3F * Settings::values.audio_volume);
 
     IPC::RequestBuilder rb = rp.MakeBuilder(2, 0);
     rb.Push(RESULT_SUCCESS);

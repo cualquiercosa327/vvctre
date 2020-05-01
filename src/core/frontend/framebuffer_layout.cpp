@@ -334,14 +334,14 @@ FramebufferLayout CustomFrameLayout(u32 width, u32 height) {
     ASSERT(width > 0);
     ASSERT(height > 0);
 
-    FramebufferLayout res{width, height, true, true, {}, {}, !Settings::values.upright_screen};
+    FramebufferLayout res{width, height, true, true, {}, {}, !Settings::values.upright_screens};
 
     Common::Rectangle<u32> top_screen{
-        Settings::values.custom_top_left, Settings::values.custom_top_top,
-        Settings::values.custom_top_right, Settings::values.custom_top_bottom};
+        Settings::values.custom_layout_top_left, Settings::values.custom_layout_top_top,
+        Settings::values.custom_layout_top_right, Settings::values.custom_layout_top_bottom};
     Common::Rectangle<u32> bot_screen{
-        Settings::values.custom_bottom_left, Settings::values.custom_bottom_top,
-        Settings::values.custom_bottom_right, Settings::values.custom_bottom_bottom};
+        Settings::values.custom_layout_bottom_left, Settings::values.custom_layout_bottom_top,
+        Settings::values.custom_layout_bottom_right, Settings::values.custom_layout_bottom_bottom};
 
     res.top_screen = top_screen;
     res.bottom_screen = bot_screen;
@@ -350,16 +350,17 @@ FramebufferLayout CustomFrameLayout(u32 width, u32 height) {
 
 FramebufferLayout FrameLayoutFromResolutionScale(u32 res_scale) {
     FramebufferLayout layout;
-    if (Settings::values.custom_layout == true) {
-        layout = CustomFrameLayout(
-            std::max(Settings::values.custom_top_right, Settings::values.custom_bottom_right),
-            std::max(Settings::values.custom_top_bottom, Settings::values.custom_bottom_bottom));
+    if (Settings::values.use_custom_layout == true) {
+        layout = CustomFrameLayout(std::max(Settings::values.custom_layout_top_right,
+                                            Settings::values.custom_layout_bottom_right),
+                                   std::max(Settings::values.custom_layout_top_bottom,
+                                            Settings::values.custom_layout_bottom_bottom));
     } else {
         int width, height;
-        switch (Settings::values.layout_option) {
-        case Settings::LayoutOption::SingleScreen:
-            if (Settings::values.upright_screen) {
-                if (Settings::values.swap_screen) {
+        switch (Settings::values.layout) {
+        case Settings::Layout::SingleScreen:
+            if (Settings::values.upright_screens) {
+                if (Settings::values.swap_screens) {
                     width = Core::kScreenBottomHeight * res_scale;
                     height = Core::kScreenBottomWidth * res_scale;
                 } else {
@@ -367,7 +368,7 @@ FramebufferLayout FrameLayoutFromResolutionScale(u32 res_scale) {
                     height = Core::kScreenTopWidth * res_scale;
                 }
             } else {
-                if (Settings::values.swap_screen) {
+                if (Settings::values.swap_screens) {
                     width = Core::kScreenBottomWidth * res_scale;
                     height = Core::kScreenBottomHeight * res_scale;
                 } else {
@@ -375,12 +376,12 @@ FramebufferLayout FrameLayoutFromResolutionScale(u32 res_scale) {
                     height = Core::kScreenTopHeight * res_scale;
                 }
             }
-            layout = SingleFrameLayout(width, height, Settings::values.swap_screen,
-                                       Settings::values.upright_screen);
+            layout = SingleFrameLayout(width, height, Settings::values.swap_screens,
+                                       Settings::values.upright_screens);
             break;
-        case Settings::LayoutOption::LargeScreen:
-            if (Settings::values.upright_screen) {
-                if (Settings::values.swap_screen) {
+        case Settings::Layout::LargeScreen:
+            if (Settings::values.upright_screens) {
+                if (Settings::values.swap_screens) {
                     width = Core::kScreenBottomHeight * res_scale;
                     height = (Core::kScreenBottomWidth + Core::kScreenTopWidth / 4) * res_scale;
                 } else {
@@ -388,7 +389,7 @@ FramebufferLayout FrameLayoutFromResolutionScale(u32 res_scale) {
                     height = (Core::kScreenTopWidth + Core::kScreenBottomWidth / 4) * res_scale;
                 }
             } else {
-                if (Settings::values.swap_screen) {
+                if (Settings::values.swap_screens) {
                     width = (Core::kScreenBottomWidth + Core::kScreenTopWidth / 4) * res_scale;
                     height = Core::kScreenBottomHeight * res_scale;
                 } else {
@@ -396,32 +397,32 @@ FramebufferLayout FrameLayoutFromResolutionScale(u32 res_scale) {
                     height = Core::kScreenTopHeight * res_scale;
                 }
             }
-            layout = LargeFrameLayout(width, height, Settings::values.swap_screen,
-                                      Settings::values.upright_screen);
+            layout = LargeFrameLayout(width, height, Settings::values.swap_screens,
+                                      Settings::values.upright_screens);
             break;
-        case Settings::LayoutOption::SideScreen:
-            if (Settings::values.upright_screen) {
+        case Settings::Layout::SideScreen:
+            if (Settings::values.upright_screens) {
                 width = Core::kScreenTopHeight * res_scale;
                 height = (Core::kScreenTopWidth + Core::kScreenBottomWidth) * res_scale;
             } else {
                 width = (Core::kScreenTopWidth + Core::kScreenBottomWidth) * res_scale;
                 height = Core::kScreenTopHeight * res_scale;
             }
-            layout = SideFrameLayout(width, height, Settings::values.swap_screen,
-                                     Settings::values.upright_screen);
+            layout = SideFrameLayout(width, height, Settings::values.swap_screens,
+                                     Settings::values.upright_screens);
             break;
-        case Settings::LayoutOption::MediumScreen: // TODO
-        case Settings::LayoutOption::Default:
+        case Settings::Layout::MediumScreen: // TODO
+        case Settings::Layout::Default:
         default:
-            if (Settings::values.upright_screen) {
+            if (Settings::values.upright_screens) {
                 width = (Core::kScreenTopHeight + Core::kScreenBottomHeight) * res_scale;
                 height = Core::kScreenTopWidth * res_scale;
             } else {
                 width = Core::kScreenTopWidth * res_scale;
                 height = (Core::kScreenTopHeight + Core::kScreenBottomHeight) * res_scale;
             }
-            layout = DefaultFrameLayout(width, height, Settings::values.swap_screen,
-                                        Settings::values.upright_screen);
+            layout = DefaultFrameLayout(width, height, Settings::values.swap_screens,
+                                        Settings::values.upright_screens);
             break;
         }
     }

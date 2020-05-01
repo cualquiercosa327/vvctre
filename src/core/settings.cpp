@@ -27,16 +27,17 @@ void Apply() {
     GDBStub::ToggleServer(values.use_gdbstub);
     InputCommon::ReloadInputDevices();
 
-    VideoCore::g_hw_renderer_enabled = values.use_hw_renderer;
+    VideoCore::g_hardware_renderer_enabled = values.use_hardware_renderer;
     VideoCore::g_shader_jit_enabled = values.use_shader_jit;
-    VideoCore::g_hw_shader_enabled = values.use_hw_shader;
-    VideoCore::g_hw_shader_accurate_mul = values.shaders_accurate_mul;
+    VideoCore::g_hardware_shader_enabled = values.use_hardware_shader;
+    VideoCore::g_hardware_shader_accurate_multiplication =
+        values.hardware_shader_accurate_multiplication;
 
     if (VideoCore::g_renderer) {
         VideoCore::g_renderer->UpdateCurrentFramebufferLayout();
     }
 
-    VideoCore::g_renderer_bg_color_update_requested = true;
+    VideoCore::g_renderer_background_color_update_requested = true;
     VideoCore::g_renderer_sampler_update_requested = true;
     VideoCore::g_renderer_shader_update_requested = true;
     VideoCore::g_texture_filter_update_requested = true;
@@ -44,7 +45,7 @@ void Apply() {
     auto& system = Core::System::GetInstance();
     if (system.IsPoweredOn()) {
         AudioCore::DspInterface& dsp = system.DSP();
-        dsp.SetSink(values.sink_id, values.audio_device_id);
+        dsp.SetSink(values.audio_sink_id, values.audio_device_id);
 
         auto hid = Service::HID::GetModule(system);
         if (hid) {
@@ -124,8 +125,8 @@ void LogSettings() {
         } else {
             LOG_INFO(Settings, "\t[ ] Use CPU JIT");
         }
-        if (values.use_frame_limit) {
-            LOG_INFO(Settings, "\t[x] Limit Speed To {}", values.frame_limit);
+        if (values.limit_speed) {
+            LOG_INFO(Settings, "\t[x] Limit Speed To {}", values.speed_limit);
         } else {
             LOG_INFO(Settings, "\t[ ] Limit Speed");
         }
@@ -140,22 +141,21 @@ void LogSettings() {
         LOG_INFO(Settings, "Camera:");
         LOG_INFO(
             Settings, "\tInner Camera Engine: {}",
-            values.camera_name[static_cast<std::size_t>(Service::CAM::CameraIndex::InnerCamera)]);
-        LOG_INFO(
-            Settings, "\tInner Camera Configuration: {}",
-            values.camera_config[static_cast<std::size_t>(Service::CAM::CameraIndex::InnerCamera)]);
-        LOG_INFO(
-            Settings, "\tOuter Left Camera Engine: {}",
-            values
-                .camera_name[static_cast<std::size_t>(Service::CAM::CameraIndex::OuterLeftCamera)]);
+            values.camera_engine[static_cast<std::size_t>(Service::CAM::CameraIndex::InnerCamera)]);
+        LOG_INFO(Settings, "\tInner Camera Configuration: {}",
+                 values.camera_parameter[static_cast<std::size_t>(
+                     Service::CAM::CameraIndex::InnerCamera)]);
+        LOG_INFO(Settings, "\tOuter Left Camera Engine: {}",
+                 values.camera_engine[static_cast<std::size_t>(
+                     Service::CAM::CameraIndex::OuterLeftCamera)]);
         LOG_INFO(Settings, "\tOuter Left Camera Configuration: {}",
-                 values.camera_config[static_cast<std::size_t>(
+                 values.camera_parameter[static_cast<std::size_t>(
                      Service::CAM::CameraIndex::OuterLeftCamera)]);
         LOG_INFO(Settings, "\tOuter Right Camera Engine: {}",
-                 values.camera_name[static_cast<std::size_t>(
+                 values.camera_engine[static_cast<std::size_t>(
                      Service::CAM::CameraIndex::OuterRightCamera)]);
         LOG_INFO(Settings, "\tOuter Right Camera Configuration: {}",
-                 values.camera_config[static_cast<std::size_t>(
+                 values.camera_parameter[static_cast<std::size_t>(
                      Service::CAM::CameraIndex::OuterRightCamera)]);
     }
     {
@@ -494,14 +494,14 @@ void LogSettings() {
     }
     {
         LOG_INFO(Settings, "Graphics:");
-        if (values.use_hw_renderer) {
+        if (values.use_hardware_renderer) {
             LOG_INFO(Settings, "\t[x] Use Hardware Renderer");
         } else {
             LOG_INFO(Settings, "\t[ ] Use Hardware Renderer");
         }
-        if (values.use_hw_shader) {
+        if (values.use_hardware_shader) {
             LOG_INFO(Settings, "\t\t[x] Use Hardware Shader");
-            if (values.shaders_accurate_mul) {
+            if (values.hardware_shader_accurate_multiplication) {
                 LOG_INFO(Settings, "\t\t\t[x] Accurate Multiplication");
             } else {
                 LOG_INFO(Settings, "\t\t\t[ ] Accurate Multiplication");
@@ -534,7 +534,7 @@ void LogSettings() {
         } else {
             LOG_INFO(Settings, "\t[ ] Preload Custom Textures");
         }
-        if (values.filter_mode) {
+        if (values.enable_linear_filtering) {
             LOG_INFO(Settings, "\t[x] Enable Linear Filtering");
         } else {
             LOG_INFO(Settings, "\t[ ] Enable Linear Filtering");
@@ -544,12 +544,13 @@ void LogSettings() {
         } else {
             LOG_INFO(Settings, "\t[ ] Sharper Distant Objects");
         }
-        LOG_INFO(Settings, "\tResolution: {}x", values.resolution_factor);
+        LOG_INFO(Settings, "\tResolution: {}x", values.resolution);
         LOG_INFO(Settings, "\tBackground Color: #{:02x}{:02x}{:02x}",
-                 static_cast<int>(values.bg_red * 255), static_cast<int>(values.bg_green * 255),
-                 static_cast<int>(values.bg_blue * 255));
-        LOG_INFO(Settings, "\tPost Processing Shader: {}", values.pp_shader_name);
-        LOG_INFO(Settings, "\tTexture Filter: {}", values.texture_filter_name);
+                 static_cast<int>(values.background_color_red * 255),
+                 static_cast<int>(values.background_color_green * 255),
+                 static_cast<int>(values.background_color_blue * 255));
+        LOG_INFO(Settings, "\tPost Processing Shader: {}", values.post_processing_shader);
+        LOG_INFO(Settings, "\tTexture Filter: {}", values.texture_filter);
         LOG_INFO(
             Settings, "\t3D: {} {}%",
             [] {
@@ -685,25 +686,25 @@ void LogSettings() {
             }
 
             if (use_cemuhookudp) {
-                LOG_INFO(Settings, "\tCemuhookUDP: {}:{} Pad {}", values.udp_input_address,
-                         values.udp_input_port, values.udp_pad_index);
+                LOG_INFO(Settings, "\tCemuhookUDP: {}:{} Pad {}", values.cemuhookudp_address,
+                         values.cemuhookudp_port, values.cemuhookudp_pad_index);
             }
         }
     }
     {
         LOG_INFO(Settings, "Layout:");
-        if (!values.custom_layout) {
+        if (!values.use_custom_layout) {
             LOG_INFO(Settings, "\tLayout: {}", [] {
-                switch (values.layout_option) {
-                case Settings::LayoutOption::Default:
+                switch (values.layout) {
+                case Settings::Layout::Default:
                     return "Default";
-                case Settings::LayoutOption::SingleScreen:
+                case Settings::Layout::SingleScreen:
                     return "Single Screen";
-                case Settings::LayoutOption::LargeScreen:
+                case Settings::Layout::LargeScreen:
                     return "Large Screen";
-                case Settings::LayoutOption::SideScreen:
+                case Settings::Layout::SideScreen:
                     return "Side by Side";
-                case Settings::LayoutOption::MediumScreen:
+                case Settings::Layout::MediumScreen:
                     return "Medium Screen";
                 default:
                     break;
@@ -712,32 +713,32 @@ void LogSettings() {
                 return "Invalid";
             }());
         }
-        if (values.custom_layout) {
+        if (values.use_custom_layout) {
             LOG_INFO(Settings, "\t[x] Use Custom Layout");
         } else {
             LOG_INFO(Settings, "\t[ ] Use Custom Layout");
         }
-        if (values.swap_screen) {
+        if (values.swap_screens) {
             LOG_INFO(Settings, "\t[x] Swap Screens");
         } else {
             LOG_INFO(Settings, "\t[ ] Swap Screens");
         }
-        if (values.upright_screen) {
+        if (values.upright_screens) {
             LOG_INFO(Settings, "\t[x] Upright Orientation");
         } else {
             LOG_INFO(Settings, "\t[ ] Upright Orientation");
         }
-        if (values.custom_layout) {
+        if (values.use_custom_layout) {
             LOG_INFO(Settings, "\tTop:");
-            LOG_INFO(Settings, "\t\tTop Left: {}", values.custom_top_left);
-            LOG_INFO(Settings, "\t\tTop Top: {}", values.custom_top_top);
-            LOG_INFO(Settings, "\t\tTop Right: {}", values.custom_top_right);
-            LOG_INFO(Settings, "\t\tTop Bottom: {}", values.custom_top_bottom);
+            LOG_INFO(Settings, "\t\tTop Left: {}", values.custom_layout_top_left);
+            LOG_INFO(Settings, "\t\tTop Top: {}", values.custom_layout_top_top);
+            LOG_INFO(Settings, "\t\tTop Right: {}", values.custom_layout_top_right);
+            LOG_INFO(Settings, "\t\tTop Bottom: {}", values.custom_layout_top_bottom);
             LOG_INFO(Settings, "\tBottom:");
-            LOG_INFO(Settings, "\t\tBottom Left: {}", values.custom_bottom_left);
-            LOG_INFO(Settings, "\t\tBottom Top: {}", values.custom_bottom_top);
-            LOG_INFO(Settings, "\t\tBottom Right: {}", values.custom_bottom_right);
-            LOG_INFO(Settings, "\t\tBottom Bottom: {}", values.custom_bottom_bottom);
+            LOG_INFO(Settings, "\t\tBottom Left: {}", values.custom_layout_bottom_left);
+            LOG_INFO(Settings, "\t\tBottom Top: {}", values.custom_layout_bottom_top);
+            LOG_INFO(Settings, "\t\tBottom Right: {}", values.custom_layout_bottom_right);
+            LOG_INFO(Settings, "\t\tBottom Bottom: {}", values.custom_layout_bottom_bottom);
         }
     }
     {

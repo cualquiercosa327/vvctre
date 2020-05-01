@@ -26,11 +26,11 @@ namespace VideoCore {
 extern std::unique_ptr<RendererBase> g_renderer; ///< Renderer plugin
 
 // TODO: Wrap these in a user settings struct along with any other graphics settings
-extern std::atomic<bool> g_hw_renderer_enabled;
+extern std::atomic<bool> g_hardware_renderer_enabled;
 extern std::atomic<bool> g_shader_jit_enabled;
-extern std::atomic<bool> g_hw_shader_enabled;
-extern std::atomic<bool> g_hw_shader_accurate_mul;
-extern std::atomic<bool> g_renderer_bg_color_update_requested;
+extern std::atomic<bool> g_hardware_shader_enabled;
+extern std::atomic<bool> g_hardware_shader_accurate_multiplication;
+extern std::atomic<bool> g_renderer_background_color_update_requested;
 extern std::atomic<bool> g_renderer_sampler_update_requested;
 extern std::atomic<bool> g_renderer_shader_update_requested;
 extern std::atomic<bool> g_texture_filter_update_requested;

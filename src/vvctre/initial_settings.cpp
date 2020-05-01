@@ -37,7 +37,9 @@
 #include "vvctre/initial_settings.h"
 
 InitialSettings::InitialSettings() {
-    const std::string window_title = fmt::format("vvctre {} - Initial Settings", vvctre_version);
+    const std::string window_title =
+        fmt::format("vvctre {}.{}.{} - Initial Settings", vvctre_version_major,
+                    vvctre_version_minor, vvctre_version_patch);
 
     render_window = SDL_CreateWindow(
         window_title.c_str(),
@@ -287,10 +289,10 @@ void InitialSettings::Run() {
                     ImGui::Text("Start Time:");
                     ImGui::SameLine();
                     if (ImGui::BeginCombo("##start_time", [] {
-                            switch (Settings::values.init_clock) {
-                            case Settings::InitClock::SystemTime:
+                            switch (Settings::values.clock) {
+                            case Settings::InitialClock::SystemTime:
                                 return "System";
-                            case Settings::InitClock::FixedTime:
+                            case Settings::InitialClock::FixedTime:
                                 return "Unix Timestamp";
                             default:
                                 break;
@@ -299,19 +301,19 @@ void InitialSettings::Run() {
                             return "Invalid";
                         }())) {
                         if (ImGui::Selectable("System")) {
-                            Settings::values.init_clock = Settings::InitClock::SystemTime;
+                            Settings::values.clock = Settings::InitialClock::SystemTime;
                         }
 
                         if (ImGui::Selectable("Unix Timestamp")) {
-                            Settings::values.init_clock = Settings::InitClock::FixedTime;
+                            Settings::values.clock = Settings::InitialClock::FixedTime;
                         }
 
                         ImGui::EndCombo();
                     }
-                    if (Settings::values.init_clock == Settings::InitClock::FixedTime) {
+                    if (Settings::values.clock == Settings::InitialClock::FixedTime) {
                         ImGui::SameLine();
                         ImGui::InputScalar("##start_time_unix_timestamp", ImGuiDataType_U64,
-                                           &Settings::values.init_time);
+                                           &Settings::values.unix_timestamp);
                     }
 
                     ImGui::Checkbox("Use Virtual SD Card", &Settings::values.use_virtual_sd);
@@ -342,15 +344,15 @@ void InitialSettings::Run() {
                     ImGui::NewLine();
 
                     ImGui::Checkbox("Use CPU JIT", &Settings::values.use_cpu_jit);
-                    ImGui::Checkbox("Limit Speed", &Settings::values.use_frame_limit);
+                    ImGui::Checkbox("Limit Speed", &Settings::values.limit_speed);
 
-                    if (Settings::values.use_frame_limit) {
+                    if (Settings::values.limit_speed) {
                         ImGui::SameLine();
                         ImGui::Text("To");
                         ImGui::SameLine();
                         ImGui::PushItemWidth(45);
                         ImGui::InputScalar("##speedlimit", ImGuiDataType_U16,
-                                           &Settings::values.frame_limit);
+                                           &Settings::values.speed_limit);
                         ImGui::PopItemWidth();
                         ImGui::SameLine();
                         ImGui::Text("%");
@@ -389,17 +391,17 @@ void InitialSettings::Run() {
 
                     ImGui::Text("Volume:");
                     ImGui::SameLine();
-                    ImGui::SliderFloat("##volume", &Settings::values.volume, 0.0f, 1.0f);
+                    ImGui::SliderFloat("##volume", &Settings::values.audio_volume, 0.0f, 1.0f);
 
                     ImGui::Text("Sink:");
                     ImGui::SameLine();
-                    if (ImGui::BeginCombo("##sink", Settings::values.sink_id.c_str())) {
+                    if (ImGui::BeginCombo("##sink", Settings::values.audio_sink_id.c_str())) {
                         if (ImGui::Selectable("auto")) {
-                            Settings::values.sink_id = "auto";
+                            Settings::values.audio_sink_id = "auto";
                         }
                         for (const auto& sink : AudioCore::GetSinkIDs()) {
                             if (ImGui::Selectable(sink)) {
-                                Settings::values.sink_id = sink;
+                                Settings::values.audio_sink_id = sink;
                             }
                         }
                         ImGui::EndCombo();
@@ -413,7 +415,7 @@ void InitialSettings::Run() {
                         }
 
                         for (const auto& device :
-                             AudioCore::GetDeviceListForSink(Settings::values.sink_id)) {
+                             AudioCore::GetDeviceListForSink(Settings::values.audio_sink_id)) {
                             if (ImGui::Selectable(device.c_str())) {
                                 Settings::values.audio_device_id = device;
                             }
@@ -424,8 +426,8 @@ void InitialSettings::Run() {
 
                     ImGui::Text("Microphone Input Type:");
                     ImGui::SameLine();
-                    if (ImGui::BeginCombo("##mic_input_type", [] {
-                            switch (Settings::values.mic_input_type) {
+                    if (ImGui::BeginCombo("##microphone_input_type", [] {
+                            switch (Settings::values.microphone_input_type) {
                             case Settings::MicInputType::None:
                                 return "Disabled";
                             case Settings::MicInputType::Real:
@@ -439,27 +441,27 @@ void InitialSettings::Run() {
                             return "Invalid";
                         }())) {
                         if (ImGui::Selectable("Disabled")) {
-                            Settings::values.mic_input_type = Settings::MicInputType::None;
+                            Settings::values.microphone_input_type = Settings::MicInputType::None;
                         }
                         if (ImGui::Selectable("Real Device")) {
-                            Settings::values.mic_input_type = Settings::MicInputType::Real;
+                            Settings::values.microphone_input_type = Settings::MicInputType::Real;
                         }
                         if (ImGui::Selectable("Static Noise")) {
-                            Settings::values.mic_input_type = Settings::MicInputType::Static;
+                            Settings::values.microphone_input_type = Settings::MicInputType::Static;
                         }
                         ImGui::EndCombo();
                     }
 
-                    if (Settings::values.mic_input_type == Settings::MicInputType::Real) {
+                    if (Settings::values.microphone_input_type == Settings::MicInputType::Real) {
                         ImGui::Text("Microphone Device");
                         ImGui::SameLine();
 
                         if (ImGui::BeginCombo("##microphonedevice",
-                                              Settings::values.mic_input_device.c_str())) {
+                                              Settings::values.microphone_input_device.c_str())) {
 #ifdef HAVE_CUBEB
                             for (const auto& device : AudioCore::ListCubebInputDevices()) {
                                 if (ImGui::Selectable(device.c_str())) {
-                                    Settings::values.mic_input_device = device;
+                                    Settings::values.microphone_input_device = device;
                                 }
                             }
 #endif
@@ -479,15 +481,15 @@ void InitialSettings::Run() {
                     ImGui::SameLine();
                     if (ImGui::BeginCombo("##innerengine",
                                           Settings::values
-                                              .camera_name[static_cast<std::size_t>(
+                                              .camera_engine[static_cast<std::size_t>(
                                                   Service::CAM::CameraIndex::InnerCamera)]
                                               .c_str())) {
                         if (ImGui::Selectable("blank")) {
-                            Settings::values.camera_name[static_cast<std::size_t>(
+                            Settings::values.camera_engine[static_cast<std::size_t>(
                                 Service::CAM::CameraIndex::InnerCamera)] = "blank";
                         }
                         if (ImGui::Selectable("image (configuration: file path or URL)")) {
-                            Settings::values.camera_name[static_cast<std::size_t>(
+                            Settings::values.camera_engine[static_cast<std::size_t>(
                                 Service::CAM::CameraIndex::InnerCamera)] = "image";
                         }
                         ImGui::EndCombo();
@@ -496,22 +498,22 @@ void InitialSettings::Run() {
                     ImGui::Text("Inner Camera Configuration");
                     ImGui::SameLine();
                     ImGui::InputText("##innerconfiguration",
-                                     &Settings::values.camera_config[static_cast<std::size_t>(
+                                     &Settings::values.camera_parameter[static_cast<std::size_t>(
                                          Service::CAM::CameraIndex::InnerCamera)]);
 
                     ImGui::Text("Outer Left Engine");
                     ImGui::SameLine();
                     if (ImGui::BeginCombo("##outerleftengine",
                                           Settings::values
-                                              .camera_name[static_cast<std::size_t>(
+                                              .camera_engine[static_cast<std::size_t>(
                                                   Service::CAM::CameraIndex::OuterLeftCamera)]
                                               .c_str())) {
                         if (ImGui::Selectable("blank")) {
-                            Settings::values.camera_name[static_cast<std::size_t>(
+                            Settings::values.camera_engine[static_cast<std::size_t>(
                                 Service::CAM::CameraIndex::OuterLeftCamera)] = "blank";
                         }
                         if (ImGui::Selectable("image (configuration: file path or URL)")) {
-                            Settings::values.camera_name[static_cast<std::size_t>(
+                            Settings::values.camera_engine[static_cast<std::size_t>(
                                 Service::CAM::CameraIndex::OuterLeftCamera)] = "image";
                         }
                         ImGui::EndCombo();
@@ -520,22 +522,22 @@ void InitialSettings::Run() {
                     ImGui::Text("Outer Left Configuration");
                     ImGui::SameLine();
                     ImGui::InputText("##outerleftconfiguration",
-                                     &Settings::values.camera_config[static_cast<std::size_t>(
+                                     &Settings::values.camera_parameter[static_cast<std::size_t>(
                                          Service::CAM::CameraIndex::OuterLeftCamera)]);
 
                     ImGui::Text("Outer Right Engine");
                     ImGui::SameLine();
                     if (ImGui::BeginCombo("##outerrightengine",
                                           Settings::values
-                                              .camera_name[static_cast<std::size_t>(
+                                              .camera_engine[static_cast<std::size_t>(
                                                   Service::CAM::CameraIndex::OuterRightCamera)]
                                               .c_str())) {
                         if (ImGui::Selectable("blank")) {
-                            Settings::values.camera_name[static_cast<std::size_t>(
+                            Settings::values.camera_engine[static_cast<std::size_t>(
                                 Service::CAM::CameraIndex::OuterRightCamera)] = "blank";
                         }
                         if (ImGui::Selectable("image (configuration: file path or URL)")) {
-                            Settings::values.camera_name[static_cast<std::size_t>(
+                            Settings::values.camera_engine[static_cast<std::size_t>(
                                 Service::CAM::CameraIndex::OuterRightCamera)] = "image";
                         }
                         ImGui::EndCombo();
@@ -544,7 +546,7 @@ void InitialSettings::Run() {
                     ImGui::Text("Outer Right Configuration");
                     ImGui::SameLine();
                     ImGui::InputText("##outerrightconfiguration",
-                                     &Settings::values.camera_config[static_cast<std::size_t>(
+                                     &Settings::values.camera_parameter[static_cast<std::size_t>(
                                          Service::CAM::CameraIndex::OuterRightCamera)]);
 
                     ImGui::EndTabItem();
@@ -1549,18 +1551,20 @@ void InitialSettings::Run() {
                     ImGui::Text("Graphics settings are not persistent.");
                     ImGui::NewLine();
 
-                    ImGui::Checkbox("Use Hardware Renderer", &Settings::values.use_hw_renderer);
-                    ImGui::Checkbox("Use Hardware Shader", &Settings::values.use_hw_shader);
-                    if (Settings::values.use_hw_shader) {
+                    ImGui::Checkbox("Use Hardware Renderer",
+                                    &Settings::values.use_hardware_renderer);
+                    ImGui::Checkbox("Use Hardware Shader", &Settings::values.use_hardware_shader);
+                    if (Settings::values.use_hardware_shader) {
                         ImGui::Checkbox("Accurate Multiplication",
-                                        &Settings::values.shaders_accurate_mul);
+                                        &Settings::values.hardware_shader_accurate_multiplication);
                     }
                     ImGui::Checkbox("Use Shader JIT", &Settings::values.use_shader_jit);
                     ImGui::Checkbox("Enable VSync", &Settings::values.enable_vsync);
                     ImGui::Checkbox("Dump Textures", &Settings::values.dump_textures);
                     ImGui::Checkbox("Use Custom Textures", &Settings::values.custom_textures);
                     ImGui::Checkbox("Preload Custom Textures", &Settings::values.preload_textures);
-                    ImGui::Checkbox("Enable Linear Filtering", &Settings::values.filter_mode);
+                    ImGui::Checkbox("Enable Linear Filtering",
+                                    &Settings::values.enable_linear_filtering);
                     if (ImGui::IsItemHovered()) {
                         ImGui::SetTooltip("This is required for some shaders to work correctly");
                     }
@@ -1571,40 +1575,40 @@ void InitialSettings::Run() {
                     ImGui::SameLine();
                     const u16 min = 0;
                     const u16 max = 10;
-                    ImGui::SliderScalar(
-                        "##resolution", ImGuiDataType_U16, &Settings::values.resolution_factor,
-                        &min, &max, Settings::values.resolution_factor == 0 ? "Window Size" : "%d");
+                    ImGui::SliderScalar("##resolution", ImGuiDataType_U16,
+                                        &Settings::values.resolution, &min, &max,
+                                        Settings::values.resolution == 0 ? "Window Size" : "%d");
 
                     ImGui::Text("Background Color");
                     ImGui::SameLine();
-                    ImGui::ColorEdit3("##backgroundcolor", &Settings::values.bg_red,
+                    ImGui::ColorEdit3("##backgroundcolor", &Settings::values.background_color_red,
                                       ImGuiColorEditFlags_NoInputs);
 
                     ImGui::Text("Post Processing Shader");
                     ImGui::SameLine();
                     if (ImGui::BeginCombo("##postprocessingshader",
-                                          Settings::values.pp_shader_name.c_str())) {
+                                          Settings::values.post_processing_shader.c_str())) {
                         const auto shaders = OpenGL::GetPostProcessingShaderList(
                             Settings::values.render_3d == Settings::StereoRenderOption::Anaglyph);
 
                         if (Settings::values.render_3d == Settings::StereoRenderOption::Anaglyph &&
                             ImGui::Selectable("dubois (builtin)")) {
-                            Settings::values.pp_shader_name = "dubois (builtin)";
+                            Settings::values.post_processing_shader = "dubois (builtin)";
                         } else if (Settings::values.render_3d ==
                                        Settings::StereoRenderOption::Interlaced &&
                                    ImGui::Selectable("horizontal (builtin)")) {
-                            Settings::values.pp_shader_name = "horizontal (builtin)";
+                            Settings::values.post_processing_shader = "horizontal (builtin)";
                         } else if ((Settings::values.render_3d ==
                                         Settings::StereoRenderOption::Off ||
                                     Settings::values.render_3d ==
                                         Settings::StereoRenderOption::SideBySide) &&
                                    ImGui::Selectable("none (builtin)")) {
-                            Settings::values.pp_shader_name = "none (builtin)";
+                            Settings::values.post_processing_shader = "none (builtin)";
                         }
 
                         for (const auto& shader : shaders) {
                             if (ImGui::Selectable(shader.c_str())) {
-                                Settings::values.pp_shader_name = shader;
+                                Settings::values.post_processing_shader = shader;
                             }
                         }
 
@@ -1614,12 +1618,12 @@ void InitialSettings::Run() {
                     ImGui::Text("Texture Filter");
                     ImGui::SameLine();
                     if (ImGui::BeginCombo("##texturefilter",
-                                          Settings::values.texture_filter_name.c_str())) {
+                                          Settings::values.texture_filter.c_str())) {
                         const auto& filters = OpenGL::TextureFilterer::GetFilterNames();
 
                         for (const auto& filter : filters) {
                             if (ImGui::Selectable(std::string(filter).c_str())) {
-                                Settings::values.texture_filter_name = filter;
+                                Settings::values.texture_filter = filter;
                             }
                         }
 
@@ -1649,28 +1653,28 @@ void InitialSettings::Run() {
                         if (ImGui::Selectable("Off", Settings::values.render_3d ==
                                                          Settings::StereoRenderOption::Off)) {
                             Settings::values.render_3d = Settings::StereoRenderOption::Off;
-                            Settings::values.pp_shader_name = "none (builtin)";
+                            Settings::values.post_processing_shader = "none (builtin)";
                         }
 
                         if (ImGui::Selectable("Side by Side",
                                               Settings::values.render_3d ==
                                                   Settings::StereoRenderOption::SideBySide)) {
                             Settings::values.render_3d = Settings::StereoRenderOption::SideBySide;
-                            Settings::values.pp_shader_name = "none (builtin)";
+                            Settings::values.post_processing_shader = "none (builtin)";
                         }
 
                         if (ImGui::Selectable("Anaglyph",
                                               Settings::values.render_3d ==
                                                   Settings::StereoRenderOption::Anaglyph)) {
                             Settings::values.render_3d = Settings::StereoRenderOption::Anaglyph;
-                            Settings::values.pp_shader_name = "dubois (builtin)";
+                            Settings::values.post_processing_shader = "dubois (builtin)";
                         }
 
                         if (ImGui::Selectable("Interlaced",
                                               Settings::values.render_3d ==
                                                   Settings::StereoRenderOption::Interlaced)) {
                             Settings::values.render_3d = Settings::StereoRenderOption::Interlaced;
-                            Settings::values.pp_shader_name = "horizontal (builtin)";
+                            Settings::values.post_processing_shader = "horizontal (builtin)";
                         }
 
                         ImGui::EndCombo();
@@ -1713,10 +1717,12 @@ void InitialSettings::Run() {
                                     json["motion_device"].get<std::string>();
                                 Settings::values.touch_device =
                                     json["touch_device"].get<std::string>();
-                                Settings::values.udp_input_address =
-                                    json["udp_input_address"].get<std::string>();
-                                Settings::values.udp_input_port = json["udp_input_port"].get<u16>();
-                                Settings::values.udp_pad_index = json["udp_pad_index"].get<u8>();
+                                Settings::values.cemuhookudp_address =
+                                    json["cemuhookudp_address"].get<std::string>();
+                                Settings::values.cemuhookudp_port =
+                                    json["cemuhookudp_port"].get<u16>();
+                                Settings::values.cemuhookudp_pad_index =
+                                    json["cemuhookudp_pad_index"].get<u8>();
                             } catch (nlohmann::json::exception& exception) {
                                 pfd::message("JSON Exception", exception.what(), pfd::choice::ok);
                             }
@@ -1735,9 +1741,10 @@ void InitialSettings::Run() {
                                     {"analogs", Settings::values.analogs},
                                     {"motion_device", Settings::values.motion_device},
                                     {"touch_device", Settings::values.touch_device},
-                                    {"udp_input_address", Settings::values.udp_input_address},
-                                    {"udp_input_port", Settings::values.udp_input_port},
-                                    {"udp_pad_index", Settings::values.udp_pad_index},
+                                    {"cemuhookudp_address", Settings::values.cemuhookudp_address},
+                                    {"cemuhookudp_port", Settings::values.cemuhookudp_port},
+                                    {"cemuhookudp_pad_index",
+                                     Settings::values.cemuhookudp_pad_index},
                                 }
                                     .dump();
 
@@ -2477,24 +2484,24 @@ void InitialSettings::Run() {
 
                         ImGui::SameLine();
                         ImGui::PushItemWidth(110);
-                        ImGui::InputText("##udp_input_address",
-                                         &Settings::values.udp_input_address);
+                        ImGui::InputText("##cemuhookudp_address",
+                                         &Settings::values.cemuhookudp_address);
                         ImGui::PopItemWidth();
 
                         ImGui::SameLine();
                         ImGui::Text(":");
                         ImGui::SameLine();
                         ImGui::PushItemWidth(45);
-                        ImGui::InputScalar("##udp_input_port", ImGuiDataType_U16,
-                                           &Settings::values.udp_input_port);
+                        ImGui::InputScalar("##cemuhookudp_port", ImGuiDataType_U16,
+                                           &Settings::values.cemuhookudp_port);
                         ImGui::PopItemWidth();
 
                         ImGui::SameLine();
                         ImGui::Text("Pad");
                         ImGui::SameLine();
                         ImGui::PushItemWidth(15);
-                        ImGui::InputScalar("##udp_pad_index", ImGuiDataType_U8,
-                                           &Settings::values.udp_pad_index);
+                        ImGui::InputScalar("##cemuhookudp_pad_index", ImGuiDataType_U8,
+                                           &Settings::values.cemuhookudp_pad_index);
                         ImGui::PopItemWidth();
                     }
 
@@ -2505,20 +2512,20 @@ void InitialSettings::Run() {
                     ImGui::Text("Layout settings are not persistent.");
                     ImGui::NewLine();
 
-                    if (!Settings::values.custom_layout) {
+                    if (!Settings::values.use_custom_layout) {
                         ImGui::Text("Layout:");
                         ImGui::SameLine();
                         if (ImGui::BeginCombo("##layout", [] {
-                                switch (Settings::values.layout_option) {
-                                case Settings::LayoutOption::Default:
+                                switch (Settings::values.layout) {
+                                case Settings::Layout::Default:
                                     return "Default";
-                                case Settings::LayoutOption::SingleScreen:
+                                case Settings::Layout::SingleScreen:
                                     return "Single Screen";
-                                case Settings::LayoutOption::LargeScreen:
+                                case Settings::Layout::LargeScreen:
                                     return "Large Screen";
-                                case Settings::LayoutOption::SideScreen:
+                                case Settings::Layout::SideScreen:
                                     return "Side by Side";
-                                case Settings::LayoutOption::MediumScreen:
+                                case Settings::Layout::MediumScreen:
                                     return "Medium Screen";
                                 default:
                                     break;
@@ -2527,64 +2534,61 @@ void InitialSettings::Run() {
                                 return "Invalid";
                             }())) {
                             if (ImGui::Selectable("Default")) {
-                                Settings::values.layout_option = Settings::LayoutOption::Default;
+                                Settings::values.layout = Settings::Layout::Default;
                             }
                             if (ImGui::Selectable("Single Screen")) {
-                                Settings::values.layout_option =
-                                    Settings::LayoutOption::SingleScreen;
+                                Settings::values.layout = Settings::Layout::SingleScreen;
                             }
                             if (ImGui::Selectable("Large Screen")) {
-                                Settings::values.layout_option =
-                                    Settings::LayoutOption::LargeScreen;
+                                Settings::values.layout = Settings::Layout::LargeScreen;
                             }
                             if (ImGui::Selectable("Side by Side")) {
-                                Settings::values.layout_option = Settings::LayoutOption::SideScreen;
+                                Settings::values.layout = Settings::Layout::SideScreen;
                             }
                             if (ImGui::Selectable("Medium Screen")) {
-                                Settings::values.layout_option =
-                                    Settings::LayoutOption::MediumScreen;
+                                Settings::values.layout = Settings::Layout::MediumScreen;
                             }
                             ImGui::EndCombo();
                         }
                     }
 
-                    ImGui::Checkbox("Use Custom Layout", &Settings::values.custom_layout);
-                    ImGui::Checkbox("Swap Screens", &Settings::values.swap_screen);
-                    ImGui::Checkbox("Upright Orientation", &Settings::values.upright_screen);
+                    ImGui::Checkbox("Use Custom Layout", &Settings::values.use_custom_layout);
+                    ImGui::Checkbox("Swap Screens", &Settings::values.swap_screens);
+                    ImGui::Checkbox("Upright Orientation", &Settings::values.upright_screens);
 
-                    if (Settings::values.custom_layout) {
+                    if (Settings::values.use_custom_layout) {
                         ImGui::Text("Top Left:");
                         ImGui::SameLine();
                         ImGui::InputScalar("##topleft", ImGuiDataType_U16,
-                                           &Settings::values.custom_top_left);
+                                           &Settings::values.custom_layout_top_left);
                         ImGui::Text("Top Top:");
                         ImGui::SameLine();
                         ImGui::InputScalar("##toptop", ImGuiDataType_U16,
-                                           &Settings::values.custom_top_top);
+                                           &Settings::values.custom_layout_top_top);
                         ImGui::Text("Top Right:");
                         ImGui::SameLine();
                         ImGui::InputScalar("##topright", ImGuiDataType_U16,
-                                           &Settings::values.custom_top_right);
+                                           &Settings::values.custom_layout_top_right);
                         ImGui::Text("Top Bottom:");
                         ImGui::SameLine();
                         ImGui::InputScalar("##topbottom", ImGuiDataType_U16,
-                                           &Settings::values.custom_top_bottom);
+                                           &Settings::values.custom_layout_top_bottom);
                         ImGui::Text("Bottom Left:");
                         ImGui::SameLine();
                         ImGui::InputScalar("##bottomleft", ImGuiDataType_U16,
-                                           &Settings::values.custom_bottom_left);
+                                           &Settings::values.custom_layout_bottom_left);
                         ImGui::Text("Bottom Top:");
                         ImGui::SameLine();
                         ImGui::InputScalar("##bottomtop", ImGuiDataType_U16,
-                                           &Settings::values.custom_bottom_top);
+                                           &Settings::values.custom_layout_bottom_top);
                         ImGui::Text("Bottom Right:");
                         ImGui::SameLine();
                         ImGui::InputScalar("##bottomright", ImGuiDataType_U16,
-                                           &Settings::values.custom_bottom_right);
+                                           &Settings::values.custom_layout_bottom_right);
                         ImGui::Text("Bottom Bottom:");
                         ImGui::SameLine();
                         ImGui::InputScalar("##bottombottom", ImGuiDataType_U16,
-                                           &Settings::values.custom_bottom_bottom);
+                                           &Settings::values.custom_layout_bottom_bottom);
                     }
 
                     ImGui::EndTabItem();

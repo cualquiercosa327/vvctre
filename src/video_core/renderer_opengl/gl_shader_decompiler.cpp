@@ -237,16 +237,16 @@ std::string GetSelectorSrc(const SwizzlePattern& pattern) {
     for (std::size_t i = 0; i < 4; ++i) {
         switch ((pattern.*getter)(i)) {
         case SwizzlePattern::Selector::x:
-            out += "x";
+            out += 'x';
             break;
         case SwizzlePattern::Selector::y:
-            out += "y";
+            out += 'y';
             break;
         case SwizzlePattern::Selector::z:
-            out += "z";
+            out += 'z';
             break;
         case SwizzlePattern::Selector::w:
-            out += "w";
+            out += 'w';
             break;
         default:
             UNREACHABLE();
@@ -546,13 +546,14 @@ private:
 
             case OpCode::Id::CMP: {
                 using CompareOp = Instruction::Common::CompareOpType::Op;
-                const std::map<CompareOp, std::pair<std::string, std::string>> cmp_ops{
+                const std::map<CompareOp, std::pair<std::string_view, std::string_view>> cmp_ops{
                     {CompareOp::Equal, {"==", "equal"}},
                     {CompareOp::NotEqual, {"!=", "notEqual"}},
                     {CompareOp::LessThan, {"<", "lessThan"}},
                     {CompareOp::LessEqual, {"<=", "lessThanEqual"}},
                     {CompareOp::GreaterThan, {">", "greaterThan"}},
-                    {CompareOp::GreaterEqual, {">=", "greaterThanEqual"}}};
+                    {CompareOp::GreaterEqual, {">=", "greaterThanEqual"}},
+                };
 
                 const CompareOp op_x = instr.common.compare_op.x.Value();
                 const CompareOp op_y = instr.common.compare_op.y.Value();

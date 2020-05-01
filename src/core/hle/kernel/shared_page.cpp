@@ -17,14 +17,14 @@
 namespace SharedPage {
 
 static std::chrono::seconds GetInitTime() {
-    const u64 override_init_time = Core::Movie::GetInstance().GetOverrideInitTime();
+    const u64 override_init_time = Core::Movie::GetInstance().GetOverrideInitialTime();
     if (override_init_time != 0) {
         // Override the clock init time with the one in the movie
         return std::chrono::seconds(override_init_time);
     }
 
-    switch (Settings::values.init_clock) {
-    case Settings::InitClock::SystemTime: {
+    switch (Settings::values.clock) {
+    case Settings::InitialClock::SystemTime: {
         auto now = std::chrono::system_clock::now();
         // If the system time is in daylight saving, we give an additional hour to console time
         std::time_t now_time_t = std::chrono::system_clock::to_time_t(now);
@@ -33,11 +33,11 @@ static std::chrono::seconds GetInitTime() {
             now = now + std::chrono::hours(1);
         return std::chrono::duration_cast<std::chrono::seconds>(now.time_since_epoch());
     }
-    case Settings::InitClock::FixedTime:
-        return std::chrono::seconds(Settings::values.init_time);
+    case Settings::InitialClock::FixedTime:
+        return std::chrono::seconds(Settings::values.unix_timestamp);
     default:
-        UNREACHABLE_MSG("Invalid InitClock value ({})",
-                        static_cast<u32>(Settings::values.init_clock));
+        UNREACHABLE_MSG("Invalid InitialClock value ({})",
+                        static_cast<u32>(Settings::values.clock));
     }
 }
 
@@ -57,7 +57,7 @@ Handler::Handler(Core::Timing& timing) : timing(timing) {
     shared_page.battery_state.is_adapter_connected.Assign(1);
     shared_page.battery_state.is_charging.Assign(1);
 
-    init_time = GetInitTime();
+    unix_timestamp = GetInitTime();
 
     using namespace std::placeholders;
     update_time_event = timing.RegisterEvent("SharedPage::UpdateTimeCallback",
@@ -71,7 +71,8 @@ Handler::Handler(Core::Timing& timing) : timing(timing) {
 /// Gets system time in 3DS format. The epoch is Jan 1900, and the unit is millisecond.
 u64 Handler::GetSystemTime() const {
     std::chrono::milliseconds now =
-        init_time + std::chrono::duration_cast<std::chrono::milliseconds>(timing.GetGlobalTimeUs());
+        unix_timestamp +
+        std::chrono::duration_cast<std::chrono::milliseconds>(timing.GetGlobalTimeUs());
 
     // 3DS system does't allow user to set a time before Jan 1 2000,
     // so we use it as an auxiliary epoch to calculate the console time.

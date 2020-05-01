@@ -16,19 +16,19 @@
 
 namespace Core {
 class System;
-}
+} // namespace Core
 
 namespace Camera {
 class CameraInterface;
-}
+} // namespace Camera
 
 namespace Core {
 struct TimingEventType;
-}
+} // namespace Core
 
 namespace Kernel {
 class Process;
-}
+} // namespace Kernel
 
 namespace Service::CAM {
 

@@ -140,30 +140,30 @@ void EmuWindow::TouchMoved(unsigned framebuffer_x, unsigned framebuffer_y) {
 
 void EmuWindow::UpdateCurrentFramebufferLayout(unsigned width, unsigned height) {
     Layout::FramebufferLayout layout;
-    if (Settings::values.custom_layout == true) {
+    if (Settings::values.use_custom_layout == true) {
         layout = Layout::CustomFrameLayout(width, height);
     } else {
-        switch (Settings::values.layout_option) {
-        case Settings::LayoutOption::SingleScreen:
-            layout = Layout::SingleFrameLayout(width, height, Settings::values.swap_screen,
-                                               Settings::values.upright_screen);
+        switch (Settings::values.layout) {
+        case Settings::Layout::SingleScreen:
+            layout = Layout::SingleFrameLayout(width, height, Settings::values.swap_screens,
+                                               Settings::values.upright_screens);
             break;
-        case Settings::LayoutOption::LargeScreen:
-            layout = Layout::LargeFrameLayout(width, height, Settings::values.swap_screen,
-                                              Settings::values.upright_screen);
+        case Settings::Layout::LargeScreen:
+            layout = Layout::LargeFrameLayout(width, height, Settings::values.swap_screens,
+                                              Settings::values.upright_screens);
             break;
-        case Settings::LayoutOption::SideScreen:
-            layout = Layout::SideFrameLayout(width, height, Settings::values.swap_screen,
-                                             Settings::values.upright_screen);
+        case Settings::Layout::SideScreen:
+            layout = Layout::SideFrameLayout(width, height, Settings::values.swap_screens,
+                                             Settings::values.upright_screens);
             break;
-        case Settings::LayoutOption::MediumScreen:
-            layout = Layout::MediumFrameLayout(width, height, Settings::values.swap_screen,
-                                               Settings::values.upright_screen);
+        case Settings::Layout::MediumScreen:
+            layout = Layout::MediumFrameLayout(width, height, Settings::values.swap_screens,
+                                               Settings::values.upright_screens);
             break;
-        case Settings::LayoutOption::Default:
+        case Settings::Layout::Default:
         default:
-            layout = Layout::DefaultFrameLayout(width, height, Settings::values.swap_screen,
-                                                Settings::values.upright_screen);
+            layout = Layout::DefaultFrameLayout(width, height, Settings::values.swap_screens,
+                                                Settings::values.upright_screens);
             break;
         }
     }

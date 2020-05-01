@@ -100,7 +100,7 @@ private:
     void UpdateTimeCallback(u64 userdata, int cycles_late);
     Core::Timing& timing;
     Core::TimingEventType* update_time_event;
-    std::chrono::seconds init_time;
+    std::chrono::seconds unix_timestamp;
 
     SharedPageDef shared_page;
 };

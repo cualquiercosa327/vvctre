@@ -71,9 +71,9 @@ private:
 
 State::State() {
     auto status = std::make_shared<DeviceStatus>();
-    client =
-        std::make_unique<Client>(status, Settings::values.udp_input_address,
-                                 Settings::values.udp_input_port, Settings::values.udp_pad_index);
+    client = std::make_unique<Client>(status, Settings::values.cemuhookudp_address,
+                                      Settings::values.cemuhookudp_port,
+                                      Settings::values.cemuhookudp_pad_index);
 
     Input::RegisterFactory<Input::TouchDevice>("cemuhookudp",
                                                std::make_shared<UDPTouchFactory>(status));
@@ -87,8 +87,8 @@ State::~State() {
 }
 
 void State::ReloadUDPClient() {
-    client->ReloadSocket(Settings::values.udp_input_address, Settings::values.udp_input_port,
-                         Settings::values.udp_pad_index);
+    client->ReloadSocket(Settings::values.cemuhookudp_address, Settings::values.cemuhookudp_port,
+                         Settings::values.cemuhookudp_pad_index);
 }
 
 } // namespace InputCommon::CemuhookUDP

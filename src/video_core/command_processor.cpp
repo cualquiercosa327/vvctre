@@ -254,7 +254,7 @@ static void WritePicaReg(u32 id, u32 value, u32 mask) {
     case PICA_REG_INDEX(pipeline.trigger_draw_indexed): {
         PrimitiveAssembler<Shader::OutputVertex>& primitive_assembler = g_state.primitive_assembler;
 
-        bool accelerate_draw = VideoCore::g_hw_shader_enabled && primitive_assembler.IsEmpty();
+        bool accelerate_draw = VideoCore::g_hardware_shader_enabled && primitive_assembler.IsEmpty();
 
         if (regs.pipeline.use_gs == PipelineRegs::UseGS::No) {
             auto topology = primitive_assembler.GetTopology();

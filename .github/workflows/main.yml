@@ -7,7 +7,6 @@ on:
   pull_request:
     branches:
       - "*"
-  repository_dispatch:
 
 jobs:
   build:
@@ -21,31 +20,8 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install --yes libsdl2-dev libpng-dev
-      - name: Checkout (not repository dispatch)
+      - name: Checkout
         uses: actions/checkout@v1
-        if: github.event_name != 'repository_dispatch'
-      - name: Checkout (repository dispatch)
-        uses: actions/checkout@v1
-        if: github.event_name == 'repository_dispatch'
-        with:
-          ref: refs/tags/${{github.event.client_payload.checkout}}
-      - name: Write settings.h
-        if: github.event_name == 'repository_dispatch'
-        uses: RollyPeres/base64-to-path@v1
-        with:
-          filePath: ${{github.workspace}}/src/core/settings.h
-          encodedString: ${{github.event.client_payload.header}}
-      - name: Check if something is changed and show changes
-        if: github.event_name == 'repository_dispatch'
-        shell: bash
-        run: |
-          cd $GITHUB_WORKSPACE
-          output=$(git diff HEAD)
-          if [[ -z "$output" ]]; then
-            curl https://raw.githubusercontent.com/ChaoticWeg/discord.sh/d2314493d5fcd01e89240fb2c6703f0f0e8cdc15/discord.sh | bash -s -- --webhook-url "${{github.event.client_payload.discordWebhook}}" --text "Error: No changes"
-            exit 1
-          fi
-          git diff HEAD
       - run: git submodule update --init --recursive
       - name: Configure CMake
         shell: bash
@@ -81,22 +57,6 @@ jobs:
           export VERSION=${GITHUB_REF:10}
           echo ::set-env name=VERSION::$VERSION
           7z a vvctre-$VERSION-${{runner.os}}.7z ./build/bin/*
-      - name: Prepare to upload (repository dispatch)
-        if: github.event_name == 'repository_dispatch'
-        shell: bash
-        run: |
-          cd $GITHUB_WORKSPACE
-          cp license.txt ./build/bin
-          if [ "$RUNNER_OS" == "Linux" ]; then
-            rm ./build/bin/tests
-          elif [ "$RUNNER_OS" == "Windows" ]; then
-            rm ./build/bin/Release/tests.exe
-            rm ./build/bin/Release/*.pdb
-            mv ./build/bin/Release/* ./build/bin
-            rm -rf ./build/bin/Release
-          fi
-          git diff HEAD > ./build/bin/changes.diff
-          7z a vvctre-custom-build-${{github.run_number}}-${{runner.os}}.7z ./build/bin/*
       - name: Prepare to upload (pull request)
         if: github.event_name == 'pull_request'
         shell: bash
@@ -126,13 +86,6 @@ jobs:
         with:
           name: vvctre-${{runner.os}}
           path: build/bin
-      - name: Upload (repository dispatch)
-        if: github.event_name == 'repository_dispatch'
-        uses: JantHsueh/upload-file-action@master
-        with:
-          url: ${{github.event.client_payload.discordWebhook}}
-          forms: '{}'
-          fileForms: '{"file": "vvctre-custom-build-${{github.run_number}}-${{runner.os}}.7z"}'
       - name: Discord Success Notification (tag push)
         if: github.event_name == 'push'
         uses: rjstone/discord-webhook-notify@v1
@@ -142,43 +95,3 @@ jobs:
             vvctre ${{env.VERSION}} for ${{runner.os}} can now be downloaded from:
             https://github.com/${{github.repository}}/releases/tag/${{env.VERSION}}
           webhookUrl: ${{secrets.DISCORD_WEBHOOK}}
-  success:
-    if: github.event_name == 'repository_dispatch' && success()
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-      - uses: Ilshidur/action-discord@master
-        env:
-          DISCORD_WEBHOOK: ${{github.event.client_payload.discordWebhook}}
-        with:
-          args: '<@${{github.event.client_payload.requester}}>'
-      - uses: Ilshidur/action-discord@master
-        env:
-          DISCORD_WEBHOOK: ${{github.event.client_payload.discordWebhook}}
-        with:
-          args: 'Delete webhook'
-  failed:
-    if: github.event_name == 'repository_dispatch' && failure()
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-      - uses: Ilshidur/action-discord@master
-        env:
-          DISCORD_WEBHOOK: ${{github.event.client_payload.discordWebhook}}
-        with:
-          args: '<@${{github.event.client_payload.requester}}> build failed'
-      - uses: Ilshidur/action-discord@master
-        env:
-          DISCORD_WEBHOOK: ${{github.event.client_payload.discordWebhook}}
-        with:
-          args: 'Delete webhook'
-  cancelled:
-    if: github.event_name == 'repository_dispatch' && cancelled()
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-      - uses: Ilshidur/action-discord@master
-        env:
-          DISCORD_WEBHOOK: ${{github.event.client_payload.discordWebhook}}
-        with:
-          args: 'Delete webhook'

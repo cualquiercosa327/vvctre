@@ -122,7 +122,7 @@ void Movie::CheckInputEnd() {
     if (current_byte + sizeof(ControllerState) > recorded_input.size()) {
         LOG_INFO(Movie, "Playback finished");
         play_mode = PlayMode::None;
-        init_time = 0;
+        unix_timestamp = 0;
         playback_completion_callback();
     }
 }
@@ -315,8 +315,8 @@ void Movie::Record(const Service::IR::ExtraHIDResponse& extra_hid_response) {
     Record(s);
 }
 
-u64 Movie::GetOverrideInitTime() const {
-    return init_time;
+u64 Movie::GetOverrideInitialTime() const {
+    return unix_timestamp;
 }
 
 Movie::ValidationResult Movie::ValidateHeader(const VCMHeader& header, u64 program_id) const {
@@ -348,7 +348,7 @@ void Movie::SaveMovie() {
 
     VCMHeader header = {};
     header.filetype = header_magic_bytes;
-    header.clock_init_time = init_time;
+    header.clock_init_time = unix_timestamp;
 
     Core::System::GetInstance().GetAppLoader().ReadProgramId(header.program_id);
 
@@ -411,13 +411,13 @@ void Movie::PrepareForPlayback(const std::string& movie_file) {
         return;
     }
 
-    init_time = header.value().clock_init_time;
+    unix_timestamp = header.value().clock_init_time;
 }
 
 void Movie::PrepareForRecording() {
-    init_time = (Settings::values.init_clock == Settings::InitClock::SystemTime
-                     ? Common::Timer::GetTimeSinceJan1970().count()
-                     : Settings::values.init_time);
+    unix_timestamp = (Settings::values.clock == Settings::InitialClock::SystemTime
+                          ? Common::Timer::GetTimeSinceJan1970().count()
+                          : Settings::values.unix_timestamp);
 }
 
 Movie::ValidationResult Movie::ValidateMovie(const std::string& movie_file, u64 program_id) const {
@@ -448,7 +448,7 @@ void Movie::Shutdown() {
     recorded_input.resize(0);
     record_movie_file.clear();
     current_byte = 0;
-    init_time = 0;
+    unix_timestamp = 0;
 }
 
 template <typename... Targs>

@@ -17,12 +17,12 @@
 
 namespace Settings {
 
-enum class InitClock {
+enum class InitialClock {
     SystemTime = 0,
     FixedTime = 1,
 };
 
-enum class LayoutOption {
+enum class Layout {
     Default,
     SingleScreen,
     LargeScreen,
@@ -123,50 +123,24 @@ static constexpr int REGION_VALUE_AUTO_SELECT = -1;
 
 struct Values {
     // Start
-
-    /// If you're making a custom build, want to change the default file path, and you use Windows,
-    /// this needs to be a full path with double backslash
     std::string file_path;
-
     std::string play_movie;
     std::string record_movie;
-
-    /**
-     * Valid values:
-     *  -1: Auto-select
-     *   0: Japan
-     *   1: USA
-     *   2: Europe
-     *   3: Australia
-     *   4: China
-     *   5: Korea
-     *   6: Taiwan
-     */
     int region_value = REGION_VALUE_AUTO_SELECT;
-
     std::string log_filter = "*:Info";
     std::string multiplayer_url = "ws://vvctre-multiplayer.glitch.me";
-
-    /**
-     * Valid values:
-     * - InitClock::SystemTime
-     * - InitClock::FixedTime
-     */
-    InitClock init_clock = InitClock::SystemTime;
-
-    u64 init_time = 0; // Unix timestamp
-
+    InitialClock clock = InitialClock::SystemTime;
+    u64 unix_timestamp = 0;
     bool use_virtual_sd = true;
     bool start_in_fullscreen_mode = false;
-
     bool record_frame_times = false;
     bool use_gdbstub = false;
     u16 gdbstub_port = 24689;
 
     // General
     bool use_cpu_jit = true;
-    bool use_frame_limit = true;
-    u16 frame_limit = 100;
+    bool limit_speed = true;
+    u16 speed_limit = 100;
     bool use_custom_cpu_ticks = false;
     u64 custom_cpu_ticks = 77;
     u32 cpu_clock_percentage = 100;
@@ -174,152 +148,90 @@ struct Values {
     // Audio
     bool enable_dsp_lle = false;
     bool enable_dsp_lle_multithread = false;
-    float volume = 1.0f;
-    std::string sink_id = "auto";
+    float audio_volume = 1.0f;
+    std::string audio_sink_id = "auto";
     std::string audio_device_id = "auto";
-
-    /**
-     * Valid values:
-     *  - MicInputType::None
-     *  - MicInputType::Real
-     *  - MicInputType::Static
-     */
-    MicInputType mic_input_type = MicInputType::None;
-
-    std::string mic_input_device;
+    MicInputType microphone_input_type = MicInputType::None;
+    std::string microphone_input_device;
 
     // Camera
-    std::array<std::string, Service::CAM::NumCameras> camera_name{
+    std::array<std::string, Service::CAM::NumCameras> camera_engine{
         "blank",
         "blank",
         "blank",
     };
-    std::array<std::string, Service::CAM::NumCameras> camera_config;
-    std::array<int, Service::CAM::NumCameras> camera_flip;
+    std::array<std::string, Service::CAM::NumCameras> camera_parameter;
+    std::array<Service::CAM::Flip, Service::CAM::NumCameras> camera_flip;
 
     // Graphics
-    bool use_hw_renderer = true;
-    bool use_hw_shader = true;
-    bool shaders_accurate_mul = false;
+    bool use_hardware_renderer = true;
+    bool use_hardware_shader = true;
+    bool hardware_shader_accurate_multiplication = false;
     bool use_shader_jit = true;
     bool enable_vsync = false;
     bool dump_textures = false;
     bool custom_textures = false;
     bool preload_textures = false;
-    bool filter_mode = true;
+    bool enable_linear_filtering = true;
     bool sharper_distant_objects = false;
-    u16 resolution_factor = 1;
-    float bg_red = 0.0f;
-    float bg_green = 0.0f;
-    float bg_blue = 0.0f;
-    std::string pp_shader_name = "none (builtin)";
-
-    /**
-     * Valid values:
-     *  - "none"
-     *  - "Anime4K Ultrafast"
-     *  - "Bicubic"
-     *  - "ScaleForce"
-     *  - "xBRZ freescale"
-     */
-    std::string texture_filter_name = "none";
-
-    /**
-     * Valid values:
-     *  - StereoRenderOption::Off
-     *  - StereoRenderOption::SideBySide
-     *  - StereoRenderOption::Anaglyph
-     *  - StereoRenderOption::Interlaced
-     */
+    u16 resolution = 1;
+    float background_color_red = 0.0f;
+    float background_color_green = 0.0f;
+    float background_color_blue = 0.0f;
+    std::string post_processing_shader = "none (builtin)";
+    std::string texture_filter = "none";
     StereoRenderOption render_3d = StereoRenderOption::Off;
-
     std::atomic<u8> factor_3d{0};
 
     // Controls
     std::array<std::string, NativeButton::NumButtons> buttons = {
-        // All the code below can be changed to JSON buttons
-        InputCommon::GenerateKeyboardParam(SDL_SCANCODE_A), // A,
-        InputCommon::GenerateKeyboardParam(SDL_SCANCODE_S), // B
-        InputCommon::GenerateKeyboardParam(SDL_SCANCODE_Z), // X
-        InputCommon::GenerateKeyboardParam(SDL_SCANCODE_X), // Y
-        InputCommon::GenerateKeyboardParam(SDL_SCANCODE_T), // Up
-        InputCommon::GenerateKeyboardParam(SDL_SCANCODE_G), // Down
-        InputCommon::GenerateKeyboardParam(SDL_SCANCODE_F), // Left
-        InputCommon::GenerateKeyboardParam(SDL_SCANCODE_H), // Right
-        InputCommon::GenerateKeyboardParam(SDL_SCANCODE_Q), // L
-        InputCommon::GenerateKeyboardParam(SDL_SCANCODE_W), // R
-        InputCommon::GenerateKeyboardParam(SDL_SCANCODE_M), // Start
-        InputCommon::GenerateKeyboardParam(SDL_SCANCODE_N), // Select
-        InputCommon::GenerateKeyboardParam(SDL_SCANCODE_0), // Debug
-        InputCommon::GenerateKeyboardParam(SDL_SCANCODE_P), // GPIO14
-        InputCommon::GenerateKeyboardParam(SDL_SCANCODE_1), // ZL
-        InputCommon::GenerateKeyboardParam(SDL_SCANCODE_2), // ZR
-        InputCommon::GenerateKeyboardParam(SDL_SCANCODE_B), // Home
-        // All the code above can be changed to JSON buttons
+        InputCommon::GenerateKeyboardParam(SDL_SCANCODE_A),
+        InputCommon::GenerateKeyboardParam(SDL_SCANCODE_S),
+        InputCommon::GenerateKeyboardParam(SDL_SCANCODE_Z),
+        InputCommon::GenerateKeyboardParam(SDL_SCANCODE_X),
+        InputCommon::GenerateKeyboardParam(SDL_SCANCODE_T),
+        InputCommon::GenerateKeyboardParam(SDL_SCANCODE_G),
+        InputCommon::GenerateKeyboardParam(SDL_SCANCODE_F),
+        InputCommon::GenerateKeyboardParam(SDL_SCANCODE_H),
+        InputCommon::GenerateKeyboardParam(SDL_SCANCODE_Q),
+        InputCommon::GenerateKeyboardParam(SDL_SCANCODE_W),
+        InputCommon::GenerateKeyboardParam(SDL_SCANCODE_M),
+        InputCommon::GenerateKeyboardParam(SDL_SCANCODE_N),
+        InputCommon::GenerateKeyboardParam(SDL_SCANCODE_0),
+        InputCommon::GenerateKeyboardParam(SDL_SCANCODE_P),
+        InputCommon::GenerateKeyboardParam(SDL_SCANCODE_1),
+        InputCommon::GenerateKeyboardParam(SDL_SCANCODE_2),
+        InputCommon::GenerateKeyboardParam(SDL_SCANCODE_B),
     };
 
     std::array<std::string, NativeAnalog::NumAnalogs> analogs = {
-        // All the code below can be changed to JSON analogs
-        InputCommon::GenerateAnalogParamFromKeys(
-            // Circle Pad
-            SDL_SCANCODE_UP,    // Up
-            SDL_SCANCODE_DOWN,  // Down
-            SDL_SCANCODE_LEFT,  // Left
-            SDL_SCANCODE_RIGHT, // Right
-            SDL_SCANCODE_D,     // Modifier Key
-            0.5f                // Modifier
-            ),
-        InputCommon::GenerateAnalogParamFromKeys(
-            // Circle Pad Pro
-            SDL_SCANCODE_I, // Up
-            SDL_SCANCODE_K, // Down
-            SDL_SCANCODE_J, // Left
-            SDL_SCANCODE_L, // Right
-            SDL_SCANCODE_D, // Modifier Key
-            0.5f            // Modifier
-            ),
-        // All the code above can be changed to JSON analogs
+        InputCommon::GenerateAnalogParamFromKeys(SDL_SCANCODE_UP, SDL_SCANCODE_DOWN,
+                                                 SDL_SCANCODE_LEFT, SDL_SCANCODE_RIGHT,
+                                                 SDL_SCANCODE_D, 0.5f),
+        InputCommon::GenerateAnalogParamFromKeys(SDL_SCANCODE_I, SDL_SCANCODE_K, SDL_SCANCODE_J,
+                                                 SDL_SCANCODE_L, SDL_SCANCODE_D, 0.5f),
     };
 
-    /// JSON motion_device
     std::string motion_device =
         "engine:motion_emu,update_period:100,sensitivity:0.01,tilt_clamp:90.0";
-
-    /// JSON touch_device
     std::string touch_device = "engine:emu_window";
-
-    // JSON udp_input_address
-    std::string udp_input_address = InputCommon::CemuhookUDP::DEFAULT_ADDR;
-
-    /// JSON udp_input_port
-    u16 udp_input_port = InputCommon::CemuhookUDP::DEFAULT_PORT;
-
-    /// JSON udp_pad_index
-    u8 udp_pad_index = 0;
+    std::string cemuhookudp_address = InputCommon::CemuhookUDP::DEFAULT_ADDR;
+    u16 cemuhookudp_port = InputCommon::CemuhookUDP::DEFAULT_PORT;
+    u8 cemuhookudp_pad_index = 0;
 
     // Layout
-
-    /**
-     * Valid values:
-     *  - LayoutOption::Default
-     *  - LayoutOption::SingleScreen
-     *  - LayoutOption::LargeScreen
-     *  - LayoutOption::SideScreen
-     *  - LayoutOption::MediumScreen
-     */
-    LayoutOption layout_option = LayoutOption::Default;
-
-    bool swap_screen = false;
-    bool upright_screen = false;
-    bool custom_layout = false;
-    u16 custom_top_left = 0;
-    u16 custom_top_top = 0;
-    u16 custom_top_right = 400;
-    u16 custom_top_bottom = 240;
-    u16 custom_bottom_left = 40;
-    u16 custom_bottom_top = 240;
-    u16 custom_bottom_right = 360;
-    u16 custom_bottom_bottom = 480;
+    Layout layout = Layout::Default;
+    bool swap_screens = false;
+    bool upright_screens = false;
+    bool use_custom_layout = false;
+    u16 custom_layout_top_left = 0;
+    u16 custom_layout_top_top = 0;
+    u16 custom_layout_top_right = 400;
+    u16 custom_layout_top_bottom = 240;
+    u16 custom_layout_bottom_left = 40;
+    u16 custom_layout_bottom_top = 240;
+    u16 custom_layout_bottom_right = 360;
+    u16 custom_layout_bottom_bottom = 480;
 
     // LLE Modules
     std::unordered_map<std::string, bool> lle_modules = {

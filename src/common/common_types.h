@@ -45,8 +45,6 @@ typedef std::int64_t s64; ///< 64-bit signed int
 typedef float f32;  ///< 32-bit floating point
 typedef double f64; ///< 64-bit floating point
 
-// TODO: It would be nice to eventually replace these with strong types that prevent accidental
-// conversion between each other.
 typedef u32 VAddr; ///< Represents a pointer in the userspace virtual address space.
 typedef u32 PAddr; ///< Represents a pointer in the ARM11 physical address space.
 

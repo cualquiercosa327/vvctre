@@ -96,7 +96,7 @@ const std::array<ServiceModuleInfo, 40> service_module_map{
      {"SSL", 0x00040130'00002F02, SSL::InstallInterfaces},
      {"PS", 0x00040130'00003102, PS::InstallInterfaces},
      {"MCU", 0x00040130'00001F02, MCU::InstallInterfaces},
-     // no HLE implementation
+     // No HLE implementation
      {"CDC", 0x00040130'00001802, nullptr},
      {"GPIO", 0x00040130'00001B02, nullptr},
      {"I2C", 0x00040130'00001E02, nullptr},

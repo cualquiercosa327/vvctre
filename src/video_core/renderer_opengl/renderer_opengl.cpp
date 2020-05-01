@@ -322,8 +322,8 @@ void RendererOpenGL::LoadColorToActiveGLTexture(u8 color_r, u8 color_g, u8 color
  * Initializes the OpenGL state and creates persistent objects.
  */
 void RendererOpenGL::InitOpenGLObjects() {
-    glClearColor(Settings::values.bg_red, Settings::values.bg_green, Settings::values.bg_blue,
-                 0.0f);
+    glClearColor(Settings::values.background_color_red, Settings::values.background_color_green,
+                 Settings::values.background_color_blue, 0.0f);
 
     filter_sampler.Create();
     ReloadSampler();
@@ -376,9 +376,9 @@ void RendererOpenGL::InitOpenGLObjects() {
 
 void RendererOpenGL::ReloadSampler() {
     glSamplerParameteri(filter_sampler.handle, GL_TEXTURE_MIN_FILTER,
-                        Settings::values.filter_mode ? GL_LINEAR : GL_NEAREST);
+                        Settings::values.enable_linear_filtering ? GL_LINEAR : GL_NEAREST);
     glSamplerParameteri(filter_sampler.handle, GL_TEXTURE_MAG_FILTER,
-                        Settings::values.filter_mode ? GL_LINEAR : GL_NEAREST);
+                        Settings::values.enable_linear_filtering ? GL_LINEAR : GL_NEAREST);
     glSamplerParameteri(filter_sampler.handle, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glSamplerParameteri(filter_sampler.handle, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 }
@@ -388,11 +388,11 @@ void RendererOpenGL::ReloadShader() {
     std::string shader_data;
 
     if (Settings::values.render_3d == Settings::StereoRenderOption::Anaglyph) {
-        if (Settings::values.pp_shader_name == "dubois (builtin)") {
+        if (Settings::values.post_processing_shader == "dubois (builtin)") {
             shader_data += fragment_shader_anaglyph;
         } else {
             std::string shader_text =
-                OpenGL::GetPostProcessingShaderCode(true, Settings::values.pp_shader_name);
+                OpenGL::GetPostProcessingShaderCode(true, Settings::values.post_processing_shader);
             if (shader_text.empty()) {
                 // Should probably provide some information that the shader couldn't load
                 shader_data += fragment_shader_anaglyph;
@@ -401,11 +401,11 @@ void RendererOpenGL::ReloadShader() {
             }
         }
     } else if (Settings::values.render_3d == Settings::StereoRenderOption::Interlaced) {
-        if (Settings::values.pp_shader_name == "horizontal (builtin)") {
+        if (Settings::values.post_processing_shader == "horizontal (builtin)") {
             shader_data += fragment_shader_interlaced;
         } else {
             std::string shader_text =
-                OpenGL::GetPostProcessingShaderCode(true, Settings::values.pp_shader_name);
+                OpenGL::GetPostProcessingShaderCode(true, Settings::values.post_processing_shader);
             if (shader_text.empty()) {
                 // Should probably provide some information that the shader couldn't load
                 shader_data += fragment_shader_interlaced;
@@ -414,11 +414,11 @@ void RendererOpenGL::ReloadShader() {
             }
         }
     } else {
-        if (Settings::values.pp_shader_name == "none (builtin)") {
+        if (Settings::values.post_processing_shader == "none (builtin)") {
             shader_data += fragment_shader;
         } else {
             const std::string shader_text =
-                OpenGL::GetPostProcessingShaderCode(false, Settings::values.pp_shader_name);
+                OpenGL::GetPostProcessingShaderCode(false, Settings::values.post_processing_shader);
             if (shader_text.empty()) {
                 // Should probably provide some information that the shader couldn't load
                 shader_data += fragment_shader;
@@ -643,10 +643,10 @@ void RendererOpenGL::DrawSingleScreenStereo(const ScreenInfo& screen_info_l,
  * Draws the emulated screens to the emulator window.
  */
 void RendererOpenGL::DrawScreens(const Layout::FramebufferLayout& layout) {
-    if (VideoCore::g_renderer_bg_color_update_requested.exchange(false)) {
+    if (VideoCore::g_renderer_background_color_update_requested.exchange(false)) {
         // Update background color before drawing
-        glClearColor(Settings::values.bg_red, Settings::values.bg_green, Settings::values.bg_blue,
-                     0.0f);
+        glClearColor(Settings::values.background_color_red, Settings::values.background_color_green,
+                     Settings::values.background_color_blue, 0.0f);
     }
 
     if (VideoCore::g_renderer_sampler_update_requested.exchange(false)) {

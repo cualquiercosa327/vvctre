@@ -214,7 +214,7 @@ System::ResultStatus System::Init(Frontend::EmuWindow& emu_window, u32 system_mo
 
     memory->SetDSP(*dsp_core);
 
-    dsp_core->SetSink(Settings::values.sink_id, Settings::values.audio_device_id);
+    dsp_core->SetSink(Settings::values.audio_sink_id, Settings::values.audio_device_id);
 
     service_manager = std::make_shared<Service::SM::ServiceManager>(*this);
     archive_manager = std::make_unique<Service::FS::ArchiveManager>(*this);

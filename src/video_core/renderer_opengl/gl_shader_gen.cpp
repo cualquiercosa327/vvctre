@@ -6,6 +6,7 @@
 #include <cstddef>
 #include <cstring>
 #include <string_view>
+#include <fmt/format.h>
 #include "common/assert.h"
 #include "common/bit_field.h"
 #include "common/bit_set.h"
@@ -20,7 +21,6 @@
 #include "video_core/renderer_opengl/gl_shader_gen.h"
 #include "video_core/renderer_opengl/gl_shader_util.h"
 #include "video_core/video_core.h"
-#include <fmt/format.h>
 
 using Pica::FramebufferRegs;
 using Pica::LightingRegs;
@@ -251,7 +251,7 @@ void PicaShaderConfigCommon::Init(const Pica::ShaderRegs& regs, Pica::Shader::Sh
     program_hash = setup.GetProgramCodeHash();
     swizzle_hash = setup.GetSwizzleDataHash();
     main_offset = regs.main_offset;
-    sanitize_mul = VideoCore::g_hw_shader_accurate_mul;
+    sanitize_mul = VideoCore::g_hardware_shader_accurate_multiplication;
 
     num_outputs = 0;
     output_map.fill(16);
@@ -630,7 +630,8 @@ static void WriteTevStage(std::string& out, const PicaFSConfig& config, unsigned
 
         if (stage.color_op == TevStageConfig::Operation::Dot3_RGBA) {
             // result of Dot3_RGBA operation is also placed to the alpha component
-            out += fmt::format("float alpha_output_{} = color_output_{}[0];\n", index_name, index_name);
+            out += fmt::format("float alpha_output_{} = color_output_{}[0];\n", index_name,
+                               index_name);
         } else {
             out += fmt::format("float alpha_results_{}[3] = float[3](", index_name);
             AppendAlphaModifier(out, config, stage.alpha_modifier1, stage.alpha_source1,

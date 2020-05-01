@@ -17,11 +17,11 @@ namespace VideoCore {
 
 std::unique_ptr<RendererBase> g_renderer; ///< Renderer plugin
 
-std::atomic<bool> g_hw_renderer_enabled;
+std::atomic<bool> g_hardware_renderer_enabled;
 std::atomic<bool> g_shader_jit_enabled;
-std::atomic<bool> g_hw_shader_enabled;
-std::atomic<bool> g_hw_shader_accurate_mul;
-std::atomic<bool> g_renderer_bg_color_update_requested;
+std::atomic<bool> g_hardware_shader_enabled;
+std::atomic<bool> g_hardware_shader_accurate_multiplication;
+std::atomic<bool> g_renderer_background_color_update_requested;
 std::atomic<bool> g_renderer_sampler_update_requested;
 std::atomic<bool> g_renderer_shader_update_requested;
 std::atomic<bool> g_texture_filter_update_requested;
@@ -75,9 +75,9 @@ bool RequestScreenshot(void* data, std::function<void()> callback,
 }
 
 u16 GetResolutionScaleFactor() {
-    if (g_hw_renderer_enabled) {
-        return Settings::values.resolution_factor
-                   ? Settings::values.resolution_factor
+    if (g_hardware_renderer_enabled) {
+        return Settings::values.resolution
+                   ? Settings::values.resolution
                    : g_renderer->GetRenderWindow().GetFramebufferLayout().GetScalingRatio();
     } else {
         // Software renderer always render at native resolution
