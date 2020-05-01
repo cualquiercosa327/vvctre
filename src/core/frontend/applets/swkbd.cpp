@@ -122,12 +122,15 @@ ValidationError SoftwareKeyboard::ValidateButton(u8 button, const KeyboardConfig
 }
 
 ValidationError SoftwareKeyboard::Finalize(const std::string& text, u8 button) {
-    ValidationError error;
-    if ((error = ValidateInput(text, config)) != ValidationError::None) {
-        return error;
-    }
-    if ((error = ValidateButton(button, config)) != ValidationError::None) {
-        return error;
+    // Skip check when OK is not pressed
+    if (button == static_cast<u8>(config.button_config)) {
+        ValidationError error;
+        if ((error = ValidateInput(text, config)) != ValidationError::None) {
+            return error;
+        }
+        if ((error = ValidateButton(button, config)) != ValidationError::None) {
+            return error;
+        }
     }
     data = {text, button};
     data_ready = true;
