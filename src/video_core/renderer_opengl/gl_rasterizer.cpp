@@ -31,8 +31,8 @@ using PixelFormat = SurfaceParams::PixelFormat;
 using SurfaceType = SurfaceParams::SurfaceType;
 
 static bool IsVendorAmd() {
-    std::string gpu_vendor{reinterpret_cast<char const*>(glGetString(GL_VENDOR))};
-    std::string gpu_renderer{reinterpret_cast<char const*>(glGetString(GL_RENDERER))};
+    const std::string_view gpu_vendor{reinterpret_cast<char const*>(glGetString(GL_VENDOR))};
+    const std::string_view gpu_renderer{reinterpret_cast<char const*>(glGetString(GL_RENDERER))};
     return gpu_vendor == "ATI Technologies Inc." || gpu_vendor == "Advanced Micro Devices, Inc." ||
            gpu_renderer == "Intel(R) HD Graphics 4600" ||
            gpu_renderer == "Intel(R) HD Graphics 4400";
