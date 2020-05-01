@@ -677,22 +677,44 @@ VVCTRE_PLUGIN_FUNCTION bool vvctre_settings_get_use_cpu_jit() {
 }
 
 VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_limit_speed(bool value) {
-    Settings.values.limit_speed = value;
+    Settings::values.limit_speed = value;
 }
 
-VVCTRE_PLUGIN_FUNCTION bool vvctre_settings_get_limit_speed();
+VVCTRE_PLUGIN_FUNCTION bool vvctre_settings_get_limit_speed() {
+    return Settings::values.limit_speed;
+}
 
-VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_speed_limit(u16 value);
-VVCTRE_PLUGIN_FUNCTION u16 vvctre_settings_get_speed_limit();
+VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_speed_limit(u16 value) {
+    Settings::values.speed_limit = value;
+}
 
-VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_use_custom_cpu_ticks(bool value);
-VVCTRE_PLUGIN_FUNCTION bool vvctre_settings_get_use_custom_cpu_ticks();
+VVCTRE_PLUGIN_FUNCTION u16 vvctre_settings_get_speed_limit() {
+    return Settings::values.speed_limit;
+}
 
-VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_custom_cpu_ticks(u64 value);
-VVCTRE_PLUGIN_FUNCTION u64 vvctre_settings_get_custom_cpu_ticks();
+VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_use_custom_cpu_ticks(bool value) {
+    Settings::values.use_custom_cpu_ticks = value;
+}
 
-VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_cpu_clock_percentage(u32 value);
-VVCTRE_PLUGIN_FUNCTION u32 vvctre_settings_get_cpu_clock_percentage();
+VVCTRE_PLUGIN_FUNCTION bool vvctre_settings_get_use_custom_cpu_ticks() {
+    return Settings::values.use_custom_cpu_ticks;
+}
+
+VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_custom_cpu_ticks(u64 value) {
+    Settings::values.custom_cpu_ticks = value;
+}
+
+VVCTRE_PLUGIN_FUNCTION u64 vvctre_settings_get_custom_cpu_ticks() {
+    return Settings::values.custom_cpu_ticks;
+}
+
+VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_cpu_clock_percentage(u32 value) {
+    Settings::values.cpu_clock_percentage = value;
+}
+
+VVCTRE_PLUGIN_FUNCTION u32 vvctre_settings_get_cpu_clock_percentage() {
+    return Settings::values.cpu_clock_percentage;
+}
 
 // Audio Settings
 VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_enable_dsp_lle(bool value);
