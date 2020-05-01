@@ -18,6 +18,7 @@
 #include "core/hle/service/nfc/nfc.h"
 #include "core/memory.h"
 #include "core/movie.h"
+#include "core/settings.h"
 #include "vvctre/common.h"
 #include "vvctre/plugins.h"
 
@@ -552,25 +553,58 @@ VVCTRE_PLUGIN_FUNCTION void vvctre_use_real_motion_state(void* core) {
 }
 
 // Start Settings
-VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_file_path(const char* value);
-VVCTRE_PLUGIN_FUNCTION const char* vvctre_settings_get_file_path();
+VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_file_path(const char* value) {
+    Settings::values.file_path = std::string(value);
+}
 
-VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_play_movie(const char* value);
-VVCTRE_PLUGIN_FUNCTION const char* vvctre_settings_get_play_movie();
+VVCTRE_PLUGIN_FUNCTION const char* vvctre_settings_get_file_path() {
+    return Settings::values.file_path.c_str();
+}
 
-VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_record_movie(const char* value);
-VVCTRE_PLUGIN_FUNCTION const char* vvctre_settings_get_record_movie();
+VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_play_movie(const char* value) {
+    Settings::values.play_movie = std::string(value);
+}
 
-VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_region_value(int value);
-VVCTRE_PLUGIN_FUNCTION int vvctre_settings_get_region_value();
+VVCTRE_PLUGIN_FUNCTION const char* vvctre_settings_get_play_movie() {
+    return Settings::values.play_movie.c_str();
+}
 
-VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_log_filter(const char* value);
-VVCTRE_PLUGIN_FUNCTION const char* vvctre_settings_get_log_filter();
+VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_record_movie(const char* value) {
+    Settings::values.record_movie = std::string(value);
+}
 
-VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_multiplayer_url(const char* value);
-VVCTRE_PLUGIN_FUNCTION const char* vvctre_settings_get_multiplayer_url();
+VVCTRE_PLUGIN_FUNCTION const char* vvctre_settings_get_record_movie() {
+    return Settings::values.record_movie.c_str();
+}
 
-VVCTRE_PLUGIN_FUNCTION void vvctre_settings_use_system_time();
+VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_region_value(int value) {
+    Settings::values.region_value = value;
+}
+
+VVCTRE_PLUGIN_FUNCTION int vvctre_settings_get_region_value() {
+    return Settings::values.region_value;
+}
+
+VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_log_filter(const char* value) {
+    Settings::values.log_filter = std::string(value);
+}
+
+VVCTRE_PLUGIN_FUNCTION const char* vvctre_settings_get_log_filter() {
+    return Settings::values.log_filter.c_str();
+}
+
+VVCTRE_PLUGIN_FUNCTION void vvctre_settings_set_multiplayer_url(const char* value) {
+    Settings::values.multiplayer_url = std::string(value);
+}
+
+VVCTRE_PLUGIN_FUNCTION const char* vvctre_settings_get_multiplayer_url() {
+    return Settings::values.multiplayer_url.c_str();
+}
+
+VVCTRE_PLUGIN_FUNCTION void vvctre_settings_use_system_time() {
+    Settings::values.initial_clock = Settings::InitialClock::FixedTime;
+}
+
 VVCTRE_PLUGIN_FUNCTION void vvctre_settings_use_unix_timestamp(u64 timestamp);
 VVCTRE_PLUGIN_FUNCTION int vvctre_settings_clock();
 

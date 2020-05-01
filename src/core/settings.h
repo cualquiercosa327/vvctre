@@ -129,7 +129,7 @@ struct Values {
     int region_value = REGION_VALUE_AUTO_SELECT;
     std::string log_filter = "*:Info";
     std::string multiplayer_url = "ws://vvctre-multiplayer.glitch.me";
-    InitialClock clock = InitialClock::SystemTime;
+    InitialClock initial_clock = InitialClock::SystemTime;
     u64 unix_timestamp = 0;
     bool use_virtual_sd = true;
     bool start_in_fullscreen_mode = false;

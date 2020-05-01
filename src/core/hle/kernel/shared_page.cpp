@@ -16,14 +16,14 @@
 
 namespace SharedPage {
 
-static std::chrono::seconds GetInitTime() {
-    const u64 override_init_time = Core::Movie::GetInstance().GetOverrideInitialTime();
-    if (override_init_time != 0) {
-        // Override the clock init time with the one in the movie
-        return std::chrono::seconds(override_init_time);
+static std::chrono::seconds GetInitialTime() {
+    const u64 override_initial_time = Core::Movie::GetInstance().GetOverrideInitialTime();
+    if (override_initial_time != 0) {
+        // Override the initial time with the one in the movie
+        return std::chrono::seconds(override_initial_time);
     }
 
-    switch (Settings::values.clock) {
+    switch (Settings::values.initial_clock) {
     case Settings::InitialClock::SystemTime: {
         auto now = std::chrono::system_clock::now();
         // If the system time is in daylight saving, we give an additional hour to console time
@@ -37,7 +37,7 @@ static std::chrono::seconds GetInitTime() {
         return std::chrono::seconds(Settings::values.unix_timestamp);
     default:
         UNREACHABLE_MSG("Invalid InitialClock value ({})",
-                        static_cast<u32>(Settings::values.clock));
+                        static_cast<u32>(Settings::values.initial_clock));
     }
 }
 
@@ -57,7 +57,7 @@ Handler::Handler(Core::Timing& timing) : timing(timing) {
     shared_page.battery_state.is_adapter_connected.Assign(1);
     shared_page.battery_state.is_charging.Assign(1);
 
-    unix_timestamp = GetInitTime();
+    unix_timestamp = GetInitialTime();
 
     using namespace std::placeholders;
     update_time_event = timing.RegisterEvent("SharedPage::UpdateTimeCallback",

@@ -289,7 +289,7 @@ void InitialSettings::Run() {
                     ImGui::Text("Start Time:");
                     ImGui::SameLine();
                     if (ImGui::BeginCombo("##start_time", [] {
-                            switch (Settings::values.clock) {
+                            switch (Settings::values.initial_clock) {
                             case Settings::InitialClock::SystemTime:
                                 return "System";
                             case Settings::InitialClock::FixedTime:
@@ -301,16 +301,16 @@ void InitialSettings::Run() {
                             return "Invalid";
                         }())) {
                         if (ImGui::Selectable("System")) {
-                            Settings::values.clock = Settings::InitialClock::SystemTime;
+                            Settings::values.initial_clock = Settings::InitialClock::SystemTime;
                         }
 
                         if (ImGui::Selectable("Unix Timestamp")) {
-                            Settings::values.clock = Settings::InitialClock::FixedTime;
+                            Settings::values.initial_clock = Settings::InitialClock::FixedTime;
                         }
 
                         ImGui::EndCombo();
                     }
-                    if (Settings::values.clock == Settings::InitialClock::FixedTime) {
+                    if (Settings::values.initial_clock == Settings::InitialClock::FixedTime) {
                         ImGui::SameLine();
                         ImGui::InputScalar("##start_time_unix_timestamp", ImGuiDataType_U64,
                                            &Settings::values.unix_timestamp);

@@ -104,7 +104,7 @@ struct VCMHeader {
     std::array<u8, 4>
         filetype;      /// Unique identifier to check the file type (always `header_magic_bytes`)
     u64_le program_id; /// ID of the ROM being executed. Also called title_id
-    u64_le clock_init_time; /// The init time of the system clock
+    u64_le clock_initial_time; /// The init time of the system clock
 
     std::array<u8, 236> reserved; /// Make heading 256 bytes so it has consistent size
 };
@@ -348,7 +348,7 @@ void Movie::SaveMovie() {
 
     VCMHeader header = {};
     header.filetype = header_magic_bytes;
-    header.clock_init_time = unix_timestamp;
+    header.clock_initial_time = unix_timestamp;
 
     Core::System::GetInstance().GetAppLoader().ReadProgramId(header.program_id);
 
@@ -411,11 +411,11 @@ void Movie::PrepareForPlayback(const std::string& movie_file) {
         return;
     }
 
-    unix_timestamp = header.value().clock_init_time;
+    unix_timestamp = header.value().clock_initial_time;
 }
 
 void Movie::PrepareForRecording() {
-    unix_timestamp = (Settings::values.clock == Settings::InitialClock::SystemTime
+    unix_timestamp = (Settings::values.initial_clock == Settings::InitialClock::SystemTime
                           ? Common::Timer::GetTimeSinceJan1970().count()
                           : Settings::values.unix_timestamp);
 }
