@@ -19,7 +19,7 @@
 
 namespace FileSys {
 
-std::string GetSystemSaveDataPath(const std::string& mount_point, const Path& path) {
+std::string GetSystemSaveDataPath(std::string_view mount_point, const Path& path) {
     const std::vector<u8> vec_data = path.AsBinary();
     u32 save_low;
     u32 save_high;
@@ -28,7 +28,7 @@ std::string GetSystemSaveDataPath(const std::string& mount_point, const Path& pa
     return fmt::format("{}{:08X}/{:08X}/", mount_point, save_low, save_high);
 }
 
-std::string GetSystemSaveDataContainerPath(const std::string& mount_point) {
+std::string GetSystemSaveDataContainerPath(std::string_view mount_point) {
     return fmt::format("{}data/{}/sysdata/", mount_point, SYSTEM_ID);
 }
 
