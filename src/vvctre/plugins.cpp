@@ -60,7 +60,13 @@ PluginManager::PluginManager(void* core) {
             void* handle = dlopen(fmt::format("./{}", entry.virtualName).c_str(), RTLD_LAZY);
 #endif
             if (handle == NULL) {
-                fmt::print("Plugin {} failed to load: {}\n", entry.virtualName, GetLastErrorMsg());
+                fmt::print("Plugin {} failed to load: {}\n", entry.virtualName,
+#ifdef _WIN32
+                           GetLastErrorMsg()
+#else
+                           dlerror()
+#endif
+                );
             } else {
                 PluginImportedFunctions::PluginLoaded f =
                     (PluginImportedFunctions::PluginLoaded)GetProcAddress(handle, "PluginLoaded");

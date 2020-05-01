@@ -1,5 +1,6 @@
 # Build directory
-[Bb]uild/
+build/
+ubuntu_build/
 
 # Project/editor files
 *.swp
