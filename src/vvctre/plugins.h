@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <unordered_map>
 #include <vector>
 #include "core/frontend/input.h"
 #include "vvctre/function_logger.h"
@@ -63,4 +64,6 @@ private:
 
     std::vector<Plugin> plugins;
     std::vector<std::unique_ptr<Input::ButtonDevice>> buttons;
+
+    static std::unordered_map<std::string, void*> function_map;
 };
