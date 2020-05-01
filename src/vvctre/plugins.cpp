@@ -333,6 +333,14 @@ void vvctre_write_u64(void* core, VAddr address, u64 value) {
     static_cast<Core::System*>(core)->Memory().Write64(address, value);
 }
 
+void* vvctre_malloc(std::size_t size) {
+    return std::malloc(size);
+}
+
+void vvctre_free(void* block) {
+    std::free(block);
+}
+
 // Debugging
 void vvctre_set_pc(void* core, u32 addr) {
     static_cast<Core::System*>(core)->CPU().SetPC(addr);
@@ -586,6 +594,84 @@ void vvctre_use_real_motion_state(void* core) {
         Service::HID::GetModule(*static_cast<Core::System*>(core));
 
     hid->SetCustomPadState(std::nullopt);
+}
+
+bool vvctre_screenshot(void* plugin_manager, void* data) {
+    const Layout::FramebufferLayout& layout =
+        VideoCore::g_renderer->GetRenderWindow().GetFramebufferLayout();
+
+    return VideoCore::RequestScreenshot(
+        data,
+        [=] {
+            const auto convert_bgra_to_rgba = [](const std::vector<u8>& input,
+                                                 const Layout::FramebufferLayout& layout) {
+                int offset = 0;
+                std::vector<u8> output(input.size());
+
+                for (u32 y = 0; y < layout.height; ++y) {
+                    for (u32 x = 0; x < layout.width; ++x) {
+                        output[offset] = input[offset + 2];
+                        output[offset + 1] = input[offset + 1];
+                        output[offset + 2] = input[offset];
+                        output[offset + 3] = input[offset + 3];
+
+                        offset += 4;
+                    }
+                }
+
+                return output;
+            };
+
+            std::vector<u8> v(layout.width * layout.height * 4);
+            std::memcpy(v.data(), data, v.size());
+            v = convert_bgra_to_rgba(v, layout);
+            Common::FlipRGBA8Texture(v, static_cast<u64>(layout.width),
+                                     static_cast<u64>(layout.height));
+            std::memcpy(data, v.data(), v.size());
+
+            PluginManager* pm = static_cast<PluginManager*>(plugin_manager);
+            pm->CallScreenshotCallbacks(data);
+        },
+        layout);
+}
+
+bool vvctre_screenshot_default_layout(void* plugin_manager, void* data) {
+    const Layout::FramebufferLayout layout = Layout::DefaultFrameLayout(
+        Core::kScreenTopWidth, Core::kScreenTopHeight + Core::kScreenBottomHeight, false, false);
+
+    return VideoCore::RequestScreenshot(
+        data,
+        [=] {
+            const auto convert_bgra_to_rgba = [](const std::vector<u8>& input,
+                                                 const Layout::FramebufferLayout& layout) {
+                int offset = 0;
+                std::vector<u8> output(input.size());
+
+                for (u32 y = 0; y < layout.height; ++y) {
+                    for (u32 x = 0; x < layout.width; ++x) {
+                        output[offset] = input[offset + 2];
+                        output[offset + 1] = input[offset + 1];
+                        output[offset + 2] = input[offset];
+                        output[offset + 3] = input[offset + 3];
+
+                        offset += 4;
+                    }
+                }
+
+                return output;
+            };
+
+            std::vector<u8> v(layout.width * layout.height * 4);
+            std::memcpy(v.data(), data, v.size());
+            v = convert_bgra_to_rgba(v, layout);
+            Common::FlipRGBA8Texture(v, static_cast<u64>(layout.width),
+                                     static_cast<u64>(layout.height));
+            std::memcpy(data, v.data(), v.size());
+
+            PluginManager* pm = static_cast<PluginManager*>(plugin_manager);
+            pm->CallScreenshotCallbacks(data);
+        },
+        layout);
 }
 
 // Settings
@@ -1180,92 +1266,6 @@ u16 vvctre_get_play_coins() {
     return Service::PTM::Module::GetPlayCoins();
 }
 
-bool vvctre_screenshot(void* plugin_manager, void* data) {
-    const Layout::FramebufferLayout& layout =
-        VideoCore::g_renderer->GetRenderWindow().GetFramebufferLayout();
-
-    return VideoCore::RequestScreenshot(
-        data,
-        [=] {
-            const auto convert_bgra_to_rgba = [](const std::vector<u8>& input,
-                                                 const Layout::FramebufferLayout& layout) {
-                int offset = 0;
-                std::vector<u8> output(input.size());
-
-                for (u32 y = 0; y < layout.height; ++y) {
-                    for (u32 x = 0; x < layout.width; ++x) {
-                        output[offset] = input[offset + 2];
-                        output[offset + 1] = input[offset + 1];
-                        output[offset + 2] = input[offset];
-                        output[offset + 3] = input[offset + 3];
-
-                        offset += 4;
-                    }
-                }
-
-                return output;
-            };
-
-            std::vector<u8> v(layout.width * layout.height * 4);
-            std::memcpy(v.data(), data, v.size());
-            v = convert_bgra_to_rgba(v, layout);
-            Common::FlipRGBA8Texture(v, static_cast<u64>(layout.width),
-                                     static_cast<u64>(layout.height));
-            std::memcpy(data, v.data(), v.size());
-
-            PluginManager* pm = static_cast<PluginManager*>(plugin_manager);
-            pm->CallScreenshotCallbacks(data);
-        },
-        layout);
-}
-
-bool vvctre_screenshot_default_layout(void* plugin_manager, void* data) {
-    const Layout::FramebufferLayout layout = Layout::DefaultFrameLayout(
-        Core::kScreenTopWidth, Core::kScreenTopHeight + Core::kScreenBottomHeight, false, false);
-
-    return VideoCore::RequestScreenshot(
-        data,
-        [=] {
-            const auto convert_bgra_to_rgba = [](const std::vector<u8>& input,
-                                                 const Layout::FramebufferLayout& layout) {
-                int offset = 0;
-                std::vector<u8> output(input.size());
-
-                for (u32 y = 0; y < layout.height; ++y) {
-                    for (u32 x = 0; x < layout.width; ++x) {
-                        output[offset] = input[offset + 2];
-                        output[offset + 1] = input[offset + 1];
-                        output[offset + 2] = input[offset];
-                        output[offset + 3] = input[offset + 3];
-
-                        offset += 4;
-                    }
-                }
-
-                return output;
-            };
-
-            std::vector<u8> v(layout.width * layout.height * 4);
-            std::memcpy(v.data(), data, v.size());
-            v = convert_bgra_to_rgba(v, layout);
-            Common::FlipRGBA8Texture(v, static_cast<u64>(layout.width),
-                                     static_cast<u64>(layout.height));
-            std::memcpy(data, v.data(), v.size());
-
-            PluginManager* pm = static_cast<PluginManager*>(plugin_manager);
-            pm->CallScreenshotCallbacks(data);
-        },
-        layout);
-}
-
-void* vvctre_malloc(std::size_t size) {
-    return std::malloc(size);
-}
-
-void vvctre_free(void* block) {
-    std::free(block);
-}
-
 std::unordered_map<std::string, void*> PluginManager::function_map = {
     // File
     {"vvctre_load_file", (void*)&vvctre_load_file},
@@ -1285,6 +1285,8 @@ std::unordered_map<std::string, void*> PluginManager::function_map = {
     {"vvctre_write_u32", (void*)&vvctre_write_u32},
     {"vvctre_read_u64", (void*)&vvctre_read_u64},
     {"vvctre_write_u64", (void*)&vvctre_write_u64},
+    {"vvctre_malloc", (void*)&vvctre_malloc},
+    {"vvctre_free", (void*)&vvctre_free},
     // Debugging
     {"vvctre_set_pc", (void*)&vvctre_set_pc},
     {"vvctre_get_pc", (void*)&vvctre_get_pc},
@@ -1343,6 +1345,8 @@ std::unordered_map<std::string, void*> PluginManager::function_map = {
     {"vvctre_use_real_touch_state", (void*)&vvctre_use_real_touch_state},
     {"vvctre_set_custom_motion_state", (void*)&vvctre_set_custom_motion_state},
     {"vvctre_use_real_motion_state", (void*)&vvctre_use_real_motion_state},
+    {"vvctre_screenshot", (void*)&vvctre_screenshot},
+    {"vvctre_screenshot_default_layout", (void*)&vvctre_screenshot_default_layout},
     // Settings
     {"vvctre_settings_apply", (void*)&vvctre_settings_apply},
     {"vvctre_settings_log", (void*)&vvctre_settings_log},
@@ -1535,8 +1539,4 @@ std::unordered_map<std::string, void*> PluginManager::function_map = {
     {"vvctre_emulation_running", (void*)&vvctre_emulation_running},
     {"vvctre_set_play_coins", (void*)&vvctre_set_play_coins},
     {"vvctre_get_play_coins", (void*)&vvctre_get_play_coins},
-    {"vvctre_screenshot", (void*)&vvctre_screenshot},
-    {"vvctre_screenshot_default_layout", (void*)&vvctre_screenshot_default_layout},
-    {"vvctre_malloc", (void*)&vvctre_malloc},
-    {"vvctre_free", (void*)&vvctre_free},
 };
