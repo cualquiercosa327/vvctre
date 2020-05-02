@@ -47,7 +47,7 @@ jobs:
           cd $GITHUB_WORKSPACE
           cp license.txt ./build/bin
           if [ "$RUNNER_OS" == "Linux" ]; then
-            rm ./build/bin/tests
+            rm ./build/bin/Release/tests
           elif [ "$RUNNER_OS" == "Windows" ]; then
             rm ./build/bin/Release/tests.exe
             rm ./build/bin/Release/*.pdb
@@ -64,7 +64,7 @@ jobs:
           cd $GITHUB_WORKSPACE
           cp license.txt ./build/bin
           if [ "$RUNNER_OS" == "Linux" ]; then
-            rm ./build/bin/tests
+            rm ./build/bin/Release/tests
           elif [ "$RUNNER_OS" == "Windows" ]; then
             rm ./build/bin/Release/tests.exe
             rm ./build/bin/Release/*.pdb
