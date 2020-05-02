@@ -4,6 +4,7 @@
 
 #include <algorithm>
 #include <cstring>
+#include <type_traits>
 #include <vector>
 #include "common/assert.h"
 #include "common/bit_field.h"
@@ -186,11 +187,6 @@ struct CTRPollFD {
         BitField<4, 1, u32> pollout;
         BitField<5, 1, u32> pollnval;
 
-        Events& operator=(const Events& other) {
-            hex = other.hex;
-            return *this;
-        }
-
         /// Translates the resulting events of a Poll operation from platform-specific to 3DS
         /// specific
         static Events TranslateTo3DS(u32 input_event) {
@@ -250,6 +246,8 @@ struct CTRPollFD {
         return result;
     }
 };
+static_assert(std::is_trivially_copyable_v<CTRPollFD>,
+              "CTRPollFD is used with std::memcpy and must be trivially copyable");
 
 /// Union to represent the 3DS' sockaddr structure
 union CTRSockAddr {
