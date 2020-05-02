@@ -45,32 +45,28 @@ jobs:
         shell: bash
         run: |
           cd $GITHUB_WORKSPACE
-          cp license.txt ./build/bin
+          cp license.txt ./build/bin/Release
           if [ "$RUNNER_OS" == "Linux" ]; then
             rm ./build/bin/Release/tests
           elif [ "$RUNNER_OS" == "Windows" ]; then
             rm ./build/bin/Release/tests.exe
             rm ./build/bin/Release/*.pdb
           fi
-          mv ./build/bin/Release/* ./build/bin
-          rm -rf ./build/bin/Release
           export VERSION=${GITHUB_REF:10}
           echo ::set-env name=VERSION::$VERSION
-          7z a vvctre-$VERSION-${{runner.os}}.7z ./build/bin/*
+          7z a vvctre-$VERSION-${{runner.os}}.7z ./build/bin/Release/*
       - name: Prepare to upload (pull request)
         if: github.event_name == 'pull_request'
         shell: bash
         run: |
           cd $GITHUB_WORKSPACE
-          cp license.txt ./build/bin
+          cp license.txt ./build/bin/release
           if [ "$RUNNER_OS" == "Linux" ]; then
             rm ./build/bin/Release/tests
           elif [ "$RUNNER_OS" == "Windows" ]; then
             rm ./build/bin/Release/tests.exe
             rm ./build/bin/Release/*.pdb
           fi
-          mv ./build/bin/Release/* ./build/bin
-          rm -rf ./build/bin/Release
       - name: Upload (tag push)
         if: github.event_name == 'push'
         uses: svenstaro/upload-release-action@v1-release
@@ -85,7 +81,7 @@ jobs:
         uses: actions/upload-artifact@v1
         with:
           name: vvctre-${{runner.os}}
-          path: build/bin
+          path: build/bin/Release
       - name: Discord Success Notification (tag push)
         if: github.event_name == 'push'
         uses: rjstone/discord-webhook-notify@v1
