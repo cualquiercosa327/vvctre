@@ -353,8 +353,8 @@ void Module::Interface::Write(Kernel::HLERequestContext& ctx) {
                                      buffer);
         }
 
-        const u32 bytes_written =
-            session_data->file->Write(0, buffer.size(), true, buffer.data()).Unwrap();
+        [[maybe_unused]] const u32 bytes_written = static_cast<u32>(
+            session_data->file->Write(0, buffer.size(), true, buffer.data()).Unwrap());
         session_data->file->Close();
 
         rb.Push(RESULT_SUCCESS);
@@ -415,7 +415,8 @@ void Module::Interface::WriteMessage(Kernel::HLERequestContext& ctx) {
                   msg_header.sender_id, msg_header.sender_id2, msg_header.send_count,
                   msg_header.forward_count, msg_header.user_data);
 
-        const u32 bytes_written = message->Write(0, buffer_size, true, buffer.data()).Unwrap();
+        [[maybe_unused]] const u32 bytes_written =
+            static_cast<u32>(message->Write(0, buffer_size, true, buffer.data()).Unwrap());
         message->Close();
 
         rb.Push(RESULT_SUCCESS);
@@ -502,6 +503,8 @@ void Module::Interface::WriteMessageWithHMAC(Kernel::HLERequestContext& ctx) {
         std::memcpy(buffer.data() + hmac_offset, hmac_digest.data(), hmac_size);
 
         const u32 bytes_written = message->Write(0, buffer_size, true, buffer.data()).Unwrap();
+        [[maybe_unused]] const u32 bytes_written =
+            static_cast<u32>(message->Write(0, buffer_size, true, buffer.data()).Unwrap());
         message->Close();
 
         rb.Push(RESULT_SUCCESS);
@@ -743,7 +746,8 @@ void Module::Interface::OpenAndWrite(Kernel::HLERequestContext& ctx) {
                 cecd->CheckAndUpdateFile(path_type, ncch_program_id, buffer);
             }
 
-            const u32 bytes_written = file->Write(0, buffer.size(), true, buffer.data()).Unwrap();
+            [[maybe_unused]] const u32 bytes_written =
+                static_cast<u32>(file->Write(0, buffer.size(), true, buffer.data()).Unwrap());
             file->Close();
 
             rb.Push(RESULT_SUCCESS);

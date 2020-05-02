@@ -27,7 +27,7 @@
 namespace Service::CFG {
 
 /// The maximum number of block entries that can exist in the config file
-static const u32 CONFIG_FILE_MAX_BLOCK_ENTRIES = 1479;
+constexpr u32 CONFIG_FILE_MAX_BLOCK_ENTRIES = 1479;
 
 namespace {
 
@@ -89,22 +89,22 @@ struct ConsoleCountryInfo {
 static_assert(sizeof(ConsoleCountryInfo) == 4, "ConsoleCountryInfo must be exactly 4 bytes");
 } // namespace
 
-static const EULAVersion MAX_EULA_VERSION = {0x7F, 0x7F};
-static const ConsoleModelInfo CONSOLE_MODEL = {NINTENDO_3DS, {0, 0, 0}};
-static const u8 CONSOLE_LANGUAGE = LANGUAGE_EN;
-static const UsernameBlock CONSOLE_USERNAME_BLOCK = {u"vvctre", 0, 0};
-static const BirthdayBlock PROFILE_BIRTHDAY = {1, 4};
-static const u8 SOUND_OUTPUT_MODE = SOUND_STEREO;
+constexpr EULAVersion MAX_EULA_VERSION = {0x7F, 0x7F};
+constexpr ConsoleModelInfo CONSOLE_MODEL = {NINTENDO_3DS, {0, 0, 0}};
+constexpr u8 CONSOLE_LANGUAGE = LANGUAGE_EN;
+constexpr UsernameBlock CONSOLE_USERNAME_BLOCK = {u"vvctre", 0, 0};
+constexpr BirthdayBlock PROFILE_BIRTHDAY = {1, 4};
+constexpr u8 SOUND_OUTPUT_MODE = SOUND_STEREO;
 
 /// TODO(Subv): Find what the other bytes are
-static const ConsoleCountryInfo COUNTRY_INFO = {{0, 0, 0}, 36};
+constexpr ConsoleCountryInfo COUNTRY_INFO = {{0, 0, 0}, 36};
 
 /**
  * TODO(Subv): Find out what this actually is, these values fix some NaN uniforms in some games,
  * for example Nintendo Zone
  * Thanks Normmatt for providing this information
  */
-static const std::array<float, 8> STEREO_CAMERA_SETTINGS = {
+constexpr std::array<float, 8> STEREO_CAMERA_SETTINGS = {
     62.0f, 289.0f, 76.80000305175781f, 46.08000183105469f,
     10.0f, 5.0f,   55.58000183105469f, 21.56999969482422f,
 };
