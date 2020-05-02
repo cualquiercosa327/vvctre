@@ -332,14 +332,6 @@ void vvctre_write_u64(void* core, VAddr address, u64 value) {
     static_cast<Core::System*>(core)->Memory().Write64(address, value);
 }
 
-void* vvctre_malloc(std::size_t size) {
-    return std::malloc(size);
-}
-
-void vvctre_free(void* block) {
-    std::free(block);
-}
-
 // Debugging
 void vvctre_set_pc(void* core, u32 addr) {
     static_cast<Core::System*>(core)->CPU().SetPC(addr);
@@ -637,6 +629,13 @@ void vvctre_use_real_pad_state(void* core) {
     hid->SetCustomPadState(std::nullopt);
 }
 
+u32 vvctre_get_pad_state(void* core) {
+    std::shared_ptr<Service::HID::Module> hid =
+        Service::HID::GetModule(*static_cast<Core::System*>(core));
+
+    return hid->GetPadState().hex;
+}
+
 void vvctre_set_custom_circle_pad_state(void* core, float x, float y) {
     std::shared_ptr<Service::HID::Module> hid =
         Service::HID::GetModule(*static_cast<Core::System*>(core));
@@ -649,6 +648,15 @@ void vvctre_use_real_circle_pad_state(void* core) {
         Service::HID::GetModule(*static_cast<Core::System*>(core));
 
     hid->SetCustomCirclePadState(std::nullopt);
+}
+
+void vvctre_get_circle_pad_state(void* core, float* x_out, float* y_out) {
+    std::shared_ptr<Service::HID::Module> hid =
+        Service::HID::GetModule(*static_cast<Core::System*>(core));
+
+    const auto [x, y] = hid->GetCirclePadState();
+    *x_out = x;
+    *y_out = y;
 }
 
 void vvctre_set_custom_touch_state(void* core, float x, float y, bool pressed) {
@@ -665,6 +673,17 @@ void vvctre_use_real_touch_state(void* core) {
     hid->SetCustomTouchState(std::nullopt);
 }
 
+bool vvctre_get_touch_state(void* core, float* x_out, float* y_out) {
+    std::shared_ptr<Service::HID::Module> hid =
+        Service::HID::GetModule(*static_cast<Core::System*>(core));
+
+    const auto [x, y, pressed] = hid->GetTouchState();
+    *x_out = x;
+    *y_out = y;
+
+    return pressed;
+}
+
 void vvctre_set_custom_motion_state(void* core, float accelerometer[3], float gyroscope[3]) {
     std::shared_ptr<Service::HID::Module> hid =
         Service::HID::GetModule(*static_cast<Core::System*>(core));
@@ -679,6 +698,19 @@ void vvctre_use_real_motion_state(void* core) {
         Service::HID::GetModule(*static_cast<Core::System*>(core));
 
     hid->SetCustomPadState(std::nullopt);
+}
+
+void vvctre_get_motion_state(void* core, float accelerometer_out[3], float gyroscope_out[3]) {
+    std::shared_ptr<Service::HID::Module> hid =
+        Service::HID::GetModule(*static_cast<Core::System*>(core));
+
+    const auto [accelerometer, gyroscope] = hid->GetMotionState();
+    accelerometer_out[0] = accelerometer.x;
+    accelerometer_out[1] = accelerometer.y;
+    accelerometer_out[2] = accelerometer.z;
+    gyroscope_out[0] = gyroscope.x;
+    gyroscope_out[1] = gyroscope.y;
+    gyroscope_out[2] = gyroscope.z;
 }
 
 bool vvctre_screenshot(void* plugin_manager, void* data) {
@@ -1370,8 +1402,6 @@ std::unordered_map<std::string, void*> PluginManager::function_map = {
     {"vvctre_write_u32", (void*)&vvctre_write_u32},
     {"vvctre_read_u64", (void*)&vvctre_read_u64},
     {"vvctre_write_u64", (void*)&vvctre_write_u64},
-    {"vvctre_malloc", (void*)&vvctre_malloc},
-    {"vvctre_free", (void*)&vvctre_free},
     // Debugging
     {"vvctre_set_pc", (void*)&vvctre_set_pc},
     {"vvctre_get_pc", (void*)&vvctre_get_pc},
@@ -1445,12 +1475,16 @@ std::unordered_map<std::string, void*> PluginManager::function_map = {
     // Remote control
     {"vvctre_set_custom_pad_state", (void*)&vvctre_set_custom_pad_state},
     {"vvctre_use_real_pad_state", (void*)&vvctre_use_real_pad_state},
+    {"vvctre_get_pad_state", (void*)&vvctre_get_pad_state},
     {"vvctre_set_custom_circle_pad_state", (void*)&vvctre_set_custom_circle_pad_state},
     {"vvctre_use_real_circle_pad_state", (void*)&vvctre_use_real_circle_pad_state},
+    {"vvctre_get_circle_pad_state", (void*)&vvctre_get_circle_pad_state},
     {"vvctre_set_custom_touch_state", (void*)&vvctre_set_custom_touch_state},
     {"vvctre_use_real_touch_state", (void*)&vvctre_use_real_touch_state},
+    {"vvctre_get_touch_state", (void*)&vvctre_get_touch_state},
     {"vvctre_set_custom_motion_state", (void*)&vvctre_set_custom_motion_state},
     {"vvctre_use_real_motion_state", (void*)&vvctre_use_real_motion_state},
+    {"vvctre_get_motion_state", (void*)&vvctre_get_motion_state},
     {"vvctre_screenshot", (void*)&vvctre_screenshot},
     {"vvctre_screenshot_default_layout", (void*)&vvctre_screenshot_default_layout},
     // Settings
