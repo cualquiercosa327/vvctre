@@ -52,9 +52,9 @@ PluginManager::PluginManager(void* core) {
         if (!entry.isDirectory &&
 #ifdef _WIN32
             entry.virtualName != "SDL2.dll" &&
-            has_suffix(entry.virtualName, fmt::format("{}.dll", vvctre_version_major))
+            has_suffix(entry.virtualName, fmt::format(".vvctre-{}.x.x.dll", vvctre_version_major))
 #else
-            has_suffix(entry.virtualName, fmt::format("{}.so", vvctre_version_major))
+            has_suffix(entry.virtualName, fmt::format(".vvctre-{}.x.x.so", vvctre_version_major))
 #endif
         ) {
 #ifdef _WIN32
