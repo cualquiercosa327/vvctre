@@ -502,7 +502,6 @@ void Module::Interface::WriteMessageWithHMAC(Kernel::HLERequestContext& ctx) {
         hmac.CalculateDigest(hmac_digest.data(), message_body.data(), msg_header.body_size);
         std::memcpy(buffer.data() + hmac_offset, hmac_digest.data(), hmac_size);
 
-        const u32 bytes_written = message->Write(0, buffer_size, true, buffer.data()).Unwrap();
         [[maybe_unused]] const u32 bytes_written =
             static_cast<u32>(message->Write(0, buffer_size, true, buffer.data()).Unwrap());
         message->Close();
