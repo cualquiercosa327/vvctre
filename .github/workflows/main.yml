@@ -51,9 +51,9 @@ jobs:
           elif [ "$RUNNER_OS" == "Windows" ]; then
             rm ./build/bin/Release/tests.exe
             rm ./build/bin/Release/*.pdb
-            mv ./build/bin/Release/* ./build/bin
-            rm -rf ./build/bin/Release
           fi
+          mv ./build/bin/Release/* ./build/bin
+          rm -rf ./build/bin/Release
           export VERSION=${GITHUB_REF:10}
           echo ::set-env name=VERSION::$VERSION
           7z a vvctre-$VERSION-${{runner.os}}.7z ./build/bin/*
@@ -68,9 +68,9 @@ jobs:
           elif [ "$RUNNER_OS" == "Windows" ]; then
             rm ./build/bin/Release/tests.exe
             rm ./build/bin/Release/*.pdb
-            mv ./build/bin/Release/* ./build/bin
-            rm -rf ./build/bin/Release
           fi
+          mv ./build/bin/Release/* ./build/bin
+          rm -rf ./build/bin/Release
       - name: Upload (tag push)
         if: github.event_name == 'push'
         uses: svenstaro/upload-release-action@v1-release
