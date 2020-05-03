@@ -99,7 +99,7 @@ enum class NetworkStatus {
 
 struct ConnectionStatus {
     u32_le status;
-    INSERT_PADDING_WORDS(1);
+    u32_le disconnect_reason;
     u16_le network_node_id;
     u16_le changed_nodes;
     u16_le nodes[UDSMaxNodes];
@@ -174,6 +174,7 @@ private:
     void BeginHostingNetworkDeprecated(Kernel::HLERequestContext& ctx);
     void ConnectToNetwork(Kernel::HLERequestContext& ctx);
     void ConnectToNetworkDeprecated(Kernel::HLERequestContext& ctx);
+    void EjectClient(Kernel::HLERequestContext& ctx);
     void DecryptBeaconData(Kernel::HLERequestContext& ctx, u16 command_id);
     template <u16 command_id>
     void DecryptBeaconData(Kernel::HLERequestContext& ctx);
