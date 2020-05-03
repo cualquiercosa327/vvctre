@@ -61,6 +61,7 @@ enum ConfigBlockID {
     StateNameBlockID = 0x000B0002,
     EULAVersionBlockID = 0x000D0000,
     ConsoleModelBlockID = 0x000F0004,
+    DebugModeBlockID = 0x00130000,
 };
 
 struct UsernameBlock {
@@ -549,6 +550,12 @@ ResultCode Module::FormatConfig() {
 
     // 0x00F0006 - Unknown
     res = CreateConfigInfoBlk(0x00F0006, 0x28, 0xC, zero_buffer);
+    if (!res.IsSuccess()) {
+        return res;
+    }
+
+    // 0x00130000 - DebugMode (0x100 for debug mode)
+    res = CreateConfigInfoBlk(DebugModeBlockID, 0x4, 0xE, zero_buffer);
     if (!res.IsSuccess()) {
         return res;
     }
