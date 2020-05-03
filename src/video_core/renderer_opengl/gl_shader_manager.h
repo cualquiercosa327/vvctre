@@ -99,7 +99,7 @@ static_assert(sizeof(VSUniformData) < 16384,
 /// A class that manage different shader stages and configures them with given config data.
 class ShaderProgramManager {
 public:
-    ShaderProgramManager(bool separable, bool is_amd);
+    explicit ShaderProgramManager(bool separable, bool is_amd);
     ~ShaderProgramManager();
 
     bool UseProgrammableVertexShader(const Pica::Regs& config, Pica::Shader::ShaderSetup& setup);
