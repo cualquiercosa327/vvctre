@@ -85,4 +85,5 @@ void Init();
 
 /// Shuts down the HLE applets
 void Shutdown();
+
 } // namespace HLE::Applets

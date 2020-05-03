@@ -82,21 +82,11 @@ template void Write<u32>(u32 addr, const u32 data);
 template void Write<u16>(u32 addr, const u16 data);
 template void Write<u8>(u32 addr, const u8 data);
 
-/// Update hardware
-void Update() {}
-
 /// Initialize hardware
 void Init(Memory::MemorySystem& memory) {
     AES::InitKeys();
     GPU::Init(memory);
     LCD::Init();
-    LOG_DEBUG(HW, "initialized OK");
 }
 
-/// Shutdown hardware
-void Shutdown() {
-    GPU::Shutdown();
-    LCD::Shutdown();
-    LOG_DEBUG(HW, "shutdown OK");
-}
 } // namespace HW

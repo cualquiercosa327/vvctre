@@ -80,7 +80,6 @@ System::ResultStatus System::RunLoop(bool tight_loop) {
         GDBStub::SetCpuStepFlag(false);
     }
 
-    HW::Update();
     Reschedule();
 
     if (reset_requested.exchange(false)) {
@@ -183,10 +182,7 @@ void System::Reschedule() {
 }
 
 System::ResultStatus System::Init(Frontend::EmuWindow& emu_window, u32 system_mode) {
-    LOG_DEBUG(HW_Memory, "initialized OK");
-
     memory = std::make_unique<Memory::MemorySystem>();
-
     timing = std::make_unique<Timing>();
 
     kernel = std::make_unique<Kernel::KernelSystem>(
@@ -224,8 +220,6 @@ System::ResultStatus System::Init(Frontend::EmuWindow& emu_window, u32 system_mo
     GDBStub::DeferStart();
 
     VideoCore::Init(emu_window, *memory);
-
-    LOG_DEBUG(Core, "Initialized OK");
 
     return ResultStatus::Success;
 }
@@ -299,7 +293,6 @@ void System::RegisterSoftwareKeyboard(std::shared_ptr<Frontend::SoftwareKeyboard
 }
 
 void System::Shutdown() {
-    // Shutdown emulation session
     GDBStub::Shutdown();
     VideoCore::Shutdown();
     HW::Shutdown();
@@ -312,8 +305,6 @@ void System::Shutdown() {
     kernel.reset();
     timing.reset();
     app_loader.reset();
-
-    LOG_DEBUG(Core, "Shutdown OK");
 }
 
 void System::Reset() {

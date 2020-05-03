@@ -214,10 +214,10 @@ void Init(Core::System& core) {
     SM::ServiceManager::InstallInterfaces(core);
 
     for (const auto& service_module : service_module_map) {
-        if (!AttemptLLE(service_module) && service_module.init_function != nullptr)
+        if (!AttemptLLE(service_module) && service_module.init_function != nullptr) {
             service_module.init_function(core);
+        }
     }
-    LOG_DEBUG(Service, "initialized OK");
 }
 
 } // namespace Service

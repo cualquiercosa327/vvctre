@@ -501,8 +501,8 @@ void Init(Memory::MemorySystem& memory) {
     g_memory = &memory;
     memset(&g_regs, 0, sizeof(g_regs));
 
-    auto& framebuffer_top = g_regs.framebuffer_config[0];
-    auto& framebuffer_sub = g_regs.framebuffer_config[1];
+    GPU::Regs::FramebufferConfig& framebuffer_top = g_regs.framebuffer_config[0];
+    GPU::Regs::FramebufferConfig& framebuffer_sub = g_regs.framebuffer_config[1];
 
     // Setup default framebuffer addresses (located in VRAM)
     // .. or at least these are the ones used by system applets.
@@ -530,13 +530,6 @@ void Init(Memory::MemorySystem& memory) {
     Core::Timing& timing = Core::System::GetInstance().CoreTiming();
     vblank_event = timing.RegisterEvent("GPU::VBlankCallback", VBlankCallback);
     timing.ScheduleEvent(frame_ticks, vblank_event);
-
-    LOG_DEBUG(HW_GPU, "initialized OK");
-}
-
-/// Shutdown hardware
-void Shutdown() {
-    LOG_DEBUG(HW_GPU, "shutdown OK");
 }
 
 } // namespace GPU

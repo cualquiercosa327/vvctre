@@ -80,7 +80,4 @@ void Write(u32 addr, const T data);
 /// Initialize hardware
 void Init();
 
-/// Shutdown hardware
-void Shutdown();
-
 } // namespace LCD

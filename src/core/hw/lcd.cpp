@@ -55,12 +55,6 @@ template void Write<u8>(u32 addr, const u8 data);
 /// Initialize hardware
 void Init() {
     memset(&g_regs, 0, sizeof(g_regs));
-    LOG_DEBUG(HW_LCD, "initialized OK");
-}
-
-/// Shutdown hardware
-void Shutdown() {
-    LOG_DEBUG(HW_LCD, "shutdown OK");
 }
 
 } // namespace LCD
