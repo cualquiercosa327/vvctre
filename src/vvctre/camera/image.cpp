@@ -79,9 +79,9 @@ std::vector<u16> ImageCamera::ReceiveFrame() {
         std::size_t pixel = 0;
 
         while (resized_offset < resized.size()) {
-            unsigned char r = resized[resized_offset++];
-            unsigned char g = resized[resized_offset++];
-            unsigned char b = resized[resized_offset++];
+            const unsigned char r = resized[resized_offset++];
+            const unsigned char g = resized[resized_offset++];
+            const unsigned char b = resized[resized_offset++];
             frame[pixel++] = ((r & 0b11111000) << 8) | ((g & 0b11111100) << 3) | (b >> 3);
         }
 
