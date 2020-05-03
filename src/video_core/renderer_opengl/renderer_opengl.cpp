@@ -145,6 +145,60 @@ static std::array<GLfloat, 3 * 2> MakeOrthographicMatrix(const float width, cons
     return matrix;
 }
 
+static const char* GetSource(GLenum source) {
+#define RET(s)                                                                                     \
+    case GL_DEBUG_SOURCE_##s:                                                                      \
+        return #s
+    switch (source) {
+        RET(API);
+        RET(WINDOW_SYSTEM);
+        RET(SHADER_COMPILER);
+        RET(THIRD_PARTY);
+        RET(APPLICATION);
+        RET(OTHER);
+    default:
+        UNREACHABLE();
+    }
+#undef RET
+}
+
+static const char* GetType(GLenum type) {
+#define RET(t)                                                                                     \
+    case GL_DEBUG_TYPE_##t:                                                                        \
+        return #t
+    switch (type) {
+        RET(ERROR);
+        RET(DEPRECATED_BEHAVIOR);
+        RET(UNDEFINED_BEHAVIOR);
+        RET(PORTABILITY);
+        RET(PERFORMANCE);
+        RET(OTHER);
+        RET(MARKER);
+    default:
+        UNREACHABLE();
+    }
+#undef RET
+}
+
+static void APIENTRY DebugHandler(GLenum source, GLenum type, GLuint id, GLenum severity,
+                                  GLsizei length, const GLchar* message, const void* user_param) {
+    Log::Level level;
+    switch (severity) {
+    case GL_DEBUG_SEVERITY_HIGH:
+        level = Log::Level::Critical;
+        break;
+    case GL_DEBUG_SEVERITY_MEDIUM:
+        level = Log::Level::Warning;
+        break;
+    case GL_DEBUG_SEVERITY_NOTIFICATION:
+    case GL_DEBUG_SEVERITY_LOW:
+        level = Log::Level::Debug;
+        break;
+    }
+    LOG_GENERIC(Log::Class::Render_OpenGL, level, "{} {} {}: {}", GetSource(source), GetType(type),
+                id, message);
+}
+
 RendererOpenGL::RendererOpenGL(Frontend::EmuWindow& window) : RendererBase{window} {
     render_window.MakeCurrent();
 
@@ -237,7 +291,6 @@ void RendererOpenGL::SwapBuffers() {
     }
 
     DrawScreens(render_window.GetFramebufferLayout());
-    m_current_frame++;
 
     Core::System::GetInstance().perf_stats->EndSystemFrame();
 
@@ -784,63 +837,6 @@ void RendererOpenGL::DrawScreens(const Layout::FramebufferLayout& layout) {
             }
         }
     }
-}
-
-/// Updates the framerate
-void RendererOpenGL::UpdateFramerate() {}
-
-static const char* GetSource(GLenum source) {
-#define RET(s)                                                                                     \
-    case GL_DEBUG_SOURCE_##s:                                                                      \
-        return #s
-    switch (source) {
-        RET(API);
-        RET(WINDOW_SYSTEM);
-        RET(SHADER_COMPILER);
-        RET(THIRD_PARTY);
-        RET(APPLICATION);
-        RET(OTHER);
-    default:
-        UNREACHABLE();
-    }
-#undef RET
-}
-
-static const char* GetType(GLenum type) {
-#define RET(t)                                                                                     \
-    case GL_DEBUG_TYPE_##t:                                                                        \
-        return #t
-    switch (type) {
-        RET(ERROR);
-        RET(DEPRECATED_BEHAVIOR);
-        RET(UNDEFINED_BEHAVIOR);
-        RET(PORTABILITY);
-        RET(PERFORMANCE);
-        RET(OTHER);
-        RET(MARKER);
-    default:
-        UNREACHABLE();
-    }
-#undef RET
-}
-
-static void APIENTRY DebugHandler(GLenum source, GLenum type, GLuint id, GLenum severity,
-                                  GLsizei length, const GLchar* message, const void* user_param) {
-    Log::Level level;
-    switch (severity) {
-    case GL_DEBUG_SEVERITY_HIGH:
-        level = Log::Level::Critical;
-        break;
-    case GL_DEBUG_SEVERITY_MEDIUM:
-        level = Log::Level::Warning;
-        break;
-    case GL_DEBUG_SEVERITY_NOTIFICATION:
-    case GL_DEBUG_SEVERITY_LOW:
-        level = Log::Level::Debug;
-        break;
-    }
-    LOG_GENERIC(Log::Class::Render_OpenGL, level, "{} {} {}: {}", GetSource(source), GetType(type),
-                id, message);
 }
 
 } // namespace OpenGL
