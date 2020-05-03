@@ -356,7 +356,7 @@ void InitialSettings::Run() {
                                            &Settings::values.speed_limit);
                         ImGui::PopItemWidth();
                         ImGui::SameLine();
-                        ImGui::Text("%");
+                        ImGui::Text("%%");
                     }
 
                     if (Settings::values.use_custom_cpu_ticks) {
