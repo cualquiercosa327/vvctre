@@ -179,9 +179,9 @@ std::vector<u16> convert_rgb888_to_yuyv(const std::vector<unsigned char>& source
     std::size_t pixel = 0;
 
     while (source_offset < source.size()) {
-        unsigned char r = source[source_offset++];
-        unsigned char g = source[source_offset++];
-        unsigned char b = source[source_offset++];
+        const unsigned char r = source[source_offset++];
+        const unsigned char g = source[source_offset++];
+        const unsigned char b = source[source_offset++];
 
         // The following transformation is a reverse of the one in Y2R using ITU_Rec601
         int y = YuvTable::Y(r, g, b);
