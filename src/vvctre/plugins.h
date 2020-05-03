@@ -26,6 +26,7 @@ using EmulatorClosing = void (*)();                                             
 using FatalError = void (*)();                                                      // optional
 using BeforeDrawingFPS = void (*)();                                                // optional
 using AddMenu = void (*)();                                                         // optional
+using AddTab = void (*)();                                                          // optional
 using AfterSwapWindow = void (*)();                                                 // optional
 using ScreenshotCallback = void (*)(void* data);
 using Log = Log::FunctionLogger::Function;
@@ -45,6 +46,7 @@ public:
     void FatalError();
     void BeforeDrawingFPS();
     void AddMenus();
+    void AddTabs();
     void AfterSwapWindow();
     void* NewButtonDevice(const char* params);
     void DeleteButtonDevice(void* device);
@@ -62,6 +64,7 @@ private:
 #endif
         PluginImportedFunctions::BeforeDrawingFPS before_drawing_fps = nullptr;
         PluginImportedFunctions::AddMenu add_menu = nullptr;
+        PluginImportedFunctions::AddTab add_tab = nullptr;
         PluginImportedFunctions::AfterSwapWindow after_swap_window = nullptr;
         PluginImportedFunctions::ScreenshotCallback screenshot_callback = nullptr;
     };

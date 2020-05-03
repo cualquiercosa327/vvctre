@@ -35,8 +35,9 @@
 #include "video_core/renderer_opengl/texture_filters/texture_filterer.h"
 #include "vvctre/common.h"
 #include "vvctre/initial_settings.h"
+#include "vvctre/plugins.h"
 
-InitialSettings::InitialSettings() {
+InitialSettings::InitialSettings(PluginManager& plugin_manager) : plugin_manager(plugin_manager) {
     const std::string window_title =
         fmt::format("vvctre {}.{}.{} - Initial Settings", vvctre_version_major,
                     vvctre_version_minor, vvctre_version_patch);
@@ -2608,6 +2609,8 @@ void InitialSettings::Run() {
 
                     ImGui::EndTabItem();
                 }
+
+                plugin_manager.AddTabs();
 
                 ImGui::EndTabBar();
             }

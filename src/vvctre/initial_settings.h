@@ -4,11 +4,12 @@
 
 #pragma once
 
+class PluginManager;
 struct SDL_Window;
 
 class InitialSettings {
 public:
-    InitialSettings();
+    explicit InitialSettings(PluginManager& plugin_manager);
     ~InitialSettings();
 
     void Run();
@@ -20,4 +21,6 @@ private:
     SDL_GLContext gl_context;
 
     bool update_config_savegame = false;
+
+    PluginManager& plugin_manager;
 };

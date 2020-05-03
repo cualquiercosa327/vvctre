@@ -90,6 +90,8 @@ PluginManager::PluginManager(void* core) {
                             handle, "BeforeDrawingFPS");
                     plugin.add_menu =
                         (PluginImportedFunctions::AddMenu)GetProcAddress(handle, "AddMenu");
+                    plugin.add_tab =
+                        (PluginImportedFunctions::AddTab)GetProcAddress(handle, "AddTab");
                     plugin.after_swap_window =
                         (PluginImportedFunctions::AfterSwapWindow)GetProcAddress(handle,
                                                                                  "AfterSwapWindow");
@@ -212,6 +214,14 @@ void PluginManager::AddMenus() {
     for (const auto& plugin : plugins) {
         if (plugin.add_menu != nullptr) {
             plugin.add_menu();
+        }
+    }
+}
+
+void PluginManager::AddTabs() {
+    for (const auto& plugin : plugins) {
+        if (plugin.add_tab != nullptr) {
+            plugin.add_tab();
         }
     }
 }
@@ -495,6 +505,14 @@ bool vvctre_gui_begin_menu(const char* label) {
 
 void vvctre_gui_end_menu() {
     ImGui::EndMenu();
+}
+
+bool vvctre_gui_begin_tab(const char* label) {
+    return ImGui::BeginTabItem(label);
+}
+
+void vvctre_gui_end_tab() {
+    ImGui::EndTabItem();
 }
 
 bool vvctre_gui_menu_item(const char* label) {
@@ -1442,6 +1460,8 @@ std::unordered_map<std::string, void*> PluginManager::function_map = {
     {"vvctre_gui_end", (void*)&vvctre_gui_end},
     {"vvctre_gui_begin_menu", (void*)&vvctre_gui_begin_menu},
     {"vvctre_gui_end_menu", (void*)&vvctre_gui_end_menu},
+    {"vvctre_gui_begin_tab", (void*)&vvctre_gui_begin_tab},
+    {"vvctre_gui_end_tab", (void*)&vvctre_gui_end_tab},
     {"vvctre_gui_menu_item", (void*)&vvctre_gui_menu_item},
     {"vvctre_gui_menu_item_with_check_mark", (void*)&vvctre_gui_menu_item_with_check_mark},
     {"vvctre_gui_begin_listbox", (void*)&vvctre_gui_begin_listbox},

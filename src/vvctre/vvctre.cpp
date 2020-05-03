@@ -86,7 +86,7 @@ int main(int, char**) {
     PluginManager plugin_manager(static_cast<void*>(&system));
 
     plugin_manager.InitialSettingsOpening();
-    InitialSettings().Run();
+    InitialSettings(plugin_manager).Run();
     plugin_manager.InitialSettingsOkPressed();
 
     InitializeLogging();
