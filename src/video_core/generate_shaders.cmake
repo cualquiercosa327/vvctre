@@ -8,7 +8,7 @@ foreach(shader_file ${SHADER_FILES})
     string(REPLACE . _ shader_name ${shader_file_name})
     GetShaderHeaderFile(${shader_file_name})
     file(WRITE ${shader_header_file}
-        "#pragma once\n"
+        "#pragma once\n\n"
         "constexpr std::string_view ${shader_name} = R\"(\n"
         "${shader}"
         ")\";\n"
