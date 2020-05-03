@@ -207,10 +207,6 @@ RendererOpenGL::RendererOpenGL(Frontend::EmuWindow& window) : RendererBase{windo
         glDebugMessageCallback(DebugHandler, nullptr);
     }
 
-    const char* gpu{reinterpret_cast<char const*>(glGetString(GL_RENDERER))};
-
-    LOG_INFO(Render_OpenGL, "GPU: {}", gpu);
-
     InitOpenGLObjects();
     RefreshRasterizerSetting();
 }
