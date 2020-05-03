@@ -576,6 +576,12 @@ void vvctre_gui_progress_bar(float value, const char* overlay) {
     ImGui::ProgressBar(value, ImVec2(-1, 0), overlay);
 }
 
+void vvctre_gui_tooltip(const char* text) {
+    if (ImGui::IsItemHovered()) {
+        ImGui::SetTooltip("%s", text);
+    }
+}
+
 // Button devices
 void* vvctre_button_device_new(void* plugin_manager, const char* params) {
     PluginManager* pm = static_cast<PluginManager*>(plugin_manager);
@@ -1477,6 +1483,7 @@ std::unordered_map<std::string, void*> PluginManager::function_map = {
     {"vvctre_gui_color_edit", (void*)&vvctre_gui_color_edit},
     {"vvctre_gui_color_picker", (void*)&vvctre_gui_color_picker},
     {"vvctre_gui_progress_bar", (void*)&vvctre_gui_progress_bar},
+    {"vvctre_gui_tooltip", (void*)&vvctre_gui_tooltip},
     // Button devices
     {"vvctre_button_device_new", (void*)&vvctre_button_device_new},
     {"vvctre_button_device_delete", (void*)&vvctre_button_device_delete},
