@@ -81,7 +81,7 @@ private:
     /// Called when user passes the fullscreen parameter flag
     void ToggleFullscreen();
 
-    /// Called when Tools -> Copy Screenshot is clicked or Ctrl+C is pressed
+    /// Called when Tools -> Copy Screenshot is clicked
     void CopyScreenshot();
 
     /// Is the window still open?
