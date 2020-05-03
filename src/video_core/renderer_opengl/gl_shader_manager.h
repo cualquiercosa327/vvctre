@@ -103,15 +103,10 @@ public:
     ~ShaderProgramManager();
 
     bool UseProgrammableVertexShader(const Pica::Regs& config, Pica::Shader::ShaderSetup& setup);
-
     void UseTrivialVertexShader();
-
     void UseFixedGeometryShader(const Pica::Regs& regs);
-
     void UseTrivialGeometryShader();
-
     void UseFragmentShader(const Pica::Regs& config);
-
     void ApplyTo(OpenGLState& state);
 
 private:
