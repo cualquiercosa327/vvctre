@@ -344,7 +344,7 @@ void EmuWindow_SDL2::SwapBuffers() {
                         }
                         ImGui::PopItemWidth();
                         ImGui::SameLine();
-                        ImGui::Text("%");
+                        ImGui::Text("%%");
                     }
 
                     ImGui::EndMenu();
