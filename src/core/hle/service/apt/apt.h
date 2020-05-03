@@ -15,7 +15,7 @@
 
 namespace Core {
 class System;
-}
+} // namespace Core
 
 namespace Kernel {
 class Mutex;
@@ -63,10 +63,15 @@ public:
     explicit Module(Core::System& system);
     ~Module();
 
+    static std::vector<u8> wireless_reboot_info;
+
     class NSInterface : public ServiceFramework<NSInterface> {
     public:
         NSInterface(std::shared_ptr<Module> apt, const char* name, u32 max_session);
         ~NSInterface();
+
+    protected:
+        void SetWirelessRebootInfo(Kernel::HLERequestContext& ctx);
 
     private:
         std::shared_ptr<Module> apt;
@@ -84,6 +89,7 @@ public:
         void GetSharedFont(Kernel::HLERequestContext& ctx);
         void Wrap(Kernel::HLERequestContext& ctx);
         void Unwrap(Kernel::HLERequestContext& ctx);
+        void GetWirelessRebootInfo(Kernel::HLERequestContext& ctx);
         void NotifyToWait(Kernel::HLERequestContext& ctx);
         void GetLockHandle(Kernel::HLERequestContext& ctx);
         void Enable(Kernel::HLERequestContext& ctx);

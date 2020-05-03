@@ -5,5 +5,5 @@
 #include "common/common_types.h"
 
 const u8 vvctre_version_major = 29;
-const u8 vvctre_version_minor = 2;
-const u8 vvctre_version_patch = 1;
+const u8 vvctre_version_minor = 3;
+const u8 vvctre_version_patch = 0;
