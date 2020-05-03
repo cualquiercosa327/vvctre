@@ -34,30 +34,16 @@ Layout::FramebufferLayout g_screenshot_framebuffer_layout;
 Memory::MemorySystem* g_memory;
 
 /// Initialize the video core
-ResultStatus Init(Frontend::EmuWindow& emu_window, Memory::MemorySystem& memory) {
+void Init(Frontend::EmuWindow& emu_window, Memory::MemorySystem& memory) {
     g_memory = &memory;
     Pica::Init();
-
     g_renderer = std::make_unique<OpenGL::RendererOpenGL>(emu_window);
-    ResultStatus result = g_renderer->Init();
-
-    if (result != ResultStatus::Success) {
-        LOG_ERROR(Render, "initialization failed !");
-    } else {
-        LOG_DEBUG(Render, "initialized OK");
-    }
-
-    return result;
 }
 
 /// Shutdown the video core
 void Shutdown() {
     Pica::Shutdown();
-
-    g_renderer->ShutDown();
     g_renderer.reset();
-
-    LOG_DEBUG(Render, "shutdown OK");
 }
 
 bool RequestScreenshot(void* data, std::function<void()> callback,

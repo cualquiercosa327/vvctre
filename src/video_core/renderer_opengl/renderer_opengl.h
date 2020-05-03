@@ -44,12 +44,6 @@ public:
     /// Swap buffers (render frame)
     void SwapBuffers() override;
 
-    /// Initialize the renderer
-    VideoCore::ResultStatus Init() override;
-
-    /// Shutdown the renderer
-    void ShutDown() override;
-
 private:
     void InitOpenGLObjects();
     void ReloadSampler();

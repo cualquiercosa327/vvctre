@@ -132,19 +132,6 @@ int main(int, char**) {
     case Core::System::ResultStatus::ErrorLoader_ErrorUnsupportedFormat:
         pfd::message("vvctre", "Unsupported file format", pfd::choice::ok, pfd::icon::error);
         return -1;
-    case Core::System::ResultStatus::ErrorVideoCore_ErrorGenericDrivers:
-        pfd::message("vvctre",
-                     "You are running default Windows drivers for your GPU.\n"
-                     "You need to install the proper drivers for your graphics card from the "
-                     "manufacturer's website.",
-                     pfd::choice::ok, pfd::icon::error);
-        return -1;
-    case Core::System::ResultStatus::ErrorVideoCore_ErrorBelowGL33:
-        pfd::message("vvctre",
-                     "Your GPU may not support OpenGL 3.3,"
-                     "or you don't have the latest graphics driver.",
-                     pfd::choice::ok, pfd::icon::error);
-        return -1;
     default:
         break;
     }

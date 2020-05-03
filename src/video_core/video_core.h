@@ -42,14 +42,8 @@ extern Layout::FramebufferLayout g_screenshot_framebuffer_layout;
 
 extern Memory::MemorySystem* g_memory;
 
-enum class ResultStatus {
-    Success,
-    ErrorGenericDrivers,
-    ErrorBelowGL33,
-};
-
 /// Initialize the video core
-ResultStatus Init(Frontend::EmuWindow& emu_window, Memory::MemorySystem& memory);
+void Init(Frontend::EmuWindow& emu_window, Memory::MemorySystem& memory);
 
 /// Shutdown the video core
 void Shutdown();

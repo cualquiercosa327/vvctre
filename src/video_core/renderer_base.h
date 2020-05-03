@@ -11,7 +11,7 @@
 
 namespace Frontend {
 class EmuWindow;
-}
+} // namespace Frontend
 
 class RendererBase : NonCopyable {
 public:
@@ -20,12 +20,6 @@ public:
 
     /// Swap buffers (render frame)
     virtual void SwapBuffers() = 0;
-
-    /// Initialize the renderer
-    virtual VideoCore::ResultStatus Init() = 0;
-
-    /// Shutdown the renderer
-    virtual void ShutDown() = 0;
 
     /// Updates the framebuffer layout of the contained render window handle.
     void UpdateCurrentFramebufferLayout();

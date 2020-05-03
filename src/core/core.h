@@ -75,11 +75,6 @@ public:
         ErrorSystemMode,            ///< Error determining the system mode
         ErrorLoader_ErrorEncrypted, ///< Error loading the specified application due to encryption
         ErrorLoader_ErrorUnsupportedFormat, ///< Unsupported file format
-        ErrorSystemFiles,                   ///< Error in finding system files
-        ErrorVideoCore_ErrorGenericDrivers, ///< Error in the video core due to the user having
-                                            /// generic drivers installed
-        ErrorVideoCore_ErrorBelowGL33,      ///< Error in the video core due to the user not having
-                                            /// OpenGL 3.3 or higher
         ShutdownRequested,                  ///< Emulated program requested a system shutdown
         FatalError,                         ///< A fatal error
     };

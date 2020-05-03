@@ -223,17 +223,7 @@ System::ResultStatus System::Init(Frontend::EmuWindow& emu_window, u32 system_mo
     Service::Init(*this);
     GDBStub::DeferStart();
 
-    VideoCore::ResultStatus result = VideoCore::Init(emu_window, *memory);
-    if (result != VideoCore::ResultStatus::Success) {
-        switch (result) {
-        case VideoCore::ResultStatus::ErrorGenericDrivers:
-            return ResultStatus::ErrorVideoCore_ErrorGenericDrivers;
-        case VideoCore::ResultStatus::ErrorBelowGL33:
-            return ResultStatus::ErrorVideoCore_ErrorBelowGL33;
-        default:
-            UNREACHABLE();
-        }
-    }
+    VideoCore::Init(emu_window, *memory);
 
     LOG_DEBUG(Core, "Initialized OK");
 

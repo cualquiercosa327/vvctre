@@ -145,7 +145,22 @@ static std::array<GLfloat, 3 * 2> MakeOrthographicMatrix(const float width, cons
     return matrix;
 }
 
-RendererOpenGL::RendererOpenGL(Frontend::EmuWindow& window) : RendererBase{window} {}
+RendererOpenGL::RendererOpenGL(Frontend::EmuWindow& window) : RendererBase{window} {
+    render_window.MakeCurrent();
+
+    if (GLAD_GL_KHR_debug) {
+        glEnable(GL_DEBUG_OUTPUT);
+        glDebugMessageCallback(DebugHandler, nullptr);
+    }
+
+    const char* gpu{reinterpret_cast<char const*>(glGetString(GL_RENDERER))};
+
+    LOG_INFO(Render_OpenGL, "GPU: {}", gpu);
+
+    InitOpenGLObjects();
+    RefreshRasterizerSetting();
+}
+
 RendererOpenGL::~RendererOpenGL() = default;
 
 /// Swap buffers (render frame)
@@ -827,40 +842,5 @@ static void APIENTRY DebugHandler(GLenum source, GLenum type, GLuint id, GLenum 
     LOG_GENERIC(Log::Class::Render_OpenGL, level, "{} {} {}: {}", GetSource(source), GetType(type),
                 id, message);
 }
-
-/// Initialize the renderer
-VideoCore::ResultStatus RendererOpenGL::Init() {
-    render_window.MakeCurrent();
-
-    if (GLAD_GL_KHR_debug) {
-        glEnable(GL_DEBUG_OUTPUT);
-        glDebugMessageCallback(DebugHandler, nullptr);
-    }
-
-    const char* gl_version{reinterpret_cast<char const*>(glGetString(GL_VERSION))};
-    const char* gpu_vendor{reinterpret_cast<char const*>(glGetString(GL_VENDOR))};
-    const char* gpu_model{reinterpret_cast<char const*>(glGetString(GL_RENDERER))};
-
-    LOG_INFO(Render_OpenGL, "GL_VERSION: {}", gl_version);
-    LOG_INFO(Render_OpenGL, "GL_VENDOR: {}", gpu_vendor);
-    LOG_INFO(Render_OpenGL, "GL_RENDERER: {}", gpu_model);
-
-    if (!strcmp(gpu_vendor, "GDI Generic")) {
-        return VideoCore::ResultStatus::ErrorGenericDrivers;
-    }
-
-    if (!GLAD_GL_VERSION_3_3) {
-        return VideoCore::ResultStatus::ErrorBelowGL33;
-    }
-
-    InitOpenGLObjects();
-
-    RefreshRasterizerSetting();
-
-    return VideoCore::ResultStatus::Success;
-}
-
-/// Shutdown the renderer
-void RendererOpenGL::ShutDown() {}
 
 } // namespace OpenGL
