@@ -757,6 +757,42 @@ void FS_USER::ObsoletedDeleteExtSaveData(Kernel::HLERequestContext& ctx) {
               static_cast<u32>(media_type));
 }
 
+void FS_USER::GetSpecialContentIndex(Kernel::HLERequestContext& ctx) {
+    IPC::RequestParser rp(ctx, 0x83A, 4, 0);
+    MediaType media_type = static_cast<MediaType>(rp.Pop<u8>());
+    u64 title_id = rp.Pop<u64>();
+    auto type = rp.PopEnum<SpecialContentType>();
+
+    LOG_DEBUG(Service_FS, "called, media_type={:08X} type={:08X}, title_id={:016X}",
+              static_cast<u32>(media_type), static_cast<u32>(type), title_id);
+
+    std::string tmd_path = AM::GetTitleMetadataPath(media_type, title_id);
+
+    FileSys::TitleMetadata tmd;
+    if (tmd.Load(tmd_path) != Loader::ResultStatus::Success || type == SpecialContentType::Update) {
+        // TODO(B3N30): Find correct result code
+        IPC::RequestBuilder rb = rp.MakeBuilder(1, 0);
+        rb.Push(ResultCode(-1));
+        return;
+    }
+
+    IPC::RequestBuilder rb = rp.MakeBuilder(2, 0);
+    rb.Push(RESULT_SUCCESS);
+    switch (type) {
+    case SpecialContentType::Update:
+        rb.Push(static_cast<u16>(FileSys::TMDContentIndex::Main));
+        break;
+    case SpecialContentType::Manual:
+        rb.Push(static_cast<u16>(FileSys::TMDContentIndex::Manual));
+        break;
+    case SpecialContentType::DLPChild:
+        rb.Push(static_cast<u16>(FileSys::TMDContentIndex::DLP));
+        break;
+    default:
+        ASSERT(false);
+    }
+}
+
 void FS_USER::GetNumSeeds(Kernel::HLERequestContext& ctx) {
     IPC::RequestBuilder rb{ctx, 0x87D, 2, 0};
     rb.Push(RESULT_SUCCESS);
@@ -875,7 +911,7 @@ FS_USER::FS_USER(Core::System& system)
         {0x08370040, nullptr, "SetCardSpiBaudRate"},
         {0x08380040, nullptr, "SetCardSpiBusMode"},
         {0x08390000, nullptr, "SendInitializeInfoTo9"},
-        {0x083A0100, nullptr, "GetSpecialContentIndex"},
+        {0x083A0100, &FS_USER::GetSpecialContentIndex, "GetSpecialContentIndex"},
         {0x083B00C2, nullptr, "GetLegacyRomHeader"},
         {0x083C00C2, nullptr, "GetLegacyBannerData"},
         {0x083D0100, nullptr, "CheckAuthorityToAccessExtSaveData"},

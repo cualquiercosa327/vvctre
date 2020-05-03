@@ -63,6 +63,7 @@ private:
     void GetProgramLaunchInfo(Kernel::HLERequestContext& ctx);
     void ObsoletedCreateExtSaveData(Kernel::HLERequestContext& ctx);
     void ObsoletedDeleteExtSaveData(Kernel::HLERequestContext& ctx);
+    void GetSpecialContentIndex(Kernel::HLERequestContext& ctx);
     void GetNumSeeds(Kernel::HLERequestContext& ctx);
     void AddSeed(Kernel::HLERequestContext& ctx);
     void SetSaveDataSecureValue(Kernel::HLERequestContext& ctx);
