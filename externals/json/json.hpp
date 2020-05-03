@@ -8201,13 +8201,13 @@ class lexer
                                     }
                                     else
                                     {
-                                        error_message = "invalid string: surrogate U+DC00..U+DFFF must be followed by U+DC00..U+DFFF";
+                                        error_message = "invalid string: surrogate U+D800..U+DBFF must be followed by U+DC00..U+DFFF";
                                         return token_type::parse_error;
                                     }
                                 }
                                 else
                                 {
-                                    error_message = "invalid string: surrogate U+DC00..U+DFFF must be followed by U+DC00..U+DFFF";
+                                    error_message = "invalid string: surrogate U+D800..U+DBFF must be followed by U+DC00..U+DFFF";
                                     return token_type::parse_error;
                                 }
                             }
@@ -11486,6 +11486,27 @@ class json_pointer
                     {
                         // "-" always fails the range check
                         return false;
+                    }
+                    if (JSON_HEDLEY_UNLIKELY(reference_token.size() == 1 and not ("0" <= reference_token and reference_token <= "9")))
+                    {
+                        // invalid char
+                        return false;
+                    }
+                    if (JSON_HEDLEY_UNLIKELY(reference_token.size() > 1))
+                    {
+                        if (JSON_HEDLEY_UNLIKELY(not ('1' <= reference_token[0] and reference_token[0] <= '9')))
+                        {
+                            // first char should be between '1' and '9'
+                            return false;
+                        }
+                        for (std::size_t i = 1; i < reference_token.size(); i++)
+                        {
+                            if (JSON_HEDLEY_UNLIKELY(not ('0' <= reference_token[i] and reference_token[i] <= '9')))
+                            {
+                                // other char should be between '0' and '9'
+                                return false;
+                            }
+                        }
                     }
 
                     const auto idx = static_cast<size_type>(array_index(reference_token));

@@ -54,24 +54,24 @@ const ResultCode ERROR_CERT_ALREADY_SET = // 0xD8A0A03D
 void Context::MakeRequest() {
     ASSERT(state == RequestState::NotStarted);
 
-    LUrlParser::clParseURL parsedUrl = LUrlParser::clParseURL::ParseURL(url);
+    LUrlParser::ParseURL parsed = LUrlParser::ParseURL::parseURL(url);
     int port;
     std::unique_ptr<httplib::Client> client;
-    if (parsedUrl.m_Scheme == "http") {
-        if (!parsedUrl.GetPort(&port)) {
+    if (parsed.scheme_ == "http") {
+        if (!parsed.getPort(&port)) {
             port = 80;
         }
         // TODO(B3N30): Support for setting timeout
         // Figure out what the default timeout on 3DS is
-        client = std::make_unique<httplib::Client>(parsedUrl.m_Host.c_str(), port);
+        client = std::make_unique<httplib::Client>(parsed.host_.c_str(), port);
     } else {
-        if (!parsedUrl.GetPort(&port)) {
+        if (!parsed.getPort(&port)) {
             port = 443;
         }
         // TODO(B3N30): Support for setting timeout
         // Figure out what the default timeout on 3DS is
 
-        auto ssl_client = std::make_unique<httplib::SSLClient>(parsedUrl.m_Host, port);
+        auto ssl_client = std::make_unique<httplib::SSLClient>(parsed.host_, port);
         SSL_CTX* ctx = ssl_client->ssl_context();
         client = std::move(ssl_client);
 

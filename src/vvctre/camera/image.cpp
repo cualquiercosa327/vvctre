@@ -15,29 +15,29 @@ namespace Camera {
 
 ImageCamera::ImageCamera(const std::string& file) {
     while (image == nullptr) {
-        LUrlParser::clParseURL url = LUrlParser::clParseURL::ParseURL(file);
+        LUrlParser::ParseURL url = LUrlParser::ParseURL::parseURL(file);
 
-        if (url.IsValid()) {
+        if (url.isValid()) {
             int port;
             std::unique_ptr<httplib::Client> client;
 
-            if (url.m_Scheme == "http") {
-                if (!url.GetPort(&port)) {
+            if (url.scheme_ == "http") {
+                if (!url.getPort(&port)) {
                     port = 80;
                 }
 
-                client = std::make_unique<httplib::Client>(url.m_Host.c_str(), port);
+                client = std::make_unique<httplib::Client>(url.host_, port);
             } else {
-                if (!url.GetPort(&port)) {
+                if (!url.getPort(&port)) {
                     port = 443;
                 }
 
-                client = std::make_unique<httplib::SSLClient>(url.m_Host, port);
+                client = std::make_unique<httplib::SSLClient>(url.host_, port);
             }
 
             client->set_follow_location(true);
 
-            std::shared_ptr<httplib::Response> response = client->Get(('/' + url.m_Path).c_str());
+            std::shared_ptr<httplib::Response> response = client->Get(('/' + url.path_).c_str());
 
             if (response != nullptr) {
                 std::vector<unsigned char> buffer(response->body.size());
