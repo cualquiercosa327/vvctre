@@ -295,7 +295,6 @@ void System::RegisterSoftwareKeyboard(std::shared_ptr<Frontend::SoftwareKeyboard
 void System::Shutdown() {
     GDBStub::Shutdown();
     VideoCore::Shutdown();
-    HW::Shutdown();
     perf_stats.reset();
     cheat_engine.reset();
     archive_manager.reset();
