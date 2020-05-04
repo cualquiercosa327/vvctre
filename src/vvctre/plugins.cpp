@@ -602,9 +602,54 @@ void vvctre_gui_progress_bar(float value, const char* overlay) {
     ImGui::ProgressBar(value, ImVec2(-1, 0), overlay);
 }
 
+bool vvctre_gui_slider_u8(const char* label, u8* value, const u8 minimum, const u8 maximum,
+                          const char* format) {
+    return ImGui::SliderScalar(label, ImGuiDataType_U8, value, &minimum, &maximum, format);
+}
+
 bool vvctre_gui_slider_u16(const char* label, u16* value, const u16 minimum, const u16 maximum,
                            const char* format) {
     return ImGui::SliderScalar(label, ImGuiDataType_U16, value, &minimum, &maximum, format);
+}
+
+bool vvctre_gui_slider_u32(const char* label, u32* value, const u32 minimum, const u32 maximum,
+                           const char* format) {
+    return ImGui::SliderScalar(label, ImGuiDataType_U32, value, &minimum, &maximum, format);
+}
+
+bool vvctre_gui_slider_u64(const char* label, u64* value, const u64 minimum, const u64 maximum,
+                           const char* format) {
+    return ImGui::SliderScalar(label, ImGuiDataType_U64, value, &minimum, &maximum, format);
+}
+
+bool vvctre_gui_slider_s8(const char* label, s8* value, const s8 minimum, const s8 maximum,
+                          const char* format) {
+    return ImGui::SliderScalar(label, ImGuiDataType_S8, value, &minimum, &maximum, format);
+}
+
+bool vvctre_gui_slider_s16(const char* label, s16* value, const s16 minimum, const s16 maximum,
+                           const char* format) {
+    return ImGui::SliderScalar(label, ImGuiDataType_S16, value, &minimum, &maximum, format);
+}
+
+bool vvctre_gui_slider_s32(const char* label, s32* value, const s32 minimum, const s32 maximum,
+                           const char* format) {
+    return ImGui::SliderScalar(label, ImGuiDataType_S32, value, &minimum, &maximum, format);
+}
+
+bool vvctre_gui_slider_s64(const char* label, s64* value, const s64 minimum, const s64 maximum,
+                           const char* format) {
+    return ImGui::SliderScalar(label, ImGuiDataType_U64, value, &minimum, &maximum, format);
+}
+
+bool vvctre_gui_slider_float(const char* label, float* value, const float minimum,
+                             const float maximum, const char* format) {
+    return ImGui::SliderScalar(label, ImGuiDataType_Float, value, &minimum, &maximum, format);
+}
+
+bool vvctre_gui_slider_double(const char* label, double* value, const double minimum,
+                              const double maximum, const char* format) {
+    return ImGui::SliderScalar(label, ImGuiDataType_Double, value, &minimum, &maximum, format);
 }
 
 // Button devices
@@ -1514,7 +1559,16 @@ std::unordered_map<std::string, void*> PluginManager::function_map = {
     {"vvctre_gui_color_edit", (void*)&vvctre_gui_color_edit},
     {"vvctre_gui_color_picker", (void*)&vvctre_gui_color_picker},
     {"vvctre_gui_progress_bar", (void*)&vvctre_gui_progress_bar},
+    {"vvctre_gui_slider_u8", (void*)&vvctre_gui_slider_u8},
     {"vvctre_gui_slider_u16", (void*)&vvctre_gui_slider_u16},
+    {"vvctre_gui_slider_u32", (void*)&vvctre_gui_slider_u32},
+    {"vvctre_gui_slider_u64", (void*)&vvctre_gui_slider_u64},
+    {"vvctre_gui_slider_s8", (void*)&vvctre_gui_slider_s8},
+    {"vvctre_gui_slider_s16", (void*)&vvctre_gui_slider_s16},
+    {"vvctre_gui_slider_s32", (void*)&vvctre_gui_slider_s32},
+    {"vvctre_gui_slider_s64", (void*)&vvctre_gui_slider_s64},
+    {"vvctre_gui_slider_float", (void*)&vvctre_gui_slider_float},
+    {"vvctre_gui_slider_double", (void*)&vvctre_gui_slider_double},
     // Button devices
     {"vvctre_button_device_new", (void*)&vvctre_button_device_new},
     {"vvctre_button_device_delete", (void*)&vvctre_button_device_delete},
