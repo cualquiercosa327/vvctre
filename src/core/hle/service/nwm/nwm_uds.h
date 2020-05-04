@@ -12,10 +12,10 @@
 #include <map>
 #include <memory>
 #include <mutex>
+#include <optional>
 #include <thread>
 #include <unordered_map>
 #include <vector>
-#include <boost/optional.hpp>
 #include "common/common_types.h"
 #include "common/swap.h"
 #include "core/hle/service/service.h"
@@ -95,6 +95,12 @@ enum class NetworkStatus {
     Connecting = 7,
     ConnectedAsClient = 9,
     ConnectedAsSpectator = 10,
+};
+
+enum class DisconnectStatus {
+    Connected = 1,
+    NotConnected = 2,
+    // TODO(B3N30): Figure out the other values
 };
 
 struct ConnectionStatus {
@@ -239,7 +245,7 @@ private:
 
     void SendPacket(WifiPacket& packet);
 
-    boost::optional<MacAddress> GetNodeMacAddress(u16 dest_node_id, u8 flags);
+    std::optional<MacAddress> GetNodeMacAddress(u16 dest_node_id, u8 flags);
 
     // Event that is signaled every time the connection status changes.
     std::shared_ptr<Kernel::Event> connection_status_event;

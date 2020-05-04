@@ -282,7 +282,7 @@ void NWM_UDS::HandleEAPoLPacket(const WifiPacket& packet) {
 
         // We're now connected, signal the application
         connection_status.status = static_cast<u32>(NetworkStatus::ConnectedAsClient);
-        connection_status.disconnect_reason = 1;
+        connection_status.disconnect_reason = static_cast<u32>(DisconnectStatus::Connected);
         // Some games require ConnectToNetwork to block, for now it doesn't
         // If blocking is implemented this lock needs to be changed,
         // otherwise it might cause deadlocks
@@ -528,7 +528,7 @@ void NWM_UDS::OnWifiPacketReceived(const WifiPacket& packet) {
     }
 }
 
-boost::optional<MacAddress> NWM_UDS::GetNodeMacAddress(u16 dest_node_id, u8 flags) {
+std::optional<MacAddress> NWM_UDS::GetNodeMacAddress(u16 dest_node_id, u8 flags) {
     constexpr u8 BroadcastFlag = 0x2;
     if ((flags & BroadcastFlag) || dest_node_id == BroadcastNetworkNodeId) {
         // Broadcast
@@ -543,7 +543,7 @@ boost::optional<MacAddress> NWM_UDS::GetNodeMacAddress(u16 dest_node_id, u8 flag
             return node.second.node_id == dest_node_id && node.second.connected;
         });
     if (destination == node_map.end()) {
-        return {};
+        return std::nullopt;
     }
     return destination->first;
 }
@@ -735,7 +735,7 @@ ResultVal<std::shared_ptr<Kernel::Event>> NWM_UDS::Initialize(
         // Reset the connection status, it contains all zeros after initialization,
         // except for the actual status value.
         connection_status = {};
-        connection_status.disconnect_reason = 2;
+        connection_status.disconnect_reason = static_cast<u32>(DisconnectStatus::NotConnected);
         connection_status.status = static_cast<u32>(NetworkStatus::NotConnected);
         node_info.clear();
         node_info.push_back(current_node);
@@ -925,7 +925,8 @@ ResultCode NWM_UDS::BeginHostingNetwork(const u8* network_info_buffer,
         ASSERT_MSG(network_info.max_nodes > 1, "Trying to host a network of only one member.");
 
         connection_status.status = static_cast<u32>(NetworkStatus::ConnectedAsHost);
-        connection_status.disconnect_reason = 1;
+        connection_status.disconnect_reason = static_cast<u32>(DisconnectStatus::Connected);
+        ;
 
         // Ensure the application data size is less than the maximum value.
         ASSERT_MSG(network_info.application_data_size <= ApplicationDataSize,
@@ -1016,7 +1017,7 @@ void NWM_UDS::BeginHostingNetworkDeprecated(Kernel::HLERequestContext& ctx) {
 
 void NWM_UDS::EjectClient(Kernel::HLERequestContext& ctx) {
     IPC::RequestParser rp(ctx, 0x05, 1, 0);
-    u16 network_node_id = rp.Pop<u16>();
+    const u16 network_node_id = rp.Pop<u16>();
 
     LOG_WARNING(Service_NWM, "(stubbed) called");
 
@@ -1041,17 +1042,16 @@ void NWM_UDS::EjectClient(Kernel::HLERequestContext& ctx) {
     // This function always returns success if the status is valid.
     rb.Push(RESULT_SUCCESS);
 
-    MacAddress dest_address;
+    MacAddress dest_address = BroadcastMac;
 
-    if (network_node_id == BroadcastNetworkNodeId) {
-        dest_address = BroadcastMac;
-    } else {
-        auto address = GetNodeMacAddress(network_node_id, 0);
+    if (network_node_id != BroadcastNetworkNodeId) {
+        std::optional<MacAddress> address = GetNodeMacAddress(network_node_id, 0);
 
         if (!address) {
             // There is no error if the network node id was not found.
             return;
         }
+
         dest_address = *address;
     }
 
