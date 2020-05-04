@@ -527,16 +527,24 @@ bool vvctre_gui_begin_listbox(const char* label) {
     return ImGui::ListBoxHeader(label);
 }
 
+void vvctre_gui_end_listbox() {
+    ImGui::ListBoxFooter();
+}
+
+bool vvctre_gui_begin_combo_box(const char* label, const char* preview) {
+    return ImGui::BeginCombo(label, preview);
+}
+
+void vvctre_gui_end_combo_box() {
+    ImGui::EndCombo();
+}
+
 bool vvctre_gui_selectable(const char* label) {
     return ImGui::Selectable(label);
 }
 
 bool vvctre_gui_selectable_with_selected(const char* label, bool* selected) {
     return ImGui::Selectable(label, selected);
-}
-
-void vvctre_gui_end_listbox() {
-    ImGui::ListBoxFooter();
 }
 
 bool vvctre_gui_text_input(const char* label, char* buffer, size_t buffer_size) {
@@ -574,6 +582,11 @@ bool vvctre_gui_color_picker(const char* label, float* color, int flags) {
 
 void vvctre_gui_progress_bar(float value, const char* overlay) {
     ImGui::ProgressBar(value, ImVec2(-1, 0), overlay);
+}
+
+bool vvctre_gui_slider_u16(const char* label, u16* value, const u16 minimum, const u16 maximum,
+                           const char* format) {
+    return ImGui::SliderScalar(label, ImGuiDataType_U16, value, &minimum, &maximum, format);
 }
 
 void vvctre_gui_tooltip(const char* text) {
@@ -1456,6 +1469,7 @@ std::unordered_map<std::string, void*> PluginManager::function_map = {
     {"vvctre_gui_bullet", (void*)&vvctre_gui_bullet},
     {"vvctre_gui_indent", (void*)&vvctre_gui_indent},
     {"vvctre_gui_unindent", (void*)&vvctre_gui_unindent},
+    {"vvctre_gui_tooltip", (void*)&vvctre_gui_tooltip},
     {"vvctre_gui_text", (void*)&vvctre_gui_text},
     {"vvctre_gui_text_colored", (void*)&vvctre_gui_text_colored},
     {"vvctre_gui_button", (void*)&vvctre_gui_button},
@@ -1471,9 +1485,11 @@ std::unordered_map<std::string, void*> PluginManager::function_map = {
     {"vvctre_gui_menu_item", (void*)&vvctre_gui_menu_item},
     {"vvctre_gui_menu_item_with_check_mark", (void*)&vvctre_gui_menu_item_with_check_mark},
     {"vvctre_gui_begin_listbox", (void*)&vvctre_gui_begin_listbox},
+    {"vvctre_gui_end_listbox", (void*)&vvctre_gui_end_listbox},
+    {"vvctre_gui_begin_combo_box", (void*)&vvctre_gui_begin_combo_box},
+    {"vvctre_gui_end_combo_box", (void*)&vvctre_gui_end_combo_box},
     {"vvctre_gui_selectable", (void*)&vvctre_gui_selectable},
     {"vvctre_gui_selectable_with_selected", (void*)&vvctre_gui_selectable_with_selected},
-    {"vvctre_gui_end_listbox", (void*)&vvctre_gui_end_listbox},
     {"vvctre_gui_text_input", (void*)&vvctre_gui_text_input},
     {"vvctre_gui_text_input_multiline", (void*)&vvctre_gui_text_input},
     {"vvctre_gui_text_input_with_hint", (void*)&vvctre_gui_text_input},
@@ -1483,7 +1499,7 @@ std::unordered_map<std::string, void*> PluginManager::function_map = {
     {"vvctre_gui_color_edit", (void*)&vvctre_gui_color_edit},
     {"vvctre_gui_color_picker", (void*)&vvctre_gui_color_picker},
     {"vvctre_gui_progress_bar", (void*)&vvctre_gui_progress_bar},
-    {"vvctre_gui_tooltip", (void*)&vvctre_gui_tooltip},
+    {"vvctre_gui_slider_u16", (void*)&vvctre_gui_slider_u16},
     // Button devices
     {"vvctre_button_device_new", (void*)&vvctre_button_device_new},
     {"vvctre_button_device_delete", (void*)&vvctre_button_device_delete},
