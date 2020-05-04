@@ -512,8 +512,8 @@ bool vvctre_gui_begin(const char* name) {
     return ImGui::Begin(name);
 }
 
-bool vvctre_gui_begin_overlay(const char* name, float x, float y) {
-    ImGui::SetNextWindowPos(ImVec2(x, y));
+bool vvctre_gui_begin_overlay(const char* name, float initial_x, float initial_y) {
+    ImGui::SetNextWindowPos(ImVec2(initial_x, initial_y), ImGuiCond_Appearing);
     return ImGui::Begin(name, nullptr,
                         ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoSavedSettings |
                             ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_AlwaysAutoResize);
