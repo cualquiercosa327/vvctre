@@ -759,9 +759,9 @@ void FS_USER::ObsoletedDeleteExtSaveData(Kernel::HLERequestContext& ctx) {
 
 void FS_USER::GetSpecialContentIndex(Kernel::HLERequestContext& ctx) {
     IPC::RequestParser rp(ctx, 0x83A, 4, 0);
-    MediaType media_type = static_cast<MediaType>(rp.Pop<u8>());
-    u64 title_id = rp.Pop<u64>();
-    auto type = rp.PopEnum<SpecialContentType>();
+    const MediaType media_type = static_cast<MediaType>(rp.Pop<u8>());
+    const u64 title_id = rp.Pop<u64>();
+    const auto type = rp.PopEnum<SpecialContentType>();
 
     LOG_DEBUG(Service_FS, "called, media_type={:08X} type={:08X}, title_id={:016X}",
               static_cast<u32>(media_type), static_cast<u32>(type), title_id);
