@@ -2559,7 +2559,7 @@ void InitialSettings::Run() {
 
                     ImGui::Checkbox("Use Custom Layout", &Settings::values.use_custom_layout);
                     ImGui::Checkbox("Swap Screens", &Settings::values.swap_screens);
-                    ImGui::Checkbox("Upright Orientation", &Settings::values.upright_screens);
+                    ImGui::Checkbox("Upright Screens", &Settings::values.upright_screens);
 
                     if (Settings::values.use_custom_layout) {
                         ImGui::Text("Top Left:");

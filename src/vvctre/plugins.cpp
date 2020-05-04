@@ -918,10 +918,6 @@ void vvctre_settings_apply() {
     Settings::Apply();
 }
 
-void vvctre_settings_log() {
-    Settings::LogSettings();
-}
-
 // Start Settings
 void vvctre_settings_set_file_path(const char* value) {
     Settings::values.file_path = std::string(value);
@@ -1636,7 +1632,6 @@ std::unordered_map<std::string, void*> PluginManager::function_map = {
     {"vvctre_screenshot_default_layout", (void*)&vvctre_screenshot_default_layout},
     // Settings
     {"vvctre_settings_apply", (void*)&vvctre_settings_apply},
-    {"vvctre_settings_log", (void*)&vvctre_settings_log},
     // Start Settings
     {"vvctre_settings_set_file_path", (void*)&vvctre_settings_set_file_path},
     {"vvctre_settings_get_file_path", (void*)&vvctre_settings_get_file_path},

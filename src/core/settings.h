@@ -280,6 +280,5 @@ struct Values {
 } extern values;
 
 void Apply();
-void LogSettings();
 
 } // namespace Settings
