@@ -466,6 +466,12 @@ void vvctre_gui_unindent() {
     ImGui::Unindent();
 }
 
+void vvctre_gui_tooltip(const char* text) {
+    if (ImGui::IsItemHovered()) {
+        ImGui::SetTooltip("%s", text);
+    }
+}
+
 void vvctre_gui_text(const char* text) {
     ImGui::TextUnformatted(text);
 }
@@ -587,12 +593,6 @@ void vvctre_gui_progress_bar(float value, const char* overlay) {
 bool vvctre_gui_slider_u16(const char* label, u16* value, const u16 minimum, const u16 maximum,
                            const char* format) {
     return ImGui::SliderScalar(label, ImGuiDataType_U16, value, &minimum, &maximum, format);
-}
-
-void vvctre_gui_tooltip(const char* text) {
-    if (ImGui::IsItemHovered()) {
-        ImGui::SetTooltip("%s", text);
-    }
 }
 
 // Button devices
