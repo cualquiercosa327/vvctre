@@ -2,6 +2,7 @@
 // Licensed under GPLv2 or any later version
 // Refer to the license.txt file included.
 
+#include <cstdlib>
 #include <utility>
 #include <fmt/format.h>
 #include <imgui.h>
@@ -1170,8 +1171,9 @@ void vvctre_settings_set_username(void* cfg, const char* value) {
     static_cast<Service::CFG::Module*>(cfg)->SetUsername(Common::UTF8ToUTF16(std::string(value)));
 }
 
-const char* vvctre_settings_get_username(void* cfg) {
-    return Common::UTF16ToUTF8(static_cast<Service::CFG::Module*>(cfg)->GetUsername()).c_str();
+void vvctre_settings_get_username(void* cfg, char* out) {
+    std::strcpy(
+        out, Common::UTF16ToUTF8(static_cast<Service::CFG::Module*>(cfg)->GetUsername()).c_str());
 }
 
 void vvctre_settings_set_birthday(void* cfg, u8 month, u8 day) {
