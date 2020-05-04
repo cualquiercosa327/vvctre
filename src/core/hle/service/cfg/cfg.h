@@ -197,7 +197,7 @@ public:
      */
     void SetPreferredRegionCodes(const std::vector<u32>& region_codes);
 
-    // Utilities for frontend to set config data.
+    // Utilities for frontend and plugins to set config data.
     // Note: UpdateConfigNANDSavegame should be called after making changes to config data.
 
     /**

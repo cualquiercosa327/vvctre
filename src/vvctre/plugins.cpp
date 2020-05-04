@@ -7,6 +7,7 @@
 #include <imgui.h>
 #include "common/common_funcs.h"
 #include "common/file_util.h"
+#include "common/string_util.h"
 #include "common/texture.h"
 #include "core/3ds.h"
 #include "core/cheats/cheat_base.h"
@@ -15,6 +16,7 @@
 #include "core/core.h"
 #include "core/hle/service/am/am.h"
 #include "core/hle/service/cam/cam.h"
+#include "core/hle/service/cfg/cfg.h"
 #include "core/hle/service/hid/hid.h"
 #include "core/hle/service/nfc/nfc.h"
 #include "core/hle/service/ptm/ptm.h"
@@ -1155,6 +1157,82 @@ int vvctre_settings_get_camera_flip(int index) {
     return static_cast<int>(Settings::values.camera_flip[index]);
 }
 
+// System Settings
+void vvctre_set_play_coins(u16 value) {
+    Service::PTM::Module::SetPlayCoins(value);
+}
+
+u16 vvctre_get_play_coins() {
+    return Service::PTM::Module::GetPlayCoins();
+}
+
+void vvctre_settings_set_username(void* cfg, const char* value) {
+    static_cast<Service::CFG::Module*>(cfg)->SetUsername(Common::UTF8ToUTF16(std::string(value)));
+}
+
+const char* vvctre_settings_get_username(void* cfg) {
+    return Common::UTF16ToUTF8(static_cast<Service::CFG::Module*>(cfg)->GetUsername()).c_str();
+}
+
+void vvctre_settings_set_birthday(void* cfg, u8 month, u8 day) {
+    static_cast<Service::CFG::Module*>(cfg)->SetBirthday(month, day);
+}
+
+void vvctre_settings_get_birthday(void* cfg, u8* month_out, u8* day_out) {
+    const auto [month, day] = static_cast<Service::CFG::Module*>(cfg)->GetBirthday();
+    *month_out = month;
+    *day_out = day;
+}
+
+void vvctre_settings_set_system_language(void* cfg, int value) {
+    static_cast<Service::CFG::Module*>(cfg)->SetSystemLanguage(
+        static_cast<Service::CFG::SystemLanguage>(value));
+}
+
+int vvctre_settings_get_system_language(void* cfg) {
+    return static_cast<int>(static_cast<Service::CFG::Module*>(cfg)->GetSystemLanguage());
+}
+
+void vvctre_settings_set_sound_output_mode(void* cfg, int value) {
+    static_cast<Service::CFG::Module*>(cfg)->SetSoundOutputMode(
+        static_cast<Service::CFG::SoundOutputMode>(value));
+}
+
+int vvctre_settings_get_sound_output_mode(void* cfg) {
+    return static_cast<int>(static_cast<Service::CFG::Module*>(cfg)->GetSoundOutputMode());
+}
+
+void vvctre_settings_set_country(void* cfg, u8 value) {
+    static_cast<Service::CFG::Module*>(cfg)->SetCountryCode(value);
+}
+
+u8 vvctre_settings_get_country(void* cfg) {
+    return static_cast<Service::CFG::Module*>(cfg)->GetCountryCode();
+}
+
+void vvctre_settings_set_console_id(void* cfg, u32 random_number, u64 console_id) {
+    static_cast<Service::CFG::Module*>(cfg)->SetConsoleUniqueId(random_number, console_id);
+}
+
+u64 vvctre_settings_get_console_id(void* cfg) {
+    return static_cast<Service::CFG::Module*>(cfg)->GetConsoleUniqueId();
+}
+
+void vvctre_settings_set_eula_version(void* cfg, u8 minor, u8 major) {
+    static_cast<Service::CFG::Module*>(cfg)->SetEULAVersion(
+        Service::CFG::EULAVersion{minor, major});
+}
+
+void vvctre_settings_get_eula_version(void* cfg, u8* minor, u8* major) {
+    Service::CFG::EULAVersion v = static_cast<Service::CFG::Module*>(cfg)->GetEULAVersion();
+    *minor = v.minor;
+    *major = v.major;
+}
+
+void vvctre_settings_write_config_savegame(void* cfg) {
+    static_cast<Service::CFG::Module*>(cfg)->UpdateConfigNANDSavegame();
+}
+
 // Graphics Settings
 void vvctre_settings_set_use_hardware_renderer(bool value) {
     Settings::values.use_hardware_renderer = value;
@@ -1462,13 +1540,22 @@ u32 vvctre_settings_get_layout_height() {
     return VideoCore::g_renderer->GetRenderWindow().GetFramebufferLayout().height;
 }
 
-// LLE Modules Settings
+// Modules
 void vvctre_settings_set_use_lle_module(const char* name, bool value) {
     Settings::values.lle_modules[std::string(name)] = value;
 }
 
 bool vvctre_settings_get_use_lle_module(const char* name) {
     return Settings::values.lle_modules[std::string(name)];
+}
+
+void* vvctre_get_cfg_module(void* core) {
+    Core::System* system = static_cast<Core::System*>(core);
+    if (system->IsPoweredOn()) {
+        return Service::CFG::GetModule(*system).get();
+    } else {
+        return new Service::CFG::Module();
+    }
 }
 
 // Other
@@ -1491,14 +1578,6 @@ u8 vvctre_get_version_patch() {
 
 bool vvctre_emulation_running(void* core) {
     return static_cast<Core::System*>(core)->IsPoweredOn();
-}
-
-void vvctre_set_play_coins(u16 value) {
-    Service::PTM::Module::SetPlayCoins(value);
-}
-
-u16 vvctre_get_play_coins() {
-    return Service::PTM::Module::GetPlayCoins();
 }
 
 std::unordered_map<std::string, void*> PluginManager::function_map = {
@@ -1700,6 +1779,25 @@ std::unordered_map<std::string, void*> PluginManager::function_map = {
     {"vvctre_settings_get_camera_parameter", (void*)&vvctre_settings_get_camera_parameter},
     {"vvctre_settings_set_camera_flip", (void*)&vvctre_settings_set_camera_flip},
     {"vvctre_settings_get_camera_flip", (void*)&vvctre_settings_get_camera_flip},
+    // System Settings
+    {"vvctre_set_play_coins", (void*)&vvctre_set_play_coins},
+    {"vvctre_get_play_coins", (void*)&vvctre_get_play_coins},
+    {"vvctre_settings_set_username", (void*)&vvctre_settings_set_username},
+    {"vvctre_settings_get_username", (void*)&vvctre_settings_get_username},
+    {"vvctre_settings_set_birthday", (void*)&vvctre_settings_set_birthday},
+    {"vvctre_settings_get_birthday", (void*)&vvctre_settings_get_birthday},
+    {"vvctre_settings_set_system_language", (void*)&vvctre_settings_set_system_language},
+    {"vvctre_settings_get_system_language", (void*)&vvctre_settings_get_system_language},
+    {"vvctre_settings_set_sound_output_mode", (void*)&vvctre_settings_set_sound_output_mode},
+    {"vvctre_settings_get_sound_output_mode", (void*)&vvctre_settings_get_sound_output_mode},
+    {"vvctre_settings_set_country", (void*)&vvctre_settings_set_country},
+    {"vvctre_settings_get_country", (void*)&vvctre_settings_get_country},
+    {"vvctre_settings_set_console_id", (void*)&vvctre_settings_set_console_id},
+    {"vvctre_settings_get_console_id", (void*)&vvctre_settings_get_console_id},
+    {"vvctre_settings_set_eula_version", (void*)&vvctre_settings_set_eula_version},
+    {"vvctre_settings_get_eula_version", (void*)&vvctre_settings_get_eula_version},
+    {"vvctre_settings_write_config_savegame", (void*)&vvctre_settings_write_config_savegame},
+    // Graphics Settings
     {"vvctre_settings_set_use_hardware_renderer",
      (void*)&vvctre_settings_set_use_hardware_renderer},
     {"vvctre_settings_get_use_hardware_renderer",
@@ -1810,15 +1908,14 @@ std::unordered_map<std::string, void*> PluginManager::function_map = {
      (void*)&vvctre_settings_get_custom_layout_bottom_bottom},
     {"vvctre_settings_get_layout_width", (void*)&vvctre_settings_get_layout_width},
     {"vvctre_settings_get_layout_height", (void*)&vvctre_settings_get_layout_height},
-    // LLE Modules Settings
+    // Modules
     {"vvctre_settings_set_use_lle_module", (void*)&vvctre_settings_set_use_lle_module},
     {"vvctre_settings_get_use_lle_module", (void*)&vvctre_settings_get_use_lle_module},
+    {"vvctre_get_cfg_module", (void*)&vvctre_get_cfg_module},
     // Other
     {"vvctre_get_version", (void*)&vvctre_get_version},
     {"vvctre_get_version_major", (void*)&vvctre_get_version_major},
     {"vvctre_get_version_minor", (void*)&vvctre_get_version_minor},
     {"vvctre_get_version_patch", (void*)&vvctre_get_version_patch},
     {"vvctre_emulation_running", (void*)&vvctre_emulation_running},
-    {"vvctre_set_play_coins", (void*)&vvctre_set_play_coins},
-    {"vvctre_get_play_coins", (void*)&vvctre_get_play_coins},
 };
