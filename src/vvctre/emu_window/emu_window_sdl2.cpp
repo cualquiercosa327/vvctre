@@ -1954,7 +1954,7 @@ void EmuWindow_SDL2::SwapBuffers() {
                     ImGui::SameLine();
                     u32 min = 5;
                     u32 max = 400;
-                    ImGui::SliderScalar("##cpuclockspeed", ImGuiDataType_U32,
+                    ImGui::SliderScalar("##cpu_clock_percentage", ImGuiDataType_U32,
                                         &Settings::values.cpu_clock_percentage, &min, &max, "%d%%");
 
                     ImGui::EndMenu();
