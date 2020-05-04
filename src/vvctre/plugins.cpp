@@ -300,7 +300,7 @@ void vvctre_remove_amiibo(void* core) {
 // Emulation
 
 void vvctre_restart(void* core) {
-    static_cast<Core::System*>(core)->Reset();
+    static_cast<Core::System*>(core)->RequestReset();
 }
 
 void vvctre_set_paused(void* plugin_manager, bool paused) {
