@@ -578,8 +578,36 @@ bool vvctre_gui_text_input_with_hint(const char* label, const char* hint, char* 
     return ImGui::InputTextWithHint(label, hint, buffer, buffer_size);
 }
 
+bool vvctre_gui_u8_input(const char* label, u8* value) {
+    return ImGui::InputScalar(label, ImGuiDataType_U8, value);
+}
+
+bool vvctre_gui_u16_input(const char* label, u16* value) {
+    return ImGui::InputScalar(label, ImGuiDataType_U16, value);
+}
+
+bool vvctre_gui_u32_input(const char* label, u32* value) {
+    return ImGui::InputScalar(label, ImGuiDataType_U32, value);
+}
+
+bool vvctre_gui_u64_input(const char* label, u64* value) {
+    return ImGui::InputScalar(label, ImGuiDataType_U64, value);
+}
+
+bool vvctre_gui_s8_input(const char* label, s8* value) {
+    return ImGui::InputScalar(label, ImGuiDataType_S8, value);
+}
+
+bool vvctre_gui_s16_input(const char* label, s16* value) {
+    return ImGui::InputScalar(label, ImGuiDataType_S16, value);
+}
+
 bool vvctre_gui_int_input(const char* label, int* value, int step, int step_fast) {
     return ImGui::InputInt(label, value, step, step_fast);
+}
+
+bool vvctre_gui_s64_input(const char* label, s64* value) {
+    return ImGui::InputScalar(label, ImGuiDataType_S64, value);
 }
 
 bool vvctre_gui_float_input(const char* label, float* value, float step, float step_fast) {
@@ -1553,7 +1581,14 @@ std::unordered_map<std::string, void*> PluginManager::function_map = {
     {"vvctre_gui_text_input", (void*)&vvctre_gui_text_input},
     {"vvctre_gui_text_input_multiline", (void*)&vvctre_gui_text_input},
     {"vvctre_gui_text_input_with_hint", (void*)&vvctre_gui_text_input},
+    {"vvctre_gui_u8_input", (void*)&vvctre_gui_u8_input},
+    {"vvctre_gui_u16_input", (void*)&vvctre_gui_u16_input},
+    {"vvctre_gui_u32_input", (void*)&vvctre_gui_u32_input},
+    {"vvctre_gui_u64_input", (void*)&vvctre_gui_u64_input},
+    {"vvctre_gui_s8_input", (void*)&vvctre_gui_s8_input},
+    {"vvctre_gui_s16_input", (void*)&vvctre_gui_s16_input},
     {"vvctre_gui_int_input", (void*)&vvctre_gui_int_input},
+    {"vvctre_gui_s64_input", (void*)&vvctre_gui_s64_input},
     {"vvctre_gui_float_input", (void*)&vvctre_gui_float_input},
     {"vvctre_gui_double_input", (void*)&vvctre_gui_double_input},
     {"vvctre_gui_color_edit", (void*)&vvctre_gui_color_edit},
