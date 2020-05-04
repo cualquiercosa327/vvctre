@@ -135,7 +135,7 @@ void LogSettings() {
         } else {
             LOG_INFO(Settings, "\t[ ] Custom CPU Ticks");
         }
-        LOG_INFO(Settings, "\tCPU Clock Speed: {}%", values.cpu_clock_percentage);
+        LOG_INFO(Settings, "\tCPU Clock Percentage: {}%", values.cpu_clock_percentage);
     }
     {
         LOG_INFO(Settings, "Camera:");

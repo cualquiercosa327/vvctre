@@ -1950,7 +1950,7 @@ void EmuWindow_SDL2::SwapBuffers() {
                         ImGui::Checkbox("Custom CPU Ticks", &Settings::values.use_custom_cpu_ticks);
                     }
 
-                    ImGui::Text("CPU Clock Speed:");
+                    ImGui::Text("CPU Clock Percentage:");
                     ImGui::SameLine();
                     u32 min = 5;
                     u32 max = 400;
