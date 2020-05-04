@@ -926,7 +926,6 @@ ResultCode NWM_UDS::BeginHostingNetwork(const u8* network_info_buffer,
 
         connection_status.status = static_cast<u32>(NetworkStatus::ConnectedAsHost);
         connection_status.disconnect_reason = static_cast<u32>(DisconnectStatus::Connected);
-        ;
 
         // Ensure the application data size is less than the maximum value.
         ASSERT_MSG(network_info.application_data_size <= ApplicationDataSize,
