@@ -539,16 +539,16 @@ void vvctre_gui_end_listbox() {
     ImGui::ListBoxFooter();
 }
 
-bool vvctre_gui_text_input(const char* label, char* buffer, std::size_t buffer_size) {
+bool vvctre_gui_text_input(const char* label, char* buffer, size_t buffer_size) {
     return ImGui::InputText(label, buffer, buffer_size);
 }
 
-bool vvctre_gui_text_input_multiline(const char* label, char* buffer, std::size_t buffer_size) {
+bool vvctre_gui_text_input_multiline(const char* label, char* buffer, size_t buffer_size) {
     return ImGui::InputTextMultiline(label, buffer, buffer_size);
 }
 
 bool vvctre_gui_text_input_with_hint(const char* label, const char* hint, char* buffer,
-                                     std::size_t buffer_size) {
+                                     size_t buffer_size) {
     return ImGui::InputTextWithHint(label, hint, buffer, buffer_size);
 }
 
