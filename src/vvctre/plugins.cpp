@@ -446,6 +446,14 @@ void vvctre_reload_camera_images(void* core) {
 }
 
 // GUI
+void vvctre_gui_push_item_width(float item_width) {
+    ImGui::PushItemWidth(item_width);
+}
+
+void vvctre_gui_pop_item_width() {
+    ImGui::PopItemWidth();
+}
+
 void vvctre_gui_same_line() {
     ImGui::SameLine();
 }
@@ -1464,6 +1472,8 @@ std::unordered_map<std::string, void*> PluginManager::function_map = {
     // Camera
     {"vvctre_reload_camera_images", (void*)&vvctre_reload_camera_images},
     // GUI
+    {"vvctre_gui_push_item_width", (void*)&vvctre_gui_push_item_width},
+    {"vvctre_gui_pop_item_width", (void*)&vvctre_gui_pop_item_width},
     {"vvctre_gui_same_line", (void*)&vvctre_gui_same_line},
     {"vvctre_gui_new_line", (void*)&vvctre_gui_new_line},
     {"vvctre_gui_bullet", (void*)&vvctre_gui_bullet},
