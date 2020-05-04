@@ -509,6 +509,10 @@ bool vvctre_gui_begin(const char* name) {
     return ImGui::Begin(name);
 }
 
+bool vvctre_gui_begin_auto_resize(const char* name) {
+    return ImGui::Begin(name, nullptr, ImGuiWindowFlags_AlwaysAutoResize);
+}
+
 void vvctre_gui_end() {
     ImGui::End();
 }
@@ -1487,6 +1491,7 @@ std::unordered_map<std::string, void*> PluginManager::function_map = {
     {"vvctre_gui_color_button", (void*)&vvctre_gui_color_button},
     {"vvctre_gui_checkbox", (void*)&vvctre_gui_checkbox},
     {"vvctre_gui_begin", (void*)&vvctre_gui_begin},
+    {"vvctre_gui_begin_auto_resize", (void*)&vvctre_gui_begin_auto_resize},
     {"vvctre_gui_end", (void*)&vvctre_gui_end},
     {"vvctre_gui_begin_menu", (void*)&vvctre_gui_begin_menu},
     {"vvctre_gui_end_menu", (void*)&vvctre_gui_end_menu},
