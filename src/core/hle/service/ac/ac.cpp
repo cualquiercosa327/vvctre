@@ -17,6 +17,7 @@
 #include "core/memory.h"
 
 namespace Service::AC {
+
 void Module::Interface::CreateDefaultConfig(Kernel::HLERequestContext& ctx) {
     IPC::RequestParser rp(ctx, 0x1, 0, 0);
 
@@ -164,6 +165,36 @@ void Module::Interface::SetClientVersion(Kernel::HLERequestContext& ctx) {
 
     IPC::RequestBuilder rb = rp.MakeBuilder(1, 0);
     rb.Push(RESULT_SUCCESS);
+}
+
+void Module::Interface::GetNetworkWirelessEssidSecuritySsid(Kernel::HLERequestContext& ctx) {
+    std::vector<u8> buffer(32, 0);
+    buffer[0] = static_cast<u8>('v');
+    buffer[1] = static_cast<u8>('v');
+    buffer[2] = static_cast<u8>('c');
+    buffer[3] = static_cast<u8>('t');
+    buffer[4] = static_cast<u8>('r');
+    buffer[5] = static_cast<u8>('e');
+
+    IPC::RequestBuilder rb(ctx, 0x40F, 1, 2);
+    rb.Push(RESULT_SUCCESS);
+    rb.PushStaticBuffer(buffer, 0);
+}
+
+void Module::Interface::GetNetworkWirelessEssidPassphrase(Kernel::HLERequestContext& ctx) {
+    std::vector<u8> buffer(64, 0);
+    buffer[0] = static_cast<u8>('p');
+    buffer[1] = static_cast<u8>('a');
+    buffer[2] = static_cast<u8>('s');
+    buffer[3] = static_cast<u8>('s');
+    buffer[4] = static_cast<u8>('w');
+    buffer[5] = static_cast<u8>('o');
+    buffer[6] = static_cast<u8>('r');
+    buffer[7] = static_cast<u8>('d');
+
+    IPC::RequestBuilder rb(ctx, 0x415, 1, 2);
+    rb.Push(RESULT_SUCCESS);
+    rb.PushStaticBuffer(buffer, 0);
 }
 
 Module::Interface::Interface(std::shared_ptr<Module> ac, const char* name, u32 max_session)

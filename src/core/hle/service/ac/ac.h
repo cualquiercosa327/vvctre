@@ -10,11 +10,11 @@
 
 namespace Core {
 class System;
-}
+} // namespace Core
 
 namespace Kernel {
 class Event;
-}
+} // namespace Kernel
 
 namespace Service::AC {
 class Module final {
@@ -34,6 +34,8 @@ public:
         void RegisterDisconnectEvent(Kernel::HLERequestContext& ctx);
         void IsConnected(Kernel::HLERequestContext& ctx);
         void SetClientVersion(Kernel::HLERequestContext& ctx);
+        void GetNetworkWirelessEssidSecuritySsid(Kernel::HLERequestContext& ctx);
+        void GetNetworkWirelessEssidPassphrase(Kernel::HLERequestContext& ctx);
 
     protected:
         std::shared_ptr<Module> ac;

@@ -10,6 +10,9 @@ AC_I::AC_I(std::shared_ptr<Module> ac) : Module::Interface(std::move(ac), "ac:i"
     static const FunctionInfo functions[] = {
         {0x00010000, &AC_I::CreateDefaultConfig, "CreateDefaultConfig"},
         {0x00040006, &AC_I::ConnectAsync, "ConnectAsync"},
+        {0x040F0000, &AC_I::GetNetworkWirelessEssidSecuritySsid,
+         "GetNetworkWirelessEssidSecuritySsid"},
+        {0x04150000, &AC_I::GetNetworkWirelessEssidPassphrase, "GetNetworkWirelessEssidPassphrase"},
         {0x00050002, &AC_I::GetConnectResult, "GetConnectResult"},
         {0x00070002, nullptr, "CancelConnectAsync"},
         {0x00080004, &AC_I::CloseAsync, "CloseAsync"},
