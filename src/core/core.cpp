@@ -141,11 +141,6 @@ System::ResultStatus System::Load(Frontend::EmuWindow& emu_window, const std::st
         }
     }
     cheat_engine = std::make_unique<Cheats::CheatEngine>(*this);
-    u64 title_id{0};
-    if (app_loader->ReadProgramId(title_id) != Loader::ResultStatus::Success) {
-        LOG_ERROR(Core, "Failed to find title id for ROM (Error {})",
-                  static_cast<u32>(load_result));
-    }
     perf_stats = std::make_unique<PerfStats>();
     custom_tex_cache = std::make_unique<Core::CustomTexCache>();
     if (Settings::values.custom_textures) {
