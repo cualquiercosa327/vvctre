@@ -367,13 +367,15 @@ namespace Loader {
 FileType AppLoader_ELF::IdentifyType(FileUtil::IOFile& file) {
     u32 magic;
     file.Seek(0, SEEK_SET);
-    if (1 != file.ReadArray<u32>(&magic, 1))
-        return FileType::Error;
+    if (file.ReadArray<u32>(&magic, 1) != 1) {
+        return FileType::Unknown;
+    }
 
-    if (MakeMagic('\x7f', 'E', 'L', 'F') == magic)
+    if (magic == MakeMagic('\x7f', 'E', 'L', 'F')) {
         return FileType::ELF;
+    }
 
-    return FileType::Error;
+    return FileType::Unknown;
 }
 
 ResultStatus AppLoader_ELF::Load(std::shared_ptr<Kernel::Process>& process) {

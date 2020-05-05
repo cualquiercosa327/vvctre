@@ -246,15 +246,15 @@ static THREEDSX_Error Load3DSXFile(FileUtil::IOFile& file, u32 base_addr,
 FileType AppLoader_THREEDSX::IdentifyType(FileUtil::IOFile& file) {
     u32 magic;
     file.Seek(0, SEEK_SET);
-    if (1 != file.ReadArray<u32>(&magic, 1)) {
-        return FileType::Error;
+    if (file.ReadArray<u32>(&magic, 1) != 1) {
+        return FileType::Unknown;
     }
 
-    if (MakeMagic('3', 'D', 'S', 'X') == magic) {
+    if (magic == MakeMagic('3', 'D', 'S', 'X')) {
         return FileType::THREEDSX;
     }
 
-    return FileType::Error;
+    return FileType::Unknown;
 }
 
 ResultStatus AppLoader_THREEDSX::Load(std::shared_ptr<Kernel::Process>& process) {

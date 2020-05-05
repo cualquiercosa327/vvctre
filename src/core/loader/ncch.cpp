@@ -35,16 +35,19 @@ static const u64 UPDATE_MASK = 0x0000000e00000000;
 FileType AppLoader_NCCH::IdentifyType(FileUtil::IOFile& file) {
     u32 magic;
     file.Seek(0x100, SEEK_SET);
-    if (1 != file.ReadArray<u32>(&magic, 1))
-        return FileType::Error;
+    if (file.ReadArray<u32>(&magic, 1) != 1) {
+        return FileType::Unknown;
+    }
 
-    if (MakeMagic('N', 'C', 'S', 'D') == magic)
+    if (magic == MakeMagic('N', 'C', 'S', 'D')) {
         return FileType::CCI;
+    }
 
-    if (MakeMagic('N', 'C', 'C', 'H') == magic)
+    if (magic == MakeMagic('N', 'C', 'C', 'H')) {
         return FileType::CXI;
+    }
 
-    return FileType::Error;
+    return FileType::Unknown;
 }
 
 std::pair<std::optional<u32>, ResultStatus> AppLoader_NCCH::LoadKernelSystemMode() {

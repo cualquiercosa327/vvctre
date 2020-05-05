@@ -92,9 +92,13 @@ System::ResultStatus System::RunLoop(bool tight_loop) {
 }
 
 System::ResultStatus System::Load(Frontend::EmuWindow& emu_window, const std::string& filepath) {
+    if (!FileUtil::Exists(filepath)) {
+        return ResultStatus::ErrorFileNotFound;
+    }
+
     app_loader = Loader::GetLoader(filepath);
     if (!app_loader) {
-        LOG_CRITICAL(Core, "Unsupported file format", filepath);
+        LOG_CRITICAL(Core, "Unsupported file format");
         return ResultStatus::ErrorLoader_ErrorUnsupportedFormat;
     }
     std::pair<std::optional<u32>, Loader::ResultStatus> system_mode =

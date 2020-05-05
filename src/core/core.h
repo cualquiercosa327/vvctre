@@ -75,6 +75,7 @@ public:
         ErrorSystemMode,            ///< Error determining the system mode
         ErrorLoader_ErrorEncrypted, ///< Error loading the specified application due to encryption
         ErrorLoader_ErrorUnsupportedFormat, ///< Unsupported file format
+        ErrorFileNotFound,                  ///< File not found
         ShutdownRequested,                  ///< Emulated program requested a system shutdown
         FatalError,                         ///< A fatal error
     };

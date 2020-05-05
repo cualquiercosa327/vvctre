@@ -24,7 +24,7 @@ public:
     /**
      * Returns the type of the file
      * @param file FileUtil::IOFile open file
-     * @return FileType found, or FileType::Error if this loader doesn't know it
+     * @return FileType found, or FileType::Unknown if this loader doesn't know it
      */
     static FileType IdentifyType(FileUtil::IOFile& file);
 

@@ -138,6 +138,9 @@ int main(int argc, char** argv) {
     case Core::System::ResultStatus::ErrorLoader_ErrorUnsupportedFormat:
         pfd::message("vvctre", "Unsupported file format", pfd::choice::ok, pfd::icon::error);
         return -1;
+    case Core::System::ResultStatus::ErrorFileNotFound:
+        pfd::message("vvctre", "File not found", pfd::choice::ok, pfd::icon::error);
+        return -1;
     default:
         break;
     }
