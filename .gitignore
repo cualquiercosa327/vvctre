@@ -1,7 +1,5 @@
 # Build directory
 build/
-ubuntu_build/
-ubuntu_debug/
 
 # Project/editor files
 *.swp
