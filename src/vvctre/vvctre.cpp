@@ -63,7 +63,7 @@ static void InitializeLogging() {
     Log::AddBackend(std::make_unique<Log::ColorConsoleBackend>());
 }
 
-int main(int, char**) {
+int main(int argc, char** argv) {
     // Initialize SDL
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_JOYSTICK) < 0) {
         std::cerr << "Failed to initialize SDL2! Exiting..." << std::endl;
@@ -86,7 +86,13 @@ int main(int, char**) {
     PluginManager plugin_manager(static_cast<void*>(&system));
 
     plugin_manager.InitialSettingsOpening();
-    InitialSettings(plugin_manager).Run();
+    if (argc < 2) {
+        InitialSettings(plugin_manager).Run();
+    } else {
+        Settings::values.file_path = std::string(argv[1]);
+        Settings::values.start_in_fullscreen_mode = true;
+        Settings::Apply();
+    }
     plugin_manager.InitialSettingsOkPressed();
 
     InitializeLogging();
