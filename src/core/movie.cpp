@@ -97,7 +97,7 @@ struct ControllerState {
 static_assert(sizeof(ControllerState) == 7, "ControllerState should be 7 bytes");
 #pragma pack(pop)
 
-constexpr std::array<u8, 4> header_magic_bytes{{'V', 'C', 'M', Movie::Version}};
+constexpr std::array<u8, 4> header_magic_bytes{{'V', 'C', 'M', MovieVersion}};
 
 #pragma pack(push, 1)
 struct VCMHeader {

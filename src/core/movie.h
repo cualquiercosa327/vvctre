@@ -25,10 +25,10 @@ struct VCMHeader;
 struct ControllerState;
 enum class PlayMode;
 
+constexpr u8 MovieVersion = 2;
+
 class Movie {
 public:
-    static const u8 Version = 2;
-
     enum class ValidationResult {
         OK,
         GameDismatch,

@@ -64,13 +64,13 @@ static void InitializeLogging() {
 }
 
 int main(int, char**) {
-    InputCommon::Init();
-
     // Initialize SDL
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_JOYSTICK) < 0) {
         std::cerr << "Failed to initialize SDL2! Exiting..." << std::endl;
         std::exit(1);
     }
+
+    InputCommon::Init();
 
     SDL_SetMainReady();
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);

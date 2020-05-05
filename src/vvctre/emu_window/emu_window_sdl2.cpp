@@ -188,7 +188,7 @@ EmuWindow_SDL2::EmuWindow_SDL2(Core::System& system, PluginManager& plugin_manag
     SDL_PumpEvents();
     LOG_INFO(Frontend, "Version: {}.{}.{}", vvctre_version_major, vvctre_version_minor,
              vvctre_version_patch);
-    LOG_INFO(Frontend, "Movie version: {}", Core::Movie::Version);
+    LOG_INFO(Frontend, "Movie version: {}", Core::MovieVersion);
 
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
@@ -232,7 +232,7 @@ void EmuWindow_SDL2::SwapBuffers() {
         }
         ImGui::SetWindowPos(ImVec2(), ImGuiCond_Once);
         ImGui::TextColored(fps_color, "%d FPS", static_cast<int>(io.Framerate));
-        if (ImGui::BeginPopupContextItem(nullptr, ImGuiMouseButton_Right)) {
+        if (ImGui::BeginPopupContextItem("##menu", ImGuiMouseButton_Right)) {
             paused = true;
 
             if (ImGui::BeginMenu("File")) {

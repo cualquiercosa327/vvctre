@@ -108,7 +108,7 @@ void InitialSettings::Run() {
         ImGui_ImplSDL2_NewFrame(render_window);
         ImGui::NewFrame();
         ImGuiIO& io = ImGui::GetIO();
-        if (ImGui::Begin("", nullptr,
+        if (ImGui::Begin("Initial Settings", nullptr,
                          ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoTitleBar |
                              ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse |
                              ImGuiWindowFlags_NoMove | ImGuiWindowFlags_HorizontalScrollbar)) {
