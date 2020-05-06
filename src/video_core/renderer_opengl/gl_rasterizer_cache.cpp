@@ -845,16 +845,15 @@ void CachedSurface::DownloadGLTexture(const Common::Rectangle<u32>& rect, GLuint
     std::size_t buffer_offset =
         (rect.bottom * stride + rect.left) * GetGLBytesPerPixel(pixel_format);
 
-    const bool use_pbo = type == SurfaceType::DepthStencil;
+    const bool use_pbo = type == SurfaceType::Depth || type == SurfaceType::DepthStencil ||
+                         type == SurfaceType::Texture;
     if (use_pbo && !pixel_buffers[0].handle) {
         const GLsizeiptr pbo_size = width * height * GetGLBytesPerPixel(pixel_format);
-        pixel_buffers[0].Create();
-        pixel_buffers[1].Create();
-        // glBufferData() with NULL pointer reserves memory space
-        glBindBuffer(GL_PIXEL_PACK_BUFFER, pixel_buffers[0].handle);
-        glBufferData(GL_PIXEL_PACK_BUFFER, pbo_size, nullptr, GL_STREAM_READ);
-        glBindBuffer(GL_PIXEL_PACK_BUFFER, pixel_buffers[1].handle);
-        glBufferData(GL_PIXEL_PACK_BUFFER, pbo_size, nullptr, GL_STREAM_READ);
+        for (auto& buffer : pixel_buffers) {
+            buffer.Create();
+            glBindBuffer(GL_PIXEL_PACK_BUFFER, buffer.handle);
+            glBufferData(GL_PIXEL_PACK_BUFFER, pbo_size, nullptr, GL_STREAM_READ);
+        }
         glBindBuffer(GL_PIXEL_PACK_BUFFER, 0);
     }
 
@@ -906,8 +905,6 @@ void CachedSurface::DownloadGLTexture(const Common::Rectangle<u32>& rect, GLuint
         }
 
         if (use_pbo) {
-            // copy pixels from framebuffer to PBO
-            // OpenGL should perform asynch DMA transfer, so glReadPixels() will return immediately.
             glBindBuffer(GL_PIXEL_PACK_BUFFER, pixel_buffers[pbo_index].handle);
             glReadPixels(static_cast<GLint>(rect.left), static_cast<GLint>(rect.bottom),
                          static_cast<GLsizei>(rect.GetWidth()),
@@ -921,12 +918,11 @@ void CachedSurface::DownloadGLTexture(const Common::Rectangle<u32>& rect, GLuint
     }
 
     if (use_pbo) {
-        // map the PBO that contains framebuffer pixels
         pbo_index = (pbo_index + 1) % 2;
         glBindBuffer(GL_PIXEL_PACK_BUFFER, pixel_buffers[pbo_index].handle);
         GLubyte* pbo_data = static_cast<GLubyte*>(glMapBuffer(GL_PIXEL_PACK_BUFFER, GL_READ_ONLY));
         std::copy(pbo_data, pbo_data + gl_buffer.size() - buffer_offset, &gl_buffer[buffer_offset]);
-        glUnmapBuffer(GL_PIXEL_PACK_BUFFER); // release pointer to the mapped buffer
+        glUnmapBuffer(GL_PIXEL_PACK_BUFFER);
         glBindBuffer(GL_PIXEL_PACK_BUFFER, 0);
     }
 
@@ -1769,9 +1765,6 @@ void RasterizerCacheOpenGL::FlushRegion(PAddr addr, u32 size, Surface flush_surf
             SurfaceParams params = surface->FromInterval(interval);
             surface->DownloadGLTexture(surface->GetSubRect(params), read_framebuffer.handle,
                                        draw_framebuffer.handle);
-            // downloaded rect could be bigger than requested, shouldn't flushed interval reflect
-            // that?
-            /*interval = SurfaceInterval(params.addr, params.end);*/
         }
         surface->FlushGLBuffer(boost::icl::first(interval), boost::icl::last_next(interval));
         flushed_intervals += interval;
