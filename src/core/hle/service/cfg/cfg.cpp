@@ -679,9 +679,8 @@ void Module::SetPreferredRegionCodes(const std::vector<u32>& region_codes) {
 }
 
 void Module::SetUsername(const std::u16string& name) {
-    ASSERT(name.size() <= 10);
     UsernameBlock block{};
-    name.copy(block.username, name.size());
+    name.copy(block.username, std::min(name.size(), static_cast<std::size_t>(10)));
     SetConfigInfoBlock(UsernameBlockID, sizeof(block), 4, &block);
 }
 
