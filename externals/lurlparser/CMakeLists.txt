@@ -1,6 +1,6 @@
 add_library(lurlparser
-        LUrlParser.cpp
-        LUrlParser.h
+    LUrlParser.cpp
+    LUrlParser.h
 )
 
 create_target_directory_groups(lurlparser)
