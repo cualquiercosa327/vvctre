@@ -73,19 +73,8 @@ InitialSettings::InitialSettings(PluginManager& plugin_manager) : plugin_manager
 
     SDL_PumpEvents();
 
-    IMGUI_CHECKVERSION();
-    ImGui::CreateContext();
-    ImGui::StyleColorsDark();
-    ImGui::GetIO().IniFilename = nullptr;
     ImGui_ImplSDL2_InitForOpenGL(render_window, gl_context);
     ImGui_ImplOpenGL3_Init("#version 330 core");
-
-    ImGui::GetStyle().WindowRounding = 0.0f;
-    ImGui::GetStyle().ChildRounding = 0.0f;
-    ImGui::GetStyle().FrameRounding = 0.0f;
-    ImGui::GetStyle().GrabRounding = 0.0f;
-    ImGui::GetStyle().PopupRounding = 0.0f;
-    ImGui::GetStyle().ScrollbarRounding = 0.0f;
 }
 
 void InitialSettings::Run() {
@@ -116,9 +105,6 @@ void InitialSettings::Run() {
             ImGui::SetWindowSize(io.DisplaySize);
             if (ImGui::BeginTabBar("##tabBar")) {
                 if (ImGui::BeginTabItem("Start")) {
-                    ImGui::Text("Start settings are not persistent.");
-                    ImGui::NewLine();
-
                     ImGui::Text("File:");
                     ImGui::SameLine();
                     ImGui::PushItemWidth(330);
@@ -341,9 +327,6 @@ void InitialSettings::Run() {
                 }
 
                 if (ImGui::BeginTabItem("General")) {
-                    ImGui::Text("General settings are not persistent.");
-                    ImGui::NewLine();
-
                     ImGui::Checkbox("Use CPU JIT", &Settings::values.use_cpu_jit);
                     ImGui::Checkbox("Limit Speed", &Settings::values.limit_speed);
 
@@ -380,9 +363,6 @@ void InitialSettings::Run() {
                 }
 
                 if (ImGui::BeginTabItem("Audio")) {
-                    ImGui::Text("Audio settings are not persistent.");
-                    ImGui::NewLine();
-
                     ImGui::Checkbox("Enable DSP LLE", &Settings::values.enable_dsp_lle);
 
                     if (Settings::values.enable_dsp_lle) {
@@ -479,9 +459,6 @@ void InitialSettings::Run() {
                 }
 
                 if (ImGui::BeginTabItem("Camera")) {
-                    ImGui::Text("Camera settings are not persistent.");
-                    ImGui::NewLine();
-
                     ImGui::Text("Inner Camera Engine");
                     ImGui::SameLine();
                     if (ImGui::BeginCombo("##innerengine",
@@ -558,9 +535,6 @@ void InitialSettings::Run() {
                 }
 
                 if (ImGui::BeginTabItem("System")) {
-                    ImGui::Text("System settings are persistent.");
-                    ImGui::NewLine();
-
                     ImGui::Text("Username:");
                     ImGui::SameLine();
 
@@ -1553,9 +1527,6 @@ void InitialSettings::Run() {
                 }
 
                 if (ImGui::BeginTabItem("Graphics")) {
-                    ImGui::Text("Graphics settings are not persistent.");
-                    ImGui::NewLine();
-
                     ImGui::Checkbox("Use Hardware Renderer",
                                     &Settings::values.use_hardware_renderer);
                     ImGui::Checkbox("Use Hardware Shader", &Settings::values.use_hardware_shader);
@@ -2514,9 +2485,6 @@ void InitialSettings::Run() {
                 }
 
                 if (ImGui::BeginTabItem("Layout")) {
-                    ImGui::Text("Layout settings are not persistent.");
-                    ImGui::NewLine();
-
                     if (!Settings::values.use_custom_layout) {
                         ImGui::Text("Layout:");
                         ImGui::SameLine();
@@ -2600,9 +2568,6 @@ void InitialSettings::Run() {
                 }
 
                 if (ImGui::BeginTabItem("LLE Modules")) {
-                    ImGui::Text("LLE Modules settings are not persistent.");
-                    ImGui::NewLine();
-
                     for (auto& module : Settings::values.lle_modules) {
                         ImGui::Checkbox(module.first.c_str(), &module.second);
                     }
@@ -2640,7 +2605,6 @@ void InitialSettings::Run() {
 InitialSettings::~InitialSettings() {
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplSDL2_Shutdown();
-    ImGui::DestroyContext();
     SDL_GL_DeleteContext(gl_context);
     SDL_DestroyWindow(render_window);
 }

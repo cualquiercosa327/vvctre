@@ -190,19 +190,8 @@ EmuWindow_SDL2::EmuWindow_SDL2(Core::System& system, PluginManager& plugin_manag
              vvctre_version_patch);
     LOG_INFO(Frontend, "Movie version: {}", Core::MovieVersion);
 
-    IMGUI_CHECKVERSION();
-    ImGui::CreateContext();
-    ImGui::StyleColorsDark();
-    ImGui::GetIO().IniFilename = nullptr;
     ImGui_ImplSDL2_InitForOpenGL(render_window, gl_context);
     ImGui_ImplOpenGL3_Init("#version 330 core");
-
-    ImGui::GetStyle().WindowRounding = 0.0f;
-    ImGui::GetStyle().ChildRounding = 0.0f;
-    ImGui::GetStyle().FrameRounding = 0.0f;
-    ImGui::GetStyle().GrabRounding = 0.0f;
-    ImGui::GetStyle().PopupRounding = 0.0f;
-    ImGui::GetStyle().ScrollbarRounding = 0.0f;
 
     DoneCurrent();
 }
@@ -211,7 +200,6 @@ EmuWindow_SDL2::~EmuWindow_SDL2() {
     InputCommon::Shutdown();
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplSDL2_Shutdown();
-    ImGui::DestroyContext();
     SDL_GL_DeleteContext(gl_context);
     SDL_Quit();
 }

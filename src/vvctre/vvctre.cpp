@@ -18,6 +18,7 @@
 
 #define SDL_MAIN_HANDLED
 #include <SDL.h>
+#include <imgui.h>
 #include <portable-file-dialogs.h>
 #include "common/detached_tasks.h"
 #include "common/file_util.h"
@@ -84,6 +85,17 @@ int main(int argc, char** argv) {
 
     Core::System& system = Core::System::GetInstance();
     PluginManager plugin_manager(static_cast<void*>(&system));
+
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGui::StyleColorsDark();
+    ImGui::GetIO().IniFilename = nullptr;
+    ImGui::GetStyle().WindowRounding = 0.0f;
+    ImGui::GetStyle().ChildRounding = 0.0f;
+    ImGui::GetStyle().FrameRounding = 0.0f;
+    ImGui::GetStyle().GrabRounding = 0.0f;
+    ImGui::GetStyle().PopupRounding = 0.0f;
+    ImGui::GetStyle().ScrollbarRounding = 0.0f;
 
     plugin_manager.InitialSettingsOpening();
     if (argc < 2) {

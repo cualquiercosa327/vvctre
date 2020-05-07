@@ -690,6 +690,10 @@ bool vvctre_gui_slider_double(const char* label, double* value, const double min
     return ImGui::SliderScalar(label, ImGuiDataType_Double, value, &minimum, &maximum, format);
 }
 
+void vvctre_gui_set_color(int index, float r, float g, float b, float a) {
+    ImGui::GetStyle().Colors[index] = ImVec4(r, g, b, a);
+}
+
 // Button devices
 void* vvctre_button_device_new(void* plugin_manager, const char* params) {
     PluginManager* pm = static_cast<PluginManager*>(plugin_manager);
@@ -1689,6 +1693,7 @@ std::unordered_map<std::string, void*> PluginManager::function_map = {
     {"vvctre_gui_slider_s64", (void*)&vvctre_gui_slider_s64},
     {"vvctre_gui_slider_float", (void*)&vvctre_gui_slider_float},
     {"vvctre_gui_slider_double", (void*)&vvctre_gui_slider_double},
+    {"vvctre_gui_set_color", (void*)&vvctre_gui_set_color},
     // Button devices
     {"vvctre_button_device_new", (void*)&vvctre_button_device_new},
     {"vvctre_button_device_delete", (void*)&vvctre_button_device_delete},
