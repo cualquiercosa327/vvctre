@@ -492,7 +492,7 @@ static void ExecuteCommand(const Command& command, u32 thread_id) {
         if (params.do_flush) {
             // This flag flushes the command list (params.address, params.size) from the cache.
             // Command lists are not processed by the hardware renderer, so we don't need to
-            // actually flush them in Citra.
+            // actually flush them in vvctre.
         }
 
         WriteGPURegister(static_cast<u32>(GPU_REG_INDEX(command_processor_config.address)),
