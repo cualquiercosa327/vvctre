@@ -465,8 +465,7 @@ static void ExecuteCommand(const Command& command, u32 thread_id) {
     };
 
     switch (command.id) {
-
-        // GX request DMA - typically used for copying memory from GSP heap to VRAM
+    // GX request DMA - typically used for copying memory from GSP heap to VRAM
     case CommandId::REQUEST_DMA: {
         // TODO: Consider attempting rasterizer-accelerated surface blit if that usage is ever
         // possible/likely
@@ -485,7 +484,7 @@ static void ExecuteCommand(const Command& command, u32 thread_id) {
         SignalInterrupt(InterruptId::DMA);
         break;
     }
-        // TODO: This will need some rework in the future. (why?)
+    // TODO: This will need some rework in the future. (why?)
     case CommandId::SUBMIT_GPU_CMDLIST: {
         auto& params = command.submit_gpu_cmdlist;
 
@@ -509,8 +508,8 @@ static void ExecuteCommand(const Command& command, u32 thread_id) {
         break;
     }
 
-        // It's assumed that the two "blocks" behave equivalently.
-        // Presumably this is done simply to allow two memory fills to run in parallel.
+    // It's assumed that the two "blocks" behave equivalently.
+    // Presumably this is done simply to allow two memory fills to run in parallel.
     case CommandId::SET_MEMORY_FILL: {
         auto& params = command.memory_fill;
 
@@ -605,18 +604,16 @@ void GSP_GPU::SetLcdForceBlack(Kernel::HLERequestContext& ctx) {
 void GSP_GPU::TriggerCmdReqQueue(Kernel::HLERequestContext& ctx) {
     IPC::RequestParser rp(ctx, 0xC, 0, 0);
 
-    // Iterate through each thread's command queue...
-    for (unsigned thread_id = 0; thread_id < 0x4; ++thread_id) {
-        CommandBuffer* command_buffer = (CommandBuffer*)GetCommandBuffer(shared_memory, thread_id);
+    CommandBuffer* command_buffer =
+        (CommandBuffer*)GetCommandBuffer(shared_memory, active_thread_id);
 
-        // Iterate through each command...
-        for (unsigned i = 0; i < command_buffer->number_commands; ++i) {
-            // Decode and execute command
-            ExecuteCommand(command_buffer->commands[i], thread_id);
+    // Iterate through each command...
+    for (unsigned i = 0; i < command_buffer->number_commands; ++i) {
+        // Decode and execute command
+        ExecuteCommand(command_buffer->commands[i], active_thread_id);
 
-            // Indicates that command has completed
-            command_buffer->number_commands.Assign(command_buffer->number_commands - 1);
-        }
+        // Indicates that command has completed
+        command_buffer->number_commands.Assign(command_buffer->number_commands - 1);
     }
 
     IPC::RequestBuilder rb = rp.MakeBuilder(1, 0);
@@ -626,14 +623,8 @@ void GSP_GPU::TriggerCmdReqQueue(Kernel::HLERequestContext& ctx) {
 void GSP_GPU::ImportDisplayCaptureInfo(Kernel::HLERequestContext& ctx) {
     IPC::RequestParser rp(ctx, 0x18, 0, 0);
 
-    // TODO(Subv): We're always returning the framebuffer structures for thread_id = 0,
-    // because we only support a single running application at a time.
-    // This should always return the framebuffer data that is currently displayed on the screen.
-
-    u32 thread_id = 0;
-
-    FrameBufferUpdate* top_screen = GetFrameBufferInfo(thread_id, 0);
-    FrameBufferUpdate* bottom_screen = GetFrameBufferInfo(thread_id, 1);
+    FrameBufferUpdate* top_screen = GetFrameBufferInfo(active_thread_id, 0);
+    FrameBufferUpdate* bottom_screen = GetFrameBufferInfo(active_thread_id, 1);
 
     struct CaptureInfoEntry {
         u32_le address_left;
