@@ -105,7 +105,8 @@ enum class Class : ClassType {
     Loader,            ///< ROM loader
     Input,             ///< Input emulation
     Movie,             ///< Movie (Input Recording) Playback
-    Count              ///< Total number of logging classes
+    Plugins,           ///< Messages from plugins
+    Count              ///< Total number of logging classes 
 };
 
 /// Logs a message to the global logger, using fmt

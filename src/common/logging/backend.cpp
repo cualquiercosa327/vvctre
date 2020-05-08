@@ -201,7 +201,8 @@ void ColorConsoleBackend::Write(const Entry& entry) {
     SUB(Audio, Sink)                                                                               \
     CLS(Input)                                                                                     \
     CLS(Movie)                                                                                     \
-    CLS(Loader)
+    CLS(Loader)                                                                                    \
+    CLS(Plugins)
 
 // GetClassName is a macro defined by Windows.h, grrr...
 const char* GetLogClassName(Class log_class) {

@@ -8,6 +8,7 @@
 #include <imgui.h>
 #include "common/common_funcs.h"
 #include "common/file_util.h"
+#include "common/logging/log.h"
 #include "common/string_util.h"
 #include "common/texture.h"
 #include "core/3ds.h"
@@ -310,6 +311,10 @@ void vvctre_set_paused(void* plugin_manager, bool paused) {
 
 bool vvctre_get_paused(void* plugin_manager) {
     return static_cast<PluginManager*>(plugin_manager)->paused;
+}
+
+bool vvctre_emulation_running(void* core) {
+    return static_cast<Core::System*>(core)->IsPoweredOn();
 }
 
 // Memory
@@ -1589,8 +1594,28 @@ u8 vvctre_get_version_patch() {
     return vvctre_version_patch;
 }
 
-bool vvctre_emulation_running(void* core) {
-    return static_cast<Core::System*>(core)->IsPoweredOn();
+void vvctre_log_trace(const char* line) {
+    LOG_TRACE(Plugins, "{}", line);
+}
+
+void vvctre_log_debug(const char* line) {
+    LOG_DEBUG(Plugins, "{}", line);
+}
+
+void vvctre_log_info(const char* line) {
+    LOG_INFO(Plugins, "{}", line);
+}
+
+void vvctre_log_warning(const char* line) {
+    LOG_WARNING(Plugins, "{}", line);
+}
+
+void vvctre_log_error(const char* line) {
+    LOG_ERROR(Plugins, "{}", line);
+}
+
+void vvctre_log_critical(const char* line) {
+    LOG_CRITICAL(Plugins, "{}", line);
 }
 
 std::unordered_map<std::string, void*> PluginManager::function_map = {
@@ -1603,6 +1628,7 @@ std::unordered_map<std::string, void*> PluginManager::function_map = {
     {"vvctre_restart", (void*)&vvctre_restart},
     {"vvctre_set_paused", (void*)&vvctre_set_paused},
     {"vvctre_get_paused", (void*)&vvctre_get_paused},
+    {"vvctre_emulation_running", (void*)&vvctre_emulation_running},
     // Memory
     {"vvctre_read_u8", (void*)&vvctre_read_u8},
     {"vvctre_write_u8", (void*)&vvctre_write_u8},
@@ -1932,5 +1958,10 @@ std::unordered_map<std::string, void*> PluginManager::function_map = {
     {"vvctre_get_version_major", (void*)&vvctre_get_version_major},
     {"vvctre_get_version_minor", (void*)&vvctre_get_version_minor},
     {"vvctre_get_version_patch", (void*)&vvctre_get_version_patch},
-    {"vvctre_emulation_running", (void*)&vvctre_emulation_running},
+    {"vvctre_log_trace", (void*)&vvctre_log_trace},
+    {"vvctre_log_debug", (void*)&vvctre_log_debug},
+    {"vvctre_log_info", (void*)&vvctre_log_info},
+    {"vvctre_log_warning", (void*)&vvctre_log_warning},
+    {"vvctre_log_error", (void*)&vvctre_log_error},
+    {"vvctre_log_critical", (void*)&vvctre_log_critical},
 };
