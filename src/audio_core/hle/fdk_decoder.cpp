@@ -198,7 +198,7 @@ std::optional<BinaryResponse> FDKDecoder::Impl::Decode(const BinaryRequest& requ
     if (out_streams[0].size() != 0) {
         if (request.dst_addr_ch0 < Memory::FCRAM_PADDR ||
             request.dst_addr_ch0 + out_streams[0].size() >
-                Memory::FCRAM_PADDR + Memory::FCRAMSIZE) {
+                Memory::FCRAM_PADDR + Memory::FCRAM_SIZE) {
             LOG_ERROR(Audio_DSP, "Got out of bounds dst_addr_ch0 {:08x}", request.dst_addr_ch0);
             return {};
         }
