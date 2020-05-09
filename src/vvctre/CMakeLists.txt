@@ -33,10 +33,6 @@ target_link_libraries(${PROJECT_NAME} PRIVATE common core input_common audio_cor
 target_link_libraries(${PROJECT_NAME} PRIVATE glad clip portable-file-dialogs imgui json ${OPENSSL_LIBS} httplib lurlparser ${PLATFORM_LIBRARIES} Threads::Threads)
 target_compile_definitions(${PROJECT_NAME} PRIVATE -DCPPHTTPLIB_OPENSSL_SUPPORT)
 
-if(UNIX)
-    install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION "${CMAKE_INSTALL_PREFIX}/bin")
-endif()
-
 if (MSVC)
     include(CopySDLDeps)
     copy_SDL_deps(${PROJECT_NAME})
