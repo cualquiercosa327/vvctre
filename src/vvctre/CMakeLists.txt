@@ -3,6 +3,7 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PROJECT_SOURCE_DIR}/CMakeModules)
 add_executable(${PROJECT_NAME}
     ${PROJECT_NAME}.cpp
     ${PROJECT_NAME}.rc
+    common.cpp
     common.h
     emu_window/emu_window_sdl2.cpp
     emu_window/emu_window_sdl2.h
