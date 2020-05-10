@@ -114,14 +114,16 @@ static bool LZSS_Decompress(const u8* compressed, u32 compressed_size, u8* decom
     return true;
 }
 
-NCCHContainer::NCCHContainer(const std::string& filepath, u32 ncch_offset)
-    : ncch_offset(ncch_offset), filepath(filepath) {
+NCCHContainer::NCCHContainer(const std::string& filepath, u32 ncch_offset, u32 partition)
+    : ncch_offset(ncch_offset), partition(partition), filepath(filepath) {
     file = FileUtil::IOFile(filepath, "rb");
 }
 
-Loader::ResultStatus NCCHContainer::OpenFile(const std::string& filepath, u32 ncch_offset) {
+Loader::ResultStatus NCCHContainer::OpenFile(const std::string& filepath, u32 ncch_offset,
+                                             u32 partition) {
     this->filepath = filepath;
     this->ncch_offset = ncch_offset;
+    this->partition = partition;
     file = FileUtil::IOFile(filepath, "rb");
 
     if (!file.IsOpen()) {
@@ -130,6 +132,43 @@ Loader::ResultStatus NCCHContainer::OpenFile(const std::string& filepath, u32 nc
     }
 
     LOG_DEBUG(Service_FS, "Opened {}", filepath);
+    return Loader::ResultStatus::Success;
+}
+
+Loader::ResultStatus NCCHContainer::LoadHeader() {
+    if (has_header) {
+        return Loader::ResultStatus::Success;
+    }
+    if (!file.IsOpen()) {
+        return Loader::ResultStatus::Error;
+    }
+
+    // Reset read pointer in case this file has been read before.
+    file.Seek(ncch_offset, SEEK_SET);
+
+    if (file.ReadBytes(&ncch_header, sizeof(NCCH_Header)) != sizeof(NCCH_Header)) {
+        return Loader::ResultStatus::Error;
+    }
+
+    // Skip NCSD header and load first NCCH (NCSD is just a container of NCCH files)...
+    if (ncch_header.magic == Loader::MakeMagic('N', 'C', 'S', 'D')) {
+        NCSD_Header ncsd_header;
+        file.Seek(ncch_offset, SEEK_SET);
+        file.ReadBytes(&ncsd_header, sizeof(NCSD_Header));
+        ASSERT(Loader::MakeMagic('N', 'C', 'S', 'D') == ncsd_header.magic);
+        ASSERT(partition < 8);
+        ncch_offset = ncsd_header.partitions[partition].offset * kBlockSize;
+        LOG_ERROR(Service_FS, "{}", ncch_offset);
+        file.Seek(ncch_offset, SEEK_SET);
+        file.ReadBytes(&ncch_header, sizeof(NCCH_Header));
+    }
+
+    // Verify we are loading the correct file type...
+    if (ncch_header.magic != Loader::MakeMagic('N', 'C', 'C', 'H')) {
+        return Loader::ResultStatus::ErrorInvalidFormat;
+    }
+
+    has_header = true;
     return Loader::ResultStatus::Success;
 }
 
@@ -147,8 +186,12 @@ Loader::ResultStatus NCCHContainer::Load() {
 
         // Skip NCSD header and load first NCCH (NCSD is just a container of NCCH files)...
         if (Loader::MakeMagic('N', 'C', 'S', 'D') == ncch_header.magic) {
-            LOG_DEBUG(Service_FS, "Only loading the first (bootable) NCCH within the NCSD file!");
-            ncch_offset += 0x4000;
+            NCSD_Header ncsd_header;
+            file.Seek(ncch_offset, SEEK_SET);
+            file.ReadBytes(&ncsd_header, sizeof(NCSD_Header));
+            ASSERT(Loader::MakeMagic('N', 'C', 'S', 'D') == ncsd_header.magic);
+            ASSERT(partition < 8);
+            ncch_offset = ncsd_header.partitions[partition].offset * kBlockSize;
             file.Seek(ncch_offset, SEEK_SET);
             file.ReadBytes(&ncch_header, sizeof(NCCH_Header));
         }

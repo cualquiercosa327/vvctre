@@ -11,6 +11,7 @@
 #include "common/string_util.h"
 #include "core/core.h"
 #include "core/file_sys/errors.h"
+#include "core/file_sys/ncch_container.h"
 #include "core/file_sys/seed_db.h"
 #include "core/hle/ipc.h"
 #include "core/hle/ipc_helpers.h"
@@ -687,13 +688,11 @@ void FS_USER::GetProgramLaunchInfo(Kernel::HLERequestContext& ctx) {
 
     LOG_DEBUG(Service_FS, "process_id={}", process_id);
 
-    // TODO(Subv): The real FS service manages its own process list and only checks the processes
-    // that were registered with the 'fs:REG' service.
-    auto process = system.Kernel().GetProcessById(process_id);
+    auto program_info = program_info_map.find(process_id);
 
     IPC::RequestBuilder rb = rp.MakeBuilder(5, 0);
 
-    if (process == nullptr) {
+    if (program_info == program_info_map.end()) {
         // Note: In this case, the rest of the parameters are not changed but the command header
         // remains the same.
         rb.Push(ResultCode(FileSys::ErrCodes::ArchiveNotMounted, ErrorModule::FS,
@@ -702,13 +701,9 @@ void FS_USER::GetProgramLaunchInfo(Kernel::HLERequestContext& ctx) {
         return;
     }
 
-    u64 program_id = process->codeset->program_id;
-
-    auto media_type = Service::AM::GetTitleMediaType(program_id);
-
     rb.Push(RESULT_SUCCESS);
-    rb.Push(program_id);
-    rb.Push(static_cast<u8>(media_type));
+    rb.Push(program_info->second.program_id);
+    rb.Push(static_cast<u8>(program_info->second.media_type));
 
     // TODO(Subv): Find out what this value means.
     rb.Push<u32>(0);
@@ -766,30 +761,20 @@ void FS_USER::GetSpecialContentIndex(Kernel::HLERequestContext& ctx) {
     LOG_DEBUG(Service_FS, "called, media_type={:08X} type={:08X}, title_id={:016X}",
               static_cast<u32>(media_type), static_cast<u32>(type), title_id);
 
-    std::string tmd_path = AM::GetTitleMetadataPath(media_type, title_id);
-
-    FileSys::TitleMetadata tmd;
-    if (tmd.Load(tmd_path) != Loader::ResultStatus::Success || type == SpecialContentType::Update) {
-        // TODO(B3N30): Find correct result code
-        IPC::RequestBuilder rb = rp.MakeBuilder(1, 0);
-        rb.Push(ResultCode(-1));
-        return;
+    ResultVal<u16> index;
+    if (media_type == MediaType::GameCard) {
+        index = GetSpecialContentIndexFromGameCard(title_id, type);
+    } else {
+        index = GetSpecialContentIndexFromTMD(media_type, title_id, type);
     }
 
-    IPC::RequestBuilder rb = rp.MakeBuilder(2, 0);
-    rb.Push(RESULT_SUCCESS);
-    switch (type) {
-    case SpecialContentType::Update:
-        rb.Push(static_cast<u16>(FileSys::TMDContentIndex::Main));
-        break;
-    case SpecialContentType::Manual:
-        rb.Push(static_cast<u16>(FileSys::TMDContentIndex::Manual));
-        break;
-    case SpecialContentType::DLPChild:
-        rb.Push(static_cast<u16>(FileSys::TMDContentIndex::DLP));
-        break;
-    default:
-        ASSERT(false);
+    if (index.Succeeded()) {
+        IPC::RequestBuilder rb = rp.MakeBuilder(2, 0);
+        rb.Push(RESULT_SUCCESS);
+        rb.Push(index.Unwrap());
+    } else {
+        IPC::RequestBuilder rb = rp.MakeBuilder(1, 0);
+        rb.Push(index.Code());
     }
 }
 
@@ -847,6 +832,65 @@ void FS_USER::GetSaveDataSecureValue(Kernel::HLERequestContext& ctx) {
 
     rb.Push<bool>(false); // indicates that the secure value doesn't exist
     rb.Push<u64>(0);      // the secure value
+}
+
+void FS_USER::Register(u32 process_id, u64 program_id, const std::string& filepath) {
+    const MediaType media_type = GetMediaTypeFromPath(filepath);
+    program_info_map.insert_or_assign(process_id, ProgramInfo{program_id, media_type});
+    if (media_type == MediaType::GameCard) {
+        current_gamecard_path = filepath;
+    }
+}
+
+std::string FS_USER::GetCurrentGamecardPath() const {
+    return current_gamecard_path;
+}
+
+ResultVal<u16> FS_USER::GetSpecialContentIndexFromGameCard(u64 title_id, SpecialContentType type) {
+    // TODO(B3N30) check if on real 3DS NCSD is checked if partition exists
+
+    if (type > SpecialContentType::DLPChild) {
+        // TODO(B3N30): Find correct result code
+        return ResultCode(-1);
+    }
+
+    switch (type) {
+    case SpecialContentType::Update:
+        return MakeResult(static_cast<u16>(NCSDContentIndex::Update));
+    case SpecialContentType::Manual:
+        return MakeResult(static_cast<u16>(NCSDContentIndex::Manual));
+    case SpecialContentType::DLPChild:
+        return MakeResult(static_cast<u16>(NCSDContentIndex::DLP));
+    default:
+        ASSERT(false);
+    }
+}
+
+ResultVal<u16> FS_USER::GetSpecialContentIndexFromTMD(MediaType media_type, u64 title_id,
+                                                      SpecialContentType type) {
+    if (type > SpecialContentType::DLPChild) {
+        // TODO(B3N30): Find correct result code
+        return ResultCode(-1);
+    }
+
+    std::string tmd_path = AM::GetTitleMetadataPath(media_type, title_id);
+
+    FileSys::TitleMetadata tmd;
+    if (tmd.Load(tmd_path) != Loader::ResultStatus::Success || type == SpecialContentType::Update) {
+        // TODO(B3N30): Find correct result code
+        return ResultCode(-1);
+    }
+
+    // TODO(B3N30): Does real 3DS check if content exists in TMD?
+
+    switch (type) {
+    case SpecialContentType::Manual:
+        return MakeResult(static_cast<u16>(FileSys::TMDContentIndex::Manual));
+    case SpecialContentType::DLPChild:
+        return MakeResult(static_cast<u16>(FileSys::TMDContentIndex::DLP));
+    default:
+        ASSERT(false);
+    }
 }
 
 FS_USER::FS_USER(Core::System& system)
