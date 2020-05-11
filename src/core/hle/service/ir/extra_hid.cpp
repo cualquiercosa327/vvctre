@@ -25,7 +25,7 @@ enum class RequestID : u8 {
 
     /**
      * ReadCalibrationData request
-     * Reads the calibration data stored in circle pad pro.
+     * Reads the calibration data stored in Circle Pad Pro.
      *  Inputs:
      *     byte 0: request ID
      *     byte 1: expected response time in ms?
