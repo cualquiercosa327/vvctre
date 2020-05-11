@@ -432,6 +432,15 @@ void IR_USER::ReloadInputDevices() {
     extra_hid->RequestInputDevicesReload();
 }
 
+void IR_USER::SetCustomCirclePadProState(
+    std::optional<std::tuple<float, float, bool, bool>> state) {
+    extra_hid->SetCustomState(std::move(state));
+}
+
+std::tuple<float, float, bool, bool> IR_USER::GetCirclePadProState() {
+    return extra_hid->GetState();
+}
+
 IRDevice::IRDevice(SendFunc send_func_) : send_func(send_func_) {}
 IRDevice::~IRDevice() = default;
 

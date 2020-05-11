@@ -6,6 +6,8 @@
 
 #include <functional>
 #include <memory>
+#include <optional>
+#include <tuple>
 #include <vector>
 #include "core/hle/service/service.h"
 
@@ -55,6 +57,8 @@ public:
     ~IR_USER();
 
     void ReloadInputDevices();
+    void SetCustomCirclePadProState(std::optional<std::tuple<float, float, bool, bool>> state);
+    std::tuple<float, float, bool, bool> GetCirclePadProState();
 
 private:
     void InitializeIrNopShared(Kernel::HLERequestContext& ctx);

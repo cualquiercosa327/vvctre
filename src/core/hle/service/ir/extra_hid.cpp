@@ -236,8 +236,7 @@ void ExtraHID::SendHIDStatus() {
     // take values in the whole range of a 12-bit integer.
     constexpr int CIRCLE_PAD_PRO_RADIUS = 0x7FF;
 
-    float x, y;
-    std::tie(x, y) = circle_pad_pro->GetStatus();
+    const auto [x, y, zl, zr] = GetState();
 
     ExtraHIDResponse response;
     response.circle_pad_pro.header.Assign(static_cast<u8>(ResponseID::PollHID));
@@ -246,8 +245,8 @@ void ExtraHID::SendHIDStatus() {
     response.circle_pad_pro.circle_pad_pro_y.Assign(
         static_cast<u32>(CIRCLE_PAD_PRO_CENTER + CIRCLE_PAD_PRO_RADIUS * y));
     response.buttons.battery_level.Assign(0x1F);
-    response.buttons.zl_not_held.Assign(!zl->GetStatus());
-    response.buttons.zr_not_held.Assign(!zr->GetStatus());
+    response.buttons.zl_not_held.Assign(!zl);
+    response.buttons.zr_not_held.Assign(!zr);
     response.buttons.r_not_held.Assign(1);
     response.unknown = 0;
 
@@ -269,6 +268,19 @@ void ExtraHID::LoadInputDevices() {
         Settings::values.buttons[Settings::NativeButton::ZR]);
     circle_pad_pro = Input::CreateDevice<Input::AnalogDevice>(
         Settings::values.analogs[Settings::NativeAnalog::CirclePadPro]);
+}
+
+void ExtraHID::SetCustomState(std::optional<std::tuple<float, float, bool, bool>> state) {
+    custom_state = std::move(state);
+}
+
+std::tuple<float, float, bool, bool> ExtraHID::GetState() {
+    if (custom_state) {
+        return *custom_state;
+    } else {
+        const auto [x, y] = circle_pad_pro->GetStatus();
+        return std::make_tuple(x, y, zl->GetStatus(), zr->GetStatus());
+    }
 }
 
 } // namespace Service::IR

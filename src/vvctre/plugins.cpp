@@ -20,8 +20,10 @@
 #include "core/hle/service/cam/cam.h"
 #include "core/hle/service/cfg/cfg.h"
 #include "core/hle/service/hid/hid.h"
+#include "core/hle/service/ir/ir_user.h"
 #include "core/hle/service/nfc/nfc.h"
 #include "core/hle/service/ptm/ptm.h"
+#include "core/hle/service/sm/sm.h"
 #include "core/memory.h"
 #include "core/movie.h"
 #include "core/settings.h"
@@ -798,6 +800,35 @@ void vvctre_get_circle_pad_state(void* core, float* x_out, float* y_out) {
     const auto [x, y] = hid->GetCirclePadState();
     *x_out = x;
     *y_out = y;
+}
+
+void vvctre_set_custom_circle_pad_pro_state(void* core, float x, float y, bool zl, bool zr) {
+    std::shared_ptr<Service::IR::IR_USER> ir =
+        static_cast<Core::System*>(core)->ServiceManager().GetService<Service::IR::IR_USER>(
+            "ir:USER");
+
+    ir->SetCustomCirclePadProState(std::make_tuple(x, y, zl, zr));
+}
+
+void vvctre_use_real_circle_pad_pro_state(void* core) {
+    std::shared_ptr<Service::IR::IR_USER> ir =
+        static_cast<Core::System*>(core)->ServiceManager().GetService<Service::IR::IR_USER>(
+            "ir:USER");
+
+    ir->SetCustomCirclePadProState(std::nullopt);
+}
+
+void vvctre_get_circle_pad_pro_state(void* core, float* x_out, float* y_out, bool* zl_out,
+                                     bool* zr_out) {
+    std::shared_ptr<Service::IR::IR_USER> ir =
+        static_cast<Core::System*>(core)->ServiceManager().GetService<Service::IR::IR_USER>(
+            "ir:USER");
+
+    const auto [x, y, zl, zr] = ir->GetCirclePadProState();
+    *x_out = x;
+    *y_out = y;
+    *zl_out = zl;
+    *zr_out = zr;
 }
 
 void vvctre_set_custom_touch_state(void* core, float x, float y, bool pressed) {
@@ -1742,6 +1773,9 @@ std::unordered_map<std::string, void*> PluginManager::function_map = {
     {"vvctre_set_custom_circle_pad_state", (void*)&vvctre_set_custom_circle_pad_state},
     {"vvctre_use_real_circle_pad_state", (void*)&vvctre_use_real_circle_pad_state},
     {"vvctre_get_circle_pad_state", (void*)&vvctre_get_circle_pad_state},
+    {"vvctre_set_custom_circle_pad_pro_state", (void*)&vvctre_set_custom_circle_pad_pro_state},
+    {"vvctre_use_real_circle_pad_pro_state", (void*)&vvctre_use_real_circle_pad_pro_state},
+    {"vvctre_get_circle_pad_pro_state", (void*)&vvctre_get_circle_pad_pro_state},
     {"vvctre_set_custom_touch_state", (void*)&vvctre_set_custom_touch_state},
     {"vvctre_use_real_touch_state", (void*)&vvctre_use_real_touch_state},
     {"vvctre_get_touch_state", (void*)&vvctre_get_touch_state},

@@ -6,6 +6,8 @@
 
 #include <array>
 #include <atomic>
+#include <optional>
+#include <tuple>
 #include "common/bit_field.h"
 #include "common/swap.h"
 #include "core/frontend/input.h"
@@ -53,6 +55,9 @@ public:
     /// Requests input devices reload from current settings. Called when the input settings change.
     void RequestInputDevicesReload();
 
+    void SetCustomState(std::optional<std::tuple<float, float, bool, bool>> state);
+    std::tuple<float, float, bool, bool> GetState();
+
 private:
     void SendHIDStatus();
     void HandleConfigureHIDPollingRequest(const std::vector<u8>& request);
@@ -67,6 +72,8 @@ private:
     std::unique_ptr<Input::ButtonDevice> zr;
     std::unique_ptr<Input::AnalogDevice> circle_pad_pro;
     std::atomic<bool> is_device_reload_pending;
+
+    std::optional<std::tuple<float, float, bool, bool>> custom_state;
 };
 
 } // namespace Service::IR
