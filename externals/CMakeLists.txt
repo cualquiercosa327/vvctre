@@ -53,9 +53,8 @@ target_compile_definitions(ssl PRIVATE -DHAVE_INET_NTOP)
 
 # lurlparser
 add_library(lurlparser
-    ./lurlparser/LUrlParser.cpp
-    ./lurlparser/LUrlParser.h
-)
+    lurlparser/LUrlParser.cpp
+    lurlparser/LUrlParser.h)
 target_include_directories(lurlparser INTERFACE ./lurlparser)
 
 # httplib
@@ -64,10 +63,9 @@ target_include_directories(httplib INTERFACE ./httplib)
 
 # OpenGL loader
 add_library(opengl-loader STATIC
-    ./opengl-loader/src/glad.c
-    ./opengl-loader/include/KHR/khrplatform.h
-    ./opengl-loader/include/glad/glad.h
-)
+    opengl-loader/src/glad.c
+    opengl-loader/include/KHR/khrplatform.h
+    opengl-loader/include/glad/glad.h)
 target_include_directories(opengl-loader PUBLIC ./opengl-loader/include)
 if (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
     target_link_libraries(opengl-loader PRIVATE dl)
@@ -89,8 +87,7 @@ add_library(imgui
     imgui/examples/imgui_impl_sdl.cpp
     imgui/examples/imgui_impl_sdl.h
     imgui/misc/cpp/imgui_stdlib.cpp
-    imgui/misc/cpp/imgui_stdlib.h
-)
+    imgui/misc/cpp/imgui_stdlib.h)
 target_link_libraries(imgui PRIVATE opengl-loader SDL2)
 target_include_directories(imgui INTERFACE ./imgui ./imgui/examples ./imgui/misc/cpp)
 target_include_directories(imgui PRIVATE ./imgui ./imgui/examples ./imgui/misc/cpp)
@@ -106,8 +103,8 @@ target_include_directories(clip INTERFACE ./clip)
 
 # easywsclient
 add_library(easywsclient
-    ./easywsclient/easywsclient.cpp
-    ./easywsclient/easywsclient.hpp
+    easywsclient/easywsclient.cpp
+    easywsclient/easywsclient.hpp
 )
 target_include_directories(easywsclient PUBLIC ./easywsclient)
 
