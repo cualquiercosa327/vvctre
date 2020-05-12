@@ -1,4 +1,4 @@
-# This function downloads a binary library package from our external repository.
+# This function downloads a binary library package from my external repository.
 # Params:
 #   remote_path: path to the file to download, relative to the remote repository root
 #   prefix_var: name of a variable which will be set with the path to the extracted contents
