@@ -1,4 +1,4 @@
-// Copyright 2019 Citra Valentin Emulator Project
+// Copyright 2020 vvctre project
 // Licensed under GPLv2 or any later version
 // Refer to the license.txt file included.
 
