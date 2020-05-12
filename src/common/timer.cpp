@@ -109,10 +109,11 @@ std::chrono::seconds Timer::GetLocalTimeSinceJan1970() {
 
     // Account for DST where needed
     gmTime = localtime(&sysTime);
-    if (gmTime->tm_isdst == 1)
+    if (gmTime->tm_isdst == 1) {
         tzDST = 3600;
-    else
+    } else {
         tzDST = 0;
+    }
 
     // Lazy way to get local time in sec
     gmTime = gmtime(&sysTime);
@@ -141,20 +142,19 @@ std::string Timer::GetTimeFormatted() {
 // ----------------
 double Timer::GetDoubleTime() {
     // Get continuous timestamp
-    u64 TmpSeconds = static_cast<u64>(Common::Timer::GetTimeSinceJan1970().count());
+    u64 tmp_seconds = static_cast<u64>(Common::Timer::GetTimeSinceJan1970().count());
     double ms = static_cast<u64>(GetTimeMs().count()) % 1000;
 
     // Remove a few years. We only really want enough seconds to make
     // sure that we are detecting actual actions, perhaps 60 seconds is
     // enough really, but I leave a year of seconds anyway, in case the
     // user's clock is incorrect or something like that.
-    TmpSeconds = TmpSeconds - (38 * 365 * 24 * 60 * 60);
+    tmp_seconds = tmp_seconds - (38 * 365 * 24 * 60 * 60);
 
     // Make a smaller integer that fits in the double
-    u32 Seconds = static_cast<u32>(TmpSeconds);
-    double TmpTime = Seconds + ms;
+    u32 seconds = static_cast<u32>(tmp_seconds);
 
-    return TmpTime;
+    return seconds + ms;
 }
 
 } // namespace Common
