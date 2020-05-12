@@ -15,15 +15,19 @@
 #include "common/logging/log.h"
 
 namespace AudioCore {
+
 namespace {
+
 struct SinkDetails {
     using FactoryFn = std::unique_ptr<Sink> (*)(std::string_view);
     using ListDevicesFn = std::vector<std::string> (*)();
 
     /// Name for this sink.
     const char* id;
+
     /// A method to call to construct an instance of this type of sink.
     FactoryFn factory;
+
     /// A method to call to list available devices.
     ListDevicesFn list_devices;
 };
@@ -65,6 +69,7 @@ const SinkDetails& GetSinkDetails(std::string_view sink_id) {
 
     return *iter;
 }
+
 } // Anonymous namespace
 
 std::vector<const char*> GetSinkIDs() {

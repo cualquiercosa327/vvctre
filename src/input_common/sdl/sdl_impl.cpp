@@ -464,7 +464,7 @@ SDLState::SDLState() {
     RegisterFactory<ButtonDevice>("sdl", std::make_shared<SDLButtonFactory>(*this));
     RegisterFactory<AnalogDevice>("sdl", std::make_shared<SDLAnalogFactory>(*this));
 
-    // If the frontend is going to manage the event loop, then we dont start one here
+    // If the frontend is going to manage the event loop, then we don't start one here
     start_thread = !SDL_WasInit(SDL_INIT_JOYSTICK);
     if (start_thread && SDL_Init(SDL_INIT_JOYSTICK) < 0) {
         LOG_CRITICAL(Input, "SDL_Init(SDL_INIT_JOYSTICK) failed with: {}", SDL_GetError());

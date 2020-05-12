@@ -5,9 +5,11 @@
 #pragma once
 
 namespace Frontend {
+
 /**
  * Registers default, frontend-independent applet implementations.
  * Will be replaced later if any frontend-specific implementation is available.
  */
 void RegisterDefaultApplets();
+
 } // namespace Frontend

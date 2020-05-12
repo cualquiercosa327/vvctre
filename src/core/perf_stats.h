@@ -59,13 +59,7 @@ public:
 
     void DoFrameLimiting(std::chrono::microseconds current_system_time_us);
 
-    /**
-     * Sets whether frame advancing is enabled or not.
-     * Note: The frontend must cancel frame advancing before shutting down in order
-     *       to resume the emu_thread.
-     */
     void SetFrameAdvancing(bool value);
-
     void AdvanceFrame();
     bool FrameAdvancingEnabled() const;
 

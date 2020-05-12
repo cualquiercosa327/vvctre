@@ -63,8 +63,10 @@ struct KeyboardData {
 
 enum class ValidationError {
     None,
+
     // Button Selection
     ButtonOutOfRange,
+
     // Configured Filters
     MaxDigitsExceeded,
     AtSignNotAllowed,
@@ -72,6 +74,7 @@ enum class ValidationError {
     BackslashNotAllowed,
     ProfanityNotAllowed,
     CallbackFailed,
+
     // Allowed Input Type
     FixedLengthRequired,
     MaxLengthExceeded,

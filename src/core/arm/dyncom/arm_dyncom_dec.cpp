@@ -6,6 +6,7 @@
 #include "core/arm/skyeye_common/armsupp.h"
 
 namespace {
+
 struct InstructionSetEncodingItem {
     const char* name;
     int attribute_value;
@@ -28,6 +29,7 @@ enum {
     ARMVFP3,
     ARMV6K,
 };
+
 } // namespace
 
 // clang-format off
