@@ -1,7 +1,6 @@
 # CMake 3.8 required for 17 to be a valid value for CXX_STANDARD
 cmake_minimum_required(VERSION 3.8)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/CMakeModules")
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/externals/cmake-modules")
 include(DownloadExternals)
 include(CMakeDependentOption)
 
