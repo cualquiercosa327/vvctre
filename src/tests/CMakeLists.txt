@@ -12,10 +12,7 @@ add_executable(tests
 )
 
 if (ARCHITECTURE_x86_64)
-    target_sources(tests
-        PRIVATE
-            video_core/shader/shader_jit_x64_compiler.cpp
-    )
+    target_sources(tests PRIVATE video_core/shader/shader_jit_x64_compiler.cpp)
 endif()
 
 target_link_libraries(tests PRIVATE common core video_core audio_core input_common)
