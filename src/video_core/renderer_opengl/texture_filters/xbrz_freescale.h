@@ -26,4 +26,5 @@ private:
     OGLVertexArray vao{};
     OGLSampler src_sampler{};
 };
+
 } // namespace OpenGL

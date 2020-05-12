@@ -6,12 +6,12 @@
 #include <functional>
 #include <unordered_map>
 #include "common/logging/log.h"
-#include "video_core/renderer_opengl/texture_filters/anime4k/anime4k_ultrafast.h"
-#include "video_core/renderer_opengl/texture_filters/bicubic/bicubic.h"
-#include "video_core/renderer_opengl/texture_filters/scale_force/scale_force.h"
+#include "video_core/renderer_opengl/texture_filters/anime4k_ultrafast.h"
+#include "video_core/renderer_opengl/texture_filters/bicubic.h"
+#include "video_core/renderer_opengl/texture_filters/scale_force.h"
 #include "video_core/renderer_opengl/texture_filters/texture_filter_base.h"
 #include "video_core/renderer_opengl/texture_filters/texture_filterer.h"
-#include "video_core/renderer_opengl/texture_filters/xbrz/xbrz_freescale.h"
+#include "video_core/renderer_opengl/texture_filters/xbrz_freescale.h"
 
 namespace OpenGL {
 
