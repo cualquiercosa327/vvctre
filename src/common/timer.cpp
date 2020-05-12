@@ -157,4 +157,4 @@ double Timer::GetDoubleTime() {
     return TmpTime;
 }
 
-} // Namespace Common
+} // namespace Common

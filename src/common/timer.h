@@ -9,6 +9,7 @@
 #include "common/common_types.h"
 
 namespace Common {
+
 class Timer {
 public:
     Timer();
@@ -38,4 +39,4 @@ private:
     bool m_Running;
 };
 
-} // Namespace Common
+} // namespace Common
