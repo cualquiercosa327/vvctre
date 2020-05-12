@@ -171,19 +171,12 @@ function(get_timestamp _var)
     set(${_var} "${timestamp}" PARENT_SCOPE)
 endfunction()
 
-# Prevent boost from linking against libs when building
+# Prevent Boost from linking against libs when building
 add_definitions(-DBOOST_ERROR_CODE_HEADER_ONLY
     -DBOOST_SYSTEM_NO_LIB
     -DBOOST_DATE_TIME_NO_LIB
     -DBOOST_REGEX_NO_LIB
 )
-
-# generate git/build information
-include(GetGitRevisionDescription)
-get_git_head_revision(GIT_REF_SPEC GIT_REV)
-git_describe(GIT_DESC --always --long --dirty)
-git_branch_name(GIT_BRANCH)
-get_timestamp(BUILD_DATE)
 
 enable_testing()
 add_subdirectory(externals)
