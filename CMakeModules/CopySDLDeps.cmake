@@ -1,5 +1,5 @@
 function(copy_SDL_deps target_dir)
     include(WindowsCopyFiles)
-    set(DLL_DEST "${CMAKE_BINARY_DIR}/bin/$<CONFIG>/")
+    set(DLL_DEST "${PROJECT_BINARY_DIR}/bin/$<CONFIG>/")
     windows_copy_files(${target_dir} ${SDL2_DLL_DIR} ${DLL_DEST} SDL2.dll)
 endfunction(copy_SDL_deps)
