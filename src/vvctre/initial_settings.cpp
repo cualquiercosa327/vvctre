@@ -17,7 +17,7 @@
 #ifdef HAVE_CUBEB
 #include "audio_core/cubeb_input.h"
 #endif
-#include <json.hpp>
+#include <nlohmann/json.hpp>
 #include "audio_core/sink.h"
 #include "audio_core/sink_details.h"
 #include "common/file_util.h"

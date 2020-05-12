@@ -1,8 +1,8 @@
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PROJECT_SOURCE_DIR}/CMakeModules)
 
-add_executable(${PROJECT_NAME}
-    ${PROJECT_NAME}.cpp
-    ${PROJECT_NAME}.rc
+add_executable(vvctre
+    vvctre.cpp
+    vvctre.rc
     common.cpp
     common.h
     emu_window/emu_window_sdl2.cpp
@@ -24,17 +24,15 @@ add_executable(${PROJECT_NAME}
     plugins.h
 )
 
-create_target_directory_groups(${PROJECT_NAME})
-
 get_directory_property(OPENSSL_LIBS
     DIRECTORY ${PROJECT_SOURCE_DIR}/externals/libressl
     DEFINITION OPENSSL_LIBS)
 
-target_link_libraries(${PROJECT_NAME} PRIVATE common core input_common audio_core)
-target_link_libraries(${PROJECT_NAME} PRIVATE glad clip portable-file-dialogs imgui json ${OPENSSL_LIBS} httplib lurlparser ${PLATFORM_LIBRARIES} Threads::Threads)
-target_compile_definitions(${PROJECT_NAME} PRIVATE -DCPPHTTPLIB_OPENSSL_SUPPORT)
+target_link_libraries(vvctre PRIVATE common core input_common audio_core)
+target_link_libraries(vvctre PRIVATE opengl-loader clip portable_file_dialogs imgui nlohmann_json ${OPENSSL_LIBS} httplib lurlparser ${PLATFORM_LIBRARIES} Threads::Threads)
+target_compile_definitions(vvctre PRIVATE -DCPPHTTPLIB_OPENSSL_SUPPORT)
 
 if (MSVC)
     include(CopySDLDeps)
-    copy_SDL_deps(${PROJECT_NAME})
+    copy_SDL_deps(vvctre)
 endif()

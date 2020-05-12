@@ -19,5 +19,4 @@ add_library(input_common STATIC
     udp/udp.h
 )
 
-create_target_directory_groups(input_common)
 target_link_libraries(input_common PUBLIC core PRIVATE common ${Boost_LIBRARIES})

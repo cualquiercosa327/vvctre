@@ -37,3 +37,24 @@
 [submodule "clip"]
     path = externals/clip
     url = https://github.com/dacap/clip.git
+[submodule "opengl-loader"]
+    path = externals/opengl-loader
+    url = https://github.com/vvanelslande/vvctre-opengl-loader.git
+[submodule "httplib"]
+    path = externals/httplib
+    url = https://github.com/yhirose/cpp-httplib.git
+[submodule "externals/lurlparser"]
+	path = externals/lurlparser
+	url = https://github.com/corporateshark/LUrlParser.git
+[submodule "easywsclient"]
+    path = externals/easywsclient
+    url = https://github.com/dhbaird/easywsclient.git
+[submodule "system-archives"]
+    path = externals/system-archives
+    url = https://github.com/vvanelslande/vvctre-system-archives.git
+[submodule "portable-file-dialogs"]
+    path = externals/portable-file-dialogs
+    url = https://github.com/samhocevar/portable-file-dialogs.git
+[submodule "externals/json"]
+	path = externals/json
+	url = https://github.com/nlohmann/json.git

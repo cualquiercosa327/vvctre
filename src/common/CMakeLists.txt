@@ -65,8 +65,6 @@ if(ARCHITECTURE_x86_64)
     )
 endif()
 
-create_target_directory_groups(common)
-
 target_link_libraries(common PUBLIC fmt ${PLATFORM_LIBRARIES})
 
 if (ARCHITECTURE_x86_64)

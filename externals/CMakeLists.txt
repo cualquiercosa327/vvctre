@@ -8,9 +8,6 @@ include(ExternalProject)
 add_library(catch-single-include INTERFACE)
 target_include_directories(catch-single-include INTERFACE catch/single_include)
 
-# Crypto++
-add_subdirectory(cryptopp)
-
 # Dynarmic
 if (ARCHITECTURE_x86_64)
     # Dynarmic will skip defining xbyak if it's already defined, we then define it below
@@ -25,23 +22,14 @@ endif()
 add_subdirectory(fmt)
 add_library(fmt::fmt ALIAS fmt)
 
-# Glad
-add_subdirectory(glad)
-
 # Nihstro
 add_library(nihstro-headers INTERFACE)
 target_include_directories(nihstro-headers INTERFACE ./nihstro/include)
-
-# Open Source Archives
-add_subdirectory(open_source_archives)
 
 # SoundTouch
 add_subdirectory(soundtouch)
 # The SoundTouch target doesn't export the necessary include paths as properties by default
 target_include_directories(SoundTouch INTERFACE ./soundtouch/include)
-
-# Teakra
-add_subdirectory(teakra EXCLUDE_FROM_ALL)
 
 # Xbyak
 if (ARCHITECTURE_x86_64)
@@ -64,19 +52,26 @@ target_include_directories(ssl INTERFACE ./libressl/include)
 target_compile_definitions(ssl PRIVATE -DHAVE_INET_NTOP)
 
 # lurlparser
-add_subdirectory(lurlparser EXCLUDE_FROM_ALL)
+add_library(lurlparser
+    ./lurlparser/LUrlParser.cpp
+    ./lurlparser/LUrlParser.h
+)
+target_include_directories(lurlparser INTERFACE ./lurlparser)
 
 # httplib
 add_library(httplib INTERFACE)
 target_include_directories(httplib INTERFACE ./httplib)
 
-# JSON
-add_library(json INTERFACE)
-target_include_directories(json INTERFACE ./json)
-
-# portable-file-dialogs
-add_library(portable-file-dialogs INTERFACE)
-target_include_directories(portable-file-dialogs INTERFACE ./portable-file-dialogs/include)
+# OpenGL loader
+add_library(opengl-loader STATIC
+    ./opengl-loader/src/glad.c
+    ./opengl-loader/include/KHR/khrplatform.h
+    ./opengl-loader/include/glad/glad.h
+)
+target_include_directories(opengl-loader PUBLIC ./opengl-loader/include)
+if (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+    target_link_libraries(opengl-loader PRIVATE dl)
+endif()
 
 # Dear ImGui
 add_library(imgui
@@ -96,7 +91,7 @@ add_library(imgui
     imgui/misc/cpp/imgui_stdlib.cpp
     imgui/misc/cpp/imgui_stdlib.h
 )
-target_link_libraries(imgui PRIVATE glad SDL2)
+target_link_libraries(imgui PRIVATE opengl-loader SDL2)
 target_include_directories(imgui INTERFACE ./imgui ./imgui/examples ./imgui/misc/cpp)
 target_include_directories(imgui PRIVATE ./imgui ./imgui/examples ./imgui/misc/cpp)
 
@@ -109,4 +104,15 @@ endif()
 add_subdirectory(clip EXCLUDE_FROM_ALL)
 target_include_directories(clip INTERFACE ./clip)
 
-add_subdirectory(easywsclient)
+# easywsclient
+add_library(easywsclient
+    ./easywsclient/easywsclient.cpp
+    ./easywsclient/easywsclient.hpp
+)
+target_include_directories(easywsclient PUBLIC ./easywsclient)
+
+add_subdirectory(cryptopp)
+add_subdirectory(system-archives)
+add_subdirectory(teakra EXCLUDE_FROM_ALL)
+add_subdirectory(json EXCLUDE_FROM_ALL)
+add_subdirectory(portable-file-dialogs EXCLUDE_FROM_ALL)
