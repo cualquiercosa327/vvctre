@@ -165,12 +165,6 @@ function(create_target_directory_groups target_name)
     endforeach()
 endfunction()
 
-# Gets a UTC timstamp and sets the provided variable to it
-function(get_timestamp _var)
-    string(TIMESTAMP timestamp UTC)
-    set(${_var} "${timestamp}" PARENT_SCOPE)
-endfunction()
-
 # Prevent Boost from linking against libs when building
 add_definitions(-DBOOST_ERROR_CODE_HEADER_ONLY
     -DBOOST_SYSTEM_NO_LIB
