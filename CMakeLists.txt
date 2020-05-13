@@ -155,4 +155,4 @@ add_subdirectory(externals)
 add_subdirectory(src)
 
 # Set vvctre project as default StartUp Project in Visual Studio
-set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT ${PROJECT_NAME})
+set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT vvctre)
