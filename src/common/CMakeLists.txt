@@ -40,12 +40,6 @@ add_library(common STATIC
     timer.cpp
     timer.h
     vector_math.h
-    stb_image.cpp
-    stb_image.h
-    stb_image_write.cpp
-    stb_image_write.h
-    stb_image_resize.cpp
-    stb_image_resize.h
 )
 
 if(UNIX)

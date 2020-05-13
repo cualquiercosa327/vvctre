@@ -15,14 +15,14 @@
 #include <vector>
 #include <boost/range/iterator_range.hpp>
 #include <glad/glad.h>
+#include <stb_image.h>
+#include <stb_image_write.h>
 #include "common/alignment.h"
 #include "common/bit_field.h"
 #include "common/color.h"
 #include "common/logging/log.h"
 #include "common/math_util.h"
 #include "common/scope_exit.h"
-#include "common/stb_image.h"
-#include "common/stb_image_write.h"
 #include "common/texture.h"
 #include "common/vector_math.h"
 #include "core/core.h"

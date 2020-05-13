@@ -3,8 +3,8 @@
 // Refer to the license.txt file included.
 
 #include <fmt/format.h>
+#include <stb_image.h>
 #include "common/file_util.h"
-#include "common/stb_image.h"
 #include "common/texture.h"
 #include "core/core.h"
 #include "core/custom_tex_cache.h"

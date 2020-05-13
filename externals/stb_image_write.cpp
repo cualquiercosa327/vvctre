@@ -2,5 +2,5 @@
 // Licensed under GPLv2 or any later version
 // Refer to the license.txt file included.
 
-#define STB_IMAGE_IMPLEMENTATION
-#include "common/stb_image.h"
+#define STB_IMAGE_WRITE_IMPLEMENTATION
+#include <stb_image_write.h>

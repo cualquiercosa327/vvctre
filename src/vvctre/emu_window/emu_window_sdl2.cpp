@@ -22,7 +22,7 @@
 #include "audio_core/sink_details.h"
 #include "common/file_util.h"
 #include "common/logging/log.h"
-#include "common/stb_image_write.h"
+#include <stb_image_write.h>
 #include "common/string_util.h"
 #include "common/texture.h"
 #include "core/3ds.h"

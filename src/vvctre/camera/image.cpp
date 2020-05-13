@@ -4,10 +4,10 @@
 
 #include <LUrlParser.h>
 #include <httplib.h>
+#include <stb_image.h>
+#include <stb_image_resize.h>
 #include "common/assert.h"
 #include "common/file_util.h"
-#include "common/stb_image.h"
-#include "common/stb_image_resize.h"
 #include "vvctre/camera/image.h"
 #include "vvctre/camera/util.h"
 

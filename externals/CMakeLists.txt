@@ -108,6 +108,17 @@ add_library(easywsclient
 )
 target_include_directories(easywsclient PUBLIC ./easywsclient)
 
+# stb
+add_library(stb
+    stb/stb_image.h
+    stb/stb_image_write.h
+    stb/stb_image_resize.h
+    stb_image.cpp
+    stb_image_write.cpp
+    stb_image_resize.cpp
+)
+target_include_directories(stb PUBLIC ./stb)
+
 add_subdirectory(cryptopp)
 add_subdirectory(system-archives)
 add_subdirectory(teakra EXCLUDE_FROM_ALL)

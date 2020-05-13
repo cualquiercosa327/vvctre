@@ -101,7 +101,7 @@ if(ARCHITECTURE_x86_64)
 endif()
 
 target_link_libraries(video_core PUBLIC common core)
-target_link_libraries(video_core PRIVATE opengl-loader nihstro-headers)
+target_link_libraries(video_core PRIVATE stb opengl-loader nihstro-headers)
 
 if (ARCHITECTURE_x86_64)
     target_link_libraries(video_core PUBLIC xbyak)
