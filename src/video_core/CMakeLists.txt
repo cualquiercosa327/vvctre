@@ -88,8 +88,6 @@ add_library(video_core STATIC
     video_core.h
 )
 
-target_include_directories(video_core PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
-
 if(ARCHITECTURE_x86_64)
     target_sources(video_core
         PRIVATE
