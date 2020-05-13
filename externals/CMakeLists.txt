@@ -119,8 +119,12 @@ add_library(stb
 )
 target_include_directories(stb PUBLIC ./stb)
 
+# json
+set(JSON_BuildTests OFF CACHE BOOL "")
+set(JSON_Install OFF CACHE BOOL "")
+add_subdirectory(json EXCLUDE_FROM_ALL)
+
 add_subdirectory(cryptopp)
 add_subdirectory(system-archives)
 add_subdirectory(teakra EXCLUDE_FROM_ALL)
-add_subdirectory(json EXCLUDE_FROM_ALL)
 add_subdirectory(portable-file-dialogs EXCLUDE_FROM_ALL)
