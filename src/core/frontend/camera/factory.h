@@ -15,13 +15,13 @@ public:
     virtual ~CameraFactory();
 
     /**
-     * Creates a camera object based on the configuration string.
-     * @param config Configuration string to create the camera. The implementation can decide the
-     *               meaning of this string.
+     * Creates a camera object based on the parameter string.
+     * @param parameter Parameter string to create the camera. The implementation can decide the
+     *                  meaning of this string.
      * @param flip The image flip to apply
      * @returns a unique_ptr to the created camera object.
      */
-    virtual std::unique_ptr<CameraInterface> Create(const std::string& config,
+    virtual std::unique_ptr<CameraInterface> Create(const std::string& parameter,
                                                     const Service::CAM::Flip& flip) = 0;
 
     /**
