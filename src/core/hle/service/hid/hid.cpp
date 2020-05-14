@@ -124,10 +124,10 @@ void Module::UpdatePadCallback(u64 userdata, s64 cycles_late) {
 
     // Get the previous pad state
     u32 last_entry_index = (mem->pad.index - 1) % mem->pad.entries.size();
-    PadState old_state = mem->pad.entries[last_entry_index].current_state;
+    PadDataEntry& old_entry = mem->pad.entries[last_entry_index];
 
     // Compute bitmask with 1s for bits different from the old state
-    PadState changed = {{(state.hex ^ old_state.hex)}};
+    PadState changed = {{(state.hex ^ old_entry.current_state.hex)}};
 
     // Get the current pad entry
     PadDataEntry& pad_entry = mem->pad.entries[mem->pad.index];
@@ -135,9 +135,9 @@ void Module::UpdatePadCallback(u64 userdata, s64 cycles_late) {
     // Update entry properties
     pad_entry.current_state.hex = state.hex;
     pad_entry.delta_additions.hex = changed.hex & state.hex;
-    pad_entry.delta_removals.hex = changed.hex & old_state.hex;
-    pad_entry.circle_pad_x = circle_pad_x;
-    pad_entry.circle_pad_y = circle_pad_y;
+    pad_entry.delta_removals.hex = changed.hex & old_entry.current_state.hex;
+    pad_entry.circle_pad_x = (old_entry.circle_pad_x + circle_pad_x) / 2;
+    pad_entry.circle_pad_y = (old_entry.circle_pad_y + circle_pad_y) / 2;
 
     // If we just updated index 0, provide a new timestamp
     if (mem->pad.index == 0) {
