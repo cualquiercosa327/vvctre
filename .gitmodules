@@ -42,7 +42,7 @@
     url = https://github.com/vvanelslande/vvctre-opengl-loader.git
 [submodule "httplib"]
     path = externals/httplib
-    url = https://github.com/yhirose/cpp-httplib.git
+    url = https://github.com/vvanelslande/cpp-httplib.git
 [submodule "externals/lurlparser"]
 	path = externals/lurlparser
 	url = https://github.com/corporateshark/LUrlParser.git

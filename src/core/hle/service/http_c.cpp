@@ -6,6 +6,7 @@
 #include <LUrlParser.h>
 #include <cryptopp/aes.h>
 #include <cryptopp/modes.h>
+#include <fmt/format.h>
 #include "common/assert.h"
 #include "core/core.h"
 #include "core/file_sys/archive_ncch.h"
@@ -50,6 +51,9 @@ const ResultCode ERROR_WRONG_CERT_HANDLE = // 0xD8A0A0C9
     ResultCode(201, ErrorModule::HTTP, ErrorSummary::InvalidState, ErrorLevel::Permanent);
 const ResultCode ERROR_CERT_ALREADY_SET = // 0xD8A0A03D
     ResultCode(61, ErrorModule::HTTP, ErrorSummary::InvalidState, ErrorLevel::Permanent);
+const ResultCode RESULT_DOWNLOADPENDING = // 0xD840A02B
+    ResultCode(static_cast<ErrorDescription>(43), ErrorModule::HTTP, ErrorSummary::WouldBlock,
+               ErrorLevel::Permanent);
 
 void Context::MakeRequest() {
     ASSERT(state == RequestState::NotStarted);
@@ -99,8 +103,23 @@ void Context::MakeRequest() {
 
     httplib::Request request;
     request.method = request_method_strings.at(method);
-    request.path = url;
-    // TODO(B3N30): Add post data body
+    request.path = fmt::format("/{}", parsed.path_);
+    for (int i = 0; i < post_data.size(); ++i) {
+        const PostData& d = post_data[i];
+
+        switch (d.type) {
+        case PostData::Type::Binary:
+        case PostData::Type::Ascii:
+            request.body += httplib::detail::encode_url(fmt::format(
+                "{}={}", d.name, (i == (post_data.size() - 1)) ? (d.value + '&') : d.value));
+            break;
+        case PostData::Type::Raw:
+            request.body = d.value;
+            break;
+        default:
+            break;
+        }
+    }
     request.progress = [this](u64 current, u64 total) -> bool {
         // TODO(B3N30): Is there a state that shows response header are available
         current_download_size_bytes = current;
@@ -109,14 +128,16 @@ void Context::MakeRequest() {
     };
 
     for (const auto& header : headers) {
-        request.headers.emplace(header.name, header.value);
+        request.set_header(header.name.c_str(), header.value);
     }
 
+    client->set_decompress(false);
+
     if (!client->send(request, response)) {
-        LOG_ERROR(Service_HTTP, "Request failed");
+        LOG_ERROR(Service_HTTP, "Request failed ({})", response.status);
         state = RequestState::TimedOut;
     } else {
-        LOG_DEBUG(Service_HTTP, "Request successful");
+        LOG_DEBUG(Service_HTTP, "Request successful: {}", response.body);
         // TODO(B3N30): Verify this state on HW
         state = RequestState::ReadyToDownloadContent;
     }
@@ -233,8 +254,7 @@ void HTTP_C::BeginRequest(Kernel::HLERequestContext& ctx) {
     // Then there are 3? worker threads that pop the requests from the queue and send them
     // For now make every request async in it's own thread.
 
-    itr->second.request_future =
-        std::async(std::launch::async, &Context::MakeRequest, std::ref(itr->second));
+    itr->second.MakeRequest();
 
     IPC::RequestBuilder rb = rp.MakeBuilder(1, 0);
     rb.Push(RESULT_SUCCESS);
@@ -286,11 +306,74 @@ void HTTP_C::BeginRequestAsync(Kernel::HLERequestContext& ctx) {
     // Then there are 3? worker threads that pop the requests from the queue and send them
     // For now make every request async in it's own thread.
 
-    itr->second.request_future =
-        std::async(std::launch::async, &Context::MakeRequest, std::ref(itr->second));
+    itr->second.MakeRequest();
 
     IPC::RequestBuilder rb = rp.MakeBuilder(1, 0);
     rb.Push(RESULT_SUCCESS);
+}
+
+void HTTP_C::ReceiveData(Kernel::HLERequestContext& ctx) {
+    IPC::RequestParser rp(ctx, 0xB, 2, 2);
+    const Context::Handle context_handle = rp.Pop<Context::Handle>();
+    const u32 buffer_size = rp.Pop<u32>();
+    Kernel::MappedBuffer& buffer = rp.PopMappedBuffer();
+
+    LOG_DEBUG(Service_HTTP, "context_handle = {}, buffer_size = {}", context_handle, buffer_size);
+
+    auto itr = contexts.find(context_handle);
+    ASSERT(itr != contexts.end());
+
+    const u32 size = std::min<u32>(
+        buffer_size,
+        (itr->second.response.has_header("Content-Length")
+             ? static_cast<u32>(std::stoul(itr->second.response.get_header_value("Content-Length")))
+             : static_cast<u32>(itr->second.total_download_size_bytes.load())) -
+            itr->second.current_offset);
+    buffer.Write(&itr->second.response.body[itr->second.current_offset], 0, size);
+    itr->second.current_offset += size;
+
+    IPC::RequestBuilder rb = rp.MakeBuilder(1, 2);
+    rb.Push(itr->second.current_offset <
+                    (itr->second.response.has_header("Content-Length")
+                         ? static_cast<u32>(
+                               std::stoul(itr->second.response.get_header_value("Content-Length")))
+                         : static_cast<u32>(itr->second.total_download_size_bytes.load()))
+                ? RESULT_DOWNLOADPENDING
+                : RESULT_SUCCESS);
+    rb.PushMappedBuffer(buffer);
+}
+
+void HTTP_C::ReceiveDataTimeout(Kernel::HLERequestContext& ctx) {
+    IPC::RequestParser rp(ctx, 0xC, 4, 2);
+    const Context::Handle context_handle = rp.Pop<Context::Handle>();
+    const u32 buffer_size = rp.Pop<u32>();
+    const u64 timeout = rp.Pop<u64>();
+    Kernel::MappedBuffer& buffer = rp.PopMappedBuffer();
+
+    LOG_DEBUG(Service_HTTP, "context_handle = {}, buffer_size = {}, timeout = {}", context_handle,
+              buffer_size, timeout);
+
+    auto itr = contexts.find(context_handle);
+    ASSERT(itr != contexts.end());
+
+    const u32 size = std::min<u32>(
+        buffer_size,
+        (itr->second.response.has_header("Content-Length")
+             ? static_cast<u32>(std::stoul(itr->second.response.get_header_value("Content-Length")))
+             : static_cast<u32>(itr->second.total_download_size_bytes.load())) -
+            itr->second.current_offset);
+    buffer.Write(&itr->second.response.body[itr->second.current_offset], 0, size);
+    itr->second.current_offset += size;
+
+    IPC::RequestBuilder rb = rp.MakeBuilder(1, 2);
+    rb.Push(itr->second.current_offset <
+                    (itr->second.response.has_header("Content-Length")
+                         ? static_cast<u32>(
+                               std::stoul(itr->second.response.get_header_value("Content-Length")))
+                         : static_cast<u32>(itr->second.total_download_size_bytes.load()))
+                ? RESULT_DOWNLOADPENDING
+                : RESULT_SUCCESS);
+    rb.PushMappedBuffer(buffer);
 }
 
 void HTTP_C::CreateContext(Kernel::HLERequestContext& ctx) {
@@ -405,6 +488,35 @@ void HTTP_C::CloseContext(Kernel::HLERequestContext& ctx) {
 
     IPC::RequestBuilder rb = rp.MakeBuilder(1, 0);
     rb.Push(RESULT_SUCCESS);
+}
+
+void HTTP_C::GetRequestState(Kernel::HLERequestContext& ctx) {
+    IPC::RequestParser rp(ctx, 0x5, 1, 0);
+    const Context::Handle context_handle = rp.Pop<Context::Handle>();
+
+    LOG_DEBUG(Service_HTTP, "context_handle = {}", context_handle);
+
+    auto itr = contexts.find(context_handle);
+    ASSERT(itr != contexts.end());
+
+    IPC::RequestBuilder rb = rp.MakeBuilder(2, 0);
+    rb.Push(RESULT_SUCCESS);
+    rb.PushEnum<RequestState>(itr->second.state.load());
+}
+
+void HTTP_C::GetDownloadSizeState(Kernel::HLERequestContext& ctx) {
+    IPC::RequestParser rp(ctx, 0x6, 1, 0);
+    const Context::Handle context_handle = rp.Pop<Context::Handle>();
+
+    LOG_DEBUG(Service_HTTP, "context_handle = {}", context_handle);
+
+    auto itr = contexts.find(context_handle);
+    ASSERT(itr != contexts.end());
+
+    IPC::RequestBuilder rb = rp.MakeBuilder(3, 0);
+    rb.Push(RESULT_SUCCESS);
+    rb.Push<u32>(static_cast<u32>(itr->second.current_offset));
+    rb.Push<u32>(static_cast<u32>(itr->second.total_download_size_bytes.load()));
 }
 
 void HTTP_C::AddRequestHeader(Kernel::HLERequestContext& ctx) {
@@ -551,11 +663,212 @@ void HTTP_C::AddPostDataAscii(Kernel::HLERequestContext& ctx) {
                         [&name](const Context::PostData& m) -> bool { return m.name == name; }) ==
            itr->second.post_data.end());
 
-    itr->second.post_data.emplace_back(name, value);
+    itr->second.post_data.emplace_back(name, value, Context::PostData::Type::Ascii);
 
     IPC::RequestBuilder rb = rp.MakeBuilder(1, 2);
     rb.Push(RESULT_SUCCESS);
     rb.PushMappedBuffer(value_buffer);
+}
+
+void HTTP_C::AddPostDataBinary(Kernel::HLERequestContext& ctx) {
+    IPC::RequestParser rp(ctx, 0x13, 3, 4);
+    const u32 context_handle = rp.Pop<u32>();
+    [[maybe_unused]] const u32 name_size = rp.Pop<u32>();
+    const u32 value_size = rp.Pop<u32>();
+    const std::vector<u8> name_buffer = rp.PopStaticBuffer();
+    Kernel::MappedBuffer& value_buffer = rp.PopMappedBuffer();
+
+    // Copy the name_buffer into a string without the \0 at the end
+    const std::string name(name_buffer.begin(), name_buffer.end() - 1);
+
+    LOG_DEBUG(Service_HTTP, "called (context_handle = {}, name = {}, value_size = {})",
+              context_handle, name, value_size);
+
+    auto* session_data = GetSessionData(ctx.Session());
+    ASSERT(session_data);
+
+    if (!session_data->initialized) {
+        LOG_ERROR(Service_HTTP, "Tried to add post data on an uninitialized session");
+        IPC::RequestBuilder rb = rp.MakeBuilder(1, 2);
+        rb.Push(ERROR_STATE_ERROR);
+        rb.PushMappedBuffer(value_buffer);
+        return;
+    }
+
+    // This command can only be called with a bound context
+    if (!session_data->current_http_context) {
+        LOG_ERROR(Service_HTTP, "Command called without a bound context");
+
+        IPC::RequestBuilder rb = rp.MakeBuilder(1, 2);
+        rb.Push(ResultCode(ErrorDescription::NotImplemented, ErrorModule::HTTP,
+                           ErrorSummary::Internal, ErrorLevel::Permanent));
+        rb.PushMappedBuffer(value_buffer);
+        return;
+    }
+
+    if (session_data->current_http_context != context_handle) {
+        LOG_ERROR(Service_HTTP,
+                  "Tried to add post data on a mismatched session input context={} session "
+                  "context={}",
+                  context_handle, *session_data->current_http_context);
+        IPC::RequestBuilder rb = rp.MakeBuilder(1, 2);
+        rb.Push(ERROR_STATE_ERROR);
+        rb.PushMappedBuffer(value_buffer);
+        return;
+    }
+
+    auto itr = contexts.find(context_handle);
+    ASSERT(itr != contexts.end());
+
+    if (itr->second.state != RequestState::NotStarted) {
+        LOG_ERROR(Service_HTTP,
+                  "Tried to add post data on a context that has already been started.");
+        IPC::RequestBuilder rb = rp.MakeBuilder(1, 2);
+        rb.Push(ResultCode(ErrCodes::InvalidRequestState, ErrorModule::HTTP,
+                           ErrorSummary::InvalidState, ErrorLevel::Permanent));
+        rb.PushMappedBuffer(value_buffer);
+        return;
+    }
+
+    ASSERT(std::find_if(itr->second.post_data.begin(), itr->second.post_data.end(),
+                        [&name](const Context::PostData& m) -> bool { return m.name == name; }) ==
+           itr->second.post_data.end());
+
+    std::string value(value_size, '\0');
+    value_buffer.Read(value.data(), 0, value_size);
+    itr->second.post_data.emplace_back(name, value, Context::PostData::Type::Binary);
+
+    IPC::RequestBuilder rb = rp.MakeBuilder(1, 2);
+    rb.Push(RESULT_SUCCESS);
+    rb.PushMappedBuffer(value_buffer);
+}
+
+void HTTP_C::AddPostDataRaw(Kernel::HLERequestContext& ctx) {
+    IPC::RequestParser rp(ctx, 0x14, 2, 2);
+    const u32 context_handle = rp.Pop<u32>();
+    const u32 size = rp.Pop<u32>();
+    Kernel::MappedBuffer& buffer = rp.PopMappedBuffer();
+
+    std::string value(size, '\0');
+    buffer.Read(value.data(), 0, size);
+
+    LOG_DEBUG(Service_HTTP, "called (context_handle = {}, value = {})", context_handle, value);
+
+    auto* session_data = GetSessionData(ctx.Session());
+    ASSERT(session_data);
+
+    if (!session_data->initialized) {
+        LOG_ERROR(Service_HTTP, "Tried to add post data on an uninitialized session");
+        IPC::RequestBuilder rb = rp.MakeBuilder(1, 2);
+        rb.Push(ERROR_STATE_ERROR);
+        rb.PushMappedBuffer(buffer);
+        return;
+    }
+
+    // This command can only be called with a bound context
+    if (!session_data->current_http_context) {
+        LOG_ERROR(Service_HTTP, "Command called without a bound context");
+
+        IPC::RequestBuilder rb = rp.MakeBuilder(1, 2);
+        rb.Push(ResultCode(ErrorDescription::NotImplemented, ErrorModule::HTTP,
+                           ErrorSummary::Internal, ErrorLevel::Permanent));
+        rb.PushMappedBuffer(buffer);
+        return;
+    }
+
+    if (session_data->current_http_context != context_handle) {
+        LOG_ERROR(Service_HTTP,
+                  "Tried to add post data on a mismatched session input context={} session "
+                  "context={}",
+                  context_handle, *session_data->current_http_context);
+        IPC::RequestBuilder rb = rp.MakeBuilder(1, 2);
+        rb.Push(ERROR_STATE_ERROR);
+        rb.PushMappedBuffer(buffer);
+        return;
+    }
+
+    auto itr = contexts.find(context_handle);
+    ASSERT(itr != contexts.end());
+
+    if (itr->second.state != RequestState::NotStarted) {
+        LOG_ERROR(Service_HTTP,
+                  "Tried to add post data on a context that has already been started.");
+        IPC::RequestBuilder rb = rp.MakeBuilder(1, 2);
+        rb.Push(ResultCode(ErrCodes::InvalidRequestState, ErrorModule::HTTP,
+                           ErrorSummary::InvalidState, ErrorLevel::Permanent));
+        rb.PushMappedBuffer(buffer);
+        return;
+    }
+
+    ASSERT(std::find_if(itr->second.post_data.begin(), itr->second.post_data.end(),
+                        [](const Context::PostData& m) -> bool {
+                            return m.type == Context::PostData::Type::Raw;
+                        }) == itr->second.post_data.end());
+
+    itr->second.post_data.emplace_back("Raw", value, Context::PostData::Type::Raw);
+
+    IPC::RequestBuilder rb = rp.MakeBuilder(1, 2);
+    rb.Push(RESULT_SUCCESS);
+    rb.PushMappedBuffer(buffer);
+}
+
+void HTTP_C::GetResponseHeader(Kernel::HLERequestContext& ctx) {
+    IPC::RequestParser rp(ctx, 0x1E, 3, 4);
+    const Context::Handle context_handle = rp.Pop<Context::Handle>();
+    const u32 name_size = rp.Pop<u32>();
+    const u32 value_size = rp.Pop<u32>();
+    const std::vector<u8> name_buffer = rp.PopStaticBuffer();
+    Kernel::MappedBuffer& value_buffer = rp.PopMappedBuffer();
+    const std::string name(name_buffer.begin(), name_buffer.end() - 1);
+
+    auto itr = contexts.find(context_handle);
+    ASSERT(itr != contexts.end());
+
+    const std::string value = itr->second.response.has_header(name.c_str())
+                                  ? itr->second.response.headers.find(name)->second + '\0'
+                                  : "";
+
+    LOG_DEBUG(Service_HTTP, "context_handle = {}, name = {}, value = {}", context_handle, name,
+              value);
+
+    u32 size = static_cast<u32>(value.size());
+    value_buffer.Write(value.c_str(), 0, size);
+
+    IPC::RequestBuilder rb = rp.MakeBuilder(2, 2);
+    rb.Push(RESULT_SUCCESS);
+    rb.Push<u32>(size);
+    rb.PushMappedBuffer(value_buffer);
+}
+
+void HTTP_C::GetResponseStatusCode(Kernel::HLERequestContext& ctx) {
+    IPC::RequestParser rp(ctx, 0x22, 1, 0);
+    const Context::Handle context_handle = rp.Pop<Context::Handle>();
+
+    auto itr = contexts.find(context_handle);
+    ASSERT(itr != contexts.end());
+
+    IPC::RequestBuilder rb = rp.MakeBuilder(2, 0);
+    rb.Push(RESULT_SUCCESS);
+    rb.Push<u32>(static_cast<u32>(itr->second.response.status));
+
+    LOG_DEBUG(Service_HTTP, "context_handle = {}, status = {}", context_handle,
+              itr->second.response.status);
+}
+
+void HTTP_C::GetResponseStatusCodeTimeout(Kernel::HLERequestContext& ctx) {
+    IPC::RequestParser rp(ctx, 0x23, 3, 0);
+    const Context::Handle context_handle = rp.Pop<Context::Handle>();
+    const u64 timeout = rp.Pop<u64>();
+
+    auto itr = contexts.find(context_handle);
+    ASSERT(itr != contexts.end());
+
+    IPC::RequestBuilder rb = rp.MakeBuilder(2, 0);
+    rb.Push(RESULT_SUCCESS);
+    rb.Push<u32>(static_cast<u32>(itr->second.response.status));
+
+    LOG_DEBUG(Service_HTTP, "context_handle = {}, status = {}, timeout = {}", context_handle,
+              itr->second.response.status, timeout);
 }
 
 void HTTP_C::SetClientCertContext(Kernel::HLERequestContext& ctx) {
@@ -882,22 +1195,22 @@ HTTP_C::HTTP_C() : ServiceFramework("http:C", 32) {
         {0x00020082, &HTTP_C::CreateContext, "CreateContext"},
         {0x00030040, &HTTP_C::CloseContext, "CloseContext"},
         {0x00040040, nullptr, "CancelConnection"},
-        {0x00050040, nullptr, "GetRequestState"},
-        {0x00060040, nullptr, "GetDownloadSizeState"},
+        {0x00050040, &HTTP_C::GetRequestState, "GetRequestState"},
+        {0x00060040, &HTTP_C::GetDownloadSizeState, "GetDownloadSizeState"},
         {0x00070040, nullptr, "GetRequestError"},
         {0x00080042, &HTTP_C::InitializeConnectionSession, "InitializeConnectionSession"},
         {0x00090040, &HTTP_C::BeginRequest, "BeginRequest"},
         {0x000A0040, &HTTP_C::BeginRequestAsync, "BeginRequestAsync"},
-        {0x000B0082, nullptr, "ReceiveData"},
-        {0x000C0102, nullptr, "ReceiveDataTimeout"},
+        {0x000B0082, &HTTP_C::ReceiveData, "ReceiveData"},
+        {0x000C0102, &HTTP_C::ReceiveDataTimeout, "ReceiveDataTimeout"},
         {0x000D0146, nullptr, "SetProxy"},
         {0x000E0040, nullptr, "SetProxyDefault"},
         {0x000F00C4, nullptr, "SetBasicAuthorization"},
         {0x00100080, nullptr, "SetSocketBufferSize"},
         {0x001100C4, &HTTP_C::AddRequestHeader, "AddRequestHeader"},
         {0x001200C4, &HTTP_C::AddPostDataAscii, "AddPostDataAscii"},
-        {0x001300C4, nullptr, "AddPostDataBinary"},
-        {0x00140082, nullptr, "AddPostDataRaw"},
+        {0x001300C4, &HTTP_C::AddPostDataBinary, "AddPostDataBinary"},
+        {0x00140082, &HTTP_C::AddPostDataRaw, "AddPostDataRaw"},
         {0x00150080, nullptr, "SetPostDataType"},
         {0x001600C4, nullptr, "SendPostDataAscii"},
         {0x00170144, nullptr, "SendPostDataAsciiTimeout"},
@@ -907,12 +1220,12 @@ HTTP_C::HTTP_C() : ServiceFramework("http:C", 32) {
         {0x001B0102, nullptr, "SendPOSTDataRawTimeout"},
         {0x001C0080, nullptr, "SetPostDataEncoding"},
         {0x001D0040, nullptr, "NotifyFinishSendPostData"},
-        {0x001E00C4, nullptr, "GetResponseHeader"},
+        {0x001E00C4, &HTTP_C::GetResponseHeader, "GetResponseHeader"},
         {0x001F0144, nullptr, "GetResponseHeaderTimeout"},
         {0x00200082, nullptr, "GetResponseData"},
         {0x00210102, nullptr, "GetResponseDataTimeout"},
-        {0x00220040, nullptr, "GetResponseStatusCode"},
-        {0x002300C0, nullptr, "GetResponseStatusCodeTimeout"},
+        {0x00220040, &HTTP_C::GetResponseStatusCode, "GetResponseStatusCode"},
+        {0x002300C0, &HTTP_C::GetResponseStatusCodeTimeout, "GetResponseStatusCodeTimeout"},
         {0x00240082, nullptr, "AddTrustedRootCA"},
         {0x00250080, nullptr, "AddDefaultCert"},
         {0x00260080, nullptr, "SelectRootCertChain"},

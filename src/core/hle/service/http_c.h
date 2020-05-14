@@ -101,10 +101,18 @@ public:
     };
 
     struct PostData {
-        // TODO(Subv): Support Binary and Raw POST elements.
-        PostData(std::string name, std::string value) : name(name), value(value){};
+        enum class Type {
+            Ascii,
+            Binary,
+            Raw,
+        };
+
+        PostData(std::string name, std::string value, Type type)
+            : name(name), value(value), type(type) {}
+
         std::string name;
         std::string value;
+        Type type;
     };
 
     struct SSLConfig {
@@ -128,6 +136,7 @@ public:
     std::future<void> request_future;
     std::atomic<u64> current_download_size_bytes;
     std::atomic<u64> total_download_size_bytes;
+    u32 current_offset = 0;
     httplib::Response response;
 };
 
@@ -156,11 +165,20 @@ private:
     void Initialize(Kernel::HLERequestContext& ctx);
     void CreateContext(Kernel::HLERequestContext& ctx);
     void CloseContext(Kernel::HLERequestContext& ctx);
+    void GetRequestState(Kernel::HLERequestContext& ctx);
+    void GetDownloadSizeState(Kernel::HLERequestContext& ctx);
     void InitializeConnectionSession(Kernel::HLERequestContext& ctx);
     void BeginRequest(Kernel::HLERequestContext& ctx);
     void BeginRequestAsync(Kernel::HLERequestContext& ctx);
+    void ReceiveData(Kernel::HLERequestContext& ctx);
+    void ReceiveDataTimeout(Kernel::HLERequestContext& ctx);
     void AddRequestHeader(Kernel::HLERequestContext& ctx);
     void AddPostDataAscii(Kernel::HLERequestContext& ctx);
+    void AddPostDataBinary(Kernel::HLERequestContext& ctx);
+    void AddPostDataRaw(Kernel::HLERequestContext& ctx);
+    void GetResponseHeader(Kernel::HLERequestContext& ctx);
+    void GetResponseStatusCode(Kernel::HLERequestContext& ctx);
+    void GetResponseStatusCodeTimeout(Kernel::HLERequestContext& ctx);
     void SetClientCertContext(Kernel::HLERequestContext& ctx);
     void GetSSLError(Kernel::HLERequestContext& ctx);
     void OpenClientCertContext(Kernel::HLERequestContext& ctx);
