@@ -37,7 +37,7 @@ public:
     virtual std::unique_ptr<CameraInterface> CreatePreview(const std::string& parameter, int width,
                                                            int height,
                                                            const Service::CAM::Flip& flip) {
-        return Create(config, flip);
+        return Create(parameter, flip);
     }
 };
 
