@@ -1,8 +1,6 @@
 add_library(common STATIC
     alignment.h
     assert.h
-    detached_tasks.cpp
-    detached_tasks.h
     bit_field.h
     bit_set.h
     cityhash.cpp

@@ -20,7 +20,6 @@
 #include <SDL.h>
 #include <imgui.h>
 #include <portable-file-dialogs.h>
-#include "common/detached_tasks.h"
 #include "common/file_util.h"
 #include "common/logging/backend.h"
 #include "common/logging/filter.h"
@@ -108,8 +107,6 @@ int main(int argc, char** argv) {
     plugin_manager.InitialSettingsOkPressed();
 
     InitializeLogging();
-
-    Common::DetachedTasks detached_tasks;
 
     if (!Settings::values.record_movie.empty()) {
         Core::Movie::GetInstance().PrepareForRecording();
@@ -199,7 +196,6 @@ int main(int argc, char** argv) {
 
     Core::Movie::GetInstance().Shutdown();
     system.Shutdown();
-    detached_tasks.WaitForAllTasks();
     plugin_manager.EmulatorClosing();
 
     return 0;
