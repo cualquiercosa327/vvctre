@@ -247,13 +247,6 @@ void HTTP_C::BeginRequest(Kernel::HLERequestContext& ctx) {
     auto itr = contexts.find(context_handle);
     ASSERT(itr != contexts.end());
 
-    // On a 3DS BeginRequest and BeginRequestAsync will push the Request to a worker queue.
-    // You can only enqueue 8 requests at the same time.
-    // trying to enqueue any more will either fail (BeginRequestAsync), or block (BeginRequest)
-    // Note that you only can have 8 Contexts at a time. So this difference shouldn't matter
-    // Then there are 3? worker threads that pop the requests from the queue and send them
-    // For now make every request async in it's own thread.
-
     itr->second.MakeRequest();
 
     IPC::RequestBuilder rb = rp.MakeBuilder(1, 0);
@@ -298,13 +291,6 @@ void HTTP_C::BeginRequestAsync(Kernel::HLERequestContext& ctx) {
 
     auto itr = contexts.find(context_handle);
     ASSERT(itr != contexts.end());
-
-    // On a 3DS BeginRequest and BeginRequestAsync will push the Request to a worker queue.
-    // You can only enqueue 8 requests at the same time.
-    // trying to enqueue any more will either fail (BeginRequestAsync), or block (BeginRequest)
-    // Note that you only can have 8 Contexts at a time. So this difference shouldn't matter
-    // Then there are 3? worker threads that pop the requests from the queue and send them
-    // For now make every request async in it's own thread.
 
     itr->second.MakeRequest();
 
