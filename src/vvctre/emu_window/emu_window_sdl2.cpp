@@ -18,11 +18,11 @@
 #ifdef HAVE_CUBEB
 #include "audio_core/cubeb_input.h"
 #endif
+#include <stb_image_write.h>
 #include "audio_core/sink.h"
 #include "audio_core/sink_details.h"
 #include "common/file_util.h"
 #include "common/logging/log.h"
-#include <stb_image_write.h>
 #include "common/string_util.h"
 #include "common/texture.h"
 #include "core/3ds.h"
@@ -620,7 +620,7 @@ void EmuWindow_SDL2::SwapBuffers() {
                                 cam->ReloadCameraDevices();
                             }
                         }
-                        if (ImGui::Selectable("image (configuration: file path or URL)")) {
+                        if (ImGui::Selectable("image (parameter: file path or URL)")) {
                             Settings::values.camera_engine[static_cast<std::size_t>(
                                 Service::CAM::CameraIndex::InnerCamera)] = "image";
                             auto cam = Service::CAM::GetModule(system);
@@ -631,10 +631,10 @@ void EmuWindow_SDL2::SwapBuffers() {
                         ImGui::EndCombo();
                     }
 
-                    ImGui::Text("Inner Camera Configuration:");
+                    ImGui::Text("Inner Camera Parameter:");
                     ImGui::SameLine();
                     if (ImGui::InputText(
-                            "##innerconfiguration",
+                            "##innerparameter",
                             &Settings::values.camera_parameter[static_cast<std::size_t>(
                                 Service::CAM::CameraIndex::InnerCamera)])) {
                         auto cam = Service::CAM::GetModule(system);
@@ -658,7 +658,7 @@ void EmuWindow_SDL2::SwapBuffers() {
                                 cam->ReloadCameraDevices();
                             }
                         }
-                        if (ImGui::Selectable("image (configuration: file path or URL)")) {
+                        if (ImGui::Selectable("image (parameter: file path or URL)")) {
                             Settings::values.camera_engine[static_cast<std::size_t>(
                                 Service::CAM::CameraIndex::OuterLeftCamera)] = "image";
                             auto cam = Service::CAM::GetModule(system);
@@ -669,10 +669,10 @@ void EmuWindow_SDL2::SwapBuffers() {
                         ImGui::EndCombo();
                     }
 
-                    ImGui::Text("Outer Left Configuration:");
+                    ImGui::Text("Outer Left Parameter:");
                     ImGui::SameLine();
                     if (ImGui::InputText(
-                            "##outerleftconfiguration",
+                            "##outerleftparameter",
                             &Settings::values.camera_parameter[static_cast<std::size_t>(
                                 Service::CAM::CameraIndex::OuterLeftCamera)])) {
                         auto cam = Service::CAM::GetModule(system);
@@ -696,7 +696,7 @@ void EmuWindow_SDL2::SwapBuffers() {
                                 cam->ReloadCameraDevices();
                             }
                         }
-                        if (ImGui::Selectable("image (configuration: file path or URL)")) {
+                        if (ImGui::Selectable("image (parameter: file path or URL)")) {
                             Settings::values.camera_engine[static_cast<std::size_t>(
                                 Service::CAM::CameraIndex::OuterRightCamera)] = "image";
                             auto cam = Service::CAM::GetModule(system);
@@ -707,10 +707,10 @@ void EmuWindow_SDL2::SwapBuffers() {
                         ImGui::EndCombo();
                     }
 
-                    ImGui::Text("Outer Right Configuration:");
+                    ImGui::Text("Outer Right Parameter:");
                     ImGui::SameLine();
                     if (ImGui::InputText(
-                            "##outerrightconfiguration",
+                            "##outerrightparameter",
                             &Settings::values.camera_parameter[static_cast<std::size_t>(
                                 Service::CAM::CameraIndex::OuterRightCamera)])) {
                         auto cam = Service::CAM::GetModule(system);

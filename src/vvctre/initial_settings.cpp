@@ -459,7 +459,7 @@ void InitialSettings::Run() {
                 }
 
                 if (ImGui::BeginTabItem("Camera")) {
-                    ImGui::Text("Inner Camera Engine");
+                    ImGui::Text("Inner Camera Engine:");
                     ImGui::SameLine();
                     if (ImGui::BeginCombo("##innerengine",
                                           Settings::values
@@ -470,20 +470,20 @@ void InitialSettings::Run() {
                             Settings::values.camera_engine[static_cast<std::size_t>(
                                 Service::CAM::CameraIndex::InnerCamera)] = "blank";
                         }
-                        if (ImGui::Selectable("image (configuration: file path or URL)")) {
+                        if (ImGui::Selectable("image (parameter: file path or URL)")) {
                             Settings::values.camera_engine[static_cast<std::size_t>(
                                 Service::CAM::CameraIndex::InnerCamera)] = "image";
                         }
                         ImGui::EndCombo();
                     }
 
-                    ImGui::Text("Inner Camera Configuration");
+                    ImGui::Text("Inner Camera Parameter:");
                     ImGui::SameLine();
-                    ImGui::InputText("##innerconfiguration",
+                    ImGui::InputText("##innerparameter",
                                      &Settings::values.camera_parameter[static_cast<std::size_t>(
                                          Service::CAM::CameraIndex::InnerCamera)]);
 
-                    ImGui::Text("Outer Left Engine");
+                    ImGui::Text("Outer Left Engine:");
                     ImGui::SameLine();
                     if (ImGui::BeginCombo("##outerleftengine",
                                           Settings::values
@@ -494,16 +494,16 @@ void InitialSettings::Run() {
                             Settings::values.camera_engine[static_cast<std::size_t>(
                                 Service::CAM::CameraIndex::OuterLeftCamera)] = "blank";
                         }
-                        if (ImGui::Selectable("image (configuration: file path or URL)")) {
+                        if (ImGui::Selectable("image (parameter: file path or URL)")) {
                             Settings::values.camera_engine[static_cast<std::size_t>(
                                 Service::CAM::CameraIndex::OuterLeftCamera)] = "image";
                         }
                         ImGui::EndCombo();
                     }
 
-                    ImGui::Text("Outer Left Configuration");
+                    ImGui::Text("Outer Left Parameter:");
                     ImGui::SameLine();
-                    ImGui::InputText("##outerleftconfiguration",
+                    ImGui::InputText("##outerleftparameter",
                                      &Settings::values.camera_parameter[static_cast<std::size_t>(
                                          Service::CAM::CameraIndex::OuterLeftCamera)]);
 
@@ -518,16 +518,16 @@ void InitialSettings::Run() {
                             Settings::values.camera_engine[static_cast<std::size_t>(
                                 Service::CAM::CameraIndex::OuterRightCamera)] = "blank";
                         }
-                        if (ImGui::Selectable("image (configuration: file path or URL)")) {
+                        if (ImGui::Selectable("image (parameter: file path or URL)")) {
                             Settings::values.camera_engine[static_cast<std::size_t>(
                                 Service::CAM::CameraIndex::OuterRightCamera)] = "image";
                         }
                         ImGui::EndCombo();
                     }
 
-                    ImGui::Text("Outer Right Configuration");
+                    ImGui::Text("Outer Right Parameter:");
                     ImGui::SameLine();
-                    ImGui::InputText("##outerrightconfiguration",
+                    ImGui::InputText("##outerrightparameter",
                                      &Settings::values.camera_parameter[static_cast<std::size_t>(
                                          Service::CAM::CameraIndex::OuterRightCamera)]);
 
