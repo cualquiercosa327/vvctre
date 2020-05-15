@@ -104,14 +104,21 @@ void Context::MakeRequest() {
     httplib::Request request;
     request.method = request_method_strings.at(method);
     request.path = fmt::format("/{}", parsed.path_);
-    for (int i = 0; i < post_data.size(); ++i) {
-        const PostData& d = post_data[i];
-
+    if (method == RequestMethod::Get) {
+        request.path += fmt::format("?{}", parsed.query_);
+    } else if (method == RequestMethod::Post || method == RequestMethod::Put) {
+        httplib::Params params;
+        httplib::detail::parse_query_text(parsed.query_, params);
+        for (const auto& p : params) {
+            post_data.emplace_back(p.first, p.second, PostData::Type::Ascii);
+        }
+    }
+    for (const auto& d : post_data) {
         switch (d.type) {
         case PostData::Type::Binary:
         case PostData::Type::Ascii:
             request.body += httplib::detail::encode_url(fmt::format(
-                "{}={}", d.name, (i == (post_data.size() - 1)) ? (d.value + '&') : d.value));
+                "{}={}", request.body.empty() ? fmt::format("&{}", d.name) : d.name, d.value));
             break;
         case PostData::Type::Raw:
             request.body = d.value;
