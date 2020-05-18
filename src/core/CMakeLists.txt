@@ -310,10 +310,6 @@ add_library(core STATIC
     hle/service/mcu/hwc.h
     hle/service/mcu/mcu.cpp
     hle/service/mcu/mcu.h
-    hle/service/mvd/mvd.cpp
-    hle/service/mvd/mvd.h
-    hle/service/mvd/mvd_std.cpp
-    hle/service/mvd/mvd_std.h
     hle/service/ndm/ndm_u.cpp
     hle/service/ndm/ndm_u.h
     hle/service/news/news.cpp
@@ -382,16 +378,6 @@ add_library(core STATIC
     hle/service/pxi/dev.h
     hle/service/pxi/pxi.cpp
     hle/service/pxi/pxi.h
-    hle/service/qtm/qtm.cpp
-    hle/service/qtm/qtm.h
-    hle/service/qtm/qtm_c.cpp
-    hle/service/qtm/qtm_c.h
-    hle/service/qtm/qtm_s.cpp
-    hle/service/qtm/qtm_s.h
-    hle/service/qtm/qtm_sp.cpp
-    hle/service/qtm/qtm_sp.h
-    hle/service/qtm/qtm_u.cpp
-    hle/service/qtm/qtm_u.h
     hle/service/service.cpp
     hle/service/service.h
     hle/service/sm/sm.cpp

@@ -36,7 +36,6 @@
 #include "core/hle/service/ldr_ro/ldr_ro.h"
 #include "core/hle/service/mcu/mcu.h"
 #include "core/hle/service/mic_u.h"
-#include "core/hle/service/mvd/mvd.h"
 #include "core/hle/service/ndm/ndm_u.h"
 #include "core/hle/service/news/news.h"
 #include "core/hle/service/nfc/nfc.h"
@@ -46,7 +45,6 @@
 #include "core/hle/service/ps/ps_ps.h"
 #include "core/hle/service/ptm/ptm.h"
 #include "core/hle/service/pxi/pxi.h"
-#include "core/hle/service/qtm/qtm.h"
 #include "core/hle/service/service.h"
 #include "core/hle/service/sm/sm.h"
 #include "core/hle/service/sm/srv.h"
@@ -56,12 +54,11 @@
 
 namespace Service {
 
-const std::array<ServiceModuleInfo, 40> service_module_map{
+const std::array<ServiceModuleInfo, 38> service_module_map{
     {{"FS", 0x00040130'00001102, FS::InstallInterfaces},
      {"PM", 0x00040130'00001202, PM::InstallInterfaces},
      {"LDR", 0x00040130'00003702, LDR::InstallInterfaces},
      {"PXI", 0x00040130'00001402, PXI::InstallInterfaces},
-
      {"ERR", 0x00040030'00008A02, ERR::InstallInterfaces},
      {"AC", 0x00040130'00002402, AC::InstallInterfaces},
      {"ACT", 0x00040130'00003802, ACT::InstallInterfaces},
@@ -81,7 +78,6 @@ const std::array<ServiceModuleInfo, 40> service_module_map{
      {"HID", 0x00040130'00001D02, HID::InstallInterfaces},
      {"IR", 0x00040130'00003302, IR::InstallInterfaces},
      {"MIC", 0x00040130'00002002, MIC::InstallInterfaces},
-     {"MVD", 0x00040130'20004102, MVD::InstallInterfaces},
      {"NDM", 0x00040130'00002B02, NDM::InstallInterfaces},
      {"NEWS", 0x00040130'00003502, NEWS::InstallInterfaces},
      {"NFC", 0x00040130'00004002, NFC::InstallInterfaces},
@@ -89,7 +85,6 @@ const std::array<ServiceModuleInfo, 40> service_module_map{
      {"NS", 0x00040130'00008002, APT::InstallInterfaces},
      {"NWM", 0x00040130'00002D02, NWM::InstallInterfaces},
      {"PTM", 0x00040130'00002202, PTM::InstallInterfaces},
-     {"QTM", 0x00040130'00004202, QTM::InstallInterfaces},
      {"CSND", 0x00040130'00002702, CSND::InstallInterfaces},
      {"HTTP", 0x00040130'00002902, HTTP::InstallInterfaces},
      {"SOC", 0x00040130'00002E02, SOC::InstallInterfaces},

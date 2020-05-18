@@ -145,11 +145,9 @@ enum class ErrorModule : u32 {
 
     AVD = 90,
     L2B = 91,
-    MVD = 92,
     NFC = 93,
     UART = 94,
     SPM = 95,
-    QTM = 96,
     NFP = 97,
 
     Application = 254,
