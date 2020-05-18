@@ -350,6 +350,10 @@ void vvctre_write_u64(void* core, VAddr address, u64 value) {
     static_cast<Core::System*>(core)->Memory().Write64(address, value);
 }
 
+void vvctre_invalidate_cache_range(void* core, u32 address, size_t length) {
+    static_cast<Core::System*>(core)->CPU().InvalidateCacheRange(address, length);
+}
+
 // Debugging
 void vvctre_set_pc(void* core, u32 addr) {
     static_cast<Core::System*>(core)->CPU().SetPC(addr);
@@ -1667,6 +1671,7 @@ std::unordered_map<std::string, void*> PluginManager::function_map = {
     {"vvctre_write_u32", (void*)&vvctre_write_u32},
     {"vvctre_read_u64", (void*)&vvctre_read_u64},
     {"vvctre_write_u64", (void*)&vvctre_write_u64},
+    {"vvctre_invalidate_cache_range", (void*)&vvctre_invalidate_cache_range},
     // Debugging
     {"vvctre_set_pc", (void*)&vvctre_set_pc},
     {"vvctre_get_pc", (void*)&vvctre_get_pc},
