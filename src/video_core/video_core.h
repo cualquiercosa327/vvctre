@@ -23,9 +23,8 @@ class MemorySystem;
 
 namespace VideoCore {
 
-extern std::unique_ptr<RendererBase> g_renderer; ///< Renderer plugin
+extern std::unique_ptr<RendererBase> g_renderer;
 
-// TODO: Wrap these in a user settings struct along with any other graphics settings
 extern std::atomic<bool> g_hardware_renderer_enabled;
 extern std::atomic<bool> g_shader_jit_enabled;
 extern std::atomic<bool> g_hardware_shader_enabled;
@@ -34,7 +33,7 @@ extern std::atomic<bool> g_renderer_background_color_update_requested;
 extern std::atomic<bool> g_renderer_sampler_update_requested;
 extern std::atomic<bool> g_renderer_shader_update_requested;
 extern std::atomic<bool> g_texture_filter_update_requested;
-// Screenshot
+
 extern std::atomic<bool> g_renderer_screenshot_requested;
 extern void* g_screenshot_bits;
 extern std::function<void()> g_screenshot_complete_callback;
