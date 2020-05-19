@@ -308,7 +308,6 @@ const char* vvctre_get_process_name(void* core) {
 }
 
 // Emulation
-
 void vvctre_restart(void* core) {
     static_cast<Core::System*>(core)->RequestReset();
 }
