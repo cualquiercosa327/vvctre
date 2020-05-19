@@ -303,6 +303,10 @@ u64 vvctre_get_program_id(void* core) {
     return static_cast<Core::System*>(core)->Kernel().GetCurrentProcess()->codeset->program_id;
 }
 
+const char* vvctre_get_process_name(void* core) {
+    return static_cast<Core::System*>(core)->Kernel().GetCurrentProcess()->codeset->name.c_str();
+}
+
 // Emulation
 
 void vvctre_restart(void* core) {
@@ -1662,6 +1666,7 @@ std::unordered_map<std::string, void*> PluginManager::function_map = {
     {"vvctre_load_amiibo", (void*)&vvctre_load_amiibo},
     {"vvctre_remove_amiibo", (void*)&vvctre_remove_amiibo},
     {"vvctre_get_program_id", (void*)&vvctre_get_program_id},
+    {"vvctre_get_process_name", (void*)&vvctre_get_process_name},
     // Emulation
     {"vvctre_restart", (void*)&vvctre_restart},
     {"vvctre_set_paused", (void*)&vvctre_set_paused},
