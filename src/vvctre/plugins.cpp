@@ -453,6 +453,10 @@ void vvctre_ipc_recorder_bind_callback(void* core, void (*callback)(const char* 
         });
 }
 
+const char* vvctre_get_service_name_by_port_id(void* core, u32 port) {
+    return static_cast<Core::System*>(core)->ServiceManager().GetServiceNameByPortId(port).c_str();
+}
+
 // Cheats
 int vvctre_cheat_count(void* core) {
     return static_cast<int>(static_cast<Core::System*>(core)->CheatEngine().GetCheats().size());
@@ -1742,6 +1746,7 @@ std::unordered_map<std::string, void*> PluginManager::function_map = {
     {"vvctre_ipc_recorder_set_enabled", (void*)&vvctre_ipc_recorder_set_enabled},
     {"vvctre_ipc_recorder_get_enabled", (void*)&vvctre_ipc_recorder_get_enabled},
     {"vvctre_ipc_recorder_bind_callback", (void*)&vvctre_ipc_recorder_bind_callback},
+    {"vvctre_get_service_name_by_port_id", (void*)&vvctre_get_service_name_by_port_id},
     // Cheats
     {"vvctre_cheat_count", (void*)&vvctre_cheat_count},
     {"vvctre_get_cheat", (void*)&vvctre_get_cheat},
