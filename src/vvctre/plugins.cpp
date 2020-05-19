@@ -6,6 +6,7 @@
 #include <utility>
 #include <fmt/format.h>
 #include <imgui.h>
+#include <nlohmann/json.hpp>
 #include "common/common_funcs.h"
 #include "common/file_util.h"
 #include "common/logging/log.h"
@@ -16,6 +17,7 @@
 #include "core/cheats/cheats.h"
 #include "core/cheats/gateway_cheat.h"
 #include "core/core.h"
+#include "core/hle/kernel/ipc_debugger/recorder.h"
 #include "core/hle/service/am/am.h"
 #include "core/hle/service/cam/cam.h"
 #include "core/hle/service/cfg/cfg.h"
@@ -404,6 +406,51 @@ void vvctre_set_cp15_register(void* core, int index, u32 value) {
 u32 vvctre_get_cp15_register(void* core, int index) {
     return static_cast<Core::System*>(core)->CPU().GetCP15Register(
         static_cast<CP15Register>(index));
+}
+
+void vvctre_ipc_recorder_set_enabled(void* core, bool enabled) {
+    static_cast<Core::System*>(core)->Kernel().GetIPCRecorder().SetEnabled(enabled);
+}
+
+bool vvctre_ipc_recorder_get_enabled(void* core) {
+    return static_cast<Core::System*>(core)->Kernel().GetIPCRecorder().IsEnabled();
+}
+
+void vvctre_ipc_recorder_bind_callback(void* core, void (*callback)(const char* json)) {
+    static_cast<Core::System*>(core)->Kernel().GetIPCRecorder().BindCallback(
+        [callback](const IPCDebugger::RequestRecord& record) {
+            nlohmann::json json;
+            json["id"] = record.id;
+            json["status"] = static_cast<int>(record.status);
+            json["client_process"]["type"] = record.client_process.type;
+            json["client_process"]["name"] = record.client_process.name;
+            json["client_process"]["id"] = record.client_process.id;
+            json["client_thread"]["type"] = record.client_thread.type;
+            json["client_thread"]["name"] = record.client_thread.name;
+            json["client_thread"]["id"] = record.client_thread.id;
+            json["client_session"]["type"] = record.client_session.type;
+            json["client_session"]["name"] = record.client_session.name;
+            json["client_session"]["id"] = record.client_session.id;
+            json["client_port"]["type"] = record.client_port.type;
+            json["client_port"]["name"] = record.client_port.name;
+            json["client_port"]["id"] = record.client_port.id;
+            json["server_process"]["type"] = record.server_process.type;
+            json["server_process"]["name"] = record.server_process.name;
+            json["server_process"]["id"] = record.server_process.id;
+            json["server_thread"]["type"] = record.server_thread.type;
+            json["server_thread"]["name"] = record.server_thread.name;
+            json["server_thread"]["id"] = record.server_thread.id;
+            json["server_session"]["type"] = record.server_session.type;
+            json["server_session"]["name"] = record.server_session.name;
+            json["server_session"]["id"] = record.server_session.id;
+            json["function_name"] = record.function_name;
+            json["is_hle"] = record.is_hle;
+            json["untranslated_request_cmdbuf"] = record.untranslated_request_cmdbuf;
+            json["translated_request_cmdbuf"] = record.translated_request_cmdbuf;
+            json["untranslated_reply_cmdbuf"] = record.untranslated_reply_cmdbuf;
+            json["translated_reply_cmdbuf"] = record.translated_reply_cmdbuf;
+            callback(json.dump().c_str());
+        });
 }
 
 // Cheats
@@ -1692,6 +1739,9 @@ std::unordered_map<std::string, void*> PluginManager::function_map = {
     {"vvctre_get_vfp_system_register", (void*)&vvctre_get_vfp_system_register},
     {"vvctre_set_cp15_register", (void*)&vvctre_set_cp15_register},
     {"vvctre_get_cp15_register", (void*)&vvctre_get_cp15_register},
+    {"vvctre_ipc_recorder_set_enabled", (void*)&vvctre_ipc_recorder_set_enabled},
+    {"vvctre_ipc_recorder_get_enabled", (void*)&vvctre_ipc_recorder_get_enabled},
+    {"vvctre_ipc_recorder_bind_callback", (void*)&vvctre_ipc_recorder_bind_callback},
     // Cheats
     {"vvctre_cheat_count", (void*)&vvctre_cheat_count},
     {"vvctre_get_cheat", (void*)&vvctre_get_cheat},

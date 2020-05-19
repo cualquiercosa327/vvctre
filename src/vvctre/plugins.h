@@ -28,8 +28,8 @@ using BeforeDrawingFPS = void (*)();                                            
 using AddMenu = void (*)();                                                         // optional
 using AddTab = void (*)();                                                          // optional
 using AfterSwapWindow = void (*)();                                                 // optional
-using ScreenshotCallback = void (*)(void* data);
-using Log = Log::FunctionLogger::Function;
+using ScreenshotCallback = void (*)(void* data);                                    // optional
+using Log = Log::FunctionLogger::Function;                                          // optional
 } // namespace PluginImportedFunctions
 
 class PluginManager {
