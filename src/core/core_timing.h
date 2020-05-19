@@ -136,7 +136,6 @@ constexpr int MAX_SLICE_LENGTH = 20000;
 
 class Timing {
 public:
-    explicit Timing(const bool testing = false);
     ~Timing();
 
     /**
@@ -229,9 +228,6 @@ private:
     // executing the first cycle of each slice to prepare the slice length and downcount for
     // that slice.
     bool is_global_timer_sane = true;
-
-    // Don't use custom CPU ticks and CPU clock percentage settings
-    const bool testing;
 };
 
 } // namespace Core

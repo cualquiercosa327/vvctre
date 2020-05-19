@@ -3,6 +3,7 @@
 // Refer to the license.txt file included.
 
 #include <cstring>
+#include <ctime>
 #include <optional>
 #include <string>
 #include <vector>
@@ -12,7 +13,6 @@
 #include "common/logging/log.h"
 #include "common/string_util.h"
 #include "common/swap.h"
-#include "common/timer.h"
 #include "core/core.h"
 #include "core/hle/service/hid/hid.h"
 #include "core/hle/service/ir/extra_hid.h"
@@ -416,7 +416,7 @@ void Movie::PrepareForPlayback(const std::string& movie_file) {
 
 void Movie::PrepareForRecording() {
     unix_timestamp = (Settings::values.initial_clock == Settings::InitialClock::SystemTime
-                          ? Common::Timer::GetTimeSinceJan1970().count()
+                          ? std::time(nullptr)
                           : Settings::values.unix_timestamp);
 }
 

@@ -37,19 +37,13 @@ jobs:
         if: github.event_name == 'push' && matrix.os == 'ubuntu-latest'
         shell: bash
         run: curl https://discord-vvctre-sbu-bot-1585620067.glitch.me/update
-      - name: Test
-        working-directory: ./build
-        run: ctest -C Release
       - name: Prepare to upload (tag push)
         if: github.event_name == 'push'
         shell: bash
         run: |
           cd $GITHUB_WORKSPACE
           cp license.txt ./build/bin/Release
-          if [ "$RUNNER_OS" == "Linux" ]; then
-            rm ./build/bin/Release/tests
-          elif [ "$RUNNER_OS" == "Windows" ]; then
-            rm ./build/bin/Release/tests.exe
+          if [ "$RUNNER_OS" == "Windows" ]; then
             rm ./build/bin/Release/*.pdb
           fi
           export VERSION=${GITHUB_REF:10}
@@ -61,10 +55,7 @@ jobs:
         run: |
           cd $GITHUB_WORKSPACE
           cp license.txt ./build/bin/release
-          if [ "$RUNNER_OS" == "Linux" ]; then
-            rm ./build/bin/Release/tests
-          elif [ "$RUNNER_OS" == "Windows" ]; then
-            rm ./build/bin/Release/tests.exe
+          if [ "$RUNNER_OS" == "Windows" ]; then
             rm ./build/bin/Release/*.pdb
           fi
       - name: Upload (tag push)

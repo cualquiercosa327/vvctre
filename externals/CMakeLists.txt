@@ -4,10 +4,6 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PROJECT_SOURCE_DIR}/CMakeModules)
 include(DownloadExternals)
 include(ExternalProject)
 
-# Catch
-add_library(catch-single-include INTERFACE)
-target_include_directories(catch-single-include INTERFACE catch/single_include)
-
 # Dynarmic
 if (ARCHITECTURE_x86_64)
     # Dynarmic will skip defining xbyak if it's already defined, we then define it below

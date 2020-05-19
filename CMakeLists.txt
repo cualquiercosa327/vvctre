@@ -150,7 +150,6 @@ add_definitions(-DBOOST_ERROR_CODE_HEADER_ONLY
     -DBOOST_REGEX_NO_LIB
 )
 
-enable_testing()
 add_subdirectory(externals)
 add_subdirectory(src)
 
