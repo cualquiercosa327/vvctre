@@ -135,7 +135,7 @@ static const Xmm NEGBIT = xmm15;
 
 // State registers that must not be modified by external functions calls
 // Scratch registers, e.g., SRC1 and SCRATCH, have to be saved on the side if needed
-static const BitSet32 persistent_regs = BuildRegSet({
+static const BitSet<u32> persistent_regs = BuildRegSet({
     // Pointers to register blocks
     UNIFORMS,
     STATE,
@@ -356,7 +356,7 @@ void JitShader::Compile_UniformCondition(Instruction instr) {
     cmp(byte[UNIFORMS + offset], 0);
 }
 
-BitSet32 JitShader::PersistentCallerSavedRegs() {
+BitSet<u32> JitShader::PersistentCallerSavedRegs() {
     return persistent_regs & ABI_ALL_CALLER_SAVED;
 }
 

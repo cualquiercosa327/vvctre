@@ -11,9 +11,6 @@
 #include <type_traits>
 #include "common/common_types.h"
 
-// namespace avoids conflict with OS X Carbon; don't use BitSet<T> directly
-namespace Common {
-
 // Helper functions:
 
 #ifdef _MSC_VER
@@ -77,11 +74,11 @@ static inline int LeastSignificantSetBit(u64 val) {
 // Similar to std::bitset, this is a class which encapsulates a bitset, i.e.
 // using the set bits of an integer to represent a set of integers.  Like that
 // class, it acts like an array of bools:
-//     BitSet32 bs;
+//     BitSet<u32> bs;
 //     bs[1] = true;
 // but also like the underlying integer ([0] = least significant bit):
-//     BitSet32 bs2 = ...;
-//     bs = (bs ^ bs2) & BitSet32(0xffff);
+//     BitSet<u32> bs2 = ...;
+//     bs = (bs ^ bs2) & BitSet<u32>(0xffff);
 // The following additional functionality is provided:
 // - Construction using an initializer list.
 //     BitSet bs { 1, 2, 4, 8 };
@@ -220,10 +217,3 @@ public:
 
     IntTy m_val;
 };
-
-} // namespace Common
-
-typedef Common::BitSet<u8> BitSet8;
-typedef Common::BitSet<u16> BitSet16;
-typedef Common::BitSet<u32> BitSet32;
-typedef Common::BitSet<u64> BitSet64;

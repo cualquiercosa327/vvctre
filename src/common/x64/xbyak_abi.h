@@ -37,16 +37,16 @@ inline Xbyak::Reg IndexToReg(int reg_index) {
     }
 }
 
-inline BitSet32 BuildRegSet(std::initializer_list<Xbyak::Reg> regs) {
-    BitSet32 bits;
+inline BitSet<u32> BuildRegSet(std::initializer_list<Xbyak::Reg> regs) {
+    BitSet<u32> bits;
     for (const Xbyak::Reg& reg : regs) {
         bits[RegToIndex(reg)] = true;
     }
     return bits;
 }
 
-const BitSet32 ABI_ALL_GPRS(0x0000FFFF);
-const BitSet32 ABI_ALL_XMMS(0xFFFF0000);
+const BitSet<u32> ABI_ALL_GPRS(0x0000FFFF);
+const BitSet<u32> ABI_ALL_XMMS(0xFFFF0000);
 
 #ifdef _WIN32
 
@@ -57,7 +57,7 @@ const Xbyak::Reg ABI_PARAM2 = Xbyak::util::rdx;
 const Xbyak::Reg ABI_PARAM3 = Xbyak::util::r8;
 const Xbyak::Reg ABI_PARAM4 = Xbyak::util::r9;
 
-const BitSet32 ABI_ALL_CALLER_SAVED = BuildRegSet({
+const BitSet<u32> ABI_ALL_CALLER_SAVED = BuildRegSet({
     // GPRs
     Xbyak::util::rcx,
     Xbyak::util::rdx,
@@ -74,7 +74,7 @@ const BitSet32 ABI_ALL_CALLER_SAVED = BuildRegSet({
     Xbyak::util::xmm5,
 });
 
-const BitSet32 ABI_ALL_CALLEE_SAVED = BuildRegSet({
+const BitSet<u32> ABI_ALL_CALLEE_SAVED = BuildRegSet({
     // GPRs
     Xbyak::util::rbx,
     Xbyak::util::rsi,
@@ -108,7 +108,7 @@ const Xbyak::Reg ABI_PARAM2 = Xbyak::util::rsi;
 const Xbyak::Reg ABI_PARAM3 = Xbyak::util::rdx;
 const Xbyak::Reg ABI_PARAM4 = Xbyak::util::rcx;
 
-const BitSet32 ABI_ALL_CALLER_SAVED = BuildRegSet({
+const BitSet<u32> ABI_ALL_CALLER_SAVED = BuildRegSet({
     // GPRs
     Xbyak::util::rcx,
     Xbyak::util::rdx,
@@ -137,7 +137,7 @@ const BitSet32 ABI_ALL_CALLER_SAVED = BuildRegSet({
     Xbyak::util::xmm15,
 });
 
-const BitSet32 ABI_ALL_CALLEE_SAVED = BuildRegSet({
+const BitSet<u32> ABI_ALL_CALLEE_SAVED = BuildRegSet({
     // GPRs
     Xbyak::util::rbx,
     Xbyak::util::rbp,
@@ -151,7 +151,7 @@ constexpr std::size_t ABI_SHADOW_SPACE = 0;
 
 #endif
 
-inline void ABI_CalculateFrameSize(BitSet32 regs, std::size_t rsp_alignment,
+inline void ABI_CalculateFrameSize(BitSet<u32> regs, std::size_t rsp_alignment,
                                    std::size_t needed_frame_size, s32* out_subtraction,
                                    s32* out_xmm_offset) {
     int count = (regs & ABI_ALL_GPRS).Count();
@@ -174,7 +174,7 @@ inline void ABI_CalculateFrameSize(BitSet32 regs, std::size_t rsp_alignment,
     *out_xmm_offset = (s32)(subtraction - xmm_base_subtraction);
 }
 
-inline std::size_t ABI_PushRegistersAndAdjustStack(Xbyak::CodeGenerator& code, BitSet32 regs,
+inline std::size_t ABI_PushRegistersAndAdjustStack(Xbyak::CodeGenerator& code, BitSet<u32> regs,
                                                    std::size_t rsp_alignment,
                                                    std::size_t needed_frame_size = 0) {
     s32 subtraction, xmm_offset;
@@ -196,7 +196,7 @@ inline std::size_t ABI_PushRegistersAndAdjustStack(Xbyak::CodeGenerator& code, B
     return ABI_SHADOW_SPACE;
 }
 
-inline void ABI_PopRegistersAndAdjustStack(Xbyak::CodeGenerator& code, BitSet32 regs,
+inline void ABI_PopRegistersAndAdjustStack(Xbyak::CodeGenerator& code, BitSet<u32> regs,
                                            std::size_t rsp_alignment,
                                            std::size_t needed_frame_size = 0) {
     s32 subtraction, xmm_offset;

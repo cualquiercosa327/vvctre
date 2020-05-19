@@ -256,13 +256,13 @@ void PicaShaderConfigCommon::Init(const Pica::ShaderRegs& regs, Pica::Shader::Sh
     num_outputs = 0;
     output_map.fill(16);
 
-    for (int reg : Common::BitSet<u32>(regs.output_mask)) {
+    for (int reg : BitSet<u32>(regs.output_mask)) {
         output_map[reg] = num_outputs++;
     }
 }
 
 void PicaGSConfigCommonRaw::Init(const Pica::Regs& regs) {
-    vs_output_attributes = Common::BitSet<u32>(regs.vs.output_mask).Count();
+    vs_output_attributes = BitSet<u32>(regs.vs.output_mask).Count();
     gs_output_attributes = vs_output_attributes;
 
     semantic_maps.fill({16, 0});

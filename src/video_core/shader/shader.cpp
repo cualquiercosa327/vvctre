@@ -87,7 +87,7 @@ void UnitState::LoadInput(const ShaderRegs& config, const AttributeBuffer& input
 static void CopyRegistersToOutput(const Common::Vec4<float24>* regs, u32 mask,
                                   AttributeBuffer& buffer) {
     int output_i = 0;
-    for (int reg : Common::BitSet<u32>(mask)) {
+    for (int reg : BitSet<u32>(mask)) {
         buffer.attr[output_i++] = regs[reg];
     }
 }

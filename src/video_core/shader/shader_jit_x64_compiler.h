@@ -91,7 +91,7 @@ private:
      */
     void Compile_Return();
 
-    BitSet32 PersistentCallerSavedRegs();
+    BitSet<u32> PersistentCallerSavedRegs();
 
     /**
      * Assertion evaluated at compile-time, but only triggered if executed at runtime.

@@ -178,9 +178,9 @@ void Module::ActivatePort(int port_id, int camera_id) {
 }
 
 template <int max_index>
-class CommandParamBitSet : public BitSet8 {
+class CommandParamBitSet : public BitSet<u8> {
 public:
-    explicit CommandParamBitSet(u8 command_param) : BitSet8(command_param) {}
+    explicit CommandParamBitSet(u8 command_param) : BitSet<u8>(command_param) {}
 
     bool IsValid() const {
         return m_val < (1 << max_index);
