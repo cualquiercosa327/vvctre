@@ -299,6 +299,10 @@ void vvctre_remove_amiibo(void* core) {
     }
 }
 
+u64 vvctre_get_program_id(void* core) {
+    return static_cast<Core::System*>(core)->Kernel().GetCurrentProcess()->codeset->program_id;
+}
+
 // Emulation
 
 void vvctre_restart(void* core) {
@@ -1657,6 +1661,7 @@ std::unordered_map<std::string, void*> PluginManager::function_map = {
     {"vvctre_install_cia", (void*)&vvctre_install_cia},
     {"vvctre_load_amiibo", (void*)&vvctre_load_amiibo},
     {"vvctre_remove_amiibo", (void*)&vvctre_remove_amiibo},
+    {"vvctre_get_program_id", (void*)&vvctre_get_program_id},
     // Emulation
     {"vvctre_restart", (void*)&vvctre_restart},
     {"vvctre_set_paused", (void*)&vvctre_set_paused},
