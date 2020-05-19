@@ -8,7 +8,7 @@
 
 namespace OpenGL {
 
-constexpr std::string_view fragment_shader = R"("#version 330 core
+constexpr std::string_view fragment_shader = R"(#version 330 core
 
 in vec2 tex_coord;
 

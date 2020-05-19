@@ -36,7 +36,7 @@
 
 namespace OpenGL {
 
-constexpr std::string_view refine_fragment = R"("#version 330 core
+constexpr std::string_view refine_fragment = R"(#version 330 core
 
 in vec2 tex_coord;
 in vec2 input_max;
@@ -157,7 +157,7 @@ void main() {
     frag_color = Compute();
 })";
 
-constexpr std::string_view refine_vertex = R"("#version 330 core
+constexpr std::string_view refine_vertex = R"(#version 330 core
 
 out vec2 tex_coord;
 out vec2 input_max;
@@ -173,7 +173,7 @@ void main() {
     input_max = textureSize(HOOKED, 0) * 2.0 - 1.0;
 })";
 
-constexpr std::string_view x_gradient_fragment = R"("#version 330 core
+constexpr std::string_view x_gradient_fragment = R"(#version 330 core
 
 in vec2 tex_coord;
 
@@ -193,7 +193,7 @@ void main() {
     frag_color = vec2(r - l, l + 2.0 * c + r);
 })";
 
-constexpr std::string_view y_gradient_fragment = R"("#version 330 core
+constexpr std::string_view y_gradient_fragment = R"(#version 330 core
 
 in vec2 input_max;
 
@@ -211,7 +211,7 @@ void main() {
     frag_color = 1 - length(grad);
 })";
 
-constexpr std::string_view y_gradient_vertex = R"("#version 330 core
+constexpr std::string_view y_gradient_vertex = R"(#version 330 core
 
 out vec2 input_max;
 

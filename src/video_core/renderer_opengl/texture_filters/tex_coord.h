@@ -6,7 +6,7 @@
 
 #include <string_view>
 
-constexpr std::string_view tex_coord = R"("#version 330 core
+constexpr std::string_view tex_coord = R"(#version 330 core
 
 out vec2 tex_coord;
 

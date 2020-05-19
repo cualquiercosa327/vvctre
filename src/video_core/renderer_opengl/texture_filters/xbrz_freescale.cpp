@@ -45,7 +45,7 @@
 
 namespace OpenGL {
 
-constexpr std::string_view fragment_shader = R"("#version 330 core
+constexpr std::string_view fragment_shader = R"(#version 330 core
 
 in vec2 tex_coord;
 in vec2 source_size;
@@ -289,7 +289,7 @@ void main() {
     frag_color = res;
 })";
 
-constexpr std::string_view vertex_shader = R"("#version 330 core
+constexpr std::string_view vertex_shader = R"(#version 330 core
 
 out vec2 tex_coord;
 out vec2 source_size;
