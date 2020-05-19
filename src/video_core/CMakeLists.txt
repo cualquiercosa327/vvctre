@@ -10,7 +10,6 @@ add_library(video_core STATIC
     primitive_assembly.cpp
     primitive_assembly.h
     rasterizer_interface.h
-    regs.cpp
     regs.h
     regs_framebuffer.h
     regs_lighting.h

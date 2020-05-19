@@ -7,7 +7,6 @@
 #include <array>
 #include <cstddef>
 #include <string>
-
 #include "common/common_funcs.h"
 #include "common/common_types.h"
 #include "video_core/regs_framebuffer.h"
@@ -40,9 +39,6 @@ struct Regs {
         };
         std::array<u32, NUM_REGS> reg_array;
     };
-
-    /// Map register indices to names readable by humans
-    static const char* GetRegisterName(u16 index);
 };
 
 static_assert(sizeof(Regs) == Regs::NUM_REGS * sizeof(u32), "Regs struct has wrong size");
