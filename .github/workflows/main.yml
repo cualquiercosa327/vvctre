@@ -1,12 +1,7 @@
 name: CI
 
 on:
-  push:
-    tags:
-      - "*"
-  pull_request:
-    branches:
-      - "*"
+  repository_dispatch:
 
 jobs:
   build:
@@ -34,11 +29,11 @@ jobs:
         shell: bash
         run: cmake --build . --config Release
       - name: Update Discord SBU
-        if: github.event_name == 'push' && matrix.os == 'ubuntu-latest'
+        if: github.event_name == 'repository_dispatch' && matrix.os == 'ubuntu-latest'
         shell: bash
-        run: curl https://discord-vvctre-sbu-bot-1585620067.glitch.me/update
-      - name: Prepare to upload (tag push)
-        if: github.event_name == 'push'
+        run: curl https://discord-vvctre-sbu-bot.glitch.me/update
+      - name: Prepare to upload (repository dispatch)
+        if: github.event_name == 'repository_dispatch'
         shell: bash
         run: |
           cd $GITHUB_WORKSPACE
@@ -58,27 +53,16 @@ jobs:
           if [ "$RUNNER_OS" == "Windows" ]; then
             rm ./build/bin/Release/*.pdb
           fi
-      - name: Upload (tag push)
-        if: github.event_name == 'push'
-        uses: svenstaro/upload-release-action@v1-release
+      - name: Upload (repository dispatch)
+        if: github.event_name == 'repository_dispatch'
+        uses: JantHsueh/upload-file-action@master
         with:
-          repo_token: ${{secrets.GITHUB_TOKEN}}
-          file: vvctre-${{env.VERSION}}-${{runner.os}}.7z
-          asset_name: vvctre-${{env.VERSION}}-${{runner.os}}.7z
-          tag: ${{github.ref}}
-          overwrite: true
+          url: ${{secrets.DISCORD_WEBHOOK}}
+          forms: '{}'
+          fileForms: '{"file": "vvctre-${{env.VERSION}}-${{runner.os}}.7z"}'
       - name: Upload (pull request)
         if: github.event_name == 'pull_request'
         uses: actions/upload-artifact@v1
         with:
           name: vvctre-${{runner.os}}
           path: build/bin/Release
-      - name: Discord Success Notification (tag push)
-        if: github.event_name == 'push'
-        uses: rjstone/discord-webhook-notify@v1
-        with:
-          severity: info
-          description: |
-            vvctre ${{env.VERSION}} for ${{runner.os}} can now be downloaded from:
-            https://github.com/${{github.repository}}/releases/tag/${{env.VERSION}}
-          webhookUrl: ${{secrets.DISCORD_WEBHOOK}}
