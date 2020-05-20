@@ -41,9 +41,7 @@ jobs:
           if [ "$RUNNER_OS" == "Windows" ]; then
             rm ./build/bin/Release/*.pdb
           fi
-          export VERSION=${GITHUB_REF:10}
-          echo ::set-env name=VERSION::$VERSION
-          7z a vvctre-$VERSION-${{runner.os}}.7z ./build/bin/Release/*
+          7z a vvctre-${{github.event.client_payload.version}}-${{runner.os}}.7z ./build/bin/Release/*
       - name: Prepare to upload (pull request)
         if: github.event_name == 'pull_request'
         shell: bash
@@ -59,7 +57,7 @@ jobs:
         with:
           url: ${{secrets.DISCORD_WEBHOOK}}
           forms: '{}'
-          fileForms: '{"file": "vvctre-${{env.VERSION}}-${{runner.os}}.7z"}'
+          fileForms: '{"file": "vvctre-${{github.event.client_payload.version}}-${{runner.os}}.7z"}'
       - name: Upload (pull request)
         if: github.event_name == 'pull_request'
         uses: actions/upload-artifact@v1
