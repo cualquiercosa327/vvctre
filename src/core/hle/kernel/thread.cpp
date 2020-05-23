@@ -22,6 +22,7 @@
 #include "core/hle/kernel/thread.h"
 #include "core/hle/result.h"
 #include "core/memory.h"
+#include "core/settings.h"
 
 namespace Kernel {
 
