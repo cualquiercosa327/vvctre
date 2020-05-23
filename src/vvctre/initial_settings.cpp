@@ -2575,6 +2575,11 @@ void InitialSettings::Run() {
                     ImGui::EndTabItem();
                 }
 
+                                if (ImGui::BeginTabItem("Hacks")) {
+ImGui::Checkbox("Priority Boost", &Settings::values.enable_priority_boost);
+                    ImGui::EndTabItem();
+                }
+
                 plugin_manager.AddTabs();
 
                 ImGui::EndTabBar();

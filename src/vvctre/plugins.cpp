@@ -1667,6 +1667,15 @@ void* vvctre_get_cfg_module(void* core) {
     }
 }
 
+// Hacks Settings
+void vvctre_settings_set_enable_priority_boost(bool value) {
+    Settings::values.enable_priority_boost = value;
+}
+
+bool vvctre_settings_get_enable_priority_boost() {
+    return Settings::values.enable_priority_boost;
+}
+
 // Other
 const char* vvctre_get_version() {
     return fmt::format("{}.{}.{}", vvctre_version_major, vvctre_version_minor, vvctre_version_patch)
@@ -2054,6 +2063,11 @@ std::unordered_map<std::string, void*> PluginManager::function_map = {
     {"vvctre_settings_set_use_lle_module", (void*)&vvctre_settings_set_use_lle_module},
     {"vvctre_settings_get_use_lle_module", (void*)&vvctre_settings_get_use_lle_module},
     {"vvctre_get_cfg_module", (void*)&vvctre_get_cfg_module},
+    // Hacks Settings
+    {"vvctre_settings_set_enable_priority_boost",
+     (void*)&vvctre_settings_set_enable_priority_boost},
+    {"vvctre_settings_get_enable_priority_boost",
+     (void*)&vvctre_settings_get_enable_priority_boost},
     // Other
     {"vvctre_get_version", (void*)&vvctre_get_version},
     {"vvctre_get_version_major", (void*)&vvctre_get_version_major},

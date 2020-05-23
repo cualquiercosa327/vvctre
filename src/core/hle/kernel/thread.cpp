@@ -450,7 +450,9 @@ void ThreadManager::PriorityBoostStarvedThreads() {
 }
 
 void ThreadManager::Reschedule() {
-    PriorityBoostStarvedThreads();
+    if (Settings::values.enable_priority_boost) {
+        PriorityBoostStarvedThreads();
+    }
 
     Thread* cur = GetCurrentThread();
     Thread* next = PopNextReadyThread();

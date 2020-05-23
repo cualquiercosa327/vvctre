@@ -275,6 +275,9 @@ struct Values {
         {"PDN", false},
         {"SPI", false},
     };
+
+    // Hacks
+    bool enable_priority_boost = true;
 } extern values;
 
 void Apply();

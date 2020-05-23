@@ -18,7 +18,7 @@
 
 namespace Settings {
 
-Values values = {};
+Values values;
 
 void Apply() {
     GDBStub::SetServerPort(values.gdbstub_port);
