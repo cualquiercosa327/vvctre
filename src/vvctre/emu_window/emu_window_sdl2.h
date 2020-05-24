@@ -22,7 +22,8 @@ class System;
 
 class EmuWindow_SDL2 : public Frontend::EmuWindow {
 public:
-    explicit EmuWindow_SDL2(Core::System& system, PluginManager& plugin_manager);
+    explicit EmuWindow_SDL2(Core::System& system, PluginManager& plugin_manager,
+                            SDL_Window* window);
     ~EmuWindow_SDL2();
 
     /// Swap buffers to display the next frame
@@ -30,12 +31,6 @@ public:
 
     /// Polls window events
     void PollEvents() override;
-
-    /// Makes the graphics context current for the caller thread
-    void MakeCurrent() override;
-
-    /// Releases the GL context from the caller thread
-    void DoneCurrent() override;
 
     /// Whether the window is still open, and a close request hasn't yet been sent
     bool IsOpen() const;
@@ -84,16 +79,9 @@ private:
     /// Called when Tools -> Copy Screenshot is clicked
     void CopyScreenshot();
 
-    /// Is the window still open?
+    /// Window
     bool is_open = true;
-
-    /// Internal SDL2 render window
-    SDL_Window* render_window = nullptr;
-
-    using SDL_GLContext = void*;
-
-    /// The OpenGL context associated with the window
-    SDL_GLContext gl_context;
+    SDL_Window* window = nullptr;
 
     Core::System& system;
     ImVec4 fps_color{0.0f, 1.0f, 0.0f, 1.0f}; // Green

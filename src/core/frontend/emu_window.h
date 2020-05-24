@@ -31,12 +31,6 @@ public:
     /// Polls window events
     virtual void PollEvents() = 0;
 
-    /// Makes the graphics context current for the caller thread
-    virtual void MakeCurrent() = 0;
-
-    /// Releases (dunno if this is the "right" word) the GLFW context from the caller thread
-    virtual void DoneCurrent() = 0;
-
     /**
      * Signal that a touch pressed event has occurred (e.g. mouse click pressed)
      * @param framebuffer_x Framebuffer x-coordinate that was pressed

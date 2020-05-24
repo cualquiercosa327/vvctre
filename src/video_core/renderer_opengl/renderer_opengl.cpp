@@ -200,8 +200,6 @@ static void APIENTRY DebugHandler(GLenum source, GLenum type, GLuint id, GLenum 
 }
 
 RendererOpenGL::RendererOpenGL(Frontend::EmuWindow& window) : RendererBase{window} {
-    render_window.MakeCurrent();
-
     if (GLAD_GL_KHR_debug) {
         glEnable(GL_DEBUG_OUTPUT);
         glDebugMessageCallback(DebugHandler, nullptr);

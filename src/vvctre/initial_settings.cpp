@@ -8,7 +8,6 @@
 #define SDL_MAIN_HANDLED
 #include <SDL.h>
 #include <fmt/format.h>
-#include <glad/glad.h>
 #include <imgui.h>
 #include <imgui_impl_opengl3.h>
 #include <imgui_impl_sdl.h>
@@ -37,47 +36,7 @@
 #include "vvctre/initial_settings.h"
 #include "vvctre/plugins.h"
 
-InitialSettings::InitialSettings(PluginManager& plugin_manager) : plugin_manager(plugin_manager) {
-    const std::string window_title =
-        fmt::format("vvctre {}.{}.{} - Initial Settings", vvctre_version_major,
-                    vvctre_version_minor, vvctre_version_patch);
-
-    render_window = SDL_CreateWindow(
-        window_title.c_str(),
-        SDL_WINDOWPOS_UNDEFINED, // x position
-        SDL_WINDOWPOS_UNDEFINED, // y position
-        640, 480, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
-
-    if (render_window == nullptr) {
-        pfd::message("vvctre", fmt::format("Failed to create window: {}", SDL_GetError()),
-                     pfd::choice::ok, pfd::icon::error);
-        std::exit(-1);
-    }
-
-    SDL_SetWindowMinimumSize(render_window, 640, 480);
-
-    gl_context = SDL_GL_CreateContext(render_window);
-    if (gl_context == nullptr) {
-        pfd::message("vvctre", fmt::format("Failed to create OpenGL context: {}", SDL_GetError()),
-                     pfd::choice::ok, pfd::icon::error);
-        std::exit(-1);
-    }
-
-    if (!gladLoadGLLoader(static_cast<GLADloadproc>(SDL_GL_GetProcAddress))) {
-        pfd::message("vvctre", fmt::format("Failed to initialize OpenGL: {}", SDL_GetError()),
-                     pfd::choice::ok, pfd::icon::error);
-        std::exit(-1);
-    }
-
-    SDL_GL_SetSwapInterval(1);
-
-    SDL_PumpEvents();
-
-    ImGui_ImplSDL2_InitForOpenGL(render_window, gl_context);
-    ImGui_ImplOpenGL3_Init("#version 330 core");
-}
-
-void InitialSettings::Run() {
+InitialSettings::InitialSettings(PluginManager& plugin_manager, SDL_Window* window) {
     SDL_Event event;
     std::shared_ptr<Service::CFG::Module> cfg = std::make_shared<Service::CFG::Module>();
 
@@ -94,7 +53,7 @@ void InitialSettings::Run() {
 
         // Draw window
         ImGui_ImplOpenGL3_NewFrame();
-        ImGui_ImplSDL2_NewFrame(render_window);
+        ImGui_ImplSDL2_NewFrame(window);
         ImGui::NewFrame();
         ImGuiIO& io = ImGui::GetIO();
         if (ImGui::Begin("Initial Settings", nullptr,
@@ -147,7 +106,7 @@ void InitialSettings::Run() {
 
                                     // Draw window
                                     ImGui_ImplOpenGL3_NewFrame();
-                                    ImGui_ImplSDL2_NewFrame(render_window);
+                                    ImGui_ImplSDL2_NewFrame(window);
                                     ImGui::NewFrame();
 
                                     ImGui::OpenPopup("Installing CIA");
@@ -166,7 +125,7 @@ void InitialSettings::Run() {
                                     glClear(GL_COLOR_BUFFER_BIT);
                                     ImGui::Render();
                                     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-                                    SDL_GL_SwapWindow(render_window);
+                                    SDL_GL_SwapWindow(window);
                                 });
 
                             switch (status) {
@@ -2638,13 +2597,6 @@ void InitialSettings::Run() {
         glClear(GL_COLOR_BUFFER_BIT);
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-        SDL_GL_SwapWindow(render_window);
+        SDL_GL_SwapWindow(window);
     }
-}
-
-InitialSettings::~InitialSettings() {
-    ImGui_ImplOpenGL3_Shutdown();
-    ImGui_ImplSDL2_Shutdown();
-    SDL_GL_DeleteContext(gl_context);
-    SDL_DestroyWindow(render_window);
 }

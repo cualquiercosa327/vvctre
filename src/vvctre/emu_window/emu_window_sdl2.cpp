@@ -9,7 +9,6 @@
 #include <SDL.h>
 #include <clip.h>
 #include <fmt/format.h>
-#include <glad/glad.h>
 #include <imgui.h>
 #include <imgui_impl_opengl3.h>
 #include <imgui_impl_sdl.h>
@@ -87,7 +86,7 @@ void EmuWindow_SDL2::OnMouseButton(u32 button, u8 state, s32 x, s32 y) {
 
 std::pair<unsigned, unsigned> EmuWindow_SDL2::TouchToPixelPos(float touch_x, float touch_y) const {
     int w, h;
-    SDL_GetWindowSize(render_window, &w, &h);
+    SDL_GetWindowSize(window, &w, &h);
 
     touch_x *= w;
     touch_y *= h;
@@ -132,54 +131,32 @@ void EmuWindow_SDL2::Close() {
 
 void EmuWindow_SDL2::OnResize() {
     int width, height;
-    SDL_GetWindowSize(render_window, &width, &height);
+    SDL_GetWindowSize(window, &width, &height);
     UpdateCurrentFramebufferLayout(width, height);
 }
 
 void EmuWindow_SDL2::ToggleFullscreen() {
-    if (SDL_GetWindowFlags(render_window) & SDL_WINDOW_FULLSCREEN_DESKTOP) {
-        SDL_SetWindowFullscreen(render_window, 0);
+    if (SDL_GetWindowFlags(window) & SDL_WINDOW_FULLSCREEN_DESKTOP) {
+        SDL_SetWindowFullscreen(window, 0);
     } else {
-        SDL_SetWindowFullscreen(render_window, SDL_WINDOW_FULLSCREEN_DESKTOP);
+        SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN_DESKTOP);
     }
 }
 
-EmuWindow_SDL2::EmuWindow_SDL2(Core::System& system, PluginManager& plugin_manager)
-    : system(system), plugin_manager(plugin_manager) {
-    const std::string window_title = fmt::format("vvctre {}.{}.{}", vvctre_version_major,
-                                                 vvctre_version_minor, vvctre_version_patch);
-
-    render_window =
-        SDL_CreateWindow(window_title.c_str(),
-                         SDL_WINDOWPOS_UNDEFINED, // x position
-                         SDL_WINDOWPOS_UNDEFINED, // y position
-                         Core::kScreenTopWidth, Core::kScreenTopHeight + Core::kScreenBottomHeight,
-                         SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
-
-    if (render_window == nullptr) {
-        pfd::message("vvctre", fmt::format("Failed to create window: {}", SDL_GetError()),
-                     pfd::choice::ok, pfd::icon::error);
-        std::exit(1);
-    }
+EmuWindow_SDL2::EmuWindow_SDL2(Core::System& system, PluginManager& plugin_manager,
+                               SDL_Window* window)
+    : system(system), plugin_manager(plugin_manager), window(window) {
+    SDL_SetWindowTitle(window, fmt::format("vvctre {}.{}.{}", vvctre_version_major,
+                                           vvctre_version_minor, vvctre_version_patch)
+                                   .c_str());
 
     if (Settings::values.start_in_fullscreen_mode) {
         ToggleFullscreen();
     } else {
-        SDL_SetWindowMinimumSize(render_window, Core::kScreenTopWidth,
+        SDL_SetWindowMinimumSize(window, Core::kScreenTopWidth,
                                  Core::kScreenTopHeight + Core::kScreenBottomHeight);
-    }
-
-    gl_context = SDL_GL_CreateContext(render_window);
-    if (gl_context == nullptr) {
-        pfd::message("vvctre", fmt::format("Failed to create OpenGL context: {}", SDL_GetError()),
-                     pfd::choice::ok, pfd::icon::error);
-        std::exit(1);
-    }
-
-    if (!gladLoadGLLoader(static_cast<GLADloadproc>(SDL_GL_GetProcAddress))) {
-        pfd::message("vvctre", fmt::format("Failed to initialize OpenGL: {}", SDL_GetError()),
-                     pfd::choice::ok, pfd::icon::error);
-        std::exit(1);
+        SDL_SetWindowSize(window, Core::kScreenTopWidth,
+                          Core::kScreenTopHeight + Core::kScreenBottomHeight);
     }
 
     SDL_GL_SetSwapInterval(Settings::values.enable_vsync ? 1 : 0);
@@ -189,24 +166,15 @@ EmuWindow_SDL2::EmuWindow_SDL2(Core::System& system, PluginManager& plugin_manag
     LOG_INFO(Frontend, "Version: {}.{}.{}", vvctre_version_major, vvctre_version_minor,
              vvctre_version_patch);
     LOG_INFO(Frontend, "Movie version: {}", Core::MovieVersion);
-
-    ImGui_ImplSDL2_InitForOpenGL(render_window, gl_context);
-    ImGui_ImplOpenGL3_Init("#version 330 core");
-
-    DoneCurrent();
 }
 
 EmuWindow_SDL2::~EmuWindow_SDL2() {
-    InputCommon::Shutdown();
-    ImGui_ImplOpenGL3_Shutdown();
-    ImGui_ImplSDL2_Shutdown();
-    SDL_GL_DeleteContext(gl_context);
     SDL_Quit();
 }
 
 void EmuWindow_SDL2::SwapBuffers() {
     ImGui_ImplOpenGL3_NewFrame();
-    ImGui_ImplSDL2_NewFrame(render_window);
+    ImGui_ImplSDL2_NewFrame(window);
     ImGui::NewFrame();
     ImGuiIO& io = ImGui::GetIO();
 
@@ -263,7 +231,7 @@ void EmuWindow_SDL2::SwapBuffers() {
 
                                     // Draw window
                                     ImGui_ImplOpenGL3_NewFrame();
-                                    ImGui_ImplSDL2_NewFrame(render_window);
+                                    ImGui_ImplSDL2_NewFrame(window);
                                     ImGui::NewFrame();
 
                                     ImGui::OpenPopup("Installing CIA");
@@ -282,7 +250,7 @@ void EmuWindow_SDL2::SwapBuffers() {
                                     glClear(GL_COLOR_BUFFER_BIT);
                                     ImGui::Render();
                                     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-                                    SDL_GL_SwapWindow(render_window);
+                                    SDL_GL_SwapWindow(window);
                                 });
 
                             switch (status) {
@@ -2063,7 +2031,7 @@ void EmuWindow_SDL2::SwapBuffers() {
 
                 ImGui::Checkbox("Cheats", &show_cheats_window);
 
-                bool fullscreen = SDL_GetWindowFlags(render_window) & SDL_WINDOW_FULLSCREEN_DESKTOP;
+                bool fullscreen = SDL_GetWindowFlags(window) & SDL_WINDOW_FULLSCREEN_DESKTOP;
                 if (ImGui::Checkbox("Fullscreen", &fullscreen)) {
                     ToggleFullscreen();
                 }
@@ -2528,7 +2496,7 @@ void EmuWindow_SDL2::SwapBuffers() {
 
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-    SDL_GL_SwapWindow(render_window);
+    SDL_GL_SwapWindow(window);
 
     plugin_manager.AfterSwapWindow();
 }
@@ -2621,14 +2589,6 @@ void EmuWindow_SDL2::PollEvents() {
             break;
         }
     }
-}
-
-void EmuWindow_SDL2::MakeCurrent() {
-    SDL_GL_MakeCurrent(render_window, gl_context);
-}
-
-void EmuWindow_SDL2::DoneCurrent() {
-    SDL_GL_MakeCurrent(render_window, nullptr);
 }
 
 void EmuWindow_SDL2::CopyScreenshot() {

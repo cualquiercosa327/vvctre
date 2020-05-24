@@ -18,7 +18,11 @@
 
 #define SDL_MAIN_HANDLED
 #include <SDL.h>
+#include <fmt/format.h>
+#include <glad/glad.h>
 #include <imgui.h>
+#include <imgui_impl_opengl3.h>
+#include <imgui_impl_sdl.h>
 #include <portable-file-dialogs.h>
 #include "common/file_util.h"
 #include "common/logging/backend.h"
@@ -64,7 +68,6 @@ static void InitializeLogging() {
 }
 
 int main(int argc, char** argv) {
-    // Initialize SDL
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_JOYSTICK) < 0) {
         std::cerr << "Failed to initialize SDL2! Exiting..." << std::endl;
         std::exit(1);
@@ -85,6 +88,33 @@ int main(int argc, char** argv) {
     Core::System& system = Core::System::GetInstance();
     PluginManager plugin_manager(static_cast<void*>(&system));
 
+    SDL_Window* window = SDL_CreateWindow(
+        fmt::format("vvctre {}.{}.{} - Initial Settings", vvctre_version_major,
+                    vvctre_version_minor, vvctre_version_patch)
+            .c_str(),
+        SDL_WINDOWPOS_UNDEFINED, // x position
+        SDL_WINDOWPOS_UNDEFINED, // y position
+        640, 480, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
+    if (window == nullptr) {
+        pfd::message("vvctre", fmt::format("Failed to create window: {}", SDL_GetError()),
+                     pfd::choice::ok, pfd::icon::error);
+        std::exit(-1);
+    }
+    SDL_SetWindowMinimumSize(window, 640, 480);
+    SDL_GLContext context = SDL_GL_CreateContext(window);
+    if (context == nullptr) {
+        pfd::message("vvctre", fmt::format("Failed to create OpenGL context: {}", SDL_GetError()),
+                     pfd::choice::ok, pfd::icon::error);
+        std::exit(-1);
+    }
+    if (!gladLoadGLLoader(static_cast<GLADloadproc>(SDL_GL_GetProcAddress))) {
+        pfd::message("vvctre", fmt::format("Failed to initialize OpenGL: {}", SDL_GetError()),
+                     pfd::choice::ok, pfd::icon::error);
+        std::exit(-1);
+    }
+    SDL_GL_SetSwapInterval(1);
+    SDL_PumpEvents();
+
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
     ImGui::StyleColorsDark();
@@ -95,10 +125,12 @@ int main(int argc, char** argv) {
     ImGui::GetStyle().GrabRounding = 0.0f;
     ImGui::GetStyle().PopupRounding = 0.0f;
     ImGui::GetStyle().ScrollbarRounding = 0.0f;
+    ImGui_ImplSDL2_InitForOpenGL(window, context);
+    ImGui_ImplOpenGL3_Init("#version 330 core");
 
     plugin_manager.InitialSettingsOpening();
     if (argc < 2) {
-        InitialSettings(plugin_manager).Run();
+        InitialSettings(plugin_manager, window);
     } else {
         Settings::values.file_path = std::string(argv[1]);
         Settings::values.start_in_fullscreen_mode = true;
@@ -117,7 +149,7 @@ int main(int argc, char** argv) {
     }
 
     std::unique_ptr<EmuWindow_SDL2> emu_window =
-        std::make_unique<EmuWindow_SDL2>(system, plugin_manager);
+        std::make_unique<EmuWindow_SDL2>(system, plugin_manager, window);
 
     // Register frontend applets
     system.RegisterSoftwareKeyboard(std::make_shared<Frontend::SDL2_SoftwareKeyboard>(*emu_window));
@@ -197,6 +229,12 @@ int main(int argc, char** argv) {
     Core::Movie::GetInstance().Shutdown();
     system.Shutdown();
     plugin_manager.EmulatorClosing();
+    SDL_GL_MakeCurrent(window, nullptr);
+    InputCommon::Shutdown();
+    ImGui_ImplOpenGL3_Shutdown();
+    ImGui_ImplSDL2_Shutdown();
+    SDL_GL_DeleteContext(context);
+    SDL_DestroyWindow(window);
 
     return 0;
 }
