@@ -19,7 +19,8 @@ NIM_U::NIM_U(Core::System& system) : ServiceFramework("nim:u", 2) {
         {0x000A0000, nullptr, "GetState"},
         {0x000B0000, nullptr, "GetSystemTitleHash"},
         {0x00110000, &NIM_U::Unknown, "Unknown"},
-        {0x00170042, &NIM_U::Unknown2, "Unknown"},
+        {0x00170042, &NIM_U::Unknown2, "Unknown2"},
+        {0x000F0042, &NIM_U::Unknown3, "Unknown3"},
     };
     RegisterHandlers(functions);
 
@@ -60,6 +61,12 @@ void NIM_U::Unknown(Kernel::HLERequestContext& ctx) {
 
 void NIM_U::Unknown2(Kernel::HLERequestContext& ctx) {
     IPC::RequestBuilder rb(ctx, 0x17, 2, 0);
+    rb.Push(RESULT_SUCCESS);
+    rb.Push(0);
+}
+
+void NIM_U::Unknown3(Kernel::HLERequestContext& ctx) {
+    IPC::RequestBuilder rb(ctx, 0x0F, 2, 0);
     rb.Push(RESULT_SUCCESS);
     rb.Push(0);
 }
