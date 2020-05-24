@@ -2,6 +2,7 @@
 // Licensed under GPLv2 or any later version
 // Refer to the license.txt file included.
 
+#include <algorithm>
 #include <atomic>
 #include <LUrlParser.h>
 #include <cryptopp/aes.h>
@@ -117,8 +118,8 @@ void Context::MakeRequest() {
         switch (d.type) {
         case PostData::Type::Binary:
         case PostData::Type::Ascii:
-            request.body += httplib::detail::encode_url(fmt::format(
-                "{}={}", request.body.empty() ? fmt::format("&{}", d.name) : d.name, d.value));
+            request.body += fmt::format("{}={}&", httplib::detail::encode_url(d.name),
+                                        httplib::detail::encode_url(d.value));
             break;
         case PostData::Type::Raw:
             request.body = d.value;
@@ -126,6 +127,13 @@ void Context::MakeRequest() {
         default:
             break;
         }
+    }
+    if (std::any_of(post_data.cbegin(), post_data.cend(),
+                    [](const Service::HTTP::Context::PostData& d) {
+                        return d.type == Service::HTTP::Context::PostData::Type::Ascii ||
+                               d.type == Service::HTTP::Context::PostData::Type::Binary;
+                    })) {
+        request.body.pop_back();
     }
     request.progress = [this](u64 current, u64 total) -> bool {
         // TODO(B3N30): Is there a state that shows response header are available
