@@ -132,12 +132,45 @@ void InitialSettings::Run() {
                                 .result();
 
                         for (const auto& file : files) {
-                            const Service::AM::InstallStatus status = Service::AM::InstallCIA(file);
+                            const Service::AM::InstallStatus status = Service::AM::InstallCIA(
+                                file, [&](std::size_t current, std::size_t total) {
+                                    // Poll events
+                                    while (SDL_PollEvent(&event)) {
+                                        ImGui_ImplSDL2_ProcessEvent(&event);
+
+                                        if (event.type == SDL_QUIT ||
+                                            (event.type == SDL_WINDOWEVENT &&
+                                             event.window.event == SDL_WINDOWEVENT_CLOSE)) {
+                                            std::exit(1);
+                                        }
+                                    }
+
+                                    // Draw window
+                                    ImGui_ImplOpenGL3_NewFrame();
+                                    ImGui_ImplSDL2_NewFrame(render_window);
+                                    ImGui::NewFrame();
+
+                                    ImGui::OpenPopup("Installing CIA");
+
+                                    if (ImGui::BeginPopupModal(
+                                            "Installing CIA", nullptr,
+                                            ImGuiWindowFlags_NoSavedSettings |
+                                                ImGuiWindowFlags_AlwaysAutoResize)) {
+                                        ImGui::Text("Installing %s", file.c_str());
+                                        ImGui::ProgressBar(static_cast<float>(current) /
+                                                           static_cast<float>(total));
+                                        ImGui::EndPopup();
+                                    }
+
+                                    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+                                    glClear(GL_COLOR_BUFFER_BIT);
+                                    ImGui::Render();
+                                    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+                                    SDL_GL_SwapWindow(render_window);
+                                });
 
                             switch (status) {
                             case Service::AM::InstallStatus::Success:
-                                pfd::message("vvctre", fmt::format("{} installed", file),
-                                             pfd::choice::ok);
                                 break;
                             case Service::AM::InstallStatus::ErrorFailedToOpenFile:
                                 pfd::message("vvctre", fmt::format("Failed to open {}", file),
@@ -161,6 +194,8 @@ void InitialSettings::Run() {
                                 break;
                             }
                         }
+
+                        continue;
                     }
 
                     ImGui::SameLine();
@@ -2575,8 +2610,8 @@ void InitialSettings::Run() {
                     ImGui::EndTabItem();
                 }
 
-                                if (ImGui::BeginTabItem("Hacks")) {
-ImGui::Checkbox("Priority Boost", &Settings::values.enable_priority_boost);
+                if (ImGui::BeginTabItem("Hacks")) {
+                    ImGui::Checkbox("Priority Boost", &Settings::values.enable_priority_boost);
                     ImGui::EndTabItem();
                 }
 
