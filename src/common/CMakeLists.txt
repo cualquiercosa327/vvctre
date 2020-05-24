@@ -31,7 +31,6 @@ add_library(common STATIC
     swap.h
     texture.cpp
     texture.h
-    thread.cpp
     thread.h
     thread_queue_list.h
     threadsafe_queue.h

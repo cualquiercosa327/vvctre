@@ -256,22 +256,4 @@ ResultStatus AppLoader_NCCH::ReadUpdateRomFS(std::shared_ptr<FileSys::RomFSReade
     return ResultStatus::Success;
 }
 
-ResultStatus AppLoader_NCCH::ReadTitle(std::string& title) {
-    std::vector<u8> data;
-    Loader::SMDH smdh;
-    ReadIcon(data);
-
-    if (!Loader::IsValidSMDH(data)) {
-        return ResultStatus::ErrorInvalidFormat;
-    }
-
-    memcpy(&smdh, data.data(), sizeof(Loader::SMDH));
-
-    const auto& short_title = smdh.GetShortTitle(SMDH::TitleLanguage::English);
-    auto title_end = std::find(short_title.begin(), short_title.end(), u'\0');
-    title = Common::UTF16ToUTF8(std::u16string{short_title.begin(), title_end});
-
-    return ResultStatus::Success;
-}
-
 } // namespace Loader

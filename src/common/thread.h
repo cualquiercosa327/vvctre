@@ -91,6 +91,4 @@ private:
     std::size_t generation = 0; // Incremented once each time the barrier is used
 };
 
-void SetCurrentThreadName(const char* name);
-
 } // namespace Common
