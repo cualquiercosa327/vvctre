@@ -426,6 +426,8 @@ add_library(core STATIC
     settings.h
 )
 
+create_target_directory_groups(core)
+
 get_directory_property(OPENSSL_LIBS
     DIRECTORY ${PROJECT_SOURCE_DIR}/externals/libressl
     DEFINITION OPENSSL_LIBS)

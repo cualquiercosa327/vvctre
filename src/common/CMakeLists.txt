@@ -37,6 +37,8 @@ add_library(common STATIC
     vector_math.h
 )
 
+create_target_directory_groups(common)
+
 if(UNIX)
     target_sources(common PRIVATE fastmem_mapper_posix.cpp)
 else()

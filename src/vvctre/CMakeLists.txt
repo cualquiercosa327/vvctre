@@ -24,6 +24,8 @@ add_executable(vvctre
     plugins.h
 )
 
+create_target_directory_groups(vvctre)
+
 get_directory_property(OPENSSL_LIBS
     DIRECTORY ${PROJECT_SOURCE_DIR}/externals/libressl
     DEFINITION OPENSSL_LIBS)

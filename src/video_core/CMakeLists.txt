@@ -87,6 +87,8 @@ add_library(video_core STATIC
     video_core.h
 )
 
+create_target_directory_groups(video_core)
+
 if(ARCHITECTURE_x86_64)
     target_sources(video_core
         PRIVATE
