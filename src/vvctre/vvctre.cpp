@@ -128,9 +128,11 @@ int main(int argc, char** argv) {
     Core::System& system = Core::System::GetInstance();
     PluginManager plugin_manager(system, window);
 
+    std::shared_ptr<Service::CFG::Module> cfg = std::make_shared<Service::CFG::Module>();
+    plugin_manager.cfg = cfg.get();
     plugin_manager.InitialSettingsOpening();
     if (argc < 2) {
-        InitialSettings(plugin_manager, window);
+        InitialSettings(plugin_manager, window, *cfg);
     } else {
         Settings::values.file_path = std::string(argv[1]);
         Settings::values.start_in_fullscreen_mode = true;
@@ -159,6 +161,8 @@ int main(int argc, char** argv) {
     Camera::RegisterFactory("image", std::make_unique<Camera::ImageCameraFactory>());
 
     plugin_manager.BeforeLoading();
+    cfg.reset();
+    plugin_manager.cfg = nullptr;
 
     const Core::System::ResultStatus load_result =
         system.Load(*emu_window, Settings::values.file_path);

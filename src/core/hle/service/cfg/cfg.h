@@ -97,6 +97,9 @@ public:
     Module();
     ~Module();
 
+    void SetSystemModel(SystemModel model);
+    SystemModel GetSystemModel();
+
     class Interface : public ServiceFramework<Interface> {
     public:
         Interface(std::shared_ptr<Module> cfg, const char* name, u32 max_session);

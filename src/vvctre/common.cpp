@@ -5,6 +5,6 @@
 
 #include "vvctre/common.h"
 
-const u8 vvctre_version_major = 32;
-const u8 vvctre_version_minor = 5;
+const u8 vvctre_version_major = 33;
+const u8 vvctre_version_minor = 0;
 const u8 vvctre_version_patch = 0;

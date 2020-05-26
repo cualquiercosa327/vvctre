@@ -227,6 +227,17 @@ void Module::Interface::GetRegionCanadaUSA(Kernel::HLERequestContext& ctx) {
     }
 }
 
+void Module::SetSystemModel(SystemModel model) {
+    ConsoleModelInfo info = {static_cast<u8>(model), {0, 0, 0}};
+    SetConfigInfoBlock(ConsoleModelBlockID, 4, 0x8, &info);
+}
+
+SystemModel Module::GetSystemModel() {
+    ConsoleModelInfo info;
+    GetConfigInfoBlock(ConsoleModelBlockID, 4, 0x8, &info);
+    return static_cast<SystemModel>(info.model);
+}
+
 void Module::Interface::GetSystemModel(Kernel::HLERequestContext& ctx) {
     IPC::RequestParser rp(ctx, 0x05, 0, 0);
     IPC::RequestBuilder rb = rp.MakeBuilder(2, 0);
@@ -234,10 +245,6 @@ void Module::Interface::GetSystemModel(Kernel::HLERequestContext& ctx) {
 
     // TODO(Subv): Find out the correct error codes
     rb.Push(cfg->GetConfigInfoBlock(ConsoleModelBlockID, 4, 0x8, reinterpret_cast<u8*>(&data)));
-    ConsoleModelInfo model;
-    std::memcpy(&model, &data, 4);
-    model.model = NINTENDO_3DS;
-    std::memcpy(&data, &model, 4);
     rb.Push<u8>(data & 0xFF);
 }
 

@@ -60,7 +60,8 @@ public:
 
     // Functions for plugins use these
     bool paused = false;
-    SDL_Window* window;
+    SDL_Window* window = nullptr;
+    void* cfg = nullptr;
 
 private:
     struct Plugin {

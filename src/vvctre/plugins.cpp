@@ -1370,6 +1370,15 @@ u64 vvctre_settings_get_console_id(void* cfg) {
     return static_cast<Service::CFG::Module*>(cfg)->GetConsoleUniqueId();
 }
 
+void vvctre_settings_set_console_model(void* cfg, u8 value) {
+    static_cast<Service::CFG::Module*>(cfg)->SetSystemModel(
+        static_cast<Service::CFG::SystemModel>(value));
+}
+
+u8 vvctre_settings_get_console_model(void* cfg) {
+    return static_cast<u8>(static_cast<Service::CFG::Module*>(cfg)->GetSystemModel());
+}
+
 void vvctre_settings_set_eula_version(void* cfg, u8 minor, u8 major) {
     static_cast<Service::CFG::Module*>(cfg)->SetEULAVersion(
         Service::CFG::EULAVersion{minor, major});
@@ -1701,12 +1710,12 @@ bool vvctre_settings_get_use_lle_module(const char* name) {
     return Settings::values.lle_modules[std::string(name)];
 }
 
-void* vvctre_get_cfg_module(void* core) {
-    Core::System* system = static_cast<Core::System*>(core);
-    if (system->IsPoweredOn()) {
-        return Service::CFG::GetModule(*system).get();
+void* vvctre_get_cfg_module(void* core, void* plugin_manager) {
+    PluginManager* pm = static_cast<PluginManager*>(plugin_manager);
+    if (pm->cfg == nullptr) {
+        return Service::CFG::GetModule(*static_cast<Core::System*>(core)).get();
     } else {
-        return new Service::CFG::Module();
+        return pm->cfg;
     }
 }
 
@@ -1998,6 +2007,8 @@ std::unordered_map<std::string, void*> PluginManager::function_map = {
     {"vvctre_settings_get_country", (void*)&vvctre_settings_get_country},
     {"vvctre_settings_set_console_id", (void*)&vvctre_settings_set_console_id},
     {"vvctre_settings_get_console_id", (void*)&vvctre_settings_get_console_id},
+    {"vvctre_settings_set_console_model", (void*)&vvctre_settings_set_console_model},
+    {"vvctre_settings_get_console_model", (void*)&vvctre_settings_get_console_model},
     {"vvctre_settings_set_eula_version", (void*)&vvctre_settings_set_eula_version},
     {"vvctre_settings_get_eula_version", (void*)&vvctre_settings_get_eula_version},
     {"vvctre_settings_write_config_savegame", (void*)&vvctre_settings_write_config_savegame},
