@@ -14,6 +14,12 @@
 #include <windows.h>
 #endif
 
+namespace Core {
+class System;
+} // namespace Core
+
+struct SDL_Window;
+
 namespace PluginImportedFunctions {
 using GetRequiredFunctionCount = int (*)();                                         // required
 using GetRequiredFunctionNames = const char** (*)();                                // required
@@ -34,10 +40,10 @@ using Log = Log::FunctionLogger::Function;                                      
 
 class PluginManager {
 public:
-    explicit PluginManager(void* core);
+    explicit PluginManager(Core::System& core, SDL_Window* window);
     ~PluginManager();
 
-    // Calls the plugin exported functions
+    // Calls the exported functions of all plugins
     void InitialSettingsOpening();
     void InitialSettingsOkPressed();
     void BeforeLoading();
@@ -52,8 +58,9 @@ public:
     void DeleteButtonDevice(void* device);
     void CallScreenshotCallbacks(void* data);
 
-    // Plugins can change this
+    // Functions for plugins use these
     bool paused = false;
+    SDL_Window* window;
 
 private:
     struct Plugin {

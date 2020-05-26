@@ -4,6 +4,8 @@
 
 #include <cstdlib>
 #include <utility>
+#define SDL_MAIN_HANDLED
+#include <SDL.h>
 #include <fmt/format.h>
 #include <imgui.h>
 #include <nlohmann/json.hpp>
@@ -44,7 +46,7 @@ bool has_suffix(const std::string& str, const std::string& suffix) {
            str.compare(str.size() - suffix.size(), suffix.size(), suffix) == 0;
 }
 
-PluginManager::PluginManager(void* core) {
+PluginManager::PluginManager(Core::System& core, SDL_Window* window) : window(window) {
     FileUtil::FSTEntry parent;
     FileUtil::ScanDirectoryTree(
 #ifdef _WIN32
@@ -118,7 +120,8 @@ PluginManager::PluginManager(void* core) {
                         required_functions[i] =
                             function_map[std::string(required_function_names[i])];
                     }
-                    PluginLoaded(core, static_cast<void*>(this), required_functions.data());
+                    PluginLoaded(static_cast<void*>(&core), static_cast<void*>(this),
+                                 required_functions.data());
 
                     plugins.push_back(std::move(plugin));
                     fmt::print("Plugin {} loaded\n", entry.virtualName);
@@ -759,6 +762,46 @@ bool vvctre_gui_slider_double(const char* label, double* value, const double min
 
 void vvctre_gui_set_color(int index, float r, float g, float b, float a) {
     ImGui::GetStyle().Colors[index] = ImVec4(r, g, b, a);
+}
+
+void vvctre_set_os_window_size(void* plugin_manager, int width, int height) {
+    SDL_SetWindowSize(static_cast<PluginManager*>(plugin_manager)->window, width, height);
+}
+
+void vvctre_get_os_window_size(void* plugin_manager, int* width, int* height) {
+    SDL_GetWindowSize(static_cast<PluginManager*>(plugin_manager)->window, width, height);
+}
+
+void vvctre_set_os_window_minimum_size(void* plugin_manager, int width, int height) {
+    SDL_SetWindowMinimumSize(static_cast<PluginManager*>(plugin_manager)->window, width, height);
+}
+
+void vvctre_get_os_window_minimum_size(void* plugin_manager, int* width, int* height) {
+    SDL_GetWindowMinimumSize(static_cast<PluginManager*>(plugin_manager)->window, width, height);
+}
+
+void vvctre_set_os_window_maximum_size(void* plugin_manager, int width, int height) {
+    SDL_SetWindowMaximumSize(static_cast<PluginManager*>(plugin_manager)->window, width, height);
+}
+
+void vvctre_get_os_window_maximum_size(void* plugin_manager, int* width, int* height) {
+    SDL_GetWindowMaximumSize(static_cast<PluginManager*>(plugin_manager)->window, width, height);
+}
+
+void vvctre_set_os_window_position(void* plugin_manager, int x, int y) {
+    SDL_SetWindowPosition(static_cast<PluginManager*>(plugin_manager)->window, x, y);
+}
+
+void vvctre_get_os_window_position(void* plugin_manager, int* x, int* y) {
+    SDL_GetWindowPosition(static_cast<PluginManager*>(plugin_manager)->window, x, y);
+}
+
+void vvctre_set_os_window_title(void* plugin_manager, const char* title) {
+    SDL_SetWindowTitle(static_cast<PluginManager*>(plugin_manager)->window, title);
+}
+
+const char* vvctre_get_os_window_title(void* plugin_manager) {
+    return SDL_GetWindowTitle(static_cast<PluginManager*>(plugin_manager)->window);
 }
 
 // Button devices
@@ -1827,6 +1870,16 @@ std::unordered_map<std::string, void*> PluginManager::function_map = {
     {"vvctre_gui_slider_float", (void*)&vvctre_gui_slider_float},
     {"vvctre_gui_slider_double", (void*)&vvctre_gui_slider_double},
     {"vvctre_gui_set_color", (void*)&vvctre_gui_set_color},
+    {"vvctre_set_os_window_size", (void*)&vvctre_set_os_window_size},
+    {"vvctre_get_os_window_size", (void*)&vvctre_get_os_window_size},
+    {"vvctre_set_os_window_minimum_size", (void*)&vvctre_set_os_window_minimum_size},
+    {"vvctre_get_os_window_minimum_size", (void*)&vvctre_get_os_window_minimum_size},
+    {"vvctre_set_os_window_maximum_size", (void*)&vvctre_set_os_window_maximum_size},
+    {"vvctre_get_os_window_maximum_size", (void*)&vvctre_get_os_window_maximum_size},
+    {"vvctre_set_os_window_position", (void*)&vvctre_set_os_window_position},
+    {"vvctre_get_os_window_position", (void*)&vvctre_get_os_window_position},
+    {"vvctre_set_os_window_title", (void*)&vvctre_set_os_window_title},
+    {"vvctre_get_os_window_title", (void*)&vvctre_get_os_window_title},
     // Button devices
     {"vvctre_button_device_new", (void*)&vvctre_button_device_new},
     {"vvctre_button_device_delete", (void*)&vvctre_button_device_delete},

@@ -85,9 +85,6 @@ int main(int argc, char** argv) {
     SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 8);
     SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, 0);
 
-    Core::System& system = Core::System::GetInstance();
-    PluginManager plugin_manager(static_cast<void*>(&system));
-
     SDL_Window* window = SDL_CreateWindow(
         fmt::format("vvctre {}.{}.{} - Initial Settings", vvctre_version_major,
                     vvctre_version_minor, vvctre_version_patch)
@@ -127,6 +124,9 @@ int main(int argc, char** argv) {
     ImGui::GetStyle().ScrollbarRounding = 0.0f;
     ImGui_ImplSDL2_InitForOpenGL(window, context);
     ImGui_ImplOpenGL3_Init("#version 330 core");
+
+    Core::System& system = Core::System::GetInstance();
+    PluginManager plugin_manager(system, window);
 
     plugin_manager.InitialSettingsOpening();
     if (argc < 2) {
