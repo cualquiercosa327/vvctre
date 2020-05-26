@@ -284,6 +284,13 @@ public:
                                    bool use_layered_fs = true);
 
     /**
+     * Dump the RomFS of the NCCH container to the user folder.
+     * @param target_path target path to dump to
+     * @return ResultStatus result of function.
+     */
+    Loader::ResultStatus DumpRomFS(const std::string& target_path);
+
+    /**
      * Get the override RomFS of the NCCH container
      * Since the RomFS can be huge, we return a file reference instead of copying to a buffer
      * @param romfs_file The file containing the RomFS

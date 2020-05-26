@@ -247,6 +247,10 @@ ResultStatus AppLoader_NCCH::ReadRomFS(std::shared_ptr<FileSys::RomFSReader>& ro
     return base_ncch.ReadRomFS(romfs_file);
 }
 
+ResultStatus AppLoader_NCCH::DumpRomFS(const std::string& target_path) {
+    return base_ncch.DumpRomFS(target_path);
+}
+
 ResultStatus AppLoader_NCCH::ReadUpdateRomFS(std::shared_ptr<FileSys::RomFSReader>& romfs_file) {
     ResultStatus result = update_ncch.ReadRomFS(romfs_file);
 
@@ -254,6 +258,14 @@ ResultStatus AppLoader_NCCH::ReadUpdateRomFS(std::shared_ptr<FileSys::RomFSReade
         return base_ncch.ReadRomFS(romfs_file);
 
     return ResultStatus::Success;
+}
+
+ResultStatus AppLoader_NCCH::DumpUpdateRomFS(const std::string& target_path) {
+    u64 program_id;
+    ReadProgramId(program_id);
+    update_ncch.OpenFile(
+        Service::AM::GetTitleContentPath(Service::FS::MediaType::SDMC, program_id | UPDATE_MASK));
+    return update_ncch.DumpRomFS(target_path);
 }
 
 } // namespace Loader

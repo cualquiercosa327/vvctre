@@ -56,8 +56,10 @@ public:
     ResultStatus ReadExtdataId(u64& out_extdata_id) override;
 
     ResultStatus ReadRomFS(std::shared_ptr<FileSys::RomFSReader>& romfs_file) override;
+    ResultStatus DumpRomFS(const std::string& target_path) override;
 
     ResultStatus ReadUpdateRomFS(std::shared_ptr<FileSys::RomFSReader>& romfs_file) override;
+    ResultStatus DumpUpdateRomFS(const std::string& target_path) override;
 
 private:
     /**

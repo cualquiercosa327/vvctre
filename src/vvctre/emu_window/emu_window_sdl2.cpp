@@ -2100,6 +2100,22 @@ void EmuWindow_SDL2::SwapBuffers() {
                     CopyScreenshot();
                 }
 
+                if (ImGui::MenuItem("Dump RomFS")) {
+                    const std::string folder = pfd::select_folder("Dump RomFS").result();
+
+                    if (!folder.empty()) {
+                        Loader::AppLoader& loader = system.GetAppLoader();
+
+                        if (loader.DumpRomFS(folder) == Loader::ResultStatus::Success) {
+                            loader.DumpUpdateRomFS(folder);
+                            pfd::message("vvctre", "RomFS dumped", pfd::choice::ok);
+                        } else {
+                            pfd::message("vvctre", "Failed to dump RomFS", pfd::choice::ok,
+                                         pfd::icon::error);
+                        }
+                    }
+                }
+
                 if (ImGui::BeginMenu("Movie")) {
                     auto& movie = Core::Movie::GetInstance();
 
