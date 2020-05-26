@@ -2,7 +2,16 @@
 
 /////////////////////////////////////////////////////////////////////////////
 //
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+VVCTRE_ICON              ICON                    "./vvctre.ico"
+
+/////////////////////////////////////////////////////////////////////////////
+//
 // RT_MANIFEST
 //
 
-1                       RT_MANIFEST             "./vvctre.manifest"
+1                        RT_MANIFEST             "./vvctre.manifest"
