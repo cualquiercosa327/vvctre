@@ -547,6 +547,18 @@ void vvctre_gui_unindent() {
     ImGui::Unindent();
 }
 
+void vvctre_gui_spacing() {
+    ImGui::Spacing();
+}
+
+void vvctre_gui_separator() {
+    ImGui::Separator();
+}
+
+void vvctre_gui_dummy(float width, float height) {
+    ImGui::Dummy(ImVec2(width, height));
+}
+
 void vvctre_gui_tooltip(const char* text) {
     if (ImGui::IsItemHovered()) {
         ImGui::SetTooltip("%s", text);
@@ -572,6 +584,14 @@ bool vvctre_gui_small_button(const char* label) {
 bool vvctre_gui_color_button(const char* tooltip, float red, float green, float blue, float alpha,
                              int flags) {
     return ImGui::ColorButton(tooltip, ImVec4(red, green, blue, alpha), flags);
+}
+
+bool vvctre_gui_invisible_button(const char* id, float width, float height) {
+    return ImGui::InvisibleButton(id, ImVec2(width, height));
+}
+
+bool vvctre_gui_radio_button(const char* label, bool active) {
+    return ImGui::RadioButton(label, active);
 }
 
 bool vvctre_gui_checkbox(const char* label, bool* checked) {
@@ -1829,12 +1849,17 @@ std::unordered_map<std::string, void*> PluginManager::function_map = {
     {"vvctre_gui_bullet", (void*)&vvctre_gui_bullet},
     {"vvctre_gui_indent", (void*)&vvctre_gui_indent},
     {"vvctre_gui_unindent", (void*)&vvctre_gui_unindent},
+    {"vvctre_gui_spacing", (void*)&vvctre_gui_spacing},
+    {"vvctre_gui_separator", (void*)&vvctre_gui_separator},
+    {"vvctre_gui_dummy", (void*)&vvctre_gui_dummy},
     {"vvctre_gui_tooltip", (void*)&vvctre_gui_tooltip},
     {"vvctre_gui_text", (void*)&vvctre_gui_text},
     {"vvctre_gui_text_colored", (void*)&vvctre_gui_text_colored},
     {"vvctre_gui_button", (void*)&vvctre_gui_button},
     {"vvctre_gui_small_button", (void*)&vvctre_gui_small_button},
     {"vvctre_gui_color_button", (void*)&vvctre_gui_color_button},
+    {"vvctre_gui_invisible_button", (void*)&vvctre_gui_invisible_button},
+    {"vvctre_gui_radio_button", (void*)&vvctre_gui_radio_button},
     {"vvctre_gui_checkbox", (void*)&vvctre_gui_checkbox},
     {"vvctre_gui_begin", (void*)&vvctre_gui_begin},
     {"vvctre_gui_begin_overlay", (void*)&vvctre_gui_begin_overlay},
