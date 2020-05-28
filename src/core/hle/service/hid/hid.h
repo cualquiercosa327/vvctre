@@ -7,6 +7,7 @@
 #include <array>
 #include <atomic>
 #include <cstddef>
+#include <deque>
 #include <memory>
 #include <optional>
 #include "common/bit_field.h"
@@ -253,6 +254,16 @@ private:
     std::optional<std::tuple<float, float>> custom_circle_pad_state;
     std::optional<std::tuple<float, float, bool>> custom_touch_state;
     std::optional<std::tuple<Common::Vec3<float>, Common::Vec3<float>>> custom_motion_state;
+
+    // xperia64: These are used to averate the previous N
+    // raw circle pad inputs with the current raw input
+    // to simulate the sluggishness of a real 3DS circle pad
+    // The Theatrhythm games rely on the circle pad being
+    // fairly slow to move, and from empircal testing,
+    // need a minimum of 3 averaging to not drop inputs
+    static constexpr s16 CIRCLE_PAD_AVERAGING = 3;
+    std::deque<s16> circle_pad_old_x;
+    std::deque<s16> circle_pad_old_y;
 
     u32 next_pad_index = 0;
     u32 next_touch_index = 0;
