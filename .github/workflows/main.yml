@@ -28,10 +28,6 @@ jobs:
         working-directory: ./build
         shell: bash
         run: cmake --build . --config Release
-      - name: Update Discord SBU
-        if: github.event_name == 'repository_dispatch' && matrix.os == 'ubuntu-latest'
-        shell: bash
-        run: curl https://discord-vvctre-sbu-bot.glitch.me/update
       - name: Prepare to upload (repository dispatch)
         if: github.event_name == 'repository_dispatch'
         shell: bash
