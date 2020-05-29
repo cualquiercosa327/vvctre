@@ -7,7 +7,6 @@
 #include <array>
 #include <atomic>
 #include <cstddef>
-#include <deque>
 #include <memory>
 #include <optional>
 #include "common/bit_field.h"
@@ -262,8 +261,8 @@ private:
     // fairly slow to move, and from empircal testing,
     // need a minimum of 3 averaging to not drop inputs
     static constexpr s16 CIRCLE_PAD_AVERAGING = 3;
-    std::deque<s16> circle_pad_old_x;
-    std::deque<s16> circle_pad_old_y;
+    std::vector<s16> circle_pad_old_x = std::vector<s16>(CIRCLE_PAD_AVERAGING - 1, 0);
+    std::vector<s16> circle_pad_old_y = std::vector<s16>(CIRCLE_PAD_AVERAGING - 1, 0);
 
     u32 next_pad_index = 0;
     u32 next_touch_index = 0;

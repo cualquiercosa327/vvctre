@@ -111,18 +111,18 @@ void Module::UpdatePadCallback(u64 userdata, s64 cycles_late) {
     // on the circle pad and calibrating using the system settings application
     constexpr int MAX_CIRCLEPAD_POS = 0x9A; // Max value for a circle pad position
     s16 circle_pad_new_x = static_cast<s16>(
-        floorf(circle_pad_x_f * MAX_CIRCLEPAD_POS + 0.5f)); // These are rounded rather than
+        std::roundf(circle_pad_x_f * MAX_CIRCLEPAD_POS)); // These are rounded rather than
     s16 circle_pad_new_y = static_cast<s16>(
-        floorf(circle_pad_y_f * MAX_CIRCLEPAD_POS + 0.5f)); // truncated on actual hardware
+        std::roundf(circle_pad_y_f * MAX_CIRCLEPAD_POS)); // truncated on actual hardware
     s16 circle_pad_x =
         (circle_pad_new_x + std::accumulate(circle_pad_old_x.begin(), circle_pad_old_x.end(), 0)) /
         CIRCLE_PAD_AVERAGING;
     s16 circle_pad_y =
         (circle_pad_new_y + std::accumulate(circle_pad_old_y.begin(), circle_pad_old_y.end(), 0)) /
         CIRCLE_PAD_AVERAGING;
-    circle_pad_old_x.pop_front();
+    circle_pad_old_x.erase(circle_pad_old_x.begin());
     circle_pad_old_x.push_back(circle_pad_new_x);
-    circle_pad_old_y.pop_front();
+    circle_pad_old_y.erase(circle_pad_old_y.begin());
     circle_pad_old_y.push_back(circle_pad_new_y);
 
     Core::Movie::GetInstance().HandlePadAndCircleStatus(state, circle_pad_x, circle_pad_y);
