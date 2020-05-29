@@ -434,17 +434,12 @@ void ThreadManager::PriorityBoostStarvedThreads() {
     const u64 current_ticks = kernel.timing.GetTicks();
 
     for (auto& thread : thread_list) {
-        // Threads that have been waiting to be scheduled for `boost_ticks` (or longer) will have
-        // their priority temporarily adjusted to 1 higher than the highest priority thread to
-        // prevent thread starvation. This general behavior has been verified on hardware.
-
-        const u64 boost_ticks = 2000000; // Boost threads that have been ready for > this long
+        const u64 boost_ticks = 1400000;
 
         u64 delta = current_ticks - thread->last_running_ticks;
 
         if (thread->status == ThreadStatus::Ready && delta > boost_ticks) {
-            const s32 priority = std::max(ready_queue.get_first()->current_priority - 1,
-                                          static_cast<unsigned int>(0));
+            const s32 priority = std::max(ready_queue.get_first()->current_priority, 40u);
             thread->BoostPriority(priority);
         }
     }
