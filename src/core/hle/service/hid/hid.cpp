@@ -110,10 +110,9 @@ void Module::UpdatePadCallback(u64 userdata, s64 cycles_late) {
     // Verified by using Input Redirector with very large-value digital inputs
     // on the circle pad and calibrating using the system settings application
     constexpr int MAX_CIRCLEPAD_POS = 0x9A; // Max value for a circle pad position
-    s16 circle_pad_new_x = static_cast<s16>(
-        std::roundf(circle_pad_x_f * MAX_CIRCLEPAD_POS)); // These are rounded rather than
-    s16 circle_pad_new_y = static_cast<s16>(
-        std::roundf(circle_pad_y_f * MAX_CIRCLEPAD_POS)); // truncated on actual hardware
+    // These are rounded rather than truncated on actual hardware
+    s16 circle_pad_new_x = static_cast<s16>(std::roundf(circle_pad_x_f * MAX_CIRCLEPAD_POS));
+    s16 circle_pad_new_y = static_cast<s16>(std::roundf(circle_pad_y_f * MAX_CIRCLEPAD_POS));
     s16 circle_pad_x =
         (circle_pad_new_x + std::accumulate(circle_pad_old_x.begin(), circle_pad_old_x.end(), 0)) /
         CIRCLE_PAD_AVERAGING;
