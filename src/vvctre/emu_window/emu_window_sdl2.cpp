@@ -2207,9 +2207,9 @@ void EmuWindow_SDL2::SwapBuffers() {
                 switch (swkbd_config->button_config) {
                 case Frontend::ButtonConfig::None:
                 case Frontend::ButtonConfig::Single: {
-                    if (ImGui::Button((swkbd_config->has_custom_button_text
-                                           ? swkbd_config->button_text[2]
-                                           : Frontend::SWKBD_BUTTON_OKAY)
+                    if (ImGui::Button((swkbd_config->button_text[2].empty()
+                                           ? Frontend::SWKBD_BUTTON_OKAY
+                                           : swkbd_config->button_text[2])
                                           .c_str())) {
                         swkbd_config = nullptr;
                         swkbd_code = nullptr;
@@ -2219,12 +2219,12 @@ void EmuWindow_SDL2::SwapBuffers() {
                 }
 
                 case Frontend::ButtonConfig::Dual: {
-                    const std::string cancel = swkbd_config->has_custom_button_text
-                                                   ? swkbd_config->button_text[0]
-                                                   : Frontend::SWKBD_BUTTON_CANCEL;
-                    const std::string ok = swkbd_config->has_custom_button_text
-                                               ? swkbd_config->button_text[2]
-                                               : Frontend::SWKBD_BUTTON_OKAY;
+                    const std::string cancel = swkbd_config->button_text[0].empty()
+                                                   ? Frontend::SWKBD_BUTTON_CANCEL
+                                                   : swkbd_config->button_text[0];
+                    const std::string ok = swkbd_config->button_text[2].empty()
+                                               ? Frontend::SWKBD_BUTTON_OKAY
+                                               : swkbd_config->button_text[2];
                     if (ImGui::Button(cancel.c_str())) {
                         swkbd_config = nullptr;
                         swkbd_code = nullptr;
@@ -2242,15 +2242,15 @@ void EmuWindow_SDL2::SwapBuffers() {
                 }
 
                 case Frontend::ButtonConfig::Triple: {
-                    const std::string cancel = swkbd_config->has_custom_button_text
-                                                   ? swkbd_config->button_text[0]
-                                                   : Frontend::SWKBD_BUTTON_CANCEL;
-                    const std::string forgot = swkbd_config->has_custom_button_text
-                                                   ? swkbd_config->button_text[1]
-                                                   : Frontend::SWKBD_BUTTON_FORGOT;
-                    const std::string ok = swkbd_config->has_custom_button_text
-                                               ? swkbd_config->button_text[2]
-                                               : Frontend::SWKBD_BUTTON_OKAY;
+                    const std::string cancel = swkbd_config->button_text[0].empty()
+                                                   ? Frontend::SWKBD_BUTTON_CANCEL
+                                                   : swkbd_config->button_text[0];
+                    const std::string forgot = swkbd_config->button_text[1].empty()
+                                                   ? Frontend::SWKBD_BUTTON_FORGOT
+                                                   : swkbd_config->button_text[1];
+                    const std::string ok = swkbd_config->button_text[2].empty()
+                                               ? Frontend::SWKBD_BUTTON_OKAY
+                                               : swkbd_config->button_text[2];
                     if (ImGui::Button(cancel.c_str())) {
                         swkbd_config = nullptr;
                         swkbd_code = nullptr;
