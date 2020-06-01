@@ -254,10 +254,10 @@ private:
     std::optional<std::tuple<float, float, bool>> custom_touch_state;
     std::optional<std::tuple<Common::Vec3<float>, Common::Vec3<float>>> custom_motion_state;
 
-    // xperia64: These are used to averate the previous N raw circle pad inputs
-    // with the current raw input to simulate the sluggishness of a real 3DS Circle Pad The
-    // Theatrhythm games rely on the Circle Pad being fairly slow to move,
-    // and from empirical testing, need a minimum of 3 averaging to not drop inputs
+    // xperia64: These are used to averate the previous N raw circle pad inputs with the current raw
+    // input to simulate the sluggishness of a real 3DS circle pad
+    // The Theatrhythm games rely on the circle pad being fairly slow to move, and from empircal
+    // testing, need a minimum of 3 averaging to not drop inputs
     static constexpr s16 CIRCLE_PAD_AVERAGING = 3;
     std::vector<s16> circle_pad_old_x = std::vector<s16>(CIRCLE_PAD_AVERAGING - 1, 0);
     std::vector<s16> circle_pad_old_y = std::vector<s16>(CIRCLE_PAD_AVERAGING - 1, 0);
