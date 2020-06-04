@@ -349,7 +349,7 @@ void NWM_UDS::HandleSecureDataPacket(const WifiPacket& packet) {
         // The packet wasn't addressed to us, we can only act as a router if we're the host.
         // However, we might have received this packet due to a broadcast from the host, in that
         // case just ignore it.
-        if (packet.destination_address != Network::BroadcastMac &&
+        if (packet.destination_address != BroadcastMac &&
             connection_status.status != static_cast<u32>(NetworkStatus::ConnectedAsHost)) {
             LOG_ERROR(Service_NWM, "Received packet addressed to others but we're not a host");
             return;
