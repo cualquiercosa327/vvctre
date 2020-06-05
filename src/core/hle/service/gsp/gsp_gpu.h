@@ -246,7 +246,7 @@ private:
     void UnregisterInterruptRelayQueue(Kernel::HLERequestContext& ctx);
     void AcquireRight(Kernel::HLERequestContext& ctx);
     void ReleaseRight(Kernel::HLERequestContext& ctx);
-    void ReleaseRight(SessionData* session_data);
+    void ReleaseRight(const SessionData* session_data);
     void ImportDisplayCaptureInfo(Kernel::HLERequestContext& ctx);
     void StoreDataCache(Kernel::HLERequestContext& ctx);
     void SetLedForceOff(Kernel::HLERequestContext& ctx);
@@ -254,7 +254,7 @@ private:
     /// Returns the session data for the specified registered thread id, or nullptr if not found.
     SessionData* FindRegisteredThreadData(u32 thread_id);
 
-    u32 GetUnusedThreadId();
+    u32 GetUnusedThreadId() const;
 
     std::unique_ptr<Kernel::SessionRequestHandler::SessionDataBase> MakeSessionData() override;
 
@@ -263,8 +263,8 @@ private:
     /// GSP shared memory
     std::shared_ptr<Kernel::SharedMemory> shared_memory;
 
-    /// Thread id that currently has GPU rights or -1 if none.
-    int active_thread_id = -1;
+    /// Thread id that currently has GPU rights or UINT32_MAX if none.
+    u32 active_thread_id = UINT32_MAX;
 
     bool first_initialization = true;
 

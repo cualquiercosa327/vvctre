@@ -2,6 +2,7 @@
 // Licensed under GPLv2 or any later version
 // Refer to the license.txt file included.
 
+#include <array>
 #include <cstring>
 #include "common/common_funcs.h"
 #include "common/logging/log.h"
@@ -14,12 +15,12 @@
 
 namespace Service::Y2R {
 
-static const CoefficientSet standard_coefficients[4] = {
+constexpr std::array<CoefficientSet, 4> standard_coefficients{{
     {{0x100, 0x166, 0xB6, 0x58, 0x1C5, -0x166F, 0x10EE, -0x1C5B}}, // ITU_Rec601
     {{0x100, 0x193, 0x77, 0x2F, 0x1DB, -0x1933, 0xA7C, -0x1D51}},  // ITU_Rec709
     {{0x12A, 0x198, 0xD0, 0x64, 0x204, -0x1BDE, 0x10F2, -0x229B}}, // ITU_Rec601_Scaling
     {{0x12A, 0x1CA, 0x88, 0x36, 0x21C, -0x1F04, 0x99C, -0x2421}},  // ITU_Rec709_Scaling
-};
+}};
 
 ResultCode ConversionConfiguration::SetInputLineWidth(u16 width) {
     if (width == 0 || width > 1024 || width % 8 != 0) {
@@ -51,8 +52,8 @@ ResultCode ConversionConfiguration::SetInputLines(u16 lines) {
 
 ResultCode ConversionConfiguration::SetStandardCoefficient(
     StandardCoefficient standard_coefficient) {
-    std::size_t index = static_cast<std::size_t>(standard_coefficient);
-    if (index >= ARRAY_SIZE(standard_coefficients)) {
+    const std::size_t index = static_cast<std::size_t>(standard_coefficient);
+    if (index >= standard_coefficients.size()) {
         return ResultCode(ErrorDescription::InvalidEnumValue, ErrorModule::CAM,
                           ErrorSummary::InvalidArgument, ErrorLevel::Usage); // 0xE0E053ED
     }
@@ -63,7 +64,6 @@ ResultCode ConversionConfiguration::SetStandardCoefficient(
 
 void Y2R_U::SetInputFormat(Kernel::HLERequestContext& ctx) {
     IPC::RequestParser rp(ctx, 0x1, 1, 0);
-
     conversion.input_format = rp.PopEnum<InputFormat>();
 
     IPC::RequestBuilder rb = rp.MakeBuilder(1, 0);
@@ -73,9 +73,7 @@ void Y2R_U::SetInputFormat(Kernel::HLERequestContext& ctx) {
 }
 
 void Y2R_U::GetInputFormat(Kernel::HLERequestContext& ctx) {
-    IPC::RequestParser rp(ctx, 0x2, 0, 0);
-
-    IPC::RequestBuilder rb = rp.MakeBuilder(2, 0);
+    IPC::RequestBuilder rb(ctx, 0x2, 2, 0);
     rb.Push(RESULT_SUCCESS);
     rb.PushEnum(conversion.input_format);
 
@@ -442,9 +440,9 @@ void Y2R_U::SetStandardCoefficient(Kernel::HLERequestContext& ctx) {
 
 void Y2R_U::GetStandardCoefficient(Kernel::HLERequestContext& ctx) {
     IPC::RequestParser rp(ctx, 0x21, 1, 0);
-    u32 index = rp.Pop<u32>();
+    const u32 index = rp.Pop<u32>();
 
-    if (index < ARRAY_SIZE(standard_coefficients)) {
+    if (index < standard_coefficients.size()) {
         IPC::RequestBuilder rb = rp.MakeBuilder(5, 0);
         rb.Push(RESULT_SUCCESS);
         rb.PushRaw(standard_coefficients[index]);
