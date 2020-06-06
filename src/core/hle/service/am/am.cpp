@@ -986,7 +986,7 @@ void Module::Interface::DeleteTicket(Kernel::HLERequestContext& ctx) {
 void Module::Interface::GetNumTickets(Kernel::HLERequestContext& ctx) {
     u32 count = 0;
     for (const auto& list : am->am_title_list) {
-        count += list.size();
+        count += static_cast<u32>(list.size());
     }
 
     IPC::RequestBuilder rb(ctx, 0x0008, 2, 0);
