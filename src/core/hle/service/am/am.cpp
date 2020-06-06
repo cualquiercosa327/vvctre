@@ -452,7 +452,7 @@ std::string GetTitleMetadataPath(Service::FS::MediaType media_type, u64 tid, boo
     return content_path + fmt::format("{:08x}.tmd", (update ? update_id : base_id));
 }
 
-std::string GetTitleContentPath(Service::FS::MediaType media_type, u64 tid, u16 index,
+std::string GetTitleContentPath(Service::FS::MediaType media_type, u64 tid, std::size_t index,
                                 bool update) {
     if (media_type == FS::MediaType::GameCard) {
         // TODO(B3N30): check if TID matches
