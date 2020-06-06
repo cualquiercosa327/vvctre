@@ -63,7 +63,7 @@ ResultVal<ArchiveHandle> ArchiveManager::OpenArchive(ArchiveIdCode id_code,
         ++next_handle;
     }
     handle_map.emplace(next_handle, std::move(res));
-    return MakeResult<ArchiveHandle>(next_handle++);
+    return MakeResult(next_handle++);
 }
 
 ResultCode ArchiveManager::CloseArchive(ArchiveHandle handle) {
@@ -188,22 +188,25 @@ ResultCode ArchiveManager::RenameDirectoryBetweenArchives(ArchiveHandle src_arch
 ResultVal<std::shared_ptr<Directory>> ArchiveManager::OpenDirectoryFromArchive(
     ArchiveHandle archive_handle, const FileSys::Path& path) {
     ArchiveBackend* archive = GetArchive(archive_handle);
-    if (archive == nullptr)
+    if (archive == nullptr) {
         return FileSys::ERR_INVALID_ARCHIVE_HANDLE;
+    }
 
     auto backend = archive->OpenDirectory(path);
-    if (backend.Failed())
+    if (backend.Failed()) {
         return backend.Code();
+    }
 
     auto directory = std::make_shared<Directory>(std::move(backend).Unwrap(), path);
-    return MakeResult<std::shared_ptr<Directory>>(std::move(directory));
+    return MakeResult(std::move(directory));
 }
 
 ResultVal<u64> ArchiveManager::GetFreeBytesInArchive(ArchiveHandle archive_handle) {
-    ArchiveBackend* archive = GetArchive(archive_handle);
-    if (archive == nullptr)
+    const ArchiveBackend* archive = GetArchive(archive_handle);
+    if (archive == nullptr) {
         return FileSys::ERR_INVALID_ARCHIVE_HANDLE;
-    return MakeResult<u64>(archive->GetFreeBytes());
+    }
+    return MakeResult(archive->GetFreeBytes());
 }
 
 ResultCode ArchiveManager::FormatArchive(ArchiveIdCode id_code,
