@@ -463,8 +463,7 @@ std::string GetTitleContentPath(Service::FS::MediaType media_type, u64 tid, std:
     }
 
     std::string content_path = GetTitlePath(media_type, tid) + "content/";
-
-    std::string tmd_path = GetTitleMetadataPath(media_type, tid, update);
+    const std::string tmd_path = GetTitleMetadataPath(media_type, tid, update);
 
     u32 content_id = 0;
     FileSys::TitleMetadata tmd;
@@ -499,7 +498,7 @@ std::string GetTitlePath(Service::FS::MediaType media_type, u64 tid) {
         return fmt::format("{}{:08x}/{:08x}/", GetMediaTitlePath(media_type), high, low);
     }
 
-    if (media_type == Service::FS::MediaType::GameCard) {
+    if (media_type == FS::MediaType::GameCard) {
         // TODO(B3N30): check if TID matches
         auto fs_user =
             Core::System::GetInstance().ServiceManager().GetService<Service::FS::FS_USER>(
