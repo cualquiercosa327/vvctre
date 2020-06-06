@@ -88,21 +88,22 @@ ResultCode ArchiveManager::RegisterArchiveType(std::unique_ptr<FileSys::ArchiveF
     return RESULT_SUCCESS;
 }
 
-std::tuple<ResultVal<std::shared_ptr<File>>, std::chrono::nanoseconds>
+std::pair<ResultVal<std::shared_ptr<File>>, std::chrono::nanoseconds>
 ArchiveManager::OpenFileFromArchive(ArchiveHandle archive_handle, const FileSys::Path& path,
                                     const FileSys::Mode mode) {
     ArchiveBackend* archive = GetArchive(archive_handle);
-    if (archive == nullptr)
-        return std::make_tuple(FileSys::ERR_INVALID_ARCHIVE_HANDLE,
-                               static_cast<std::chrono::nanoseconds>(0));
+    if (archive == nullptr) {
+        return std::make_pair(FileSys::ERR_INVALID_ARCHIVE_HANDLE, std::chrono::nanoseconds{0});
+    }
 
-    std::chrono::nanoseconds open_timeout_ns{archive->GetOpenDelayNs()};
+    const std::chrono::nanoseconds open_timeout_ns{archive->GetOpenDelayNs()};
     auto backend = archive->OpenFile(path, mode);
-    if (backend.Failed())
-        return std::make_tuple(backend.Code(), open_timeout_ns);
+    if (backend.Failed()) {
+        return std::make_pair(backend.Code(), open_timeout_ns);
+    }
 
     auto file = std::make_shared<File>(system, std::move(backend).Unwrap(), path);
-    return std::make_tuple(MakeResult<std::shared_ptr<File>>(std::move(file)), open_timeout_ns);
+    return std::make_pair(MakeResult(std::move(file)), open_timeout_ns);
 }
 
 ResultCode ArchiveManager::DeleteFileFromArchive(ArchiveHandle archive_handle,
