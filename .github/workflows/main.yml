@@ -8,10 +8,10 @@ jobs:
     runs-on: ${{matrix.os}}
     strategy:
       matrix:
-        os: [windows-latest, ubuntu-latest]
+        os: [windows-2019, ubuntu-18.04]
     steps:
       - name: Install Dependencies
-        if: matrix.os == 'ubuntu-latest'
+        if: matrix.os == 'ubuntu-18.04'
         run: |
           sudo apt-get update
           sudo apt-get install --yes libsdl2-dev libpng-dev
@@ -52,7 +52,7 @@ jobs:
         uses: JantHsueh/upload-file-action@master
         with:
           url: ${{secrets.DISCORD_WEBHOOK}}
-          forms: '{}'
+          forms: "{}"
           fileForms: '{"file": "vvctre-${{github.event.client_payload.version}}-${{runner.os}}.7z"}'
       - name: Upload (pull request)
         if: github.event_name == 'pull_request'
