@@ -1469,7 +1469,7 @@ vec4 shadowTextureCube(vec2 uv, float w) {
     // Do not do any sort of processing if it's obvious we're not going to pass the alpha test
     if (state.alpha_test_func == FramebufferRegs::CompareFunc::Never) {
         out += "discard; }";
-        return {out};
+        return std::move(out);
     }
 
     // Append the scissor test
@@ -1530,7 +1530,7 @@ vec4 shadowTextureCube(vec2 uv, float w) {
     } else if (state.fog_mode == TexturingRegs::FogMode::Gas) {
         LOG_CRITICAL(Render_OpenGL, "Unimplemented gas mode");
         out += "discard; }";
-        return {out};
+        return std::move(out);
     }
 
     if (state.shadow_rendering) {
@@ -1567,7 +1567,7 @@ do {
 
     out += "}";
 
-    return {out};
+    return std::move(out);
 }
 
 std::string GenerateTrivialVertexShader(bool separable_shader) {
@@ -1609,7 +1609,7 @@ void main() {
     gl_ClipDistance[1] = dot(clip_coef, vert_position);
 })";
 
-    return {out};
+    return std::move(out);
 }
 
 std::optional<std::string> GenerateVertexShader(const Pica::Shader::ShaderSetup& setup,
@@ -1674,7 +1674,7 @@ layout (std140) uniform vs_config {
 
     out += *program_source_opt;
 
-    return out;
+    return std::move(out);
 }
 
 static std::string GetGSCommonSource(const PicaGSConfigCommonRaw& config, bool separable_shader) {
@@ -1790,6 +1790,6 @@ void main() {
     out += "    EmitPrim(prim_buffer[0], prim_buffer[1], prim_buffer[2]);\n";
     out += "}\n";
 
-    return {out};
+    return std::move(out);
 }
 } // namespace OpenGL
