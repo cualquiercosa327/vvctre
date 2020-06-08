@@ -1576,20 +1576,19 @@ std::string GenerateTrivialVertexShader(bool separable_shader) {
         out += "#extension GL_ARB_separate_shader_objects : enable\n";
     }
 
-    out += "layout(location = " + std::to_string((int)ATTRIBUTE_POSITION) +
-           ") in vec4 vert_position;\n";
-    out += "layout(location = " + std::to_string((int)ATTRIBUTE_COLOR) + ") in vec4 vert_color;\n";
-    out += "layout(location = " + std::to_string((int)ATTRIBUTE_TEXCOORD0) +
-           ") in vec2 vert_texcoord0;\n";
-    out += "layout(location = " + std::to_string((int)ATTRIBUTE_TEXCOORD1) +
-           ") in vec2 vert_texcoord1;\n";
-    out += "layout(location = " + std::to_string((int)ATTRIBUTE_TEXCOORD2) +
-           ") in vec2 vert_texcoord2;\n";
-    out += "layout(location = " + std::to_string((int)ATTRIBUTE_TEXCOORD0_W) +
-           ") in float vert_texcoord0_w;\n";
-    out += "layout(location = " + std::to_string((int)ATTRIBUTE_NORMQUAT) +
-           ") in vec4 vert_normquat;\n";
-    out += "layout(location = " + std::to_string((int)ATTRIBUTE_VIEW) + ") in vec3 vert_view;\n";
+    out +=
+        fmt::format("layout(location = {}) in vec4 vert_position;\n"
+                    "layout(location = {}) in vec4 vert_color;\n"
+                    "layout(location = {}) in vec2 vert_texcoord0;\n"
+                    "layout(location = {}) in vec2 vert_texcoord1;\n"
+                    "layout(location = {}) in vec2 vert_texcoord2;\n"
+                    "layout(location = {}) in float vert_texcoord0_w;\n"
+                    "layout(location = {}) in vec4 vert_normquat;\n"
+                    "layout(location = {}) in vec3 vert_view;\n",
+                    static_cast<int>(ATTRIBUTE_POSITION), static_cast<int>(ATTRIBUTE_COLOR),
+                    static_cast<int>(ATTRIBUTE_TEXCOORD0), static_cast<int>(ATTRIBUTE_TEXCOORD1),
+                    static_cast<int>(ATTRIBUTE_TEXCOORD2), static_cast<int>(ATTRIBUTE_TEXCOORD0_W),
+                    static_cast<int>(ATTRIBUTE_NORMQUAT), static_cast<int>(ATTRIBUTE_VIEW));
 
     out += GetVertexInterfaceDeclaration(true, separable_shader);
 
