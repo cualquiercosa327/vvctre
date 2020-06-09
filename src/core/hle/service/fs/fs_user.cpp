@@ -834,6 +834,21 @@ void FS_USER::GetSaveDataSecureValue(Kernel::HLERequestContext& ctx) {
     rb.Push<u64>(0);      // the secure value
 }
 
+void FS_USER::GetThisSaveDataSecureValue(Kernel::HLERequestContext& ctx) {
+    IPC::RequestParser rp(ctx, 0x86F, 1, 0);
+    const u32 secure_value_slot = rp.Pop<u32>();
+
+    IPC::RequestBuilder rb = rp.MakeBuilder(4, 0);
+    rb.Push(RESULT_SUCCESS);
+
+    // TODO: Implement Secure Value Lookup & Generation
+
+    rb.Push<bool>(false); // indicates that the secure value doesn't exist
+    rb.Push<u64>(0);      // the secure value
+
+    LOG_WARNING(Service_FS, "(stubbed) secure_value_slot={}", secure_value_slot);
+}
+
 void FS_USER::Register(u32 process_id, u64 program_id, const std::string& filepath) {
     const MediaType media_type = GetMediaTypeFromPath(filepath);
     program_info_map.insert_or_assign(process_id, ProgramInfo{program_id, media_type});
@@ -1004,6 +1019,7 @@ FS_USER::FS_USER(Core::System& system)
         {0x08680000, nullptr, "GetMediaType"},
         {0x08690000, nullptr, "GetNandEraseCount"},
         {0x086A0082, nullptr, "ReadNandReport"},
+        {0x086F0040, &FS_USER::GetThisSaveDataSecureValue, "GetThisSaveDataSecureValue"},
         {0x087A0180, &FS_USER::AddSeed, "AddSeed"},
         {0x087D0000, &FS_USER::GetNumSeeds, "GetNumSeeds"},
         {0x088600C0, nullptr, "CheckUpdatedDat"},
