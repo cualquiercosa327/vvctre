@@ -7,4 +7,4 @@
 
 const u8 vvctre_version_major = 33;
 const u8 vvctre_version_minor = 1;
-const u8 vvctre_version_patch = 11;
+const u8 vvctre_version_patch = 12;
