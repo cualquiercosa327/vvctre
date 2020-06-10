@@ -162,8 +162,8 @@ MFOutputState WMFDecoder::Impl::DecodingLoop(ADTSData adts_header,
             }
         }
 
-        // xperia64: If we return OK here, the decoder won't be in a state to receive new data and
-        // will fail on the next call; instead treat it like the HaveMoreData case
+        // If we return OK here, the decoder won't be in a state to receive new data and will fail
+        // on the next call; instead treat it like the HaveMoreData case
         if (output_status == MFOutputState::OK)
             continue;
 
