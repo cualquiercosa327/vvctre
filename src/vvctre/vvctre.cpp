@@ -85,13 +85,13 @@ int main(int argc, char** argv) {
     SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 8);
     SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, 0);
 
-    SDL_Window* window = SDL_CreateWindow(
-        fmt::format("vvctre {}.{}.{} - Initial Settings", vvctre_version_major,
-                    vvctre_version_minor, vvctre_version_patch)
-            .c_str(),
-        SDL_WINDOWPOS_UNDEFINED, // x position
-        SDL_WINDOWPOS_UNDEFINED, // y position
-        640, 480, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
+    SDL_Window* window =
+        SDL_CreateWindow(fmt::format("vvctre {}.{}.{} - Initial Settings", vvctre_version_major,
+                                     vvctre_version_minor, vvctre_version_patch)
+                             .c_str(),
+                         SDL_WINDOWPOS_UNDEFINED, // x position
+                         SDL_WINDOWPOS_UNDEFINED, // y position
+                         640, 480, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
     if (window == nullptr) {
         pfd::message("vvctre", fmt::format("Failed to create window: {}", SDL_GetError()),
                      pfd::choice::ok, pfd::icon::error);
