@@ -745,17 +745,118 @@ void EmuWindow_SDL2::SwapBuffers() {
 
                         auto [month, day] = cfg->GetBirthday();
 
-                        if (ImGui::InputScalar("##birthday", ImGuiDataType_U8, &day)) {
-                            cfg->SetBirthday(month, day);
-                            cfg->UpdateConfigNANDSavegame();
-                            system.RequestReset();
+                        if (ImGui::BeginCombo("##birthday_month", [&] {
+                                switch (month) {
+                                case 1:
+                                    return "January";
+                                case 2:
+                                    return "February";
+                                case 3:
+                                    return "March";
+                                case 4:
+                                    return "April";
+                                case 5:
+                                    return "May";
+                                case 6:
+                                    return "June";
+                                case 7:
+                                    return "July";
+                                case 8:
+                                    return "August";
+                                case 9:
+                                    return "September";
+                                case 10:
+                                    return "October";
+                                case 11:
+                                    return "November";
+                                case 12:
+                                    return "December";
+                                default:
+                                    break;
+                                }
+
+                                return "Invalid";
+                            }())) {
+                            if (ImGui::Selectable("January")) {
+                                cfg->SetBirthday(1, day);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+
+                            if (ImGui::Selectable("February")) {
+                                cfg->SetBirthday(2, day);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+
+                            if (ImGui::Selectable("March")) {
+                                cfg->SetBirthday(3, day);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+
+                            if (ImGui::Selectable("April")) {
+                                cfg->SetBirthday(4, day);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+
+                            if (ImGui::Selectable("May")) {
+                                cfg->SetBirthday(5, day);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+
+                            if (ImGui::Selectable("June")) {
+                                cfg->SetBirthday(6, day);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+
+                            if (ImGui::Selectable("July")) {
+                                cfg->SetBirthday(7, day);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+
+                            if (ImGui::Selectable("August")) {
+                                cfg->SetBirthday(8, day);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+
+                            if (ImGui::Selectable("September")) {
+                                cfg->SetBirthday(9, day);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+
+                            if (ImGui::Selectable("October")) {
+                                cfg->SetBirthday(10, day);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+
+                            if (ImGui::Selectable("November")) {
+                                cfg->SetBirthday(11, day);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+
+                            if (ImGui::Selectable("December")) {
+                                cfg->SetBirthday(12, day);
+                                cfg->UpdateConfigNANDSavegame();
+                                system.RequestReset();
+                            }
+
+                            ImGui::EndCombo();
                         }
 
                         ImGui::SameLine();
                         ImGui::Text("/");
                         ImGui::SameLine();
 
-                        if (ImGui::InputScalar("##birthmonth", ImGuiDataType_U8, &month)) {
+                        if (ImGui::InputScalar("##birthday_day", ImGuiDataType_U8, &day)) {
                             cfg->SetBirthday(month, day);
                             cfg->UpdateConfigNANDSavegame();
                             system.RequestReset();
