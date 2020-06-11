@@ -543,7 +543,7 @@ InitialSettings::InitialSettings(PluginManager& plugin_manager, SDL_Window* wind
 
                     auto [month, day] = cfg.GetBirthday();
 
-                    if (ImGui::BeginCombo("##birthmonth", [&] {
+                    if (ImGui::BeginCombo("##birthday_month", [&] {
                             switch (month) {
                             case 1:
                                 return "January";
@@ -642,7 +642,7 @@ InitialSettings::InitialSettings(PluginManager& plugin_manager, SDL_Window* wind
                     ImGui::Text("/");
                     ImGui::SameLine();
 
-                    if (ImGui::InputScalar("##birthday", ImGuiDataType_U8, &day)) {
+                    if (ImGui::InputScalar("##birthday_day", ImGuiDataType_U8, &day)) {
                         cfg.SetBirthday(month, day);
                         update_config_savegame = true;
                     }
