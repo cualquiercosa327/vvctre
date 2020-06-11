@@ -5,7 +5,6 @@
 #pragma once
 
 #include <array>
-#include <atomic>
 #include <cstddef>
 #include <deque>
 #include <list>
@@ -28,10 +27,6 @@ namespace Kernel {
 class Event;
 class SharedMemory;
 } // namespace Kernel
-
-namespace easywsclient {
-class WebSocket;
-} // namespace easywsclient
 
 // Local-WLAN service
 
@@ -70,6 +65,19 @@ const u16 DefaultBeaconInterval = 100;
 
 /// The maximum number of nodes that can exist in an UDS session.
 constexpr u32 UDSMaxNodes = 16;
+
+// 802.11 broadcast MAC address
+constexpr MacAddress BroadcastMac = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
+
+// Number of beacons to store before we start dropping the old ones.
+// TODO(Subv): Find a more accurate value for this limit.
+constexpr std::size_t MaxBeaconFrames = 15;
+
+// Network node ID used when a SecureData packet is addressed to every connected node.
+constexpr u16 BroadcastNetworkNodeId = 0xFFFF;
+
+// The Host has always dest_node_id 1
+constexpr u16 HostDestNodeId = 1;
 
 struct NodeInfo {
     u64_le friend_code_seed;
@@ -153,10 +161,26 @@ enum class TagId : u8 {
     VendorSpecific = 221
 };
 
+struct Node {
+    bool connected;
+    u16 node_id;
+};
+
+struct BindNodeData {
+    u32 bind_node_id;    ///< Id of the bind node associated with this data.
+    u8 channel;          ///< Channel that this bind node was bound to.
+    u16 network_node_id; ///< Node id this bind node is associated with, only packets from this
+                         /// network node will be received.
+    std::shared_ptr<Kernel::Event> event;         ///< Receive event for this bind node.
+    std::deque<std::vector<u8>> received_packets; ///< List of packets received on this channel.
+};
+
 class NWM_UDS final : public ServiceFramework<NWM_UDS> {
 public:
     explicit NWM_UDS(Core::System& system);
     ~NWM_UDS();
+
+    void ConnectToMultiplayerServer();
 
 private:
     Core::System& system;
@@ -205,118 +229,21 @@ private:
     std::list<WifiPacket> GetReceivedBeacons(const MacAddress& sender, u32 wlan_comm_id);
 
     /*
-     * Returns an available index in the nodes array for the
-     * currently-hosted UDS network.
-     */
-    u16 GetNextAvailableNodeId();
-
-    void BroadcastNodeMap();
-    void HandleNodeMapPacket(const WifiPacket& packet);
-    void HandleBeaconFrame(const WifiPacket& packet);
-    void HandleAssociationResponseFrame(const WifiPacket& packet);
-    void HandleEAPoLPacket(const WifiPacket& packet);
-    void HandleSecureDataPacket(const WifiPacket& packet);
-
-    /*
      * Start a connection sequence with an UDS server. The sequence starts by sending an 802.11
      * authentication frame with SEQ1.
      */
     void StartConnectionSequence(const MacAddress& server);
 
-    /// Sends an Association Response frame to the specified mac address
-    void SendAssociationResponseFrame(const MacAddress& address);
-
-    /*
-     * Handles the authentication request frame and sends the authentication response and
-     * association response frames. Once an Authentication frame with SEQ1 is received by the
-     * server, it responds with an Authentication frame containing SEQ2, and immediately sends an
-     * Association response frame containing the details of the access point and the assigned
-     * association id for the new client.
-     */
-    void HandleAuthenticationFrame(const WifiPacket& packet);
-
-    /// Handles the deauthentication frames sent from clients to hosts, when they leave a session
-    void HandleDeauthenticationFrame(const WifiPacket& packet);
-
-    void HandleDataFrame(const WifiPacket& packet);
-
-    /// Callback to parse and handle a received wifi packet.
-    void OnWifiPacketReceived(const WifiPacket& packet);
-
-    void SendPacket(WifiPacket& packet);
-
     std::optional<MacAddress> GetNodeMacAddress(u16 dest_node_id, u8 flags);
-
-    // Event that is signaled every time the connection status changes.
-    std::shared_ptr<Kernel::Event> connection_status_event;
 
     // Shared memory provided by the application to store the receive buffer.
     // This is not currently used.
     std::shared_ptr<Kernel::SharedMemory> recv_buffer_memory;
 
-    // Connection status of this 3DS.
-    ConnectionStatus connection_status{};
-
-    std::atomic<bool> initialized{false};
-
-    /* Node information about the current network.
-     * The amount of elements in this vector is always the maximum number
-     * of nodes specified in the network configuration.
-     * The first node is always the host.
-     */
-    NodeList node_info;
-
-    // Node information about our own system.
-    NodeInfo current_node;
-
-    struct BindNodeData {
-        u32 bind_node_id;    ///< Id of the bind node associated with this data.
-        u8 channel;          ///< Channel that this bind node was bound to.
-        u16 network_node_id; ///< Node id this bind node is associated with, only packets from this
-                             /// network node will be received.
-        std::shared_ptr<Kernel::Event> event;         ///< Receive event for this bind node.
-        std::deque<std::vector<u8>> received_packets; ///< List of packets received on this channel.
-    };
-
-    // Mapping of data channels to their internal data.
-    std::unordered_map<u32, BindNodeData> channel_data;
-
-    // The WiFi network channel that the network is currently on.
-    // Since we're not actually interacting with physical radio waves, this is just a dummy value.
-    u8 network_channel = DefaultNetworkChannel;
-
-    // Information about the network that we're currently connected to.
-    NetworkInfo network_info;
-
-    // Mapping of mac addresses to their respective node_ids.
-    struct Node {
-        bool connected;
-        u16 node_id;
-    };
-
-    std::map<MacAddress, Node> node_map;
-
     // Event that will generate and send the 802.11 beacon frames.
     Core::TimingEventType* beacon_broadcast_event;
-
-    // Mutex to synchronize access to the connection status between the emulation thread and the
-    // network thread.
-    std::mutex connection_status_mutex;
-
-    std::shared_ptr<Kernel::Event> connection_event;
-
-    // Mutex to synchronize access to the list of received beacons between the emulation thread and
-    // the network thread.
-    std::mutex beacon_mutex;
-
-    // List of the last <MaxBeaconFrames> beacons received from the network.
-    std::list<WifiPacket> received_beacons;
-
-    std::mutex send_list_mutex;      ///< Mutex that controls access to the `send_list` variable.
-    std::list<WifiPacket> send_list; ///< A list that stores all packets to send async
-
-    std::unique_ptr<std::thread> loop_thread;
-    std::unique_ptr<easywsclient::WebSocket> client;
 };
+
+void ConnectToMultiplayerServer();
 
 } // namespace Service::NWM

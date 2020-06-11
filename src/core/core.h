@@ -251,7 +251,7 @@ private:
     std::shared_ptr<ARM_Interface> cpu_core;
 
     /// DSP core
-    std::unique_ptr<AudioCore::DspInterface> dsp_core;
+    std::shared_ptr<AudioCore::DspInterface> dsp_core;
 
     /// When true, signals that a reschedule should happen
     bool reschedule_pending{};
@@ -264,7 +264,7 @@ private:
     std::shared_ptr<Frontend::SoftwareKeyboard> registered_swkbd;
 
     /// Cheats manager
-    std::unique_ptr<Cheats::CheatEngine> cheat_engine;
+    std::shared_ptr<Cheats::CheatEngine> cheat_engine;
 
     /// Custom texture cache system
     std::unique_ptr<Core::CustomTexCache> custom_tex_cache;

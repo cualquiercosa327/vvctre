@@ -34,6 +34,7 @@
 #include "core/core.h"
 #include "core/hle/service/am/am.h"
 #include "core/hle/service/cfg/cfg.h"
+#include "core/hle/service/nwm/nwm_uds.h"
 #include "core/loader/loader.h"
 #include "core/movie.h"
 #include "core/settings.h"
@@ -189,6 +190,8 @@ int main(int argc, char** argv) {
     default:
         break;
     }
+
+    Service::NWM::ConnectToMultiplayerServer();
 
     if (!Settings::values.play_movie.empty()) {
         Core::Movie::GetInstance().StartPlayback(Settings::values.play_movie, [&] {

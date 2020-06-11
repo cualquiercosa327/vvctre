@@ -81,14 +81,6 @@ private:
     static ResultVal<u16> GetSpecialContentIndexFromTMD(MediaType media_type, u64 title_id,
                                                         SpecialContentType type);
 
-    struct ProgramInfo {
-        u64 program_id;
-        MediaType media_type;
-    };
-
-    std::unordered_map<u32, ProgramInfo> program_info_map;
-    std::string current_gamecard_path;
-
     u32 priority = -1; ///< For SetPriority and GetPriority service functions
 
     Core::System& system;

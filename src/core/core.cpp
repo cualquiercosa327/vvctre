@@ -144,7 +144,7 @@ System::ResultStatus System::Load(Frontend::EmuWindow& emu_window, const std::st
             UNREACHABLE();
         }
     }
-    cheat_engine = std::make_unique<Cheats::CheatEngine>(*this);
+    cheat_engine = std::make_shared<Cheats::CheatEngine>(*this);
     perf_stats = std::make_unique<PerfStats>();
     custom_tex_cache = std::make_unique<Core::CustomTexCache>();
     if (Settings::values.custom_textures) {
@@ -201,10 +201,10 @@ System::ResultStatus System::Init(Frontend::EmuWindow& emu_window, u32 system_mo
     kernel->SetCPU(cpu_core);
 
     if (Settings::values.enable_dsp_lle) {
-        dsp_core = std::make_unique<AudioCore::DspLle>(*memory,
+        dsp_core = std::make_shared<AudioCore::DspLle>(*memory,
                                                        Settings::values.enable_dsp_lle_multithread);
     } else {
-        dsp_core = std::make_unique<AudioCore::DspHle>(*memory);
+        dsp_core = std::make_shared<AudioCore::DspHle>(*memory);
     }
 
     memory->SetDSP(*dsp_core);

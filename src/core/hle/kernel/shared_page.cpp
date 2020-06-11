@@ -16,6 +16,8 @@
 
 namespace SharedPage {
 
+MacAddress mac_address;
+
 static std::chrono::seconds GetInitialTime() {
     const u64 override_initial_time = Core::Movie::GetInstance().GetOverrideInitialTime();
     if (override_initial_time != 0) {
@@ -46,7 +48,8 @@ Handler::Handler(Core::Timing& timing) : timing(timing) {
 
     shared_page.running_hw = 0x1; // Product
     shared_page.wifi_link_level = static_cast<u8>(WifiLinkLevel::Best);
-    shared_page.network_state = static_cast<u8>(NetworkState::Internet);
+    shared_page.network_state = static_cast<u8>(NetworkState::Local);
+    std::memcpy(&shared_page.wifi_macaddr[0], mac_address.data(), mac_address.size());
 
     // Some games wait until this value becomes 0x1, before asking running_hw
     shared_page.unknown_value = 0x1;

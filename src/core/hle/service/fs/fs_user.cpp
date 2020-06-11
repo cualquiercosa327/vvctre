@@ -34,6 +34,14 @@ using Kernel::ServerSession;
 
 namespace Service::FS {
 
+struct ProgramInfo {
+    u64 program_id;
+    MediaType media_type;
+};
+
+static std::unordered_map<u32, ProgramInfo> program_info_map;
+static std::string current_gamecard_path;
+
 void FS_USER::Initialize(Kernel::HLERequestContext& ctx) {
     IPC::RequestParser rp(ctx, 0x0801, 0, 2);
     u32 pid = rp.PopPID();
