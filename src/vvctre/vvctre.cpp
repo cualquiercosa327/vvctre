@@ -191,7 +191,7 @@ int main(int argc, char** argv) {
         break;
     }
 
-    Service::NWM::ConnectToMultiplayerServer();
+    std::thread network_thread(Service::NWM::NetworkThread);
 
     if (!Settings::values.play_movie.empty()) {
         Core::Movie::GetInstance().StartPlayback(Settings::values.play_movie, [&] {
@@ -232,6 +232,9 @@ int main(int argc, char** argv) {
         }
         }
     }
+
+    Service::NWM::NetworkThreadStop();
+    network_thread.join();
 
     Core::Movie::GetInstance().Shutdown();
     system.Shutdown();

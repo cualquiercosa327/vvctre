@@ -166,9 +166,7 @@ class NWM_UDS final : public ServiceFramework<NWM_UDS> {
 public:
     explicit NWM_UDS(Core::System& system);
     ~NWM_UDS();
-
-    void ConnectToMultiplayerServer();
-
+ 
 private:
     Core::System& system;
 
@@ -231,6 +229,8 @@ private:
     Core::TimingEventType* beacon_broadcast_event;
 };
 
-void ConnectToMultiplayerServer();
+void NetworkThread();
+void NetworkThreadStop(); 
 
 } // namespace Service::NWM
+ 

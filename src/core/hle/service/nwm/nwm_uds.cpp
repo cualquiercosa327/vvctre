@@ -3,10 +3,10 @@
 // Refer to the license.txt file included.
 
 #include <algorithm>
+#include <atomic>
 #include <cstring>
 #include <list>
 #include <mutex>
-#include <thread>
 #include <cryptopp/osrng.h>
 #include <easywsclient.hpp>
 #include "common/common_types.h"
@@ -1531,82 +1531,88 @@ NWM_UDS::~NWM_UDS() {
     send_list.clear();
 }
 
-void ConnectToMultiplayerServer() {
-    std::thread([] {
-        easywsclient::WebSocket::pointer client =
-            easywsclient::WebSocket::from_url(Settings::values.multiplayer_url);
+static std::atomic<bool> run_network_thread{true};
 
-        if (client == nullptr) {
-            return;
-        }
+void NetworkThread() {
+    easywsclient::WebSocket::pointer client =
+        easywsclient::WebSocket::from_url(Settings::values.multiplayer_url);
 
-        for (;;) {
-            client->poll(99);
+    if (client == nullptr) {
+        return;
+    }
 
-            client->dispatchBinary([](const std::vector<u8>& data) {
-                WifiPacket packet;
+    while (run_network_thread) {
+        client->poll(99);
+
+        client->dispatchBinary([](const std::vector<u8>& data) {
+            WifiPacket packet;
+            std::size_t offset = 0;
+
+            std::memcpy(&packet.type, &data[offset], sizeof(packet.type));
+            offset += sizeof(packet.type);
+
+            u32 data_size;
+            std::memcpy(&data_size, &data[offset], sizeof(data_size));
+            offset += sizeof(data_size);
+
+            packet.data.resize(data_size);
+            std::memcpy(&packet.data[0], &data[offset], data_size);
+            offset += data_size;
+
+            std::memcpy(&packet.transmitter_address[0], &data[offset],
+                        sizeof(packet.transmitter_address));
+            offset += sizeof(packet.transmitter_address);
+
+            std::memcpy(&packet.destination_address[0], &data[offset],
+                        sizeof(packet.destination_address));
+            offset += sizeof(packet.destination_address);
+
+            std::memcpy(&packet.channel, &data[offset], sizeof(packet.channel));
+
+            OnWifiPacketReceived(packet);
+        });
+
+        {
+            std::lock_guard<std::mutex> lock(send_list_mutex);
+
+            for (const WifiPacket& packet : send_list) {
+                std::vector<u8> data(sizeof(packet.type) + sizeof(u32) + packet.data.size() +
+                                     sizeof(packet.transmitter_address) +
+                                     sizeof(packet.destination_address) + sizeof(packet.channel));
                 std::size_t offset = 0;
 
-                std::memcpy(&packet.type, &data[offset], sizeof(packet.type));
+                std::memcpy(&data[offset], &packet.type, sizeof(packet.type));
                 offset += sizeof(packet.type);
 
-                u32 data_size;
-                std::memcpy(&data_size, &data[offset], sizeof(data_size));
+                u32 data_size = static_cast<u32>(packet.data.size());
+                std::memcpy(&data[offset], &data_size, sizeof(data_size));
                 offset += sizeof(data_size);
 
-                packet.data.resize(data_size);
-                std::memcpy(&packet.data[0], &data[offset], data_size);
+                std::memcpy(&data[offset], &packet.data[0], data_size);
                 offset += data_size;
 
-                std::memcpy(&packet.transmitter_address[0], &data[offset],
+                std::memcpy(&data[offset], &packet.transmitter_address[0],
                             sizeof(packet.transmitter_address));
                 offset += sizeof(packet.transmitter_address);
 
-                std::memcpy(&packet.destination_address[0], &data[offset],
+                std::memcpy(&data[offset], &packet.destination_address[0],
                             sizeof(packet.destination_address));
                 offset += sizeof(packet.destination_address);
 
-                std::memcpy(&packet.channel, &data[offset], sizeof(packet.channel));
+                std::memcpy(&data[offset], &packet.channel, sizeof(packet.channel));
 
-                OnWifiPacketReceived(packet);
-            });
-
-            {
-                std::lock_guard<std::mutex> lock(send_list_mutex);
-
-                for (const WifiPacket& packet : send_list) {
-                    std::vector<u8> data(sizeof(packet.type) + sizeof(u32) + packet.data.size() +
-                                         sizeof(packet.transmitter_address) +
-                                         sizeof(packet.destination_address) +
-                                         sizeof(packet.channel));
-                    std::size_t offset = 0;
-
-                    std::memcpy(&data[offset], &packet.type, sizeof(packet.type));
-                    offset += sizeof(packet.type);
-
-                    u32 data_size = static_cast<u32>(packet.data.size());
-                    std::memcpy(&data[offset], &data_size, sizeof(data_size));
-                    offset += sizeof(data_size);
-
-                    std::memcpy(&data[offset], &packet.data[0], data_size);
-                    offset += data_size;
-
-                    std::memcpy(&data[offset], &packet.transmitter_address[0],
-                                sizeof(packet.transmitter_address));
-                    offset += sizeof(packet.transmitter_address);
-
-                    std::memcpy(&data[offset], &packet.destination_address[0],
-                                sizeof(packet.destination_address));
-                    offset += sizeof(packet.destination_address);
-
-                    std::memcpy(&data[offset], &packet.channel, sizeof(packet.channel));
-
-                    client->sendBinary(data);
-                }
-                send_list.clear();
+                client->sendBinary(data);
             }
+            send_list.clear();
         }
-    }).detach();
+    }
+
+    client->close();
+    client->poll();
+}
+
+void NetworkThreadStop() {
+    run_network_thread = false;
 }
 
 } // namespace Service::NWM
