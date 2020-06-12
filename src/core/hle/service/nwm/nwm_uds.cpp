@@ -34,6 +34,19 @@ enum {
 };
 } // namespace ErrCodes
 
+// 802.11 broadcast MAC address
+constexpr MacAddress BroadcastMac = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
+
+// Number of beacons to store before we start dropping the old ones.
+// TODO(Subv): Find a more accurate value for this limit.
+constexpr std::size_t MaxBeaconFrames = 15;
+
+// Network node ID used when a SecureData packet is addressed to every connected node.
+constexpr u16 BroadcastNetworkNodeId = 0xFFFF;
+
+// The Host has always dest_node_id 1
+constexpr u16 HostDestNodeId = 1;
+
 // Send list
 static std::mutex send_list_mutex;
 static std::list<WifiPacket> send_list;

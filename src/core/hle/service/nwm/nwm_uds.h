@@ -66,19 +66,6 @@ const u16 DefaultBeaconInterval = 100;
 /// The maximum number of nodes that can exist in an UDS session.
 constexpr u32 UDSMaxNodes = 16;
 
-// 802.11 broadcast MAC address
-constexpr MacAddress BroadcastMac = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
-
-// Number of beacons to store before we start dropping the old ones.
-// TODO(Subv): Find a more accurate value for this limit.
-constexpr std::size_t MaxBeaconFrames = 15;
-
-// Network node ID used when a SecureData packet is addressed to every connected node.
-constexpr u16 BroadcastNetworkNodeId = 0xFFFF;
-
-// The Host has always dest_node_id 1
-constexpr u16 HostDestNodeId = 1;
-
 struct NodeInfo {
     u64_le friend_code_seed;
     std::array<u16_le, 10> username;
