@@ -1528,7 +1528,7 @@ void ConnectToMultiplayerServer() {
         }
 
         for (;;) {
-            client->poll();
+            client->poll(99);
 
             client->dispatchBinary([](const std::vector<u8>& data) {
                 WifiPacket packet;
