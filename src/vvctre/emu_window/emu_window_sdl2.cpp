@@ -145,7 +145,7 @@ void EmuWindow_SDL2::ToggleFullscreen() {
 
 EmuWindow_SDL2::EmuWindow_SDL2(Core::System& system, PluginManager& plugin_manager,
                                SDL_Window* window)
-    : system(system), plugin_manager(plugin_manager), window(window) {
+    : window(window), system(system), plugin_manager(plugin_manager) {
     SDL_SetWindowTitle(window, fmt::format("vvctre {}.{}.{}", vvctre_version_major,
                                            vvctre_version_minor, vvctre_version_patch)
                                    .c_str());
@@ -212,7 +212,7 @@ void EmuWindow_SDL2::SwapBuffers() {
                 if (ImGui::MenuItem("Install CIA")) {
                     const std::vector<std::string> files =
                         pfd::open_file("Install CIA", ".", {"CTR Importable Archive", "*.cia"},
-                                       true)
+                                       pfd::opt::multiselect)
                             .result();
 
                     if (!files.empty()) {
