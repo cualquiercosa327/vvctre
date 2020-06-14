@@ -87,7 +87,7 @@ InitialSettings::InitialSettings(PluginManager& plugin_manager, SDL_Window* wind
                     if (ImGui::Button("Install CIA")) {
                         const std::vector<std::string> files =
                             pfd::open_file("Install CIA", ".", {"CTR Importable Archive", "*.cia"},
-                                           true)
+                                           pfd::opt::multiselect)
                                 .result();
 
                         for (const auto& file : files) {
