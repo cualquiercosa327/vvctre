@@ -644,8 +644,6 @@ InitialSettings::InitialSettings(PluginManager& plugin_manager, SDL_Window* wind
                     }
 
                     ImGui::SameLine();
-                    ImGui::Text("/");
-                    ImGui::SameLine();
 
                     if (ImGui::InputScalar("##birthday_day", ImGuiDataType_U8, &day)) {
                         cfg.SetBirthday(month, day);

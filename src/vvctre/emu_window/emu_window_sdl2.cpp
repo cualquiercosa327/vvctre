@@ -857,8 +857,6 @@ void EmuWindow_SDL2::SwapBuffers() {
                         }
 
                         ImGui::SameLine();
-                        ImGui::Text("/");
-                        ImGui::SameLine();
 
                         if (ImGui::InputScalar("##birthday_day", ImGuiDataType_U8, &day)) {
                             cfg->SetBirthday(month, day);
