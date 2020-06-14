@@ -73,13 +73,6 @@ struct SMDH {
     };
 
     /**
-     * Gets game icon from SMDH
-     * @param large If true, returns large icon (48x48), otherwise returns small icon (24x24)
-     * @return vector of RGB565 data
-     */
-    std::vector<u16> GetIcon(bool large) const;
-
-    /**
      * Gets the short game title from SMDH
      * @param language title language
      * @return UTF-16 array of the short title
