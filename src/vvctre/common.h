@@ -4,8 +4,13 @@
 
 #pragma once
 
+#include <string>
+#include <tuple>
+#include <vector>
 #include "common/common_types.h"
 
 extern const u8 vvctre_version_major;
 extern const u8 vvctre_version_minor;
 extern const u8 vvctre_version_patch;
+
+std::vector<std::tuple<std::string, std::string>> GetInstalledList();

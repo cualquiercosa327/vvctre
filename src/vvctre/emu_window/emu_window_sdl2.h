@@ -89,6 +89,10 @@ private:
     IPCDebugger::CallbackHandle ipc_recorder_callback;
     std::map<int, IPCDebugger::RequestRecord> ipc_records;
 
+    // Installed menu item
+    std::string query;
+    std::vector<std::tuple<std::string, std::string>> installed;
+
     bool show_cheats_window = false;
     bool show_ipc_recorder_window = false;
 

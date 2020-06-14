@@ -61,6 +61,8 @@ public:
     ResultStatus ReadUpdateRomFS(std::shared_ptr<FileSys::RomFSReader>& romfs_file) override;
     ResultStatus DumpUpdateRomFS(const std::string& target_path) override;
 
+    ResultStatus ReadTitle(std::string& title) override;
+
 private:
     /**
      * Loads .code section into memory for booting

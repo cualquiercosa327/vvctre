@@ -205,6 +205,10 @@ void EmuWindow_SDL2::SwapBuffers() {
                     }
                 }
 
+                if (ImGui::MenuItem("Load Installed")) {
+                    installed = GetInstalledList();
+                }
+
                 if (ImGui::MenuItem("Install CIA")) {
                     const std::vector<std::string> files =
                         pfd::open_file("Install CIA", ".", {"CTR Importable Archive", "*.cia"},
@@ -2590,6 +2594,41 @@ void EmuWindow_SDL2::SwapBuffers() {
         }
 
         ImGui::End();
+    }
+
+    if (!installed.empty()) {
+        ImGui::OpenPopup("Installed");
+
+        ImGui::SetNextWindowSize(ImVec2(400.f, 480.0f), ImGuiCond_Appearing);
+        bool open = true;
+        if (ImGui::BeginPopupModal("Installed", &open,
+                                   ImGuiWindowFlags_NoSavedSettings |
+                                       ImGuiWindowFlags_NoDecoration)) {
+            ImGui::TextUnformatted("Search:");
+            ImGui::SameLine();
+            ImGui::InputText("##search", &query);
+
+            if (ImGui::ListBoxHeader("##installed", ImVec2(-1.0f, -1.0f))) {
+                for (const auto& title : installed) {
+                    const auto [path, name] = title;
+
+                    if (Common::ToLower(name).find(Common::ToLower(query)) != std::string::npos &&
+                        ImGui::Selectable(name.c_str())) {
+                        system.SetResetFilePath(path);
+                        system.RequestReset();
+                        installed.clear();
+                        query.clear();
+                        return;
+                    }
+                }
+                ImGui::ListBoxFooter();
+            }
+            ImGui::EndPopup();
+        }
+        if (!open) {
+            installed.clear();
+            query.clear();
+        }
     }
 
     ImGui::Render();

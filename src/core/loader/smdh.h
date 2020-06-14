@@ -12,6 +12,13 @@
 
 namespace Loader {
 
+/**
+ * Tests if data is a valid SMDH by its length and magic number.
+ * @param smdh_data data buffer to test
+ * @return bool test result
+ */
+bool IsValidSMDH(const std::vector<u8>& smdh_data);
+
 /// SMDH data structure that contains titles, icons etc. See https://www.3dbrew.org/wiki/SMDH
 struct SMDH {
     u32_le magic;
@@ -71,6 +78,13 @@ struct SMDH {
      * @return vector of RGB565 data
      */
     std::vector<u16> GetIcon(bool large) const;
+
+    /**
+     * Gets the short game title from SMDH
+     * @param language title language
+     * @return UTF-16 array of the short title
+     */
+    std::array<u16, 0x40> GetShortTitle(Loader::SMDH::TitleLanguage language) const;
 };
 static_assert(sizeof(SMDH) == 0x36C0, "SMDH structure size is wrong");
 

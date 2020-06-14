@@ -11,6 +11,17 @@
 
 namespace Loader {
 
+bool IsValidSMDH(const std::vector<u8>& smdh_data) {
+    if (smdh_data.size() < sizeof(Loader::SMDH)) {
+        return false;
+    }
+
+    u32 magic;
+    std::memcpy(&magic, smdh_data.data(), sizeof(u32));
+
+    return Loader::MakeMagic('S', 'M', 'D', 'H') == magic;
+}
+
 std::vector<u16> SMDH::GetIcon(bool large) const {
     u32 size;
     const u8* icon_data;
@@ -32,6 +43,10 @@ std::vector<u16> SMDH::GetIcon(bool large) const {
         }
     }
     return icon;
+}
+
+std::array<u16, 0x40> SMDH::GetShortTitle(Loader::SMDH::TitleLanguage language) const {
+    return titles[static_cast<int>(language)].short_title;
 }
 
 } // namespace Loader

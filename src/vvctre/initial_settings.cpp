@@ -66,7 +66,7 @@ InitialSettings::InitialSettings(PluginManager& plugin_manager, SDL_Window* wind
                 if (ImGui::BeginTabItem("Start")) {
                     ImGui::Text("File:");
                     ImGui::SameLine();
-                    ImGui::PushItemWidth(330);
+                    ImGui::PushItemWidth(250);
                     ImGui::InputText("##file", &Settings::values.file_path);
                     ImGui::PopItemWidth();
                     ImGui::SameLine();
@@ -155,6 +155,11 @@ InitialSettings::InitialSettings(PluginManager& plugin_manager, SDL_Window* wind
                         }
 
                         continue;
+                    }
+
+                    ImGui::SameLine();
+                    if (ImGui::Button("Installed")) {
+                        installed = GetInstalledList();
                     }
 
                     ImGui::SameLine();
@@ -2682,7 +2687,41 @@ InitialSettings::InitialSettings(PluginManager& plugin_manager, SDL_Window* wind
             }
         }
 
+        if (!installed.empty()) {
+            ImGui::OpenPopup("Installed");
+
+            ImGui::SetNextWindowSize(ImVec2(480.f, 400.0f), ImGuiCond_Appearing);
+            bool open = true;
+            if (ImGui::BeginPopupModal("Installed", &open, ImGuiWindowFlags_NoSavedSettings)) {
+                ImGui::TextUnformatted("Search:");
+                ImGui::SameLine();
+                ImGui::InputText("##search", &query);
+
+                if (ImGui::ListBoxHeader("##installed", ImVec2(-1.0f, -1.0f))) {
+                    for (const auto& title : installed) {
+                        const auto [path, name] = title;
+
+                        if (Common::ToLower(name).find(Common::ToLower(query)) !=
+                                std::string::npos &&
+                            ImGui::Selectable(name.c_str())) {
+                            Settings::values.file_path = path;
+                            installed.clear();
+                            query.clear();
+                            break;
+                        }
+                    }
+                    ImGui::ListBoxFooter();
+                }
+                ImGui::EndPopup();
+            }
+            if (!open) {
+                installed.clear();
+                query.clear();
+            }
+        }
+
         ImGui::End();
+
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
         ImGui::Render();
