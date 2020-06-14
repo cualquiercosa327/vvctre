@@ -64,7 +64,7 @@ InitialSettings::InitialSettings(PluginManager& plugin_manager, SDL_Window* wind
             ImGui::SetWindowSize(io.DisplaySize);
             if (ImGui::BeginTabBar("##tabBar")) {
                 if (ImGui::BeginTabItem("Start")) {
-                    ImGui::Text("File:");
+                    ImGui::TextUnformatted("File:");
                     ImGui::SameLine();
                     ImGui::PushItemWidth(250);
                     ImGui::InputText("##file", &Settings::values.file_path);
@@ -183,7 +183,7 @@ InitialSettings::InitialSettings(PluginManager& plugin_manager, SDL_Window* wind
                     }
 
                     if (Settings::values.record_movie.empty()) {
-                        ImGui::Text("Play Movie:");
+                        ImGui::TextUnformatted("Play Movie:");
                         ImGui::SameLine();
                         ImGui::InputText("##playmovie", &Settings::values.play_movie);
                         ImGui::SameLine();
@@ -198,7 +198,7 @@ InitialSettings::InitialSettings(PluginManager& plugin_manager, SDL_Window* wind
                     }
 
                     if (Settings::values.play_movie.empty()) {
-                        ImGui::Text("Record Movie:");
+                        ImGui::TextUnformatted("Record Movie:");
                         ImGui::SameLine();
                         ImGui::InputText("##recordmovie", &Settings::values.record_movie);
                         ImGui::SameLine();
@@ -213,7 +213,7 @@ InitialSettings::InitialSettings(PluginManager& plugin_manager, SDL_Window* wind
                         }
                     }
 
-                    ImGui::Text("Region:");
+                    ImGui::TextUnformatted("Region:");
                     ImGui::SameLine();
                     if (ImGui::BeginCombo("##region", [&] {
                             switch (Settings::values.region_value) {
@@ -264,15 +264,15 @@ InitialSettings::InitialSettings(PluginManager& plugin_manager, SDL_Window* wind
                         ImGui::EndCombo();
                     }
 
-                    ImGui::Text("Log Filter:");
+                    ImGui::TextUnformatted("Log Filter:");
                     ImGui::SameLine();
                     ImGui::InputText("##logfilter", &Settings::values.log_filter);
 
-                    ImGui::Text("Multiplayer Server URL:");
+                    ImGui::TextUnformatted("Multiplayer Server URL:");
                     ImGui::SameLine();
                     ImGui::InputText("##multiplayerserverurl", &Settings::values.multiplayer_url);
 
-                    ImGui::Text("Initial Time:");
+                    ImGui::TextUnformatted("Initial Time:");
                     ImGui::SameLine();
                     if (ImGui::BeginCombo("##initial_clock", [] {
                             switch (Settings::values.initial_clock) {
@@ -314,7 +314,7 @@ InitialSettings::InitialSettings(PluginManager& plugin_manager, SDL_Window* wind
                         ImGui::SameLine();
                         ImGui::Spacing();
                         ImGui::SameLine();
-                        ImGui::Text("Port:");
+                        ImGui::TextUnformatted("Port:");
                         ImGui::SameLine();
                         ImGui::PushItemWidth(45);
                         ImGui::InputScalar("##gdbstubport", ImGuiDataType_U16,
@@ -331,14 +331,14 @@ InitialSettings::InitialSettings(PluginManager& plugin_manager, SDL_Window* wind
 
                     if (Settings::values.limit_speed) {
                         ImGui::SameLine();
-                        ImGui::Text("To");
+                        ImGui::TextUnformatted("To");
                         ImGui::SameLine();
                         ImGui::PushItemWidth(45);
                         ImGui::InputScalar("##speedlimit", ImGuiDataType_U16,
                                            &Settings::values.speed_limit);
                         ImGui::PopItemWidth();
                         ImGui::SameLine();
-                        ImGui::Text("%%");
+                        ImGui::TextUnformatted("%");
                     }
 
                     if (Settings::values.use_custom_cpu_ticks) {
@@ -351,7 +351,7 @@ InitialSettings::InitialSettings(PluginManager& plugin_manager, SDL_Window* wind
                         ImGui::Checkbox("Custom CPU Ticks", &Settings::values.use_custom_cpu_ticks);
                     }
 
-                    ImGui::Text("CPU Clock Percentage:");
+                    ImGui::TextUnformatted("CPU Clock Percentage:");
                     ImGui::SameLine();
                     u32 min = 5;
                     u32 max = 400;
@@ -369,11 +369,11 @@ InitialSettings::InitialSettings(PluginManager& plugin_manager, SDL_Window* wind
                                         &Settings::values.enable_dsp_lle_multithread);
                     }
 
-                    ImGui::Text("Volume:");
+                    ImGui::TextUnformatted("Volume:");
                     ImGui::SameLine();
                     ImGui::SliderFloat("##volume", &Settings::values.audio_volume, 0.0f, 1.0f);
 
-                    ImGui::Text("Sink:");
+                    ImGui::TextUnformatted("Sink:");
                     ImGui::SameLine();
                     if (ImGui::BeginCombo("##sink", Settings::values.audio_sink_id.c_str())) {
                         if (ImGui::Selectable("auto")) {
@@ -387,7 +387,7 @@ InitialSettings::InitialSettings(PluginManager& plugin_manager, SDL_Window* wind
                         ImGui::EndCombo();
                     }
 
-                    ImGui::Text("Device:");
+                    ImGui::TextUnformatted("Device:");
                     ImGui::SameLine();
                     if (ImGui::BeginCombo("##device", Settings::values.audio_device_id.c_str())) {
                         if (ImGui::Selectable("auto")) {
@@ -404,7 +404,7 @@ InitialSettings::InitialSettings(PluginManager& plugin_manager, SDL_Window* wind
                         ImGui::EndCombo();
                     }
 
-                    ImGui::Text("Microphone Input Type:");
+                    ImGui::TextUnformatted("Microphone Input Type:");
                     ImGui::SameLine();
                     if (ImGui::BeginCombo("##microphone_input_type", [] {
                             switch (Settings::values.microphone_input_type) {
@@ -437,7 +437,7 @@ InitialSettings::InitialSettings(PluginManager& plugin_manager, SDL_Window* wind
 
                     if (Settings::values.microphone_input_type ==
                         Settings::MicrophoneInputType::Real) {
-                        ImGui::Text("Microphone Device");
+                        ImGui::TextUnformatted("Microphone Device");
                         ImGui::SameLine();
 
                         if (ImGui::BeginCombo("##microphonedevice",
@@ -458,7 +458,7 @@ InitialSettings::InitialSettings(PluginManager& plugin_manager, SDL_Window* wind
                 }
 
                 if (ImGui::BeginTabItem("Camera")) {
-                    ImGui::Text("Inner Camera Engine:");
+                    ImGui::TextUnformatted("Inner Camera Engine:");
                     ImGui::SameLine();
                     if (ImGui::BeginCombo("##innerengine",
                                           Settings::values
@@ -476,13 +476,13 @@ InitialSettings::InitialSettings(PluginManager& plugin_manager, SDL_Window* wind
                         ImGui::EndCombo();
                     }
 
-                    ImGui::Text("Inner Camera Parameter:");
+                    ImGui::TextUnformatted("Inner Camera Parameter:");
                     ImGui::SameLine();
                     ImGui::InputText("##innerparameter",
                                      &Settings::values.camera_parameter[static_cast<std::size_t>(
                                          Service::CAM::CameraIndex::InnerCamera)]);
 
-                    ImGui::Text("Outer Left Engine:");
+                    ImGui::TextUnformatted("Outer Left Engine:");
                     ImGui::SameLine();
                     if (ImGui::BeginCombo("##outerleftengine",
                                           Settings::values
@@ -500,13 +500,13 @@ InitialSettings::InitialSettings(PluginManager& plugin_manager, SDL_Window* wind
                         ImGui::EndCombo();
                     }
 
-                    ImGui::Text("Outer Left Parameter:");
+                    ImGui::TextUnformatted("Outer Left Parameter:");
                     ImGui::SameLine();
                     ImGui::InputText("##outerleftparameter",
                                      &Settings::values.camera_parameter[static_cast<std::size_t>(
                                          Service::CAM::CameraIndex::OuterLeftCamera)]);
 
-                    ImGui::Text("Outer Right Engine");
+                    ImGui::TextUnformatted("Outer Right Engine");
                     ImGui::SameLine();
                     if (ImGui::BeginCombo("##outerrightengine",
                                           Settings::values
@@ -524,7 +524,7 @@ InitialSettings::InitialSettings(PluginManager& plugin_manager, SDL_Window* wind
                         ImGui::EndCombo();
                     }
 
-                    ImGui::Text("Outer Right Parameter:");
+                    ImGui::TextUnformatted("Outer Right Parameter:");
                     ImGui::SameLine();
                     ImGui::InputText("##outerrightparameter",
                                      &Settings::values.camera_parameter[static_cast<std::size_t>(
@@ -534,7 +534,7 @@ InitialSettings::InitialSettings(PluginManager& plugin_manager, SDL_Window* wind
                 }
 
                 if (ImGui::BeginTabItem("System")) {
-                    ImGui::Text("Username:");
+                    ImGui::TextUnformatted("Username:");
                     ImGui::SameLine();
 
                     std::string username = Common::UTF16ToUTF8(cfg.GetUsername());
@@ -543,7 +543,7 @@ InitialSettings::InitialSettings(PluginManager& plugin_manager, SDL_Window* wind
                         cfg.UpdateConfigNANDSavegame();
                     }
 
-                    ImGui::Text("Birthday:");
+                    ImGui::TextUnformatted("Birthday:");
                     ImGui::SameLine();
 
                     auto [month, day] = cfg.GetBirthday();
@@ -650,7 +650,7 @@ InitialSettings::InitialSettings(PluginManager& plugin_manager, SDL_Window* wind
                         update_config_savegame = true;
                     }
 
-                    ImGui::Text("Language:");
+                    ImGui::TextUnformatted("Language:");
                     ImGui::SameLine();
 
                     if (ImGui::BeginCombo("##language", [&] {
@@ -748,7 +748,7 @@ InitialSettings::InitialSettings(PluginManager& plugin_manager, SDL_Window* wind
                         ImGui::EndCombo();
                     }
 
-                    ImGui::Text("Sound output mode:");
+                    ImGui::TextUnformatted("Sound output mode:");
                     ImGui::SameLine();
                     if (ImGui::BeginCombo("##soundoutputmode", [&] {
                             switch (cfg.GetSoundOutputMode()) {
@@ -779,7 +779,7 @@ InitialSettings::InitialSettings(PluginManager& plugin_manager, SDL_Window* wind
                         ImGui::EndCombo();
                     }
 
-                    ImGui::Text("Country:");
+                    ImGui::TextUnformatted("Country:");
                     ImGui::SameLine();
                     if (ImGui::BeginCombo("##country", [&] {
                             switch (cfg.GetCountryCode()) {
@@ -1590,7 +1590,7 @@ InitialSettings::InitialSettings(PluginManager& plugin_manager, SDL_Window* wind
                         ImGui::EndCombo();
                     }
 
-                    ImGui::Text("Play Coins:");
+                    ImGui::TextUnformatted("Play Coins:");
                     ImGui::SameLine();
 
                     const u16 min = 0;
@@ -1634,7 +1634,7 @@ InitialSettings::InitialSettings(PluginManager& plugin_manager, SDL_Window* wind
                     ImGui::Checkbox("Sharper Distant Objects",
                                     &Settings::values.sharper_distant_objects);
 
-                    ImGui::Text("Resolution");
+                    ImGui::TextUnformatted("Resolution");
                     ImGui::SameLine();
                     const u16 min = 0;
                     const u16 max = 10;
@@ -1642,12 +1642,12 @@ InitialSettings::InitialSettings(PluginManager& plugin_manager, SDL_Window* wind
                                         &Settings::values.resolution, &min, &max,
                                         Settings::values.resolution == 0 ? "Window Size" : "%d");
 
-                    ImGui::Text("Background Color");
+                    ImGui::TextUnformatted("Background Color");
                     ImGui::SameLine();
                     ImGui::ColorEdit3("##backgroundcolor", &Settings::values.background_color_red,
                                       ImGuiColorEditFlags_NoInputs);
 
-                    ImGui::Text("Post Processing Shader");
+                    ImGui::TextUnformatted("Post Processing Shader");
                     ImGui::SameLine();
                     if (ImGui::BeginCombo("##postprocessingshader",
                                           Settings::values.post_processing_shader.c_str())) {
@@ -1678,7 +1678,7 @@ InitialSettings::InitialSettings(PluginManager& plugin_manager, SDL_Window* wind
                         ImGui::EndCombo();
                     }
 
-                    ImGui::Text("Texture Filter");
+                    ImGui::TextUnformatted("Texture Filter");
                     ImGui::SameLine();
                     if (ImGui::BeginCombo("##texturefilter",
                                           Settings::values.texture_filter.c_str())) {
@@ -1693,7 +1693,7 @@ InitialSettings::InitialSettings(PluginManager& plugin_manager, SDL_Window* wind
                         ImGui::EndCombo();
                     }
 
-                    ImGui::Text("3D");
+                    ImGui::TextUnformatted("3D");
                     ImGui::SameLine();
 
                     if (ImGui::BeginCombo("##render_3d", [] {
@@ -1897,9 +1897,9 @@ InitialSettings::InitialSettings(PluginManager& plugin_manager, SDL_Window* wind
 
                     // Buttons
                     ImGui::BeginGroup();
-                    ImGui::Text("Buttons");
+                    ImGui::TextUnformatted("Buttons");
 
-                    ImGui::Text("A:");
+                    ImGui::TextUnformatted("A:");
                     ImGui::SameLine();
                     if (ImGui::Button((InputCommon::ButtonToText(
                                            Settings::values.buttons[Settings::NativeButton::A]) +
@@ -1909,7 +1909,7 @@ InitialSettings::InitialSettings(PluginManager& plugin_manager, SDL_Window* wind
                             GetInput(InputCommon::Polling::DeviceType::Button);
                     }
 
-                    ImGui::Text("B:");
+                    ImGui::TextUnformatted("B:");
                     ImGui::SameLine();
                     if (ImGui::Button((InputCommon::ButtonToText(
                                            Settings::values.buttons[Settings::NativeButton::B]) +
@@ -1919,7 +1919,7 @@ InitialSettings::InitialSettings(PluginManager& plugin_manager, SDL_Window* wind
                             GetInput(InputCommon::Polling::DeviceType::Button);
                     }
 
-                    ImGui::Text("X:");
+                    ImGui::TextUnformatted("X:");
                     ImGui::SameLine();
                     if (ImGui::Button((InputCommon::ButtonToText(
                                            Settings::values.buttons[Settings::NativeButton::X]) +
@@ -1929,7 +1929,7 @@ InitialSettings::InitialSettings(PluginManager& plugin_manager, SDL_Window* wind
                             GetInput(InputCommon::Polling::DeviceType::Button);
                     }
 
-                    ImGui::Text("Y:");
+                    ImGui::TextUnformatted("Y:");
                     ImGui::SameLine();
                     if (ImGui::Button((InputCommon::ButtonToText(
                                            Settings::values.buttons[Settings::NativeButton::Y]) +
@@ -1939,7 +1939,7 @@ InitialSettings::InitialSettings(PluginManager& plugin_manager, SDL_Window* wind
                             GetInput(InputCommon::Polling::DeviceType::Button);
                     }
 
-                    ImGui::Text("L:");
+                    ImGui::TextUnformatted("L:");
                     ImGui::SameLine();
                     if (ImGui::Button((InputCommon::ButtonToText(
                                            Settings::values.buttons[Settings::NativeButton::L]) +
@@ -1949,7 +1949,7 @@ InitialSettings::InitialSettings(PluginManager& plugin_manager, SDL_Window* wind
                             GetInput(InputCommon::Polling::DeviceType::Button);
                     }
 
-                    ImGui::Text("R:");
+                    ImGui::TextUnformatted("R:");
                     ImGui::SameLine();
                     if (ImGui::Button((InputCommon::ButtonToText(
                                            Settings::values.buttons[Settings::NativeButton::R]) +
@@ -1959,7 +1959,7 @@ InitialSettings::InitialSettings(PluginManager& plugin_manager, SDL_Window* wind
                             GetInput(InputCommon::Polling::DeviceType::Button);
                     }
 
-                    ImGui::Text("ZL:");
+                    ImGui::TextUnformatted("ZL:");
                     ImGui::SameLine();
                     if (ImGui::Button((InputCommon::ButtonToText(
                                            Settings::values.buttons[Settings::NativeButton::ZL]) +
@@ -1973,7 +1973,7 @@ InitialSettings::InitialSettings(PluginManager& plugin_manager, SDL_Window* wind
                             "If you're using a XInput controller, make sure it says Axis 2+.");
                     }
 
-                    ImGui::Text("ZR:");
+                    ImGui::TextUnformatted("ZR:");
                     ImGui::SameLine();
                     if (ImGui::Button((InputCommon::ButtonToText(
                                            Settings::values.buttons[Settings::NativeButton::ZR]) +
@@ -1987,7 +1987,7 @@ InitialSettings::InitialSettings(PluginManager& plugin_manager, SDL_Window* wind
                             "If you're using a XInput controller, make sure it says Axis 5+.");
                     }
 
-                    ImGui::Text("Start:");
+                    ImGui::TextUnformatted("Start:");
                     ImGui::SameLine();
                     if (ImGui::Button(
                             (InputCommon::ButtonToText(
@@ -1998,7 +1998,7 @@ InitialSettings::InitialSettings(PluginManager& plugin_manager, SDL_Window* wind
                             GetInput(InputCommon::Polling::DeviceType::Button);
                     }
 
-                    ImGui::Text("Select:");
+                    ImGui::TextUnformatted("Select:");
                     ImGui::SameLine();
                     if (ImGui::Button(
                             (InputCommon::ButtonToText(
@@ -2009,7 +2009,7 @@ InitialSettings::InitialSettings(PluginManager& plugin_manager, SDL_Window* wind
                             GetInput(InputCommon::Polling::DeviceType::Button);
                     }
 
-                    ImGui::Text("Debug:");
+                    ImGui::TextUnformatted("Debug:");
                     ImGui::SameLine();
                     if (ImGui::Button(
                             (InputCommon::ButtonToText(
@@ -2020,7 +2020,7 @@ InitialSettings::InitialSettings(PluginManager& plugin_manager, SDL_Window* wind
                             GetInput(InputCommon::Polling::DeviceType::Button);
                     }
 
-                    ImGui::Text("GPIO14:");
+                    ImGui::TextUnformatted("GPIO14:");
                     ImGui::SameLine();
                     if (ImGui::Button(
                             (InputCommon::ButtonToText(
@@ -2031,7 +2031,7 @@ InitialSettings::InitialSettings(PluginManager& plugin_manager, SDL_Window* wind
                             GetInput(InputCommon::Polling::DeviceType::Button);
                     }
 
-                    ImGui::Text("HOME:");
+                    ImGui::TextUnformatted("HOME:");
                     ImGui::SameLine();
                     if (ImGui::Button((InputCommon::ButtonToText(
                                            Settings::values.buttons[Settings::NativeButton::Home]) +
@@ -2046,8 +2046,8 @@ InitialSettings::InitialSettings(PluginManager& plugin_manager, SDL_Window* wind
 
                     // Circle Pad
                     ImGui::BeginGroup();
-                    ImGui::Text("Circle Pad");
-                    ImGui::Text("Up:");
+                    ImGui::TextUnformatted("Circle Pad");
+                    ImGui::TextUnformatted("Up:");
                     ImGui::SameLine();
                     if (ImGui::Button(
                             (InputCommon::AnalogToText(
@@ -2069,7 +2069,7 @@ InitialSettings::InitialSettings(PluginManager& plugin_manager, SDL_Window* wind
                         Settings::values.analogs[Settings::NativeAnalog::CirclePad] =
                             params.Serialize();
                     }
-                    ImGui::Text("Down:");
+                    ImGui::TextUnformatted("Down:");
                     ImGui::SameLine();
                     if (ImGui::Button(
                             (InputCommon::AnalogToText(
@@ -2091,7 +2091,7 @@ InitialSettings::InitialSettings(PluginManager& plugin_manager, SDL_Window* wind
                         Settings::values.analogs[Settings::NativeAnalog::CirclePad] =
                             params.Serialize();
                     }
-                    ImGui::Text("Left:");
+                    ImGui::TextUnformatted("Left:");
                     ImGui::SameLine();
                     if (ImGui::Button(
                             (InputCommon::AnalogToText(
@@ -2113,7 +2113,7 @@ InitialSettings::InitialSettings(PluginManager& plugin_manager, SDL_Window* wind
                         Settings::values.analogs[Settings::NativeAnalog::CirclePad] =
                             params.Serialize();
                     }
-                    ImGui::Text("Right:");
+                    ImGui::TextUnformatted("Right:");
                     ImGui::SameLine();
                     if (ImGui::Button(
                             (InputCommon::AnalogToText(
@@ -2135,7 +2135,7 @@ InitialSettings::InitialSettings(PluginManager& plugin_manager, SDL_Window* wind
                         Settings::values.analogs[Settings::NativeAnalog::CirclePad] =
                             params.Serialize();
                     }
-                    ImGui::Text("Modifier:");
+                    ImGui::TextUnformatted("Modifier:");
                     ImGui::SameLine();
                     if (ImGui::Button(
                             (InputCommon::AnalogToText(
@@ -2162,7 +2162,7 @@ InitialSettings::InitialSettings(PluginManager& plugin_manager, SDL_Window* wind
                             Settings::values.analogs[Settings::NativeAnalog::CirclePad]);
                         if (params.Get("engine", "") == "sdl") {
                             float deadzone = params.Get("deadzone", 0.0f);
-                            ImGui::Text("Deadzone:");
+                            ImGui::TextUnformatted("Deadzone:");
                             ImGui::SameLine();
                             ImGui::PushItemWidth(100);
                             if (ImGui::SliderFloat("##deadzoneCirclePad", &deadzone, 0.0f, 1.0f)) {
@@ -2198,8 +2198,8 @@ InitialSettings::InitialSettings(PluginManager& plugin_manager, SDL_Window* wind
 
                     // Circle Pad Pro
                     ImGui::BeginGroup();
-                    ImGui::Text("Circle Pad Pro");
-                    ImGui::Text("Up:");
+                    ImGui::TextUnformatted("Circle Pad Pro");
+                    ImGui::TextUnformatted("Up:");
                     ImGui::SameLine();
                     if (ImGui::Button(
                             (InputCommon::AnalogToText(
@@ -2221,7 +2221,7 @@ InitialSettings::InitialSettings(PluginManager& plugin_manager, SDL_Window* wind
                         Settings::values.analogs[Settings::NativeAnalog::CirclePadPro] =
                             params.Serialize();
                     }
-                    ImGui::Text("Down:");
+                    ImGui::TextUnformatted("Down:");
                     ImGui::SameLine();
                     if (ImGui::Button(
                             (InputCommon::AnalogToText(
@@ -2243,7 +2243,7 @@ InitialSettings::InitialSettings(PluginManager& plugin_manager, SDL_Window* wind
                         Settings::values.analogs[Settings::NativeAnalog::CirclePadPro] =
                             params.Serialize();
                     }
-                    ImGui::Text("Left:");
+                    ImGui::TextUnformatted("Left:");
                     ImGui::SameLine();
                     if (ImGui::Button(
                             (InputCommon::AnalogToText(
@@ -2265,7 +2265,7 @@ InitialSettings::InitialSettings(PluginManager& plugin_manager, SDL_Window* wind
                         Settings::values.analogs[Settings::NativeAnalog::CirclePadPro] =
                             params.Serialize();
                     }
-                    ImGui::Text("Right:");
+                    ImGui::TextUnformatted("Right:");
                     ImGui::SameLine();
                     if (ImGui::Button(
                             (InputCommon::AnalogToText(
@@ -2287,7 +2287,7 @@ InitialSettings::InitialSettings(PluginManager& plugin_manager, SDL_Window* wind
                         Settings::values.analogs[Settings::NativeAnalog::CirclePadPro] =
                             params.Serialize();
                     }
-                    ImGui::Text("Modifier:");
+                    ImGui::TextUnformatted("Modifier:");
                     ImGui::SameLine();
                     if (ImGui::Button(
                             (InputCommon::AnalogToText(
@@ -2314,7 +2314,7 @@ InitialSettings::InitialSettings(PluginManager& plugin_manager, SDL_Window* wind
                             Settings::values.analogs[Settings::NativeAnalog::CirclePadPro]);
                         if (params.Get("engine", "") == "sdl") {
                             float deadzone = params.Get("deadzone", 0.0f);
-                            ImGui::Text("Deadzone:");
+                            ImGui::TextUnformatted("Deadzone:");
                             ImGui::SameLine();
                             ImGui::PushItemWidth(100);
                             if (ImGui::SliderFloat("##deadzoneCirclePadPro", &deadzone, 0.0f,
@@ -2351,8 +2351,8 @@ InitialSettings::InitialSettings(PluginManager& plugin_manager, SDL_Window* wind
 
                     // D-Pad
                     ImGui::BeginGroup();
-                    ImGui::Text("D-Pad");
-                    ImGui::Text("Up:");
+                    ImGui::TextUnformatted("D-Pad");
+                    ImGui::TextUnformatted("Up:");
                     ImGui::SameLine();
                     if (ImGui::Button((InputCommon::ButtonToText(
                                            Settings::values.buttons[Settings::NativeButton::Up]) +
@@ -2361,7 +2361,7 @@ InitialSettings::InitialSettings(PluginManager& plugin_manager, SDL_Window* wind
                         Settings::values.buttons[Settings::NativeButton::Up] =
                             GetInput(InputCommon::Polling::DeviceType::Button);
                     }
-                    ImGui::Text("Down:");
+                    ImGui::TextUnformatted("Down:");
                     ImGui::SameLine();
                     if (ImGui::Button((InputCommon::ButtonToText(
                                            Settings::values.buttons[Settings::NativeButton::Down]) +
@@ -2370,7 +2370,7 @@ InitialSettings::InitialSettings(PluginManager& plugin_manager, SDL_Window* wind
                         Settings::values.buttons[Settings::NativeButton::Down] =
                             GetInput(InputCommon::Polling::DeviceType::Button);
                     }
-                    ImGui::Text("Left:");
+                    ImGui::TextUnformatted("Left:");
                     ImGui::SameLine();
                     if (ImGui::Button((InputCommon::ButtonToText(
                                            Settings::values.buttons[Settings::NativeButton::Left]) +
@@ -2379,7 +2379,7 @@ InitialSettings::InitialSettings(PluginManager& plugin_manager, SDL_Window* wind
                         Settings::values.buttons[Settings::NativeButton::Left] =
                             GetInput(InputCommon::Polling::DeviceType::Button);
                     }
-                    ImGui::Text("Right:");
+                    ImGui::TextUnformatted("Right:");
                     ImGui::SameLine();
                     if (ImGui::Button(
                             (InputCommon::ButtonToText(
@@ -2393,7 +2393,7 @@ InitialSettings::InitialSettings(PluginManager& plugin_manager, SDL_Window* wind
 
                     ImGui::NewLine();
 
-                    ImGui::Text("Motion:");
+                    ImGui::TextUnformatted("Motion:");
                     ImGui::SameLine();
 
                     ImGui::PushItemWidth(100);
@@ -2432,7 +2432,7 @@ InitialSettings::InitialSettings(PluginManager& plugin_manager, SDL_Window* wind
                         ImGui::SameLine();
                         ImGui::Spacing();
                         ImGui::SameLine();
-                        ImGui::Text("Update Period:");
+                        ImGui::TextUnformatted("Update Period:");
                         ImGui::SameLine();
                         ImGui::PushItemWidth(30);
                         if (ImGui::InputInt("##update_period", &update_period, 0)) {
@@ -2442,7 +2442,7 @@ InitialSettings::InitialSettings(PluginManager& plugin_manager, SDL_Window* wind
                         ImGui::PopItemWidth();
 
                         ImGui::SameLine();
-                        ImGui::Text("Sensitivity:");
+                        ImGui::TextUnformatted("Sensitivity:");
                         ImGui::SameLine();
                         ImGui::PushItemWidth(40);
                         if (ImGui::InputFloat("##sensitivity", &sensitivity)) {
@@ -2452,7 +2452,7 @@ InitialSettings::InitialSettings(PluginManager& plugin_manager, SDL_Window* wind
                         ImGui::PopItemWidth();
 
                         ImGui::SameLine();
-                        ImGui::Text("Clamp:");
+                        ImGui::TextUnformatted("Clamp:");
                         ImGui::SameLine();
                         ImGui::PushItemWidth(50);
                         if (ImGui::InputFloat("##clamp", &clamp)) {
@@ -2462,7 +2462,7 @@ InitialSettings::InitialSettings(PluginManager& plugin_manager, SDL_Window* wind
                         ImGui::PopItemWidth();
                     }
 
-                    ImGui::Text("Touch:");
+                    ImGui::TextUnformatted("Touch:");
                     ImGui::SameLine();
                     ImGui::PushItemWidth(100);
                     if (ImGui::BeginCombo("##touch_device", [] {
@@ -2501,7 +2501,7 @@ InitialSettings::InitialSettings(PluginManager& plugin_manager, SDL_Window* wind
                         ImGui::SameLine();
                         ImGui::Spacing();
                         ImGui::SameLine();
-                        ImGui::Text("Min X:");
+                        ImGui::TextUnformatted("Min X:");
                         ImGui::SameLine();
                         ImGui::PushItemWidth(45);
                         if (ImGui::InputInt("##min_x", &min_x, 0)) {
@@ -2511,7 +2511,7 @@ InitialSettings::InitialSettings(PluginManager& plugin_manager, SDL_Window* wind
                         ImGui::PopItemWidth();
 
                         ImGui::SameLine();
-                        ImGui::Text("Min Y:");
+                        ImGui::TextUnformatted("Min Y:");
                         ImGui::SameLine();
                         ImGui::PushItemWidth(45);
                         if (ImGui::InputInt("##min_y", &min_y, 0)) {
@@ -2521,7 +2521,7 @@ InitialSettings::InitialSettings(PluginManager& plugin_manager, SDL_Window* wind
                         ImGui::PopItemWidth();
 
                         ImGui::SameLine();
-                        ImGui::Text("Max X:");
+                        ImGui::TextUnformatted("Max X:");
                         ImGui::SameLine();
                         ImGui::PushItemWidth(45);
                         if (ImGui::InputInt("##max_x", &max_x, 0)) {
@@ -2531,7 +2531,7 @@ InitialSettings::InitialSettings(PluginManager& plugin_manager, SDL_Window* wind
                         ImGui::PopItemWidth();
 
                         ImGui::SameLine();
-                        ImGui::Text("Max Y:");
+                        ImGui::TextUnformatted("Max Y:");
                         ImGui::SameLine();
                         ImGui::PushItemWidth(45);
                         if (ImGui::InputInt("##max_y", &max_y, 0)) {
@@ -2543,7 +2543,7 @@ InitialSettings::InitialSettings(PluginManager& plugin_manager, SDL_Window* wind
 
                     if (motion_device.Get("engine", "") == "cemuhookudp" ||
                         touch_device.Get("engine", "") == "cemuhookudp") {
-                        ImGui::Text("CemuhookUDP:");
+                        ImGui::TextUnformatted("CemuhookUDP:");
 
                         ImGui::SameLine();
                         ImGui::PushItemWidth(110);
@@ -2552,7 +2552,7 @@ InitialSettings::InitialSettings(PluginManager& plugin_manager, SDL_Window* wind
                         ImGui::PopItemWidth();
 
                         ImGui::SameLine();
-                        ImGui::Text(":");
+                        ImGui::TextUnformatted(":");
                         ImGui::SameLine();
                         ImGui::PushItemWidth(45);
                         ImGui::InputScalar("##cemuhookudp_port", ImGuiDataType_U16,
@@ -2560,7 +2560,7 @@ InitialSettings::InitialSettings(PluginManager& plugin_manager, SDL_Window* wind
                         ImGui::PopItemWidth();
 
                         ImGui::SameLine();
-                        ImGui::Text("Pad");
+                        ImGui::TextUnformatted("Pad");
                         ImGui::SameLine();
                         ImGui::PushItemWidth(15);
                         ImGui::InputScalar("##cemuhookudp_pad_index", ImGuiDataType_U8,
@@ -2573,7 +2573,7 @@ InitialSettings::InitialSettings(PluginManager& plugin_manager, SDL_Window* wind
 
                 if (ImGui::BeginTabItem("Layout")) {
                     if (!Settings::values.use_custom_layout) {
-                        ImGui::Text("Layout:");
+                        ImGui::TextUnformatted("Layout:");
                         ImGui::SameLine();
                         if (ImGui::BeginCombo("##layout", [] {
                                 switch (Settings::values.layout) {
@@ -2617,35 +2617,35 @@ InitialSettings::InitialSettings(PluginManager& plugin_manager, SDL_Window* wind
                     ImGui::Checkbox("Upright Screens", &Settings::values.upright_screens);
 
                     if (Settings::values.use_custom_layout) {
-                        ImGui::Text("Top Left:");
+                        ImGui::TextUnformatted("Top Left:");
                         ImGui::SameLine();
                         ImGui::InputScalar("##topleft", ImGuiDataType_U16,
                                            &Settings::values.custom_layout_top_left);
-                        ImGui::Text("Top Top:");
+                        ImGui::TextUnformatted("Top Top:");
                         ImGui::SameLine();
                         ImGui::InputScalar("##toptop", ImGuiDataType_U16,
                                            &Settings::values.custom_layout_top_top);
-                        ImGui::Text("Top Right:");
+                        ImGui::TextUnformatted("Top Right:");
                         ImGui::SameLine();
                         ImGui::InputScalar("##topright", ImGuiDataType_U16,
                                            &Settings::values.custom_layout_top_right);
-                        ImGui::Text("Top Bottom:");
+                        ImGui::TextUnformatted("Top Bottom:");
                         ImGui::SameLine();
                         ImGui::InputScalar("##topbottom", ImGuiDataType_U16,
                                            &Settings::values.custom_layout_top_bottom);
-                        ImGui::Text("Bottom Left:");
+                        ImGui::TextUnformatted("Bottom Left:");
                         ImGui::SameLine();
                         ImGui::InputScalar("##bottomleft", ImGuiDataType_U16,
                                            &Settings::values.custom_layout_bottom_left);
-                        ImGui::Text("Bottom Top:");
+                        ImGui::TextUnformatted("Bottom Top:");
                         ImGui::SameLine();
                         ImGui::InputScalar("##bottomtop", ImGuiDataType_U16,
                                            &Settings::values.custom_layout_bottom_top);
-                        ImGui::Text("Bottom Right:");
+                        ImGui::TextUnformatted("Bottom Right:");
                         ImGui::SameLine();
                         ImGui::InputScalar("##bottomright", ImGuiDataType_U16,
                                            &Settings::values.custom_layout_bottom_right);
-                        ImGui::Text("Bottom Bottom:");
+                        ImGui::TextUnformatted("Bottom Bottom:");
                         ImGui::SameLine();
                         ImGui::InputScalar("##bottombottom", ImGuiDataType_U16,
                                            &Settings::values.custom_layout_bottom_bottom);
