@@ -7,6 +7,7 @@
 #include <tuple>
 #include <cryptopp/osrng.h>
 #include <cryptopp/sha.h>
+#include <fmt/format.h>
 #include "common/file_util.h"
 #include "common/logging/log.h"
 #include "common/string_util.h"
@@ -812,6 +813,23 @@ void InstallInterfaces(Core::System& system) {
     std::make_shared<CFG_S>(cfg)->InstallAsService(service_manager);
     std::make_shared<CFG_U>(cfg)->InstallAsService(service_manager);
     std::make_shared<CFG_NOR>()->InstallAsService(service_manager);
+}
+
+std::string GetConsoleIdHash(Core::System& system) {
+    u64_le console_id{};
+    std::array<u8, sizeof(console_id)> buffer;
+    if (system.IsPoweredOn()) {
+        auto cfg = GetModule(system);
+        ASSERT_MSG(cfg, "CFG Module missing!");
+        console_id = cfg->GetConsoleUniqueId();
+    } else {
+        console_id = std::make_unique<Service::CFG::Module>()->GetConsoleUniqueId();
+    }
+    std::memcpy(buffer.data(), &console_id, sizeof(console_id));
+
+    std::array<u8, CryptoPP::SHA256::DIGESTSIZE> hash;
+    CryptoPP::SHA256().CalculateDigest(hash.data(), buffer.data(), sizeof(buffer));
+    return fmt::format("{:02x}", fmt::join(hash.begin(), hash.end(), ""));
 }
 
 } // namespace Service::CFG

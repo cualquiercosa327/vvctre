@@ -106,7 +106,8 @@ enum class Class : ClassType {
     Input,             ///< Input emulation
     Movie,             ///< Movie (Input Recording) Playback
     Plugins,           ///< Messages from plugins
-    Count              ///< Total number of logging classes 
+    Network,           ///< Network
+    Count              ///< Total number of logging classes
 };
 
 /// Logs a message to the global logger, using fmt

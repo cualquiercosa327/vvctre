@@ -1,7 +1,12 @@
 name: CI
 
 on:
-  repository_dispatch:
+  push:
+    tags:
+      - "*"
+  pull_request:
+    branches:
+      - "*"
 
 jobs:
   build:
@@ -28,8 +33,8 @@ jobs:
         working-directory: ./build
         shell: bash
         run: cmake --build . --config Release
-      - name: Prepare to upload (repository dispatch)
-        if: github.event_name == 'repository_dispatch'
+      - name: Prepare to upload to GitHub releases
+        if: github.event_name == 'push'
         shell: bash
         run: |
           cd $GITHUB_WORKSPACE
@@ -37,8 +42,10 @@ jobs:
           if [ "$RUNNER_OS" == "Windows" ]; then
             rm ./build/bin/Release/*.pdb
           fi
-          7z a vvctre-${{github.event.client_payload.version}}-${{runner.os}}.7z ./build/bin/Release/*
-      - name: Prepare to upload (pull request)
+          export VERSION=${GITHUB_REF:10}
+          echo ::set-env name=VERSION::$VERSION
+          7z a vvctre-$VERSION-${{runner.os}}.7z ./build/bin/Release/*
+      - name: Prepare to upload artifact
         if: github.event_name == 'pull_request'
         shell: bash
         run: |
@@ -47,14 +54,16 @@ jobs:
           if [ "$RUNNER_OS" == "Windows" ]; then
             rm ./build/bin/Release/*.pdb
           fi
-      - name: Upload (repository dispatch)
-        if: github.event_name == 'repository_dispatch'
-        uses: JantHsueh/upload-file-action@master
+      - name: Upload to GitHub releases
+        if: github.event_name == 'push'
+        uses: svenstaro/upload-release-action@v1-release
         with:
-          url: ${{secrets.DISCORD_WEBHOOK}}
-          forms: "{}"
-          fileForms: '{"file": "vvctre-${{github.event.client_payload.version}}-${{runner.os}}.7z"}'
-      - name: Upload (pull request)
+          repo_token: ${{secrets.GITHUB_TOKEN}}
+          file: vvctre-${{env.VERSION}}-${{runner.os}}.7z
+          asset_name: vvctre-${{env.VERSION}}-${{runner.os}}.7z
+          tag: ${{github.ref}}
+          overwrite: true
+      - name: Upload artifact
         if: github.event_name == 'pull_request'
         uses: actions/upload-artifact@v1
         with:

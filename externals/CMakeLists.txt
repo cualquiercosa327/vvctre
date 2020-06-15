@@ -35,6 +35,10 @@ if (ARCHITECTURE_x86_64)
     target_compile_definitions(xbyak INTERFACE XBYAK_NO_OP_NAMES)
 endif()
 
+# ENet
+add_subdirectory(enet)
+target_include_directories(enet INTERFACE ./enet/include)
+
 # Cubeb
 if (ENABLE_CUBEB)
     set(BUILD_TESTS OFF CACHE BOOL "")
@@ -96,13 +100,6 @@ if(UNIX)
 endif()
 add_subdirectory(clip EXCLUDE_FROM_ALL)
 target_include_directories(clip INTERFACE ./clip)
-
-# easywsclient
-add_library(easywsclient
-    easywsclient/easywsclient.cpp
-    easywsclient/easywsclient.hpp
-)
-target_include_directories(easywsclient PUBLIC ./easywsclient)
 
 # stb
 add_library(stb

@@ -1132,14 +1132,6 @@ const char* vvctre_settings_get_log_filter() {
     return Settings::values.log_filter.c_str();
 }
 
-void vvctre_settings_set_multiplayer_url(const char* value) {
-    Settings::values.multiplayer_url = std::string(value);
-}
-
-const char* vvctre_settings_get_multiplayer_url() {
-    return Settings::values.multiplayer_url.c_str();
-}
-
 void vvctre_settings_set_initial_clock(int value) {
     Settings::values.initial_clock = static_cast<Settings::InitialClock>(value);
 }
@@ -1960,8 +1952,6 @@ std::unordered_map<std::string, void*> PluginManager::function_map = {
     {"vvctre_settings_get_region_value", (void*)&vvctre_settings_get_region_value},
     {"vvctre_settings_set_log_filter", (void*)&vvctre_settings_set_log_filter},
     {"vvctre_settings_get_log_filter", (void*)&vvctre_settings_get_log_filter},
-    {"vvctre_settings_set_multiplayer_url", (void*)&vvctre_settings_set_multiplayer_url},
-    {"vvctre_settings_get_multiplayer_url", (void*)&vvctre_settings_get_multiplayer_url},
     {"vvctre_settings_set_initial_clock", (void*)&vvctre_settings_set_initial_clock},
     {"vvctre_settings_get_initial_clock", (void*)&vvctre_settings_get_initial_clock},
     {"vvctre_settings_set_unix_timestamp", (void*)&vvctre_settings_set_unix_timestamp},

@@ -8,6 +8,7 @@
 #include <tuple>
 #include <vector>
 #include "common/common_types.h"
+#include "vvctre/common.h"
 
 class PluginManager;
 struct SDL_Window;
@@ -24,7 +25,6 @@ public:
 private:
     bool update_config_savegame = false;
 
-    // Installed button
-    std::string query;
     std::vector<std::tuple<std::string, std::string>> installed;
+    std::string installed_query;
 };

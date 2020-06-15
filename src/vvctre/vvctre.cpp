@@ -5,7 +5,6 @@
 #include <iostream>
 #include <memory>
 #include <string>
-#include <thread>
 
 #ifdef _WIN32
 // windows.h needs to be included before shellapi.h
@@ -21,6 +20,7 @@
 #include <fmt/format.h>
 #include <glad/glad.h>
 #include <imgui.h>
+#define IMGUI_IMPL_OPENGL_LOADER_GLAD
 #include <imgui_impl_opengl3.h>
 #include <imgui_impl_sdl.h>
 #include <portable-file-dialogs.h>
@@ -34,7 +34,6 @@
 #include "core/core.h"
 #include "core/hle/service/am/am.h"
 #include "core/hle/service/cfg/cfg.h"
-#include "core/hle/service/nwm/nwm_uds.h"
 #include "core/loader/loader.h"
 #include "core/movie.h"
 #include "core/settings.h"
@@ -191,8 +190,6 @@ int main(int argc, char** argv) {
         break;
     }
 
-    std::thread network_thread(Service::NWM::NetworkThread);
-
     if (!Settings::values.play_movie.empty()) {
         Core::Movie::GetInstance().StartPlayback(Settings::values.play_movie, [&] {
             pfd::message("vvctre", "Playback finished", pfd::choice::ok);
@@ -232,9 +229,6 @@ int main(int argc, char** argv) {
         }
         }
     }
-
-    Service::NWM::NetworkThreadStop();
-    network_thread.join();
 
     Core::Movie::GetInstance().Shutdown();
     system.Shutdown();
