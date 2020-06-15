@@ -4,14 +4,18 @@
 
 #pragma once
 
+#include <deque>
 #include <map>
 #include <memory>
+#include <unordered_set>
 #include <utility>
 #include <imgui.h>
 #include "core/frontend/applets/mii_selector.h"
 #include "core/frontend/applets/swkbd.h"
 #include "core/frontend/emu_window.h"
 #include "core/hle/kernel/ipc_debugger/recorder.h"
+#include "network/network.h"
+#include "vvctre/common.h"
 
 class PluginManager;
 struct SDL_Window;
@@ -79,6 +83,8 @@ private:
     /// Called when Tools -> Copy Screenshot is clicked
     void CopyScreenshot();
 
+    void ConnectToCitraRoom();
+
     /// Window
     bool is_open = true;
     SDL_Window* window = nullptr;
@@ -89,12 +95,22 @@ private:
     IPCDebugger::CallbackHandle ipc_recorder_callback;
     std::map<int, IPCDebugger::RequestRecord> ipc_records;
 
-    // Installed menu item
-    std::string query;
+    std::string installed_query;
     std::vector<std::tuple<std::string, std::string>> installed;
+
+    CitraRoomList public_rooms;
+    std::string public_rooms_query;
 
     bool show_cheats_window = false;
     bool show_ipc_recorder_window = false;
+
+    // Multiplayer
+    std::string multiplayer_message;
+    std::deque<std::string> multiplayer_messages;
+    Network::RoomMember::CallbackHandle<Network::RoomMember::Error> multiplayer_on_error;
+    Network::RoomMember::CallbackHandle<Network::ChatEntry> multiplayer_on_chat_message;
+    Network::RoomMember::CallbackHandle<Network::StatusMessageEntry> multiplayer_on_status_message;
+    std::unordered_set<std::string> multiplayer_blocked_nicknames;
 
     PluginManager& plugin_manager;
 };

@@ -432,8 +432,8 @@ get_directory_property(OPENSSL_LIBS
     DIRECTORY ${PROJECT_SOURCE_DIR}/externals/libressl
     DEFINITION OPENSSL_LIBS)
 
-target_link_libraries(core PUBLIC common PRIVATE stb audio_core video_core)
-target_link_libraries(core PUBLIC Boost::boost SDL2 PRIVATE cryptopp fmt system-archives easywsclient nlohmann_json ${OPENSSL_LIBS} httplib lurlparser)
+target_link_libraries(core PUBLIC common PRIVATE stb audio_core network video_core)
+target_link_libraries(core PUBLIC Boost::boost SDL2 PRIVATE cryptopp fmt system-archives nlohmann_json ${OPENSSL_LIBS} httplib lurlparser)
 target_compile_definitions(core PRIVATE -DCPPHTTPLIB_OPENSSL_SUPPORT)
 
 if (ARCHITECTURE_x86_64)

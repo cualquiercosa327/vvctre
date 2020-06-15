@@ -123,12 +123,11 @@ static constexpr int REGION_VALUE_AUTO_SELECT = -1;
 
 struct Values {
     // Start
-    std::string file_path; 
+    std::string file_path;
     std::string play_movie;
     std::string record_movie;
     int region_value = REGION_VALUE_AUTO_SELECT;
     std::string log_filter = "*:Info";
-    std::string multiplayer_url = "ws://vvctre.glitch.me/multiplayer";
     InitialClock initial_clock = InitialClock::SystemTime;
     u64 unix_timestamp = 0;
     bool use_virtual_sd = true;
@@ -278,6 +277,12 @@ struct Values {
 
     // Hacks
     bool enable_priority_boost = true;
+
+    // Multiplayer
+    std::string multiplayer_ip;
+    u16 multiplayer_port = 24872;
+    std::string multiplayer_nickname;
+    std::string multiplayer_password;
 } extern values;
 
 void Apply();

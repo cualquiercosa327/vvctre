@@ -168,7 +168,7 @@ ResultVal<std::size_t> CIAFile::WriteContentData(u64 offset, std::size_t length,
                 continue;
             }
 
-            // Figure out how much of this content ID we have just recieved/can write
+            // Figure out how much of this content ID we have just received/can write
             // out
             const u64 available_to_write = std::min(offset_max, range_max) - range_min;
 

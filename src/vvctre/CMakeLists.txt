@@ -30,7 +30,7 @@ get_directory_property(OPENSSL_LIBS
     DIRECTORY ${PROJECT_SOURCE_DIR}/externals/libressl
     DEFINITION OPENSSL_LIBS)
 
-target_link_libraries(vvctre PRIVATE common core input_common audio_core)
+target_link_libraries(vvctre PRIVATE common core input_common audio_core network)
 target_link_libraries(vvctre PRIVATE stb opengl-loader clip portable_file_dialogs imgui nlohmann_json ${OPENSSL_LIBS} httplib lurlparser ${PLATFORM_LIBRARIES} Threads::Threads)
 target_compile_definitions(vvctre PRIVATE -DCPPHTTPLIB_OPENSSL_SUPPORT)
 

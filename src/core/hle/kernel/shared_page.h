@@ -105,6 +105,4 @@ private:
     SharedPageDef shared_page;
 };
 
-extern MacAddress mac_address;
-
 } // namespace SharedPage

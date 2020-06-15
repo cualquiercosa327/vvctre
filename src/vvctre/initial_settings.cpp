@@ -9,6 +9,7 @@
 #include <SDL.h>
 #include <fmt/format.h>
 #include <imgui.h>
+#define IMGUI_IMPL_OPENGL_LOADER_GLAD
 #include <imgui_impl_opengl3.h>
 #include <imgui_impl_sdl.h>
 #include <imgui_stdlib.h>
@@ -39,6 +40,8 @@
 InitialSettings::InitialSettings(PluginManager& plugin_manager, SDL_Window* window,
                                  Service::CFG::Module& cfg) {
     SDL_Event event;
+    CitraRoomList public_rooms;
+    std::string public_rooms_query;
 
     for (;;) {
         // Poll events
@@ -267,10 +270,6 @@ InitialSettings::InitialSettings(PluginManager& plugin_manager, SDL_Window* wind
                     ImGui::TextUnformatted("Log Filter:");
                     ImGui::SameLine();
                     ImGui::InputText("##logfilter", &Settings::values.log_filter);
-
-                    ImGui::TextUnformatted("Multiplayer Server URL:");
-                    ImGui::SameLine();
-                    ImGui::InputText("##multiplayerserverurl", &Settings::values.multiplayer_url);
 
                     ImGui::TextUnformatted("Initial Time:");
                     ImGui::SameLine();
@@ -2654,7 +2653,8 @@ InitialSettings::InitialSettings(PluginManager& plugin_manager, SDL_Window* wind
                     ImGui::EndTabItem();
                 }
 
-                if (ImGui::BeginTabItem("LLE Modules")) {
+                if (ImGui::BeginTabItem("LLE")) {
+                    ImGui::TextUnformatted("Modules:");
                     for (auto& module : Settings::values.lle_modules) {
                         ImGui::Checkbox(module.first.c_str(), &module.second);
                     }
@@ -2664,6 +2664,61 @@ InitialSettings::InitialSettings(PluginManager& plugin_manager, SDL_Window* wind
 
                 if (ImGui::BeginTabItem("Hacks")) {
                     ImGui::Checkbox("Priority Boost", &Settings::values.enable_priority_boost);
+                    ImGui::EndTabItem();
+                }
+
+                if (ImGui::BeginTabItem("Multiplayer")) {
+                    if (public_rooms.empty()) {
+                        public_rooms = GetPublicCitraRooms();
+                    }
+
+                    ImGui::TextUnformatted("IP:");
+                    ImGui::SameLine();
+                    ImGui::InputText("##ip", &Settings::values.multiplayer_ip);
+
+                    ImGui::TextUnformatted("Port:");
+                    ImGui::SameLine();
+                    ImGui::InputScalar("##port", ImGuiDataType_U16,
+                                       &Settings::values.multiplayer_port);
+
+                    ImGui::TextUnformatted("Nickname:");
+                    ImGui::SameLine();
+                    ImGui::InputText("##nickname", &Settings::values.multiplayer_nickname);
+
+                    ImGui::TextUnformatted("Password:");
+                    ImGui::SameLine();
+                    ImGui::InputText("##password", &Settings::values.multiplayer_password);
+
+                    ImGui::NewLine();
+                    ImGui::TextUnformatted("Public Rooms");
+
+                    ImGui::TextUnformatted("Search:");
+                    ImGui::SameLine();
+                    ImGui::InputText("##search", &public_rooms_query);
+
+                    if (ImGui::ListBoxHeader("##publicrooms", ImVec2(-1.0f, -1.0f))) {
+                        for (const auto& room : public_rooms) {
+                            const std::string room_string = fmt::format(
+                                room.has_password ? "{} ({}/{}) by {} (has password)"
+                                                  : "{} ({}/{}) by {}",
+                                room.name, room.members.size(), room.max_players, room.owner);
+
+                            if (Common::ToLower(room_string)
+                                    .find(Common::ToLower(public_rooms_query)) !=
+                                std::string::npos) {
+                                if (ImGui::Selectable(room_string.c_str())) {
+                                    Settings::values.multiplayer_ip = room.ip;
+                                    Settings::values.multiplayer_port = room.port;
+                                }
+
+                                if (ImGui::IsItemHovered() && !room.description.empty()) {
+                                    ImGui::SetTooltip("%s", room.description.c_str());
+                                }
+                            }
+                        }
+                        ImGui::ListBoxFooter();
+                    }
+
                     ImGui::EndTabItem();
                 }
 
@@ -2688,23 +2743,24 @@ InitialSettings::InitialSettings(PluginManager& plugin_manager, SDL_Window* wind
         if (!installed.empty()) {
             ImGui::OpenPopup("Installed");
 
-            ImGui::SetNextWindowSize(ImVec2(480.f, 400.0f), ImGuiCond_Appearing);
+            ImGui::SetNextWindowSize(io.DisplaySize);
+
             bool open = true;
             if (ImGui::BeginPopupModal("Installed", &open, ImGuiWindowFlags_NoSavedSettings)) {
                 ImGui::TextUnformatted("Search:");
                 ImGui::SameLine();
-                ImGui::InputText("##search", &query);
+                ImGui::InputText("##search", &installed_query);
 
                 if (ImGui::ListBoxHeader("##installed", ImVec2(-1.0f, -1.0f))) {
                     for (const auto& title : installed) {
                         const auto [path, name] = title;
 
-                        if (Common::ToLower(name).find(Common::ToLower(query)) !=
+                        if (Common::ToLower(name).find(Common::ToLower(installed_query)) !=
                                 std::string::npos &&
                             ImGui::Selectable(name.c_str())) {
                             Settings::values.file_path = path;
                             installed.clear();
-                            query.clear();
+                            installed_query.clear();
                             break;
                         }
                     }
@@ -2714,7 +2770,7 @@ InitialSettings::InitialSettings(PluginManager& plugin_manager, SDL_Window* wind
             }
             if (!open) {
                 installed.clear();
-                query.clear();
+                installed_query.clear();
             }
         }
 

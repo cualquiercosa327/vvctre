@@ -4,16 +4,44 @@
 // Refer to the license.txt file included.
 
 #include <fmt/format.h>
+#include <httplib.h>
+#include <nlohmann/json.hpp>
 #include "common/file_util.h"
+#include "common/logging/log.h"
 #include "core/hle/service/am/am.h"
 #include "core/hle/service/fs/archive.h"
 #include "core/loader/loader.h"
 #include "core/loader/smdh.h"
 #include "vvctre/common.h"
 
-const u8 vvctre_version_major = 33;
-const u8 vvctre_version_minor = 4;
+const u8 vvctre_version_major = 34;
+const u8 vvctre_version_minor = 0;
 const u8 vvctre_version_patch = 0;
+
+void from_json(const nlohmann::json& json, CitraRoom::Member& member) {
+    // nothing to do
+}
+
+void from_json(const nlohmann::json& json, CitraRoom& room) {
+    room.ip = json.at("address").get<std::string>();
+    room.name = json.at("name").get<std::string>();
+    try {
+        room.description = json.at("description").get<std::string>();
+    } catch (const nlohmann::detail::out_of_range& e) {
+        room.description = "";
+        LOG_DEBUG(Network, "Room \'{}\' doesn't contain a description", room.name);
+    }
+    room.owner = json.at("owner").get<std::string>();
+    room.port = json.at("port").get<u16>();
+    room.max_players = json.at("maxPlayers").get<u32>();
+    room.net_version = json.at("netVersion").get<u32>();
+    room.has_password = json.at("hasPassword").get<bool>();
+    try {
+        room.members = json.at("players").get<std::vector<CitraRoom::Member>>();
+    } catch (const nlohmann::detail::out_of_range& e) {
+        LOG_DEBUG(Network, "Out of range {}", e.what());
+    }
+}
 
 std::vector<std::tuple<std::string, std::string>> GetInstalledList() {
     std::vector<std::tuple<std::string, std::string>> all;
@@ -87,4 +115,15 @@ std::vector<std::tuple<std::string, std::string>> GetInstalledList() {
     all.insert(all.end(), download_play.begin(), download_play.end());
 
     return all;
+}
+
+CitraRoomList GetPublicCitraRooms() {
+    httplib::SSLClient client("api.citra-emu.org");
+    std::shared_ptr<httplib::Response> response = client.Get("/lobby");
+
+    if (response == nullptr || response->status != 200) {
+        return {};
+    }
+
+    return nlohmann::json::parse(response->body).at("rooms").get<CitraRoomList>();
 }
