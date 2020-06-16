@@ -89,6 +89,7 @@ add_library(imgui
     imgui/misc/cpp/imgui_stdlib.cpp
     imgui/misc/cpp/imgui_stdlib.h)
 target_link_libraries(imgui PRIVATE opengl-loader SDL2)
+target_compile_definitions(imgui PRIVATE IMGUI_IMPL_OPENGL_LOADER_GLAD)
 target_include_directories(imgui INTERFACE ./imgui ./imgui/examples ./imgui/misc/cpp)
 target_include_directories(imgui PRIVATE ./imgui ./imgui/examples ./imgui/misc/cpp)
 
