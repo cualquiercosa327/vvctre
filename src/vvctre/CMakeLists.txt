@@ -26,13 +26,8 @@ add_executable(vvctre
 
 create_target_directory_groups(vvctre)
 
-get_directory_property(OPENSSL_LIBS
-    DIRECTORY ${PROJECT_SOURCE_DIR}/externals/libressl
-    DEFINITION OPENSSL_LIBS)
-
 target_link_libraries(vvctre PRIVATE common core input_common audio_core network)
-target_link_libraries(vvctre PRIVATE stb opengl-loader clip portable_file_dialogs imgui nlohmann_json ${OPENSSL_LIBS} httplib lurlparser asl ${PLATFORM_LIBRARIES} Threads::Threads)
-target_compile_definitions(vvctre PRIVATE -DCPPHTTPLIB_OPENSSL_SUPPORT)
+target_link_libraries(vvctre PRIVATE stb opengl-loader clip portable_file_dialogs imgui nlohmann_json asl ${PLATFORM_LIBRARIES} Threads::Threads)
 
 if (MSVC)
     include(CopySDLDeps)

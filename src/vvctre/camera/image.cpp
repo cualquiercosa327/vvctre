@@ -2,8 +2,7 @@
 // Licensed under GPLv2 or any later version
 // Refer to the license.txt file included.
 
-#include <LUrlParser.h>
-#include <httplib.h>
+#include <asl/Http.h>
 #include <stb_image.h>
 #include <stb_image_resize.h>
 #include "common/assert.h"
@@ -15,33 +14,12 @@ namespace Camera {
 
 ImageCamera::ImageCamera(const std::string& file) {
     while (image == nullptr) {
-        LUrlParser::ParseURL url = LUrlParser::ParseURL::parseURL(file);
+        if (asl::parseUrl(file.c_str()).protocol.startsWith("http")) {
+            asl::HttpResponse r = asl::Http::get(file.c_str());
 
-        if (url.isValid()) {
-            int port;
-            std::unique_ptr<httplib::Client> client;
-
-            if (url.scheme_ == "http") {
-                if (!url.getPort(&port)) {
-                    port = 80;
-                }
-
-                client = std::make_unique<httplib::Client>(url.host_, port);
-            } else {
-                if (!url.getPort(&port)) {
-                    port = 443;
-                }
-
-                client = std::make_unique<httplib::SSLClient>(url.host_, port);
-            }
-
-            client->set_follow_location(true);
-
-            std::shared_ptr<httplib::Response> response = client->Get(('/' + url.path_).c_str());
-
-            if (response != nullptr) {
-                std::vector<unsigned char> buffer(response->body.size());
-                std::memcpy(buffer.data(), response->body.data(), response->body.size());
+            if (r.ok()) {
+                std::vector<unsigned char> buffer(r.body().length());
+                std::memcpy(buffer.data(), r.body().ptr(), buffer.size());
                 image = stbi_load_from_memory(buffer.data(), buffer.size(), &file_width,
                                               &file_height, nullptr, 3);
             }
