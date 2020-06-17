@@ -2338,6 +2338,7 @@ void EmuWindow_SDL2::SwapBuffers() {
                     if (ImGui::BeginMenu("Multiplayer")) {
                         if (ImGui::MenuItem("Connect To Citra Room")) {
                             public_rooms = GetPublicCitraRooms();
+                            show_connect_to_citra_room = true;
                         }
                     }
                 }
@@ -2780,14 +2781,12 @@ void EmuWindow_SDL2::SwapBuffers() {
         }
     }
 
-    if (!public_rooms.empty()) {
+    if (show_connect_to_citra_room) {
         ImGui::OpenPopup("Connect To Citra Room");
 
         ImGui::SetNextWindowSize(io.DisplaySize);
 
-        bool open = true;
-
-        if (ImGui::BeginPopupModal("Connect To Citra Room", &open,
+        if (ImGui::BeginPopupModal("Connect To Citra Room", &show_connect_to_citra_room,
                                    ImGuiWindowFlags_NoSavedSettings)) {
             ImGui::TextUnformatted("IP:");
             ImGui::SameLine();
@@ -2839,13 +2838,14 @@ void EmuWindow_SDL2::SwapBuffers() {
 
             if (ImGui::Button("Connect")) {
                 ConnectToCitraRoom();
+                show_connect_to_citra_room = false;
                 public_rooms.clear();
                 public_rooms_query.clear();
             }
 
             ImGui::EndPopup();
         }
-        if (!open) {
+        if (!show_connect_to_citra_room) {
             public_rooms.clear();
             public_rooms_query.clear();
         }

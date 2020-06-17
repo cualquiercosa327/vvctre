@@ -98,13 +98,13 @@ private:
     std::string installed_query;
     std::vector<std::tuple<std::string, std::string>> installed;
 
-    CitraRoomList public_rooms;
-    std::string public_rooms_query;
-
     bool show_cheats_window = false;
     bool show_ipc_recorder_window = false;
 
     // Multiplayer
+    bool show_connect_to_citra_room;
+    CitraRoomList public_rooms;
+    std::string public_rooms_query;
     std::string multiplayer_message;
     std::deque<std::string> multiplayer_messages;
     Network::RoomMember::CallbackHandle<Network::RoomMember::Error> multiplayer_on_error;
