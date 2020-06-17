@@ -50,7 +50,7 @@ jobs:
         shell: bash
         run: |
           cd $GITHUB_WORKSPACE
-          cp license.txt ./build/bin/release
+          cp license.txt ./build/bin/Release
           if [ "$RUNNER_OS" == "Windows" ]; then
             rm ./build/bin/Release/*.pdb
           fi
