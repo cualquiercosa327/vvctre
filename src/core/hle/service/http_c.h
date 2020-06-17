@@ -4,12 +4,13 @@
 
 #pragma once
 
+#include <future>
 #include <memory>
 #include <optional>
 #include <string>
 #include <unordered_map>
 #include <vector>
-#include <asl/Http.h>
+#include <httplib.h>
 #include "core/hle/kernel/shared_memory.h"
 #include "core/hle/service/service.h"
 
@@ -132,8 +133,11 @@ public:
     std::vector<RequestHeader> headers;
     std::vector<PostData> post_data;
 
+    std::future<void> request_future;
+    std::atomic<u64> current_download_size_bytes;
+    std::atomic<u64> total_download_size_bytes;
     u32 current_offset = 0;
-    asl::HttpResponse response;
+    httplib::Response response;
 };
 
 struct SessionData : public Kernel::SessionRequestHandler::SessionDataBase {

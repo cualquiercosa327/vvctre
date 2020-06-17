@@ -3,6 +3,8 @@
 // Refer to the license.txt file included.
 
 #include <algorithm>
+#include <atomic>
+#include <LUrlParser.h>
 #include <cryptopp/aes.h>
 #include <cryptopp/modes.h>
 #include <fmt/format.h>
@@ -54,17 +56,42 @@ const ResultCode RESULT_DOWNLOADPENDING = // 0xD840A02B
     ResultCode(static_cast<ErrorDescription>(43), ErrorModule::HTTP, ErrorSummary::WouldBlock,
                ErrorLevel::Permanent);
 
-asl::Dic<> decodeUrlParams(const asl::String& querystring) {
-    asl::Dic<> query;
-    asl::Dic<> q = split(querystring.replace('+', ' '), '&', '=');
-    foreach2(asl::String & k, const asl::String& v, q) {
-        query[asl::decodeUrl(k)] = asl::decodeUrl(v);
-    }
-    return query;
-}
-
 void Context::MakeRequest() {
     ASSERT(state == RequestState::NotStarted);
+
+    LUrlParser::ParseURL parsed = LUrlParser::ParseURL::parseURL(url);
+    int port;
+    std::unique_ptr<httplib::Client> client;
+    if (parsed.scheme_ == "http") {
+        if (!parsed.getPort(&port)) {
+            port = 80;
+        }
+        // TODO(B3N30): Support for setting timeout
+        // Figure out what the default timeout on 3DS is
+        client = std::make_unique<httplib::Client>(parsed.host_.c_str(), port);
+    } else {
+        if (!parsed.getPort(&port)) {
+            port = 443;
+        }
+        // TODO(B3N30): Support for setting timeout
+        // Figure out what the default timeout on 3DS is
+
+        auto ssl_client = std::make_unique<httplib::SSLClient>(parsed.host_, port);
+        SSL_CTX* ctx = ssl_client->ssl_context();
+        client = std::move(ssl_client);
+
+        if (auto client_cert = ssl_config.client_cert_ctx.lock()) {
+            SSL_CTX_use_certificate_ASN1(ctx, client_cert->certificate.size(),
+                                         client_cert->certificate.data());
+            SSL_CTX_use_PrivateKey_ASN1(EVP_PKEY_RSA, ctx, client_cert->private_key.data(),
+                                        client_cert->private_key.size());
+        }
+
+        // TODO(B3N30): Check for SSLOptions-Bits and set the verify method accordingly
+        // https://www.3dbrew.org/wiki/SSL_Services#SSLOpt
+        // Hack: Since for now RootCerts are not implemented we set the VerifyMode to None.
+        SSL_CTX_set_verify(ctx, SSL_VERIFY_NONE, NULL);
+    }
 
     state = RequestState::InProgress;
 
@@ -75,54 +102,60 @@ void Context::MakeRequest() {
         {RequestMethod::PutEmpty, "PUT"},
     };
 
-    asl::HttpRequest request(request_method_strings.at(method).c_str(), url.c_str());
-    request.setFollowRedirects(false);
-
-    if (method == RequestMethod::Post || method == RequestMethod::Put) {
-        const std::size_t pos = url.find('?');
-        if (pos != std::string::npos) {
-            asl::Dic<asl::String> params = decodeUrlParams(url.substr(pos + 1).c_str());
-            foreach2(asl::String & k, const asl::String& v, params) {
-                post_data.emplace_back(std::string(static_cast<const char*>(k)),
-                                       std::string(static_cast<const char*>(v)),
-                                       PostData::Type::Ascii);
-            }
+    httplib::Request request;
+    request.method = request_method_strings.at(method);
+    request.path = fmt::format("/{}", parsed.path_);
+    if (method == RequestMethod::Get) {
+        request.path += fmt::format("?{}", parsed.query_);
+    } else if (method == RequestMethod::Post || method == RequestMethod::Put) {
+        httplib::Params params;
+        httplib::detail::parse_query_text(parsed.query_, params);
+        for (const auto& p : params) {
+            post_data.emplace_back(p.first, p.second, PostData::Type::Ascii);
         }
     }
-
     for (const auto& d : post_data) {
         switch (d.type) {
         case PostData::Type::Binary:
         case PostData::Type::Ascii:
-            request.put(fmt::format("{}{}={}&", static_cast<const char*>(request.text()),
-                                    static_cast<const char*>(asl::encodeUrl(d.name.c_str())),
-                                    static_cast<const char*>(asl::encodeUrl(d.value.c_str())))
-                            .c_str());
+            request.body += fmt::format("{}={}&", httplib::detail::encode_url(d.name),
+                                        httplib::detail::encode_url(d.value));
             break;
         case PostData::Type::Raw:
-            request.put(d.value.c_str());
+            request.body = d.value;
             break;
         default:
             break;
         }
     }
-
     if (std::any_of(post_data.cbegin(), post_data.cend(),
                     [](const Service::HTTP::Context::PostData& d) {
                         return d.type == Service::HTTP::Context::PostData::Type::Ascii ||
                                d.type == Service::HTTP::Context::PostData::Type::Binary;
                     })) {
-        asl::Array<byte> body = request.body();
-        body.removeLast();
-        request.put(body);
+        request.body.pop_back();
     }
+    request.progress = [this](u64 current, u64 total) -> bool {
+        // TODO(B3N30): Is there a state that shows response header are available
+        current_download_size_bytes = current;
+        total_download_size_bytes = total;
+        return true;
+    };
 
     for (const auto& header : headers) {
-        request.setHeader(header.name.c_str(), header.value.c_str());
+        request.set_header(header.name.c_str(), header.value);
     }
 
-    response = asl::Http::request(request);
-    state = RequestState::ReadyToDownloadContent;
+    client->set_decompress(false);
+
+    if (!client->send(request, response)) {
+        LOG_ERROR(Service_HTTP, "Request failed ({})", response.status);
+        state = RequestState::TimedOut;
+    } else {
+        LOG_DEBUG(Service_HTTP, "Request successful: {}", response.body);
+        // TODO(B3N30): Verify this state on HW
+        state = RequestState::ReadyToDownloadContent;
+    }
 }
 
 void HTTP_C::Initialize(Kernel::HLERequestContext& ctx) {
@@ -292,18 +325,20 @@ void HTTP_C::ReceiveData(Kernel::HLERequestContext& ctx) {
     ASSERT(itr != contexts.end());
 
     const u32 size = std::min<u32>(
-        buffer_size, (itr->second.response.hasHeader("Content-Length")
-                          ? static_cast<u32>(itr->second.response.header("Content-Length").toInt())
-                          : static_cast<u32>(0)) -
-                         itr->second.current_offset);
-    buffer.Write(itr->second.response.body().slice(itr->second.current_offset).ptr(), 0, size);
+        buffer_size,
+        (itr->second.response.has_header("Content-Length")
+             ? static_cast<u32>(std::stoul(itr->second.response.get_header_value("Content-Length")))
+             : static_cast<u32>(itr->second.total_download_size_bytes.load())) -
+            itr->second.current_offset);
+    buffer.Write(&itr->second.response.body[itr->second.current_offset], 0, size);
     itr->second.current_offset += size;
 
     IPC::RequestBuilder rb = rp.MakeBuilder(1, 2);
     rb.Push(itr->second.current_offset <
-                    (itr->second.response.hasHeader("Content-Length")
-                         ? static_cast<u32>(itr->second.response.header("Content-Length").toInt())
-                         : static_cast<u32>(0))
+                    (itr->second.response.has_header("Content-Length")
+                         ? static_cast<u32>(
+                               std::stoul(itr->second.response.get_header_value("Content-Length")))
+                         : static_cast<u32>(itr->second.total_download_size_bytes.load()))
                 ? RESULT_DOWNLOADPENDING
                 : RESULT_SUCCESS);
     rb.PushMappedBuffer(buffer);
@@ -323,18 +358,20 @@ void HTTP_C::ReceiveDataTimeout(Kernel::HLERequestContext& ctx) {
     ASSERT(itr != contexts.end());
 
     const u32 size = std::min<u32>(
-        buffer_size, (itr->second.response.hasHeader("Content-Length")
-                          ? static_cast<u32>(itr->second.response.header("Content-Length").toInt())
-                          : static_cast<u32>(0)) -
-                         itr->second.current_offset);
-    buffer.Write(itr->second.response.body().slice(itr->second.current_offset).ptr(), 0, size);
+        buffer_size,
+        (itr->second.response.has_header("Content-Length")
+             ? static_cast<u32>(std::stoul(itr->second.response.get_header_value("Content-Length")))
+             : static_cast<u32>(itr->second.total_download_size_bytes.load())) -
+            itr->second.current_offset);
+    buffer.Write(&itr->second.response.body[itr->second.current_offset], 0, size);
     itr->second.current_offset += size;
 
     IPC::RequestBuilder rb = rp.MakeBuilder(1, 2);
     rb.Push(itr->second.current_offset <
-                    (itr->second.response.hasHeader("Content-Length")
-                         ? static_cast<u32>(itr->second.response.header("Content-Length").toInt())
-                         : static_cast<u32>(0))
+                    (itr->second.response.has_header("Content-Length")
+                         ? static_cast<u32>(
+                               std::stoul(itr->second.response.get_header_value("Content-Length")))
+                         : static_cast<u32>(itr->second.total_download_size_bytes.load()))
                 ? RESULT_DOWNLOADPENDING
                 : RESULT_SUCCESS);
     rb.PushMappedBuffer(buffer);
@@ -480,9 +517,7 @@ void HTTP_C::GetDownloadSizeState(Kernel::HLERequestContext& ctx) {
     IPC::RequestBuilder rb = rp.MakeBuilder(3, 0);
     rb.Push(RESULT_SUCCESS);
     rb.Push<u32>(static_cast<u32>(itr->second.current_offset));
-    rb.Push<u32>(itr->second.response.hasHeader("Content-Length")
-                     ? static_cast<u32>(itr->second.response.header("Content-Length").toInt())
-                     : static_cast<u32>(0));
+    rb.Push<u32>(static_cast<u32>(itr->second.total_download_size_bytes.load()));
 }
 
 void HTTP_C::AddRequestHeader(Kernel::HLERequestContext& ctx) {
@@ -790,9 +825,8 @@ void HTTP_C::GetResponseHeader(Kernel::HLERequestContext& ctx) {
     auto itr = contexts.find(context_handle);
     ASSERT(itr != contexts.end());
 
-    const std::string value = itr->second.response.hasHeader(name.c_str())
-                                  ? std::string(static_cast<const char*>(
-                                        itr->second.response.header(name.c_str()).concat("\0", 1)))
+    const std::string value = itr->second.response.has_header(name.c_str())
+                                  ? itr->second.response.headers.find(name)->second + '\0'
                                   : "";
 
     LOG_DEBUG(Service_HTTP, "context_handle = {}, name = {}, value = {}", context_handle, name,
@@ -816,10 +850,10 @@ void HTTP_C::GetResponseStatusCode(Kernel::HLERequestContext& ctx) {
 
     IPC::RequestBuilder rb = rp.MakeBuilder(2, 0);
     rb.Push(RESULT_SUCCESS);
-    rb.Push<u32>(static_cast<u32>(itr->second.response.code()));
+    rb.Push<u32>(static_cast<u32>(itr->second.response.status));
 
     LOG_DEBUG(Service_HTTP, "context_handle = {}, status = {}", context_handle,
-              itr->second.response.code());
+              itr->second.response.status);
 }
 
 void HTTP_C::GetResponseStatusCodeTimeout(Kernel::HLERequestContext& ctx) {
@@ -832,10 +866,10 @@ void HTTP_C::GetResponseStatusCodeTimeout(Kernel::HLERequestContext& ctx) {
 
     IPC::RequestBuilder rb = rp.MakeBuilder(2, 0);
     rb.Push(RESULT_SUCCESS);
-    rb.Push<u32>(static_cast<u32>(itr->second.response.code()));
+    rb.Push<u32>(static_cast<u32>(itr->second.response.status));
 
     LOG_DEBUG(Service_HTTP, "context_handle = {}, status = {}, timeout = {}", context_handle,
-              itr->second.response.code(), timeout);
+              itr->second.response.status, timeout);
 }
 
 void HTTP_C::SetClientCertContext(Kernel::HLERequestContext& ctx) {
