@@ -31,6 +31,8 @@
 #include "core/memory.h"
 #include "core/movie.h"
 #include "core/settings.h"
+#include "network/network.h"
+#include "network/room_member.h"
 #include "video_core/renderer_base.h"
 #include "video_core/video_core.h"
 #include "vvctre/common.h"
@@ -1740,6 +1742,180 @@ bool vvctre_settings_get_enable_priority_boost() {
     return Settings::values.enable_priority_boost;
 }
 
+// Multiplayer
+
+void vvctre_settings_set_multiplayer_ip(const char* value) {
+    Settings::values.multiplayer_ip = std::string(value);
+}
+
+const char* vvctre_settings_get_multiplayer_ip() {
+    return Settings::values.multiplayer_ip.c_str();
+}
+
+void vvctre_settings_set_multiplayer_port(u16 value) {
+    Settings::values.multiplayer_port = value;
+}
+
+u16 vvctre_settings_get_multiplayer_port() {
+    return Settings::values.multiplayer_port;
+}
+
+void vvctre_settings_set_nickname(const char* value) {
+    Settings::values.multiplayer_nickname = std::string(value);
+}
+
+const char* vvctre_settings_get_nickname() {
+    return Settings::values.multiplayer_nickname.c_str();
+}
+
+void vvctre_settings_set_multiplayer_password(const char* value) {
+    Settings::values.multiplayer_password = std::string(value);
+}
+
+const char* vvctre_settings_get_multiplayer_password() {
+    return Settings::values.multiplayer_password.c_str();
+}
+
+void vvctre_multiplayer_join(void* core) {
+    if (std::shared_ptr<Network::RoomMember> room_member = Network::GetRoomMember().lock()) {
+        room_member->Join(Settings::values.multiplayer_nickname,
+                          Service::CFG::GetConsoleIdHash(*static_cast<Core::System*>(core)),
+                          Settings::values.multiplayer_ip.c_str(),
+                          Settings::values.multiplayer_port, Network::NoPreferredMac,
+                          Settings::values.multiplayer_password);
+    }
+}
+
+void vvctre_multiplayer_leave(void* /* core, currently unused */) {
+    if (std::shared_ptr<Network::RoomMember> room_member = Network::GetRoomMember().lock()) {
+        room_member->Leave();
+    }
+}
+
+u8 vvctre_multiplayer_get_state(void* /* core, currently unused */) {
+    if (std::shared_ptr<Network::RoomMember> room_member = Network::GetRoomMember().lock()) {
+        return static_cast<u8>(room_member->GetState());
+    }
+
+    return static_cast<u8>(Network::RoomMember::State::Uninitialized);
+}
+
+void vvctre_multiplayer_send_message(void* /* core, currently unused */, const char* message) {
+    if (std::shared_ptr<Network::RoomMember> room_member = Network::GetRoomMember().lock()) {
+        room_member->SendChatMessage(std::string(message));
+    }
+}
+
+void vvctre_multiplayer_set_game(void* /* core, currently unused */, const char* name, u64 id) {
+    if (std::shared_ptr<Network::RoomMember> room_member = Network::GetRoomMember().lock()) {
+        room_member->SendGameInfo(Network::GameInfo{name, id});
+    }
+}
+
+u8 vvctre_multiplayer_get_member_count(void* /* core, currently unused */) {
+    if (std::shared_ptr<Network::RoomMember> room_member = Network::GetRoomMember().lock()) {
+        return static_cast<u8>(room_member->GetMemberInformation().size());
+    }
+
+    return 0;
+}
+
+const char* vvctre_multiplayer_get_member_nickname(void* /* core, currently unused */,
+                                                   std::size_t index) {
+    if (std::shared_ptr<Network::RoomMember> room_member = Network::GetRoomMember().lock()) {
+        return room_member->GetMemberInformation()[index].nickname.c_str();
+    }
+
+    return nullptr;
+}
+
+u64 vvctre_multiplayer_get_member_game_id(void* /* core, currently unused */, std::size_t index) {
+    if (std::shared_ptr<Network::RoomMember> room_member = Network::GetRoomMember().lock()) {
+        return room_member->GetMemberInformation()[index].game_info.id;
+    }
+
+    return 0;
+}
+
+const char* vvctre_multiplayer_get_member_game_name(void* /* core, currently unused */,
+                                                    std::size_t index) {
+    if (std::shared_ptr<Network::RoomMember> room_member = Network::GetRoomMember().lock()) {
+        return room_member->GetMemberInformation()[index].game_info.name.c_str();
+    }
+
+    return nullptr;
+}
+
+const char* vvctre_multiplayer_get_room_name(void* /* core, currently unused */) {
+    if (std::shared_ptr<Network::RoomMember> room_member = Network::GetRoomMember().lock()) {
+        return room_member->GetRoomInformation().name.c_str();
+    }
+
+    return nullptr;
+}
+
+const char* vvctre_multiplayer_get_room_description(void* /* core, currently unused */) {
+    if (std::shared_ptr<Network::RoomMember> room_member = Network::GetRoomMember().lock()) {
+        return room_member->GetRoomInformation().description.c_str();
+    }
+
+    return nullptr;
+}
+
+u8 vvctre_multiplayer_get_room_member_slots(void* /* core, currently unused */) {
+    if (std::shared_ptr<Network::RoomMember> room_member = Network::GetRoomMember().lock()) {
+        return static_cast<u8>(room_member->GetRoomInformation().member_slots);
+    }
+
+    return 0;
+}
+
+void vvctre_multiplayer_on_chat_message(
+    void* /* core, currently unused */,
+    PluginImportedFunctions::MultiplayerChatMessageCallback callback) {
+    if (std::shared_ptr<Network::RoomMember> room_member = Network::GetRoomMember().lock()) {
+        room_member->BindOnChatMessageReceived([=](const Network::ChatEntry& entry) {
+            callback(entry.nickname.c_str(), entry.message.c_str());
+        });
+    }
+}
+
+void vvctre_multiplayer_on_status_message(
+    void* /* core, currently unused */,
+    PluginImportedFunctions::MultiplayerStatusMessageCallback callback) {
+    if (std::shared_ptr<Network::RoomMember> room_member = Network::GetRoomMember().lock()) {
+        room_member->BindOnStatusMessageReceived([=](const Network::StatusMessageEntry& entry) {
+            callback(static_cast<u8>(entry.type), entry.nickname.c_str());
+        });
+    }
+}
+
+void vvctre_multiplayer_on_error(void* /* core, currently unused */,
+                                 PluginImportedFunctions::MultiplayerErrorCallback callback) {
+    if (std::shared_ptr<Network::RoomMember> room_member = Network::GetRoomMember().lock()) {
+        room_member->BindOnError(
+            [=](const Network::RoomMember::Error& error) { callback(static_cast<u8>(error)); });
+    }
+}
+
+void vvctre_multiplayer_on_information_change(
+    void* /* core, currently unused */,
+    PluginImportedFunctions::MultiplayerInformationChangeCallback callback) {
+    if (std::shared_ptr<Network::RoomMember> room_member = Network::GetRoomMember().lock()) {
+        room_member->BindOnRoomInformationChanged(
+            [=](const Network::RoomInformation&) { callback(); });
+    }
+}
+
+void vvctre_multiplayer_on_state_change(
+    void* /* core, currently unused */,
+    PluginImportedFunctions::MultiplayerStateChangeCallback callback) {
+    if (std::shared_ptr<Network::RoomMember> room_member = Network::GetRoomMember().lock()) {
+        room_member->BindOnRoomInformationChanged(
+            [=](const Network::RoomInformation&) { callback(); });
+    }
+}
+
 // Other
 const char* vvctre_get_version() {
     return fmt::format("{}.{}.{}", vvctre_version_major, vvctre_version_minor, vvctre_version_patch)
@@ -2147,6 +2323,32 @@ std::unordered_map<std::string, void*> PluginManager::function_map = {
      (void*)&vvctre_settings_set_enable_priority_boost},
     {"vvctre_settings_get_enable_priority_boost",
      (void*)&vvctre_settings_get_enable_priority_boost},
+    // Multiplayer
+    {"vvctre_settings_set_multiplayer_ip", (void*)&vvctre_settings_set_multiplayer_ip},
+    {"vvctre_settings_get_multiplayer_ip", (void*)&vvctre_settings_get_multiplayer_ip},
+    {"vvctre_settings_set_multiplayer_port", (void*)&vvctre_settings_set_multiplayer_port},
+    {"vvctre_settings_get_multiplayer_port", (void*)&vvctre_settings_get_multiplayer_port},
+    {"vvctre_settings_set_nickname", (void*)&vvctre_settings_set_nickname},
+    {"vvctre_settings_get_nickname", (void*)&vvctre_settings_get_nickname},
+    {"vvctre_settings_set_multiplayer_password", (void*)&vvctre_settings_set_multiplayer_password},
+    {"vvctre_settings_get_multiplayer_password", (void*)&vvctre_settings_get_multiplayer_password},
+    {"vvctre_multiplayer_join", (void*)&vvctre_multiplayer_join},
+    {"vvctre_multiplayer_leave", (void*)&vvctre_multiplayer_leave},
+    {"vvctre_multiplayer_get_state", (void*)&vvctre_multiplayer_get_state},
+    {"vvctre_multiplayer_send_message", (void*)&vvctre_multiplayer_send_message},
+    {"vvctre_multiplayer_set_game", (void*)&vvctre_multiplayer_set_game},
+    {"vvctre_multiplayer_get_member_count", (void*)&vvctre_multiplayer_get_member_count},
+    {"vvctre_multiplayer_get_member_nickname", (void*)&vvctre_multiplayer_get_member_nickname},
+    {"vvctre_multiplayer_get_member_game_id", (void*)&vvctre_multiplayer_get_member_game_id},
+    {"vvctre_multiplayer_get_member_game_name", (void*)&vvctre_multiplayer_get_member_game_name},
+    {"vvctre_multiplayer_get_room_name", (void*)&vvctre_multiplayer_get_room_name},
+    {"vvctre_multiplayer_get_room_description", (void*)&vvctre_multiplayer_get_room_description},
+    {"vvctre_multiplayer_get_room_member_slots", (void*)&vvctre_multiplayer_get_room_member_slots},
+    {"vvctre_multiplayer_on_chat_message", (void*)&vvctre_multiplayer_on_chat_message},
+    {"vvctre_multiplayer_on_status_message", (void*)&vvctre_multiplayer_on_status_message},
+    {"vvctre_multiplayer_on_error", (void*)&vvctre_multiplayer_on_error},
+    {"vvctre_multiplayer_on_information_change", (void*)&vvctre_multiplayer_on_information_change},
+    {"vvctre_multiplayer_on_state_change", (void*)&vvctre_multiplayer_on_state_change},
     // Other
     {"vvctre_get_version", (void*)&vvctre_get_version},
     {"vvctre_get_version_major", (void*)&vvctre_get_version_major},

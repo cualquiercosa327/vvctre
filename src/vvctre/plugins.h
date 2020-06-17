@@ -21,6 +21,7 @@ class System;
 struct SDL_Window;
 
 namespace PluginImportedFunctions {
+
 using GetRequiredFunctionCount = int (*)();                                         // required
 using GetRequiredFunctionNames = const char** (*)();                                // required
 using PluginLoaded = void (*)(void* core, void* plugin_manager, void* functions[]); // required
@@ -36,6 +37,13 @@ using AddTab = void (*)();                                                      
 using AfterSwapWindow = void (*)();                                                 // optional
 using ScreenshotCallback = void (*)(void* data);                                    // optional
 using Log = Log::FunctionLogger::Function;                                          // optional
+
+using MultiplayerChatMessageCallback = void (*)(const char* nickname, const char* message);
+using MultiplayerStatusMessageCallback = void (*)(u8 type, const char* nickname);
+using MultiplayerErrorCallback = void (*)(u8 error);
+using MultiplayerInformationChangeCallback = void (*)();
+using MultiplayerStateChangeCallback = void (*)();
+
 } // namespace PluginImportedFunctions
 
 class PluginManager {
