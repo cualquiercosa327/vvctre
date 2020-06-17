@@ -102,7 +102,7 @@ private:
     bool show_ipc_recorder_window = false;
 
     // Multiplayer
-    bool show_connect_to_citra_room;
+    bool show_connect_to_citra_room = false;
     CitraRoomList public_rooms;
     std::string public_rooms_query;
     std::string multiplayer_message;
