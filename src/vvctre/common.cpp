@@ -3,8 +3,8 @@
 // Licensed under GPLv2 or any later version
 // Refer to the license.txt file included.
 
+#include <asl/Http.h>
 #include <fmt/format.h>
-#include <httplib.h>
 #include <nlohmann/json.hpp>
 #include "common/file_util.h"
 #include "common/logging/log.h"
@@ -16,7 +16,7 @@
 
 const u8 vvctre_version_major = 34;
 const u8 vvctre_version_minor = 0;
-const u8 vvctre_version_patch = 0;
+const u8 vvctre_version_patch = 1;
 
 void from_json(const nlohmann::json& json, CitraRoom::Member& member) {
     // nothing to do
@@ -118,12 +118,13 @@ std::vector<std::tuple<std::string, std::string>> GetInstalledList() {
 }
 
 CitraRoomList GetPublicCitraRooms() {
-    httplib::SSLClient client("api.citra-emu.org");
-    std::shared_ptr<httplib::Response> response = client.Get("/lobby");
+    asl::HttpResponse r = asl::Http::get("https://api.citra-emu.org/lobby");
 
-    if (response == nullptr || response->status != 200) {
+    if (!r.ok()) {
         return {};
     }
 
-    return nlohmann::json::parse(response->body).at("rooms").get<CitraRoomList>();
+    return nlohmann::json::parse(std::string(static_cast<const char*>(r.text())))
+        .at("rooms")
+        .get<CitraRoomList>();
 }
