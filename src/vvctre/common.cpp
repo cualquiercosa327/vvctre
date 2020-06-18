@@ -110,7 +110,7 @@ CitraRoomList GetPublicCitraRooms() {
         if (json_room.has("description")) {
             room.description = *json_room("description");
         }
-        room.ip = *json_room("ip");
+        room.ip = *json_room("address");
         room.port = static_cast<u16>(static_cast<int>(json_room("port")));
         room.owner = *json_room("owner");
         room.max_players = json_room("maxPlayers");
