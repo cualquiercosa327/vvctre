@@ -7,6 +7,7 @@
 #include <string>
 #define SDL_MAIN_HANDLED
 #include <SDL.h>
+#include <asl/String.h>
 #include <clip.h>
 #include <fmt/format.h>
 #include <imgui.h>
@@ -2761,8 +2762,9 @@ void EmuWindow_SDL2::SwapBuffers() {
                 for (const auto& title : installed) {
                     const auto [path, name] = title;
 
-                    if (Common::ToLower(name).find(Common::ToLower(installed_query)) !=
-                            std::string::npos &&
+                    if (asl::String(name.c_str())
+                            .toLowerCase()
+                            .contains(asl::String(installed_query.c_str()).toLowerCase()) &&
                         ImGui::Selectable(name.c_str())) {
                         system.SetResetFilePath(path);
                         system.RequestReset();
@@ -2819,8 +2821,10 @@ void EmuWindow_SDL2::SwapBuffers() {
                         room.has_password ? "{} ({}/{}) by {} (has password)" : "{} ({}/{}) by {}",
                         room.name, room.members.size(), room.max_players, room.owner);
 
-                    if (Common::ToLower(room_string).find(Common::ToLower(public_rooms_query)) !=
-                        std::string::npos) {
+                    if (asl::String(room_string.c_str())
+                            .toLowerCase()
+                            .contains(asl::String(public_rooms_query.c_str()).toLowerCase()) &&
+                        ImGui::Selectable(room_string.c_str())) {
                         if (ImGui::Selectable(room_string.c_str())) {
                             Settings::values.multiplayer_ip = room.ip;
                             Settings::values.multiplayer_port = room.port;
