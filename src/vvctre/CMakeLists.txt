@@ -30,6 +30,7 @@ target_link_libraries(vvctre PRIVATE common core input_common audio_core network
 target_link_libraries(vvctre PRIVATE stb opengl-loader clip portable_file_dialogs imgui asl ${PLATFORM_LIBRARIES} Threads::Threads)
 
 if (MSVC)
-    include(CopySDLDeps)
-    copy_SDL_deps(vvctre)
+    add_custom_command(TARGET vvctre POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy ${SDL2_DLL_DIR}/SDL2.dll ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
+    )
 endif()
