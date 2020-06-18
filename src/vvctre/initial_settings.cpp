@@ -16,7 +16,7 @@
 #ifdef HAVE_CUBEB
 #include "audio_core/cubeb_input.h"
 #endif
-#include <nlohmann/json.hpp>
+#include <asl/JSON.h>
 #include "audio_core/sink.h"
 #include "audio_core/sink_details.h"
 #include "common/file_util.h"
@@ -1761,32 +1761,22 @@ InitialSettings::InitialSettings(PluginManager& plugin_manager, SDL_Window* wind
                         const std::vector<std::string> path =
                             pfd::open_file("Load File", ".", {"JSON Files", "*.json"}).result();
                         if (!path.empty()) {
-                            std::string contents;
-                            FileUtil::ReadFileToString(true, path[0], contents);
-
-                            try {
-                                const nlohmann::json json = nlohmann::json::parse(contents);
-                                Settings::values.buttons =
-                                    json["buttons"]
-                                        .get<std::array<std::string,
-                                                        Settings::NativeButton::NumButtons>>();
-                                Settings::values.analogs =
-                                    json["analogs"]
-                                        .get<std::array<std::string,
-                                                        Settings::NativeAnalog::NumAnalogs>>();
-                                Settings::values.motion_device =
-                                    json["motion_device"].get<std::string>();
-                                Settings::values.touch_device =
-                                    json["touch_device"].get<std::string>();
-                                Settings::values.cemuhookudp_address =
-                                    json["cemuhookudp_address"].get<std::string>();
-                                Settings::values.cemuhookudp_port =
-                                    json["cemuhookudp_port"].get<u16>();
-                                Settings::values.cemuhookudp_pad_index =
-                                    json["cemuhookudp_pad_index"].get<u8>();
-                            } catch (nlohmann::json::exception& exception) {
-                                pfd::message("JSON Exception", exception.what(), pfd::choice::ok);
+                            asl::Var json = asl::Json::read(path[0].c_str());
+                            asl::Array buttons = json["buttons"].array();
+                            asl::Array analogs = json["analogs"].array();
+                            for (int i = 0; i < buttons.length(); ++i) {
+                                Settings::values.buttons[static_cast<std::size_t>(i)] = *buttons[i];
                             }
+                            for (int i = 0; i < analogs.length(); ++i) {
+                                Settings::values.analogs[static_cast<std::size_t>(i)] = *analogs[i];
+                            }
+                            Settings::values.motion_device = *json["motion_device"];
+                            Settings::values.touch_device = *json["touch_device"];
+                            Settings::values.cemuhookudp_address = *json["cemuhookudp_address"];
+                            Settings::values.cemuhookudp_port =
+                                static_cast<u16>(static_cast<int>(json["cemuhookudp_port"]));
+                            Settings::values.cemuhookudp_pad_index =
+                                static_cast<u8>(static_cast<int>(json["cemuhookudp_pad_index"]));
                         }
                     }
                     ImGui::SameLine();
@@ -1796,20 +1786,28 @@ InitialSettings::InitialSettings(PluginManager& plugin_manager, SDL_Window* wind
                                 .result();
 
                         if (!path.empty()) {
-                            const std::string json =
-                                nlohmann::json{
-                                    {"buttons", Settings::values.buttons},
-                                    {"analogs", Settings::values.analogs},
-                                    {"motion_device", Settings::values.motion_device},
-                                    {"touch_device", Settings::values.touch_device},
-                                    {"cemuhookudp_address", Settings::values.cemuhookudp_address},
-                                    {"cemuhookudp_port", Settings::values.cemuhookudp_port},
-                                    {"cemuhookudp_pad_index",
-                                     Settings::values.cemuhookudp_pad_index},
-                                }
-                                    .dump();
+                            asl::Array<asl::String> buttons;
+                            asl::Array<asl::String> analogs;
+                            for (const std::string& button : Settings::values.buttons) {
+                                buttons << asl::String(button.c_str());
+                            }
+                            for (const std::string& analog : Settings::values.analogs) {
+                                analogs << asl::String(analog.c_str());
+                            }
 
-                            FileUtil::WriteStringToFile(true, path, json);
+                            asl::Var json;
+                            json["buttons"] = buttons;
+                            json["analogs"] = analogs;
+                            json["motion_device"] = Settings::values.motion_device.c_str();
+                            json["touch_device"] = Settings::values.touch_device.c_str();
+                            json["cemuhookudp_address"] =
+                                Settings::values.cemuhookudp_address.c_str();
+                            json["cemuhookudp_port"] =
+                                static_cast<int>(Settings::values.cemuhookudp_port);
+                            json["cemuhookudp_pad_index"] =
+                                static_cast<int>(Settings::values.cemuhookudp_pad_index);
+
+                            asl::Json::write(path.c_str(), json, false);
                         }
                     }
                     ImGui::NewLine();

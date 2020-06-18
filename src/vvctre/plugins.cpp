@@ -6,9 +6,9 @@
 #include <utility>
 #define SDL_MAIN_HANDLED
 #include <SDL.h>
+#include <asl/JSON.h>
 #include <fmt/format.h>
 #include <imgui.h>
-#include <nlohmann/json.hpp>
 #include "common/common_funcs.h"
 #include "common/file_util.h"
 #include "common/logging/log.h"
@@ -46,6 +46,15 @@
 bool has_suffix(const std::string& str, const std::string& suffix) {
     return str.size() >= suffix.size() &&
            str.compare(str.size() - suffix.size(), suffix.size(), suffix) == 0;
+}
+
+template <typename T>
+asl::Array<T> STD_VECTOR_TO_ASL_ARRAY(const std::vector<T>& source) {
+    asl::Array<T> destination;
+    for (const T& x : source) {
+        destination << x;
+    }
+    return destination;
 }
 
 PluginManager::PluginManager(Core::System& core, SDL_Window* window) : window(window) {
@@ -424,37 +433,46 @@ bool vvctre_ipc_recorder_get_enabled(void* core) {
 void vvctre_ipc_recorder_bind_callback(void* core, void (*callback)(const char* json)) {
     static_cast<Core::System*>(core)->Kernel().GetIPCRecorder().BindCallback(
         [callback](const IPCDebugger::RequestRecord& record) {
-            nlohmann::json json;
+            asl::Var json;
             json["id"] = record.id;
             json["status"] = static_cast<int>(record.status);
-            json["client_process"]["type"] = record.client_process.type;
-            json["client_process"]["name"] = record.client_process.name;
-            json["client_process"]["id"] = record.client_process.id;
-            json["client_thread"]["type"] = record.client_thread.type;
-            json["client_thread"]["name"] = record.client_thread.name;
-            json["client_thread"]["id"] = record.client_thread.id;
-            json["client_session"]["type"] = record.client_session.type;
-            json["client_session"]["name"] = record.client_session.name;
-            json["client_session"]["id"] = record.client_session.id;
-            json["client_port"]["type"] = record.client_port.type;
-            json["client_port"]["name"] = record.client_port.name;
-            json["client_port"]["id"] = record.client_port.id;
-            json["server_process"]["type"] = record.server_process.type;
-            json["server_process"]["name"] = record.server_process.name;
-            json["server_process"]["id"] = record.server_process.id;
-            json["server_thread"]["type"] = record.server_thread.type;
-            json["server_thread"]["name"] = record.server_thread.name;
-            json["server_thread"]["id"] = record.server_thread.id;
-            json["server_session"]["type"] = record.server_session.type;
-            json["server_session"]["name"] = record.server_session.name;
-            json["server_session"]["id"] = record.server_session.id;
-            json["function_name"] = record.function_name;
+            json["function_name"] = record.function_name.c_str();
             json["is_hle"] = record.is_hle;
-            json["untranslated_request_cmdbuf"] = record.untranslated_request_cmdbuf;
-            json["translated_request_cmdbuf"] = record.translated_request_cmdbuf;
-            json["untranslated_reply_cmdbuf"] = record.untranslated_reply_cmdbuf;
-            json["translated_reply_cmdbuf"] = record.translated_reply_cmdbuf;
-            callback(json.dump().c_str());
+            json["client_process"]["type"] = record.client_process.type.c_str();
+            json["client_process"]["name"] = record.client_process.name.c_str();
+            json["client_process"]["id"] = record.client_process.id;
+            json["client_thread"]["type"] = record.client_thread.type.c_str();
+            json["client_thread"]["name"] = record.client_thread.name.c_str();
+            json["client_thread"]["id"] = record.client_thread.id;
+            json["client_session"]["type"] = record.client_session.type.c_str();
+            json["client_session"]["name"] = record.client_session.name.c_str();
+            json["client_session"]["id"] = record.client_session.id;
+            json["client_port"]["type"] = record.client_port.type.c_str();
+            json["client_port"]["name"] = record.client_port.name.c_str();
+            json["client_port"]["id"] = record.client_port.id;
+            json["server_process"]["type"] = record.server_process.type.c_str();
+            json["server_process"]["name"] = record.server_process.name.c_str();
+            json["server_process"]["id"] = record.server_process.id;
+            json["server_thread"]["type"] = record.server_thread.type.c_str();
+            json["server_thread"]["name"] = record.server_thread.name.c_str();
+            json["server_thread"]["id"] = record.server_thread.id;
+            json["server_session"]["type"] = record.server_session.type.c_str();
+            json["server_session"]["name"] = record.server_session.name.c_str();
+            json["server_session"]["id"] = record.server_session.id;
+            for (std::size_t i = 0; i < record.untranslated_request_cmdbuf.size(); ++i) {
+                json["untranslated_request_buf"][i] = record.untranslated_request_cmdbuf[i];
+            }
+            for (std::size_t i = 0; i < record.translated_request_cmdbuf.size(); ++i) {
+                json["translated_request_cmdbuf"][i] = record.translated_request_cmdbuf[i];
+            }
+            for (std::size_t i = 0; i < record.untranslated_reply_cmdbuf.size(); ++i) {
+                json["untranslated_reply_cmdbuf"][i] = record.untranslated_reply_cmdbuf[i];
+            }
+            for (std::size_t i = 0; i < record.translated_reply_cmdbuf.size(); ++i) {
+                json["translated_reply_cmdbuf"][i] = record.translated_reply_cmdbuf[i];
+            }
+
+            callback(*asl::Json::encode(json));
         });
 }
 

@@ -5,7 +5,6 @@
 
 #include <asl/Http.h>
 #include <fmt/format.h>
-#include <nlohmann/json.hpp>
 #include "common/file_util.h"
 #include "common/logging/log.h"
 #include "core/hle/service/am/am.h"
@@ -17,31 +16,6 @@
 const u8 vvctre_version_major = 34;
 const u8 vvctre_version_minor = 1;
 const u8 vvctre_version_patch = 0;
-
-void from_json(const nlohmann::json& json, CitraRoom::Member& member) {
-    // nothing to do
-}
-
-void from_json(const nlohmann::json& json, CitraRoom& room) {
-    room.ip = json.at("address").get<std::string>();
-    room.name = json.at("name").get<std::string>();
-    try {
-        room.description = json.at("description").get<std::string>();
-    } catch (const nlohmann::detail::out_of_range& e) {
-        room.description = "";
-        LOG_DEBUG(Network, "Room \'{}\' doesn't contain a description", room.name);
-    }
-    room.owner = json.at("owner").get<std::string>();
-    room.port = json.at("port").get<u16>();
-    room.max_players = json.at("maxPlayers").get<u32>();
-    room.net_version = json.at("netVersion").get<u32>();
-    room.has_password = json.at("hasPassword").get<bool>();
-    try {
-        room.members = json.at("players").get<std::vector<CitraRoom::Member>>();
-    } catch (const nlohmann::detail::out_of_range& e) {
-        LOG_DEBUG(Network, "Out of range {}", e.what());
-    }
-}
 
 std::vector<std::tuple<std::string, std::string>> GetInstalledList() {
     std::vector<std::tuple<std::string, std::string>> all;
@@ -124,7 +98,26 @@ CitraRoomList GetPublicCitraRooms() {
         return {};
     }
 
-    return nlohmann::json::parse(std::string(static_cast<const char*>(r.text())))
-        .at("rooms")
-        .get<CitraRoomList>();
+    asl::Var json_rooms = r.json()("rooms");
+
+    CitraRoomList rooms;
+
+    for (int i = 0; i < json_rooms.length(); ++i) {
+        asl::Var json_room = json_rooms[i];
+
+        CitraRoom room;
+        room.name = *json_room("name");
+        if (json_room.has("description")) {
+            room.description = *json_room("description");
+        }
+        room.ip = *json_room("ip");
+        room.port = static_cast<u16>(static_cast<int>(json_room("port")));
+        room.owner = *json_room("owner");
+        room.max_players = json_room("maxPlayers");
+        room.has_password = json_room("hasPassword");
+        room.members.resize(json_room("members").length());
+        rooms.push_back(std::move(room));
+    }
+
+    return rooms;
 }

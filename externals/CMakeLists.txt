@@ -97,11 +97,6 @@ add_library(stb
 )
 target_include_directories(stb PUBLIC ./stb)
 
-# json
-set(JSON_BuildTests OFF CACHE BOOL "")
-set(JSON_Install OFF CACHE BOOL "")
-add_subdirectory(json EXCLUDE_FROM_ALL)
-
 # mbedTLS
 set(ENABLE_PROGRAMS OFF CACHE BOOL "" FORCE)
 set(ENABLE_TESTING OFF CACHE BOOL "" FORCE)

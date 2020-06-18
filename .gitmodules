@@ -40,9 +40,6 @@
 [submodule "portable-file-dialogs"]
     path = externals/portable-file-dialogs
     url = https://github.com/samhocevar/portable-file-dialogs.git
-[submodule "json"]
-    path = externals/json
-    url = https://github.com/nlohmann/json.git
 [submodule "stb"]
     path = externals/stb
     url = https://github.com/nothings/stb.git
