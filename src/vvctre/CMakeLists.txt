@@ -31,6 +31,6 @@ target_link_libraries(vvctre PRIVATE stb opengl-loader clip portable_file_dialog
 
 if (MSVC)
     add_custom_command(TARGET vvctre POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy ${SDL2_DLL_DIR}/SDL2.dll ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different ${SDL2_DLL_DIR}/SDL2.dll ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
     )
 endif()
