@@ -83,9 +83,7 @@ void Context::MakeRequest() {
         if (pos != std::string::npos) {
             asl::Dic<asl::String> params = decodeUrlParams(url.substr(pos + 1).c_str());
             foreach2(asl::String & k, const asl::String& v, params) {
-                post_data.emplace_back(std::string(static_cast<const char*>(k)),
-                                       std::string(static_cast<const char*>(v)),
-                                       PostData::Type::Ascii);
+                post_data.emplace_back(std::string(*k), std::string(*v), PostData::Type::Ascii);
             }
         }
     }
@@ -94,9 +92,8 @@ void Context::MakeRequest() {
         switch (d.type) {
         case PostData::Type::Binary:
         case PostData::Type::Ascii:
-            request.put(fmt::format("{}{}={}&", static_cast<const char*>(request.text()),
-                                    static_cast<const char*>(asl::encodeUrl(d.name.c_str())),
-                                    static_cast<const char*>(asl::encodeUrl(d.value.c_str())))
+            request.put(fmt::format("{}{}={}&", *request.text(), *asl::encodeUrl(d.name.c_str()),
+                                    *asl::encodeUrl(d.value.c_str()))
                             .c_str());
             break;
         case PostData::Type::Raw:
@@ -790,10 +787,10 @@ void HTTP_C::GetResponseHeader(Kernel::HLERequestContext& ctx) {
     auto itr = contexts.find(context_handle);
     ASSERT(itr != contexts.end());
 
-    const std::string value = itr->second.response.hasHeader(name.c_str())
-                                  ? std::string(static_cast<const char*>(
-                                        itr->second.response.header(name.c_str()).concat("\0", 1)))
-                                  : "";
+    const std::string value =
+        itr->second.response.hasHeader(name.c_str())
+            ? std::string(*itr->second.response.header(name.c_str()).concat("\0", 1))
+            : "";
 
     LOG_DEBUG(Service_HTTP, "context_handle = {}, name = {}, value = {}", context_handle, name,
               value);
