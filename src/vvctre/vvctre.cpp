@@ -23,7 +23,6 @@
 #include <imgui_impl_opengl3.h>
 #include <imgui_impl_sdl.h>
 #include <portable-file-dialogs.h>
-#include "common/file_util.h"
 #include "common/logging/backend.h"
 #include "common/logging/filter.h"
 #include "common/logging/log.h"
