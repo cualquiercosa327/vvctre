@@ -19,9 +19,6 @@
 [submodule "fmt"]
     path = externals/fmt
     url = https://github.com/fmtlib/fmt.git
-[submodule "libressl"]
-    path = externals/libressl
-    url = https://github.com/vvanelslande/vvctre-libressl.git
 [submodule "cubeb"]
     path = externals/cubeb
     url = https://github.com/kinetiknz/cubeb.git
@@ -37,12 +34,6 @@
 [submodule "opengl-loader"]
     path = externals/opengl-loader
     url = https://github.com/vvanelslande/vvctre-opengl-loader.git
-[submodule "httplib"]
-    path = externals/httplib
-    url = https://github.com/yhirose/cpp-httplib.git
-[submodule "lurlparser"]
-    path = externals/lurlparser
-    url = https://github.com/corporateshark/LUrlParser.git
 [submodule "system-archives"]
     path = externals/system-archives
     url = https://github.com/vvanelslande/vvctre-system-archives.git

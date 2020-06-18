@@ -45,22 +45,6 @@ if (ENABLE_CUBEB)
     add_subdirectory(cubeb EXCLUDE_FROM_ALL)
 endif()
 
-# LibreSSL
-set(LIBRESSL_SKIP_INSTALL ON CACHE BOOL "")
-add_subdirectory(libressl EXCLUDE_FROM_ALL)
-target_include_directories(ssl INTERFACE ./libressl/include)
-target_compile_definitions(ssl PRIVATE -DHAVE_INET_NTOP)
-
-# lurlparser
-add_library(lurlparser
-    lurlparser/LUrlParser.cpp
-    lurlparser/LUrlParser.h)
-target_include_directories(lurlparser INTERFACE ./lurlparser)
-
-# httplib
-add_library(httplib INTERFACE)
-target_include_directories(httplib INTERFACE ./httplib)
-
 # OpenGL loader
 add_library(opengl-loader STATIC
     opengl-loader/src/glad.c
