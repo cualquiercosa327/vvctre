@@ -29,7 +29,6 @@
 #include "common/logging/log.h"
 #include "common/param_package.h"
 #include "common/scope_exit.h"
-#include "common/string_util.h"
 #include "core/core.h"
 #include "core/hle/service/am/am.h"
 #include "core/hle/service/cfg/cfg.h"
