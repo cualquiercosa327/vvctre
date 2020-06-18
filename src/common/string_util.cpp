@@ -41,16 +41,6 @@ std::string StripSpaces(const std::string& str) {
         return "";
 }
 
-// "\"hello\"" is turned to "hello"
-// This one assumes that the string has already been space stripped in both
-// ends, as done by StripSpaces above, for example.
-std::string StripQuotes(const std::string& s) {
-    if (s.size() && '\"' == s[0] && '\"' == *s.rbegin())
-        return s.substr(1, s.size() - 2);
-    else
-        return s;
-}
-
 bool SplitPath(const std::string& full_path, std::string* _pPath, std::string* _pFilename,
                std::string* _pExtension) {
     if (full_path.empty())
@@ -83,18 +73,6 @@ bool SplitPath(const std::string& full_path, std::string* _pPath, std::string* _
     return true;
 }
 
-void BuildCompleteFilename(std::string& _CompleteFilename, const std::string& _Path,
-                           const std::string& _Filename) {
-    _CompleteFilename = _Path;
-
-    // check for seperator
-    if ('/' != *_CompleteFilename.rbegin())
-        _CompleteFilename += '/';
-
-    // add the filename
-    _CompleteFilename += _Filename;
-}
-
 void SplitString(const std::string& str, const char delim, std::vector<std::string>& output) {
     std::istringstream iss(str);
     output.resize(1);
@@ -104,16 +82,6 @@ void SplitString(const std::string& str, const char delim, std::vector<std::stri
     }
 
     output.pop_back();
-}
-
-std::string TabsToSpaces(int tab_size, std::string in) {
-    std::size_t i = 0;
-
-    while ((i = in.find('\t')) != std::string::npos) {
-        in.replace(i, 1, tab_size, ' ');
-    }
-
-    return in;
 }
 
 std::string ReplaceAll(std::string result, const std::string& src, const std::string& dest) {

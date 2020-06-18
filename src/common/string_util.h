@@ -20,9 +20,6 @@ std::string ToLower(std::string str);
 std::string ToUpper(std::string str);
 
 std::string StripSpaces(const std::string& s);
-std::string StripQuotes(const std::string& s);
-
-std::string TabsToSpaces(int tab_size, std::string in);
 
 void SplitString(const std::string& str, char delim, std::vector<std::string>& output);
 
@@ -30,8 +27,6 @@ void SplitString(const std::string& str, char delim, std::vector<std::string>& o
 bool SplitPath(const std::string& full_path, std::string* _pPath, std::string* _pFilename,
                std::string* _pExtension);
 
-void BuildCompleteFilename(std::string& _CompleteFilename, const std::string& _Path,
-                           const std::string& _Filename);
 std::string ReplaceAll(std::string result, const std::string& src, const std::string& dest);
 
 std::string UTF16ToUTF8(const std::u16string& input);
