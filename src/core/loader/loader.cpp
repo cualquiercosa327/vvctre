@@ -21,7 +21,7 @@ const std::initializer_list<Kernel::AddressMapping> default_address_mappings = {
     {0x1F000000, 0x600000, false}, // entire VRAM
 };
 
-FileType IdentifyFile(FileUtil::IOFile& file) {
+static FileType IdentifyFile(FileUtil::IOFile& file) {
     FileType type;
 
 #define CHECK_TYPE(loader)                                                                         \
@@ -39,7 +39,7 @@ FileType IdentifyFile(FileUtil::IOFile& file) {
     return FileType::Unknown;
 }
 
-FileType IdentifyFile(const std::string& file_name) {
+static FileType IdentifyFile(const std::string& file_name) {
     FileUtil::IOFile file(file_name, "rb");
     if (!file.IsOpen()) {
         LOG_ERROR(Loader, "Failed to load file {}", file_name);
@@ -49,7 +49,7 @@ FileType IdentifyFile(const std::string& file_name) {
     return IdentifyFile(file);
 }
 
-FileType GuessFromExtension(const std::string& extension_) {
+static FileType GuessFromExtension(const std::string& extension_) {
     asl::String extension = asl::String(extension_.c_str()).toLowerCase();
 
     if (extension == "elf" || extension == "axf") {
@@ -75,7 +75,7 @@ FileType GuessFromExtension(const std::string& extension_) {
     return FileType::Unknown;
 }
 
-const char* GetFileTypeString(FileType type) {
+static const char* GetFileTypeString(FileType type) {
     switch (type) {
     case FileType::CCI:
         return "NCSD";
