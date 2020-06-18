@@ -2823,8 +2823,7 @@ void EmuWindow_SDL2::SwapBuffers() {
 
                     if (asl::String(room_string.c_str())
                             .toLowerCase()
-                            .contains(asl::String(public_rooms_query.c_str()).toLowerCase()) &&
-                        ImGui::Selectable(room_string.c_str())) {
+                            .contains(asl::String(public_rooms_query.c_str()).toLowerCase())) {
                         if (ImGui::Selectable(room_string.c_str())) {
                             Settings::values.multiplayer_ip = room.ip;
                             Settings::values.multiplayer_port = room.port;
