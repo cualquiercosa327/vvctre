@@ -307,7 +307,7 @@ void RoomMember::RoomMemberImpl::HandleJoinPacket(const ENetEvent* event) {
     Packet packet;
     packet.Append(event->packet->data, event->packet->dataLength);
 
-    // Ignore the first byte, which is the message id.
+    // Ignore the first byte, which is the message type.
     packet.IgnoreBytes(sizeof(u8)); // Ignore the message type
 
     // Parse the MAC Address from the packet
@@ -319,7 +319,7 @@ void RoomMember::RoomMemberImpl::HandleWifiPackets(const ENetEvent* event) {
     Packet packet;
     packet.Append(event->packet->data, event->packet->dataLength);
 
-    // Ignore the first byte, which is the message id.
+    // Ignore the first byte, which is the message type.
     packet.IgnoreBytes(sizeof(u8)); // Ignore the message type
 
     // Parse the WifiPacket from the packet
@@ -340,7 +340,7 @@ void RoomMember::RoomMemberImpl::HandleChatPacket(const ENetEvent* event) {
     Packet packet;
     packet.Append(event->packet->data, event->packet->dataLength);
 
-    // Ignore the first byte, which is the message id.
+    // Ignore the first byte, which is the message type.
     packet.IgnoreBytes(sizeof(u8));
 
     ChatEntry chat_entry{};
@@ -355,7 +355,7 @@ void RoomMember::RoomMemberImpl::HandleStatusMessagePacket(const ENetEvent* even
     Packet packet;
     packet.Append(event->packet->data, event->packet->dataLength);
 
-    // Ignore the first byte, which is the message id.
+    // Ignore the first byte, which is the message type.
     packet.IgnoreBytes(sizeof(u8));
 
     StatusMessageEntry status_message_entry{};
