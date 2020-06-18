@@ -115,7 +115,7 @@ CitraRoomList GetPublicCitraRooms() {
         room.owner = *json_room("owner");
         room.max_players = json_room("maxPlayers");
         room.has_password = json_room("hasPassword");
-        room.members.resize(json_room("members").length());
+        room.members.resize(json_room("players").length());
         rooms.push_back(std::move(room));
     }
 
