@@ -44,7 +44,7 @@ ContinuationIndentWidth: 4
 Cpp11BracedListStyle: true
 DerivePointerAlignment: false
 DisableFormat:   false
-ForEachMacros:   [ foreach, Q_FOREACH, BOOST_FOREACH ]
+ForEachMacros:   [ foreach, BOOST_FOREACH ]
 IncludeCategories:
   - Regex:           '^\<[^Q][^/.>]*\>'
     Priority:        -2
