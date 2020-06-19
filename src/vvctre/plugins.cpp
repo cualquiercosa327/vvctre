@@ -48,15 +48,6 @@ bool has_suffix(const std::string& str, const std::string& suffix) {
            str.compare(str.size() - suffix.size(), suffix.size(), suffix) == 0;
 }
 
-template <typename T>
-asl::Array<T> STD_VECTOR_TO_ASL_ARRAY(const std::vector<T>& source) {
-    asl::Array<T> destination;
-    for (const T& x : source) {
-        destination << x;
-    }
-    return destination;
-}
-
 PluginManager::PluginManager(Core::System& core, SDL_Window* window) : window(window) {
     FileUtil::FSTEntry parent;
     FileUtil::ScanDirectoryTree(
