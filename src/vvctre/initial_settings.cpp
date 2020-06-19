@@ -40,6 +40,7 @@ InitialSettings::InitialSettings(PluginManager& plugin_manager, SDL_Window* wind
                                  Service::CFG::Module& cfg) {
     SDL_Event event;
     CitraRoomList public_rooms;
+    bool first_time_in_multiplayer = true;
     std::string public_rooms_query;
 
     for (;;) {
@@ -2695,8 +2696,9 @@ InitialSettings::InitialSettings(PluginManager& plugin_manager, SDL_Window* wind
                 }
 
                 if (ImGui::BeginTabItem("Multiplayer")) {
-                    if (public_rooms.empty()) {
+                    if (first_time_in_multiplayer) {
                         public_rooms = GetPublicCitraRooms();
+                        first_time_in_multiplayer = false;
                     }
 
                     ImGui::TextUnformatted("IP:");
@@ -2722,6 +2724,10 @@ InitialSettings::InitialSettings(PluginManager& plugin_manager, SDL_Window* wind
                     ImGui::TextUnformatted("Search:");
                     ImGui::SameLine();
                     ImGui::InputText("##search", &public_rooms_query);
+                    ImGui::SameLine();
+                    if (ImGui::Button("Refresh")) {
+                        public_rooms = GetPublicCitraRooms();
+                    }
 
                     if (ImGui::ListBoxHeader("##publicrooms", ImVec2(-1.0f, -1.0f))) {
                         for (const auto& room : public_rooms) {
