@@ -328,7 +328,6 @@ void ARM_Dynarmic::ServeBreak() {
 
 std::unique_ptr<Dynarmic::A32::Jit> ARM_Dynarmic::MakeJit() {
     Dynarmic::A32::UserConfig config;
-    config.processor_id = 0;
     config.global_monitor = exclusive_monitor.get();
     config.callbacks = cb.get();
     if (current_page_table) {
