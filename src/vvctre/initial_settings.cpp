@@ -120,7 +120,8 @@ InitialSettings::InitialSettings(PluginManager& plugin_manager, SDL_Window* wind
                                     if (ImGui::BeginPopupModal(
                                             "Installing CIA", nullptr,
                                             ImGuiWindowFlags_NoSavedSettings |
-                                                ImGuiWindowFlags_AlwaysAutoResize)) {
+                                                ImGuiWindowFlags_AlwaysAutoResize |
+                                                ImGuiWindowFlags_NoMove)) {
                                         ImGui::Text("Installing %s", file.c_str());
                                         ImGui::ProgressBar(static_cast<float>(current) /
                                                            static_cast<float>(total));
@@ -2697,7 +2698,9 @@ InitialSettings::InitialSettings(PluginManager& plugin_manager, SDL_Window* wind
 
                 if (ImGui::BeginTabItem("Multiplayer")) {
                     if (first_time_in_multiplayer) {
-                        public_rooms = GetPublicCitraRooms();
+                        if (!ImGui::IsKeyDown(SDL_SCANCODE_LSHIFT)) {
+                            public_rooms = GetPublicCitraRooms();
+                        }
                         first_time_in_multiplayer = false;
                     }
 
@@ -2728,8 +2731,9 @@ InitialSettings::InitialSettings(PluginManager& plugin_manager, SDL_Window* wind
                     if (ImGui::Button("Refresh")) {
                         public_rooms = GetPublicCitraRooms();
                     }
-
-                    if (ImGui::ListBoxHeader("##publicrooms", ImVec2(-1.0f, -1.0f))) {
+                    if (ImGui::ListBoxHeader(
+                            "##publicrooms",
+                            ImVec2(-1.0f, ImGui::GetContentRegionAvail().y - 40.0f))) {
                         for (const auto& room : public_rooms) {
                             const std::string room_string = fmt::format(
                                 room.has_password ? "{} ({}/{}) by {} (has password)"
@@ -2746,7 +2750,13 @@ InitialSettings::InitialSettings(PluginManager& plugin_manager, SDL_Window* wind
                                 }
 
                                 if (ImGui::IsItemHovered() && !room.description.empty()) {
-                                    ImGui::SetTooltip("%s", room.description.c_str());
+                                    const float x = ImGui::GetContentRegionAvail().x;
+
+                                    ImGui::BeginTooltip();
+                                    ImGui::PushTextWrapPos(ImGui::GetCursorPosX() + x);
+                                    ImGui::TextUnformatted(room.description.c_str());
+                                    ImGui::PopTextWrapPos();
+                                    ImGui::EndTooltip();
                                 }
                             }
                         }
@@ -2780,7 +2790,9 @@ InitialSettings::InitialSettings(PluginManager& plugin_manager, SDL_Window* wind
             ImGui::SetNextWindowSize(io.DisplaySize);
 
             bool open = true;
-            if (ImGui::BeginPopupModal("Installed", &open, ImGuiWindowFlags_NoSavedSettings)) {
+            if (ImGui::BeginPopupModal("Installed", &open,
+                                       ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoMove |
+                                           ImGuiWindowFlags_NoResize)) {
                 ImGui::TextUnformatted("Search:");
                 ImGui::SameLine();
                 ImGui::InputText("##search", &installed_query);

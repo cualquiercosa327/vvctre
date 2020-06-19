@@ -7,6 +7,7 @@
 #include <string>
 #define SDL_MAIN_HANDLED
 #include <SDL.h>
+#include <asl/Date.h>
 #include <asl/String.h>
 #include <clip.h>
 #include <fmt/format.h>
@@ -170,8 +171,10 @@ EmuWindow_SDL2::EmuWindow_SDL2(Core::System& system, PluginManager& plugin_manag
                     multiplayer_messages.pop_front();
                 }
 
-                multiplayer_messages.push_back(
-                    fmt::format("<{}> {}", entry.nickname, entry.message));
+                asl::Date date = asl::Date::now();
+                multiplayer_messages.push_back(fmt::format("[{}:{}] <{}> {}", date.hours(),
+                                                           date.minutes(), entry.nickname,
+                                                           entry.message));
             });
 
         multiplayer_on_status_message =
@@ -306,7 +309,8 @@ void EmuWindow_SDL2::SwapBuffers() {
                                     if (ImGui::BeginPopupModal(
                                             "Installing CIA", nullptr,
                                             ImGuiWindowFlags_NoSavedSettings |
-                                                ImGuiWindowFlags_AlwaysAutoResize)) {
+                                                ImGuiWindowFlags_AlwaysAutoResize |
+                                                ImGuiWindowFlags_NoMove)) {
                                         ImGui::Text("Installing %s", file.c_str());
                                         ImGui::ProgressBar(static_cast<float>(current) /
                                                            static_cast<float>(total));
@@ -2394,7 +2398,9 @@ void EmuWindow_SDL2::SwapBuffers() {
                 if (room_member->GetState() == Network::RoomMember::State::Idle) {
                     if (ImGui::BeginMenu("Multiplayer")) {
                         if (ImGui::MenuItem("Connect To Citra Room")) {
-                            public_rooms = GetPublicCitraRooms();
+                            if (!ImGui::IsKeyDown(SDL_SCANCODE_LSHIFT)) {
+                                public_rooms = GetPublicCitraRooms();
+                            }
                             show_connect_to_citra_room = true;
                         }
                     }
@@ -2736,7 +2742,9 @@ void EmuWindow_SDL2::SwapBuffers() {
                                          room_information.member_slots)
                                  .c_str(),
                              &open, ImGuiWindowFlags_NoSavedSettings)) {
+                ImGui::PushTextWrapPos();
                 ImGui::TextUnformatted(room_information.description.c_str());
+                ImGui::PopTextWrapPos();
 
                 if (ImGui::ListBoxHeader("##members", ImVec2(ImGui::GetWindowWidth() / 2.0f,
                                                              ImGui::GetWindowHeight() / 1.23f))) {
@@ -2772,7 +2780,10 @@ void EmuWindow_SDL2::SwapBuffers() {
                 if (ImGui::ListBoxHeader("##messages", ImVec2(ImGui::GetWindowWidth() / 2.0f,
                                                               ImGui::GetWindowHeight() / 1.23f))) {
                     for (const std::string& message : multiplayer_messages) {
+                        ImGui::PushTextWrapPos(ImGui::GetCursorPosX() +
+                                               ImGui::GetContentRegionAvail().x);
                         ImGui::TextUnformatted(message.c_str());
+                        ImGui::PopTextWrapPos();
                         ImGui::SetScrollHereY(1.0f);
                     }
                     ImGui::ListBoxFooter();
@@ -2785,8 +2796,10 @@ void EmuWindow_SDL2::SwapBuffers() {
                     if (multiplayer_messages.size() == 100) {
                         multiplayer_messages.pop_front();
                     }
+                    asl::Date date = asl::Date::now();
                     multiplayer_messages.push_back(
-                        fmt::format("<{}> {}", room_member->GetNickname(), multiplayer_message));
+                        fmt::format("[{}:{}] <{}> {}", date.hours(), date.minutes(),
+                                    room_member->GetNickname(), multiplayer_message));
                     multiplayer_message.clear();
                     ImGui::SetKeyboardFocusHere();
                 }
@@ -2809,7 +2822,9 @@ void EmuWindow_SDL2::SwapBuffers() {
 
         bool open = true;
 
-        if (ImGui::BeginPopupModal("Installed", &open, ImGuiWindowFlags_NoSavedSettings)) {
+        if (ImGui::BeginPopupModal("Installed", &open,
+                                   ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoMove |
+                                       ImGuiWindowFlags_NoResize)) {
             ImGui::TextUnformatted("Search:");
             ImGui::SameLine();
             ImGui::InputText("##search", &installed_query);
@@ -2845,7 +2860,8 @@ void EmuWindow_SDL2::SwapBuffers() {
         ImGui::SetNextWindowSize(io.DisplaySize);
 
         if (ImGui::BeginPopupModal("Connect To Citra Room", &show_connect_to_citra_room,
-                                   ImGuiWindowFlags_NoSavedSettings)) {
+                                   ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoMove |
+                                       ImGuiWindowFlags_NoResize)) {
             ImGui::TextUnformatted("IP:");
             ImGui::SameLine();
             ImGui::InputText("##ip", &Settings::values.multiplayer_ip);
@@ -2868,10 +2884,13 @@ void EmuWindow_SDL2::SwapBuffers() {
             ImGui::TextUnformatted("Search:");
             ImGui::SameLine();
             ImGui::InputText("##search", &public_rooms_query);
+            ImGui::SameLine();
+            if (ImGui::Button("Refresh")) {
+                public_rooms = GetPublicCitraRooms();
+            }
 
-            if (ImGui::ListBoxHeader(
-                    "##publicrooms",
-                    ImVec2(ImGui::GetWindowWidth(), ImGui::GetContentRegionAvail().y - 40.0f))) {
+            if (ImGui::ListBoxHeader("##publicrooms",
+                                     ImVec2(-1.0f, ImGui::GetContentRegionAvail().y - 40.0f))) {
                 for (const auto& room : public_rooms) {
                     const std::string room_string = fmt::format(
                         room.has_password ? "{} ({}/{}) by {} (has password)" : "{} ({}/{}) by {}",
@@ -2886,7 +2905,13 @@ void EmuWindow_SDL2::SwapBuffers() {
                         }
 
                         if (ImGui::IsItemHovered() && !room.description.empty()) {
-                            ImGui::SetTooltip("%s", room.description.c_str());
+                            const float x = ImGui::GetContentRegionAvail().x;
+
+                            ImGui::BeginTooltip();
+                            ImGui::PushTextWrapPos(ImGui::GetCursorPosX() + x);
+                            ImGui::TextUnformatted(room.description.c_str());
+                            ImGui::PopTextWrapPos();
+                            ImGui::EndTooltip();
                         }
                     }
                 }
