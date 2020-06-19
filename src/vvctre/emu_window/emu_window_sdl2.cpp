@@ -673,7 +673,7 @@ void EmuWindow_SDL2::SwapBuffers() {
                 if (ImGui::BeginMenu("Camera")) {
                     ImGui::TextUnformatted("Inner Camera Engine:");
                     ImGui::SameLine();
-                    if (ImGui::BeginCombo("##innerengine",
+                    if (ImGui::BeginCombo("##innercameraengine",
                                           Settings::values
                                               .camera_engine[static_cast<std::size_t>(
                                                   Service::CAM::CameraIndex::InnerCamera)]
@@ -681,7 +681,8 @@ void EmuWindow_SDL2::SwapBuffers() {
                         if (ImGui::Selectable("blank")) {
                             Settings::values.camera_engine[static_cast<std::size_t>(
                                 Service::CAM::CameraIndex::InnerCamera)] = "blank";
-                            auto cam = Service::CAM::GetModule(system);
+                            std::shared_ptr<Service::CAM::Module> cam =
+                                Service::CAM::GetModule(system);
                             if (cam != nullptr) {
                                 cam->ReloadCameraDevices();
                             }
@@ -689,7 +690,8 @@ void EmuWindow_SDL2::SwapBuffers() {
                         if (ImGui::Selectable("image (parameter: file path or URL)")) {
                             Settings::values.camera_engine[static_cast<std::size_t>(
                                 Service::CAM::CameraIndex::InnerCamera)] = "image";
-                            auto cam = Service::CAM::GetModule(system);
+                            std::shared_ptr<Service::CAM::Module> cam =
+                                Service::CAM::GetModule(system);
                             if (cam != nullptr) {
                                 cam->ReloadCameraDevices();
                             }
@@ -697,21 +699,36 @@ void EmuWindow_SDL2::SwapBuffers() {
                         ImGui::EndCombo();
                     }
 
-                    ImGui::TextUnformatted("Inner Camera Parameter:");
-                    ImGui::SameLine();
-                    if (ImGui::InputText(
-                            "##innerparameter",
-                            &Settings::values.camera_parameter[static_cast<std::size_t>(
-                                Service::CAM::CameraIndex::InnerCamera)])) {
-                        auto cam = Service::CAM::GetModule(system);
-                        if (cam != nullptr) {
-                            cam->ReloadCameraDevices();
+                    if (Settings::values.camera_engine[static_cast<std::size_t>(
+                            Service::CAM::CameraIndex::InnerCamera)] == "image") {
+                        ImGui::TextUnformatted("Inner Camera Parameter:");
+                        ImGui::SameLine();
+                        ImGui::PushItemWidth(316);
+                        if (ImGui::InputText(
+                                "##innercameraparameter",
+                                &Settings::values.camera_parameter[static_cast<std::size_t>(
+                                    Service::CAM::CameraIndex::InnerCamera)])) {
+                            std::shared_ptr<Service::CAM::Module> cam =
+                                Service::CAM::GetModule(system);
+                            if (cam != nullptr) {
+                                cam->ReloadCameraDevices();
+                            }
+                        }
+                        ImGui::PopItemWidth();
+                        if (GUI_CameraAddBrowse(
+                                "Browse...##innercamera",
+                                static_cast<std::size_t>(Service::CAM::CameraIndex::InnerCamera))) {
+                            std::shared_ptr<Service::CAM::Module> cam =
+                                Service::CAM::GetModule(system);
+                            if (cam != nullptr) {
+                                cam->ReloadCameraDevices();
+                            }
                         }
                     }
 
-                    ImGui::TextUnformatted("Outer Left Engine:");
+                    ImGui::TextUnformatted("Outer Left Camera Engine:");
                     ImGui::SameLine();
-                    if (ImGui::BeginCombo("##outerleftengine",
+                    if (ImGui::BeginCombo("##outerleftcameraengine",
                                           Settings::values
                                               .camera_engine[static_cast<std::size_t>(
                                                   Service::CAM::CameraIndex::OuterLeftCamera)]
@@ -719,7 +736,8 @@ void EmuWindow_SDL2::SwapBuffers() {
                         if (ImGui::Selectable("blank")) {
                             Settings::values.camera_engine[static_cast<std::size_t>(
                                 Service::CAM::CameraIndex::OuterLeftCamera)] = "blank";
-                            auto cam = Service::CAM::GetModule(system);
+                            std::shared_ptr<Service::CAM::Module> cam =
+                                Service::CAM::GetModule(system);
                             if (cam != nullptr) {
                                 cam->ReloadCameraDevices();
                             }
@@ -727,7 +745,8 @@ void EmuWindow_SDL2::SwapBuffers() {
                         if (ImGui::Selectable("image (parameter: file path or URL)")) {
                             Settings::values.camera_engine[static_cast<std::size_t>(
                                 Service::CAM::CameraIndex::OuterLeftCamera)] = "image";
-                            auto cam = Service::CAM::GetModule(system);
+                            std::shared_ptr<Service::CAM::Module> cam =
+                                Service::CAM::GetModule(system);
                             if (cam != nullptr) {
                                 cam->ReloadCameraDevices();
                             }
@@ -735,19 +754,34 @@ void EmuWindow_SDL2::SwapBuffers() {
                         ImGui::EndCombo();
                     }
 
-                    ImGui::TextUnformatted("Outer Left Parameter:");
-                    ImGui::SameLine();
-                    if (ImGui::InputText(
-                            "##outerleftparameter",
-                            &Settings::values.camera_parameter[static_cast<std::size_t>(
-                                Service::CAM::CameraIndex::OuterLeftCamera)])) {
-                        auto cam = Service::CAM::GetModule(system);
-                        if (cam != nullptr) {
-                            cam->ReloadCameraDevices();
+                    if (Settings::values.camera_engine[static_cast<std::size_t>(
+                            Service::CAM::CameraIndex::OuterLeftCamera)] == "image") {
+                        ImGui::TextUnformatted("Outer Left Camera Parameter:");
+                        ImGui::SameLine();
+                        ImGui::PushItemWidth(316);
+                        if (ImGui::InputText(
+                                "##outerleftcameraparameter",
+                                &Settings::values.camera_parameter[static_cast<std::size_t>(
+                                    Service::CAM::CameraIndex::OuterLeftCamera)])) {
+                            std::shared_ptr<Service::CAM::Module> cam =
+                                Service::CAM::GetModule(system);
+                            if (cam != nullptr) {
+                                cam->ReloadCameraDevices();
+                            }
+                        }
+                        ImGui::PopItemWidth();
+                        if (GUI_CameraAddBrowse("Browse...##outerleftcamera",
+                                                static_cast<std::size_t>(
+                                                    Service::CAM::CameraIndex::OuterLeftCamera))) {
+                            std::shared_ptr<Service::CAM::Module> cam =
+                                Service::CAM::GetModule(system);
+                            if (cam != nullptr) {
+                                cam->ReloadCameraDevices();
+                            }
                         }
                     }
 
-                    ImGui::TextUnformatted("Outer Right Engine:");
+                    ImGui::TextUnformatted("Outer Right Camera Engine:");
                     ImGui::SameLine();
                     if (ImGui::BeginCombo("##outerrightengine",
                                           Settings::values
@@ -757,7 +791,8 @@ void EmuWindow_SDL2::SwapBuffers() {
                         if (ImGui::Selectable("blank")) {
                             Settings::values.camera_engine[static_cast<std::size_t>(
                                 Service::CAM::CameraIndex::OuterRightCamera)] = "blank";
-                            auto cam = Service::CAM::GetModule(system);
+                            std::shared_ptr<Service::CAM::Module> cam =
+                                Service::CAM::GetModule(system);
                             if (cam != nullptr) {
                                 cam->ReloadCameraDevices();
                             }
@@ -765,7 +800,8 @@ void EmuWindow_SDL2::SwapBuffers() {
                         if (ImGui::Selectable("image (parameter: file path or URL)")) {
                             Settings::values.camera_engine[static_cast<std::size_t>(
                                 Service::CAM::CameraIndex::OuterRightCamera)] = "image";
-                            auto cam = Service::CAM::GetModule(system);
+                            std::shared_ptr<Service::CAM::Module> cam =
+                                Service::CAM::GetModule(system);
                             if (cam != nullptr) {
                                 cam->ReloadCameraDevices();
                             }
@@ -773,15 +809,30 @@ void EmuWindow_SDL2::SwapBuffers() {
                         ImGui::EndCombo();
                     }
 
-                    ImGui::TextUnformatted("Outer Right Parameter:");
-                    ImGui::SameLine();
-                    if (ImGui::InputText(
-                            "##outerrightparameter",
-                            &Settings::values.camera_parameter[static_cast<std::size_t>(
-                                Service::CAM::CameraIndex::OuterRightCamera)])) {
-                        auto cam = Service::CAM::GetModule(system);
-                        if (cam != nullptr) {
-                            cam->ReloadCameraDevices();
+                    if (Settings::values.camera_engine[static_cast<std::size_t>(
+                            Service::CAM::CameraIndex::OuterRightCamera)] == "image") {
+                        ImGui::TextUnformatted("Outer Right Camera Parameter:");
+                        ImGui::SameLine();
+                        ImGui::PushItemWidth(316);
+                        if (ImGui::InputText(
+                                "##outerrightcameraparameter",
+                                &Settings::values.camera_parameter[static_cast<std::size_t>(
+                                    Service::CAM::CameraIndex::OuterRightCamera)])) {
+                            std::shared_ptr<Service::CAM::Module> cam =
+                                Service::CAM::GetModule(system);
+                            if (cam != nullptr) {
+                                cam->ReloadCameraDevices();
+                            }
+                        }
+                        ImGui::PopItemWidth();
+                        if (GUI_CameraAddBrowse("Browse...##outerrightcamera",
+                                                static_cast<std::size_t>(
+                                                    Service::CAM::CameraIndex::OuterRightCamera))) {
+                            std::shared_ptr<Service::CAM::Module> cam =
+                                Service::CAM::GetModule(system);
+                            if (cam != nullptr) {
+                                cam->ReloadCameraDevices();
+                            }
                         }
                     }
 

@@ -31,3 +31,5 @@ using CitraRoomList = std::vector<CitraRoom>;
 
 std::vector<std::tuple<std::string, std::string>> GetInstalledList();
 CitraRoomList GetPublicCitraRooms();
+
+bool GUI_CameraAddBrowse(const char* label, std::size_t index);

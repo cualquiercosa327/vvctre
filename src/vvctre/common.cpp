@@ -5,16 +5,19 @@
 
 #include <asl/Http.h>
 #include <fmt/format.h>
+#include <imgui.h>
+#include <portable-file-dialogs.h>
 #include "common/file_util.h"
 #include "common/logging/log.h"
 #include "core/hle/service/am/am.h"
 #include "core/hle/service/fs/archive.h"
 #include "core/loader/loader.h"
 #include "core/loader/smdh.h"
+#include "core/settings.h"
 #include "vvctre/common.h"
 
 const u8 vvctre_version_major = 34;
-const u8 vvctre_version_minor = 1;
+const u8 vvctre_version_minor = 2;
 const u8 vvctre_version_patch = 0;
 
 std::vector<std::tuple<std::string, std::string>> GetInstalledList() {
@@ -120,4 +123,41 @@ CitraRoomList GetPublicCitraRooms() {
     }
 
     return rooms;
+}
+
+bool GUI_CameraAddBrowse(const char* label, std::size_t index) {
+    ImGui::SameLine();
+
+    if (ImGui::Button(label)) {
+        const std::vector<std::string> result =
+            pfd::open_file("Browse", ".",
+                           {"All supported files",
+                            "*.jpg *.JPG *.jpeg *.JPEG *.jfif *.JFIF *.png *.PNG "
+                            "*.bmp "
+                            "*.BMP *.psd *.PSD *.tga *.TGA *.gif *.GIF "
+                            "*.hdr *.HDR *.pic *.PIC *.ppm *.PPM *.pgm *.PGM",
+                            "JPEG", "*.jpg *.JPG *.jpeg *.JPEG *.jfif *.JFIF", "PNG", "*.png *.PNG",
+                            "BMP",
+                            "*.bmp *.BMP"
+                            "PSD",
+                            "*.psd *.PSD"
+                            "TGA",
+                            "*.tga *.TGA"
+                            "GIF",
+                            "*.gif *.GIF"
+                            "HDR",
+                            "*.hdr *.HDR"
+                            "PIC",
+                            "*.pic *.PIC"
+                            "PNM",
+                            "*.ppm *.PPM *.pgm *.PGM"})
+                .result();
+
+        if (!result.empty()) {
+            Settings::values.camera_parameter[index] = result[0];
+            return true;
+        }
+    }
+
+    return false;
 }

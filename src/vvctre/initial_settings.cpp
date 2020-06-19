@@ -458,7 +458,7 @@ InitialSettings::InitialSettings(PluginManager& plugin_manager, SDL_Window* wind
                 if (ImGui::BeginTabItem("Camera")) {
                     ImGui::TextUnformatted("Inner Camera Engine:");
                     ImGui::SameLine();
-                    if (ImGui::BeginCombo("##innerengine",
+                    if (ImGui::BeginCombo("##innercameraengine",
                                           Settings::values
                                               .camera_engine[static_cast<std::size_t>(
                                                   Service::CAM::CameraIndex::InnerCamera)]
@@ -474,15 +474,24 @@ InitialSettings::InitialSettings(PluginManager& plugin_manager, SDL_Window* wind
                         ImGui::EndCombo();
                     }
 
-                    ImGui::TextUnformatted("Inner Camera Parameter:");
-                    ImGui::SameLine();
-                    ImGui::InputText("##innerparameter",
-                                     &Settings::values.camera_parameter[static_cast<std::size_t>(
-                                         Service::CAM::CameraIndex::InnerCamera)]);
+                    if (Settings::values.camera_engine[static_cast<std::size_t>(
+                            Service::CAM::CameraIndex::InnerCamera)] == "image") {
+                        ImGui::TextUnformatted("Inner Camera Parameter:");
+                        ImGui::SameLine();
+                        ImGui::PushItemWidth(316);
+                        ImGui::InputText(
+                            "##innercameraparameter",
+                            &Settings::values.camera_parameter[static_cast<std::size_t>(
+                                Service::CAM::CameraIndex::InnerCamera)]);
+                        ImGui::PopItemWidth();
+                        GUI_CameraAddBrowse(
+                            "Browse...##innercamera",
+                            static_cast<std::size_t>(Service::CAM::CameraIndex::InnerCamera));
+                    }
 
-                    ImGui::TextUnformatted("Outer Left Engine:");
+                    ImGui::TextUnformatted("Outer Left Camera Engine:");
                     ImGui::SameLine();
-                    if (ImGui::BeginCombo("##outerleftengine",
+                    if (ImGui::BeginCombo("##outerleftcameraengine",
                                           Settings::values
                                               .camera_engine[static_cast<std::size_t>(
                                                   Service::CAM::CameraIndex::OuterLeftCamera)]
@@ -498,15 +507,24 @@ InitialSettings::InitialSettings(PluginManager& plugin_manager, SDL_Window* wind
                         ImGui::EndCombo();
                     }
 
-                    ImGui::TextUnformatted("Outer Left Parameter:");
-                    ImGui::SameLine();
-                    ImGui::InputText("##outerleftparameter",
-                                     &Settings::values.camera_parameter[static_cast<std::size_t>(
-                                         Service::CAM::CameraIndex::OuterLeftCamera)]);
+                    if (Settings::values.camera_engine[static_cast<std::size_t>(
+                            Service::CAM::CameraIndex::OuterLeftCamera)] == "image") {
+                        ImGui::TextUnformatted("Outer Left Camera Parameter:");
+                        ImGui::SameLine();
+                        ImGui::PushItemWidth(316);
+                        ImGui::InputText(
+                            "##outerleftcameraparameter",
+                            &Settings::values.camera_parameter[static_cast<std::size_t>(
+                                Service::CAM::CameraIndex::OuterLeftCamera)]);
+                        ImGui::PopItemWidth();
+                        GUI_CameraAddBrowse(
+                            "Browse...##outerleftcamera",
+                            static_cast<std::size_t>(Service::CAM::CameraIndex::OuterLeftCamera));
+                    }
 
-                    ImGui::TextUnformatted("Outer Right Engine");
+                    ImGui::TextUnformatted("Outer Right Camera Engine");
                     ImGui::SameLine();
-                    if (ImGui::BeginCombo("##outerrightengine",
+                    if (ImGui::BeginCombo("##outerrightcameraengine",
                                           Settings::values
                                               .camera_engine[static_cast<std::size_t>(
                                                   Service::CAM::CameraIndex::OuterRightCamera)]
@@ -522,11 +540,20 @@ InitialSettings::InitialSettings(PluginManager& plugin_manager, SDL_Window* wind
                         ImGui::EndCombo();
                     }
 
-                    ImGui::TextUnformatted("Outer Right Parameter:");
-                    ImGui::SameLine();
-                    ImGui::InputText("##outerrightparameter",
-                                     &Settings::values.camera_parameter[static_cast<std::size_t>(
-                                         Service::CAM::CameraIndex::OuterRightCamera)]);
+                    if (Settings::values.camera_engine[static_cast<std::size_t>(
+                            Service::CAM::CameraIndex::OuterRightCamera)] == "image") {
+                        ImGui::TextUnformatted("Outer Right Camera Parameter:");
+                        ImGui::SameLine();
+                        ImGui::PushItemWidth(316);
+                        ImGui::InputText(
+                            "##outerrightcameraparameter",
+                            &Settings::values.camera_parameter[static_cast<std::size_t>(
+                                Service::CAM::CameraIndex::OuterRightCamera)]);
+                        ImGui::PopItemWidth();
+                        GUI_CameraAddBrowse(
+                            "Browse...##outerrightcamera",
+                            static_cast<std::size_t>(Service::CAM::CameraIndex::OuterRightCamera));
+                    }
 
                     ImGui::EndTabItem();
                 }
