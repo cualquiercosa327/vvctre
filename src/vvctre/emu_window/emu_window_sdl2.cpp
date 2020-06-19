@@ -355,7 +355,7 @@ void EmuWindow_SDL2::SwapBuffers() {
 
                 if (ImGui::BeginMenu("Amiibo")) {
                     if (ImGui::MenuItem("Load")) {
-                        const auto result =
+                        const std::vector<std::string> result =
                             pfd::open_file("Load Amiibo", ".",
                                            {"Amiibo Files", "*.bin *.BIN", "Anything", "*"})
                                 .result();
