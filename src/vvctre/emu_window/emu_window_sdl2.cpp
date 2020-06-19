@@ -252,9 +252,13 @@ void EmuWindow_SDL2::SwapBuffers() {
             if (ImGui::BeginMenu("File")) {
                 if (ImGui::MenuItem("Load File")) {
                     const std::vector<std::string> result =
-                        pfd::open_file(
-                            "Load File", ".",
-                            {"3DS Executables", "*.cci *.3ds *.cxi *.3dsx *.app *.elf *.axf"})
+                        pfd::open_file("Browse", ".",
+                                       {"All supported files",
+                                        "*.cci *.CCI *.3ds *.3DS *.cxi *.CXI *.3dsx *.3DSX "
+                                        "*.app *.APP *.elf *.ELF *.axf *.AXF",
+                                        "Cartridges", "*.cci *.CCI *.3ds *.3DS", "NCCHs",
+                                        "*.cxi *.CXI *.app *.APP", "Homebrew",
+                                        "*.3dsx *.3DSX *.elf *.ELF *.axf *.AXF"})
                             .result();
 
                     if (!result.empty()) {
@@ -269,7 +273,8 @@ void EmuWindow_SDL2::SwapBuffers() {
 
                 if (ImGui::MenuItem("Install CIA")) {
                     const std::vector<std::string> files =
-                        pfd::open_file("Install CIA", ".", {"CTR Importable Archive", "*.cia"},
+                        pfd::open_file("Install CIA", ".",
+                                       {"CTR Importable Archive", "*.cia *.CIA"},
                                        pfd::opt::multiselect)
                             .result();
 
@@ -352,7 +357,7 @@ void EmuWindow_SDL2::SwapBuffers() {
                     if (ImGui::MenuItem("Load")) {
                         const auto result =
                             pfd::open_file("Load Amiibo", ".",
-                                           {"Amiibo Files", "*.bin", "Anything", "*"})
+                                           {"Amiibo Files", "*.bin *.BIN", "Anything", "*"})
                                 .result();
 
                         if (!result.empty()) {

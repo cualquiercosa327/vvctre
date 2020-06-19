@@ -76,9 +76,11 @@ InitialSettings::InitialSettings(PluginManager& plugin_manager, SDL_Window* wind
                         const std::vector<std::string> result =
                             pfd::open_file("Browse", ".",
                                            {"All supported files",
-                                            "*.cci *.3ds *.cxi *.3dsx *.app *.elf *.axf",
-                                            "Cartridges", "*.cci *.3ds", "NCCHs", "*.cxi *.app",
-                                            "Homebrew", "*.3dsx *.elf *.axf"})
+                                            "*.cci *.CCI *.3ds *.3DS *.cxi *.CXI *.3dsx *.3DSX "
+                                            "*.app *.APP *.elf *.ELF *.axf *.AXF",
+                                            "Cartridges", "*.cci *.CCI *.3ds *.3DS", "NCCHs",
+                                            "*.cxi *.CXI *.app *.APP", "Homebrew",
+                                            "*.3dsx *.3DSX *.elf *.ELF *.axf *.AXF"})
                                 .result();
                         if (!result.empty()) {
                             Settings::values.file_path = result[0];
@@ -88,7 +90,8 @@ InitialSettings::InitialSettings(PluginManager& plugin_manager, SDL_Window* wind
                     ImGui::SameLine();
                     if (ImGui::Button("Install CIA")) {
                         const std::vector<std::string> files =
-                            pfd::open_file("Install CIA", ".", {"CTR Importable Archive", "*.cia"},
+                            pfd::open_file("Install CIA", ".",
+                                           {"CTR Importable Archive", "*.cia *.CIA"},
                                            pfd::opt::multiselect)
                                 .result();
 
