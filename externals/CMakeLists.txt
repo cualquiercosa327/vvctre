@@ -188,7 +188,7 @@ endif()
 
 # System Archives
 add_library(system-archives INTERFACE)
-target_include_directories(system-archives INTERFACE ./system-archives/include)
+target_include_directories(system-archives INTERFACE ./system-archives)
 
 add_subdirectory(cryptopp)
 add_subdirectory(teakra EXCLUDE_FROM_ALL)
