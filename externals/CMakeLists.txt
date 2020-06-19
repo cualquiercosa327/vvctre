@@ -45,14 +45,14 @@ if (ENABLE_CUBEB)
     add_subdirectory(cubeb EXCLUDE_FROM_ALL)
 endif()
 
-# OpenGL loader
-add_library(opengl-loader STATIC
-    opengl-loader/src/glad.c
-    opengl-loader/include/KHR/khrplatform.h
-    opengl-loader/include/glad/glad.h)
-target_include_directories(opengl-loader PUBLIC ./opengl-loader/include)
+# glad
+add_library(glad STATIC
+    glad/src/glad.c
+    glad/include/KHR/khrplatform.h
+    glad/include/glad/glad.h)
+target_include_directories(glad PUBLIC ./glad/include)
 if (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
-    target_link_libraries(opengl-loader PRIVATE dl)
+    target_link_libraries(glad PRIVATE dl)
 endif()
 
 # Dear ImGui
@@ -72,7 +72,7 @@ add_library(imgui
     imgui/examples/imgui_impl_sdl.h
     imgui/misc/cpp/imgui_stdlib.cpp
     imgui/misc/cpp/imgui_stdlib.h)
-target_link_libraries(imgui PRIVATE opengl-loader SDL2)
+target_link_libraries(imgui PRIVATE glad SDL2)
 target_compile_definitions(imgui PRIVATE IMGUI_IMPL_OPENGL_LOADER_GLAD)
 target_include_directories(imgui INTERFACE ./imgui ./imgui/examples ./imgui/misc/cpp)
 target_include_directories(imgui PRIVATE ./imgui ./imgui/examples ./imgui/misc/cpp)
@@ -186,7 +186,10 @@ if(WIN32)
     target_link_libraries(asl PRIVATE ws2_32 shell32 advapi32)
 endif()
 
+# System Archives
+add_library(system-archives INTERFACE)
+target_include_directories(system-archives INTERFACE ./system-archives/include)
+
 add_subdirectory(cryptopp)
-add_subdirectory(system-archives)
 add_subdirectory(teakra EXCLUDE_FROM_ALL)
 add_subdirectory(portable-file-dialogs EXCLUDE_FROM_ALL)

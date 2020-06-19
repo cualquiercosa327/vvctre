@@ -31,12 +31,6 @@
 [submodule "clip"]
     path = externals/clip
     url = https://github.com/dacap/clip.git
-[submodule "opengl-loader"]
-    path = externals/opengl-loader
-    url = https://github.com/vvanelslande/vvctre-opengl-loader.git
-[submodule "system-archives"]
-    path = externals/system-archives
-    url = https://github.com/vvanelslande/vvctre-system-archives.git
 [submodule "portable-file-dialogs"]
     path = externals/portable-file-dialogs
     url = https://github.com/samhocevar/portable-file-dialogs.git
