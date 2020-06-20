@@ -146,27 +146,31 @@ int main(int argc, char** argv) {
                     asl::Dic<>("User-Agent", user_agent.c_str()));
                 if (r.ok()) {
                     asl::Var json = r.json();
-                    const std::string running_version =
-                        fmt::format("{}.{}.{}", vvctre_version_major, vvctre_version_minor,
-                                    vvctre_version_patch);
-                    const std::string latest_version = *json["tag_name"];
-                    if (running_version != latest_version) {
-                        if (pfd::message(
-                                "vvctre",
-                                fmt::format("You have a old version.\nRunning: {}\nLatest: "
-                                            "{}\nOpen the latest version download page and exit?",
-                                            running_version, latest_version),
-                                pfd::choice::yes_no, pfd::icon::question)
-                                .result() == pfd::button::yes) {
+                    if (json["assets"].length() == 2) {
+                        const std::string running_version =
+                            fmt::format("{}.{}.{}", vvctre_version_major, vvctre_version_minor,
+                                        vvctre_version_patch);
+                        const std::string latest_version = *json["tag_name"];
+                        if (running_version != latest_version) {
+                            if (pfd::message(
+                                    "vvctre",
+                                    fmt::format(
+                                        "You have a old version.\nRunning: {}\nLatest: "
+                                        "{}\nOpen the latest version download page and exit?",
+                                        running_version, latest_version),
+                                    pfd::choice::yes_no, pfd::icon::question)
+                                    .result() == pfd::button::yes) {
 #ifdef _WIN32
-                            [[maybe_unused]] const int code = std::system(
-                                "start https://github.com/vvanelslande/vvctre/releases/latest");
+                                [[maybe_unused]] const int code = std::system(
+                                    "start https://github.com/vvanelslande/vvctre/releases/latest");
 #else
-                            [[maybe_unused]] const int code = std::system(
-                                "xdg-open https://github.com/vvanelslande/vvctre/releases/latest");
+                                [[maybe_unused]] const int code = std::system(
+                                    "xdg-open "
+                                    "https://github.com/vvanelslande/vvctre/releases/latest");
 #endif
 
-                            std::exit(0);
+                                std::exit(0);
+                            }
                         }
                     }
                 }
