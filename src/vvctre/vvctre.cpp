@@ -17,6 +17,8 @@
 
 #define SDL_MAIN_HANDLED
 #include <SDL.h>
+#include <asl/Http.h>
+#include <asl/JSON.h>
 #include <fmt/format.h>
 #include <glad/glad.h>
 #include <imgui.h>
@@ -129,6 +131,48 @@ int main(int argc, char** argv) {
     plugin_manager.cfg = cfg.get();
     plugin_manager.InitialSettingsOpening();
     if (argc < 2) {
+        SDL_Event event;
+        while (SDL_PollEvent(&event)) {
+            ImGui_ImplSDL2_ProcessEvent(&event);
+        }
+
+        if (!ImGui::IsKeyDown(SDL_SCANCODE_LSHIFT)) {
+            std::thread([] {
+                const std::string user_agent =
+                    fmt::format("vvctre/{}.{}.{}", vvctre_version_major, vvctre_version_minor,
+                                vvctre_version_patch);
+                asl::HttpResponse r = asl::Http::get(
+                    "https://api.github.com/repos/vvanelslande/vvctre/releases/latest",
+                    asl::Dic<>("User-Agent", user_agent.c_str()));
+                if (r.ok()) {
+                    asl::Var json = r.json();
+                    const std::string running_version =
+                        fmt::format("{}.{}.{}", vvctre_version_major, vvctre_version_minor,
+                                    vvctre_version_patch);
+                    const std::string latest_version = *json["tag_name"];
+                    if (running_version != latest_version) {
+                        if (pfd::message(
+                                "vvctre",
+                                fmt::format("You have a old version.\nRunning: {}\nLatest: "
+                                            "{}\nOpen the latest version download page and exit?",
+                                            running_version, latest_version),
+                                pfd::choice::yes_no, pfd::icon::question)
+                                .result() == pfd::button::yes) {
+#ifdef _WIN32
+                            [[maybe_unused]] const int code = std::system(
+                                "start https://github.com/vvanelslande/vvctre/releases/latest");
+#else
+                            [[maybe_unused]] const int code = std::system(
+                                "xdg-open https://github.com/vvanelslande/vvctre/releases/latest");
+#endif
+
+                            std::exit(0);
+                        }
+                    }
+                }
+            }).detach();
+        }
+
         InitialSettings(plugin_manager, window, *cfg);
     } else {
         Settings::values.file_path = std::string(argv[1]);
