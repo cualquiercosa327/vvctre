@@ -517,19 +517,25 @@ void EmuWindow_SDL2::SwapBuffers() {
                                         &Settings::values.use_hardware_renderer)) {
                         Settings::Apply();
                     }
-                    ImGui::Indent();
 
-                    if (ImGui::Checkbox("Use Hardware Shader",
-                                        &Settings::values.use_hardware_shader)) {
-                        Settings::Apply();
-                    }
-                    if (Settings::values.use_hardware_shader) {
+                    if (Settings::values.use_hardware_renderer) {
                         ImGui::Indent();
 
-                        if (ImGui::Checkbox(
-                                "Use Accurate Multiplication",
-                                &Settings::values.hardware_shader_accurate_multiplication)) {
+                        if (ImGui::Checkbox("Use Hardware Shader",
+                                            &Settings::values.use_hardware_shader)) {
                             Settings::Apply();
+                        }
+
+                        if (Settings::values.use_hardware_shader) {
+                            ImGui::Indent();
+
+                            if (ImGui::Checkbox(
+                                    "Accurate Multiplication",
+                                    &Settings::values.hardware_shader_accurate_multiplication)) {
+                                Settings::Apply();
+                            }
+
+                            ImGui::Unindent();
                         }
 
                         ImGui::Unindent();

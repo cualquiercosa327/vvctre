@@ -1646,10 +1646,18 @@ InitialSettings::InitialSettings(PluginManager& plugin_manager, SDL_Window* wind
                 if (ImGui::BeginTabItem("Graphics")) {
                     ImGui::Checkbox("Use Hardware Renderer",
                                     &Settings::values.use_hardware_renderer);
-                    ImGui::Checkbox("Use Hardware Shader", &Settings::values.use_hardware_shader);
-                    if (Settings::values.use_hardware_shader) {
-                        ImGui::Checkbox("Accurate Multiplication",
-                                        &Settings::values.hardware_shader_accurate_multiplication);
+                    if (Settings::values.use_hardware_renderer) {
+                        ImGui::Indent();
+                        ImGui::Checkbox("Use Hardware Shader",
+                                        &Settings::values.use_hardware_shader);
+                        if (Settings::values.use_hardware_shader) {
+                            ImGui::Indent();
+                            ImGui::Checkbox(
+                                "Accurate Multiplication",
+                                &Settings::values.hardware_shader_accurate_multiplication);
+                            ImGui::Unindent();
+                        }
+                        ImGui::Unindent();
                     }
                     ImGui::Checkbox("Use Shader JIT", &Settings::values.use_shader_jit);
                     ImGui::Checkbox("Enable VSync", &Settings::values.enable_vsync);
