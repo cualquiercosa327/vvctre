@@ -127,22 +127,11 @@ void GetAllFilesFromNestedEntries(FSTEntry& directory, std::vector<FSTEntry>& ou
 // deletes the given directory and anything under it. Returns true on success.
 bool DeleteDirRecursively(const std::string& directory, unsigned int recursion = 256);
 
-// Returns the current directory
-std::optional<std::string> GetCurrentDir();
-
 // Create directory and copy contents (does not overwrite existing files)
 void CopyDir(const std::string& source_path, const std::string& dest_path);
 
-// Set the current directory to given directory
-bool SetCurrentDir(const std::string& directory);
-
-// Returns a pointer to a string with a vvctre data dir in the user's home
-// directory. To be used in "multi-user" mode (that is, installed).
+// Returns a pointer to a string with a vvctre data dir
 const std::string& GetUserPath(UserPath path);
-
-#ifdef _WIN32
-const std::string& GetExeDirectory();
-#endif
 
 std::size_t WriteStringToFile(bool text_file, const std::string& filename, std::string_view str);
 

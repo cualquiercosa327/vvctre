@@ -524,48 +524,6 @@ void CopyDir(const std::string& source_path, const std::string& dest_path) {
 #endif
 }
 
-std::optional<std::string> GetCurrentDir() {
-    // Get the current working directory (getcwd uses malloc)
-#ifdef _WIN32
-    wchar_t* dir = _wgetcwd(nullptr, 0);
-    if (!dir) {
-#else
-    char* dir = getcwd(nullptr, 0);
-    if (!dir) {
-#endif
-        LOG_ERROR(Common_Filesystem, "GetCurrentDirectory failed: {}", GetLastErrorMsg());
-        return {};
-    }
-#ifdef _WIN32
-    std::string strDir = Common::UTF16ToUTF8(dir);
-#else
-    std::string strDir = dir;
-#endif
-    free(dir);
-    return strDir;
-}
-
-bool SetCurrentDir(const std::string& directory) {
-#ifdef _WIN32
-    return _wchdir(Common::UTF8ToUTF16W(directory).c_str()) == 0;
-#else
-    return chdir(directory.c_str()) == 0;
-#endif
-}
-
-#ifdef _WIN32
-const std::string& GetExeDirectory() {
-    static std::string exe_path;
-    if (exe_path.empty()) {
-        wchar_t wchar_exe_path[2048];
-        GetModuleFileNameW(nullptr, wchar_exe_path, 2048);
-        exe_path = Common::UTF16ToUTF8(wchar_exe_path);
-        exe_path = exe_path.substr(0, exe_path.find_last_of('\\'));
-    }
-    return exe_path;
-}
-#endif
-
 namespace {
 std::unordered_map<UserPath, std::string> g_paths;
 }
