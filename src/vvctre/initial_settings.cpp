@@ -368,8 +368,10 @@ InitialSettings::InitialSettings(PluginManager& plugin_manager, SDL_Window* wind
                     ImGui::Checkbox("Enable DSP LLE", &Settings::values.enable_dsp_lle);
 
                     if (Settings::values.enable_dsp_lle) {
+                        ImGui::Indent();
                         ImGui::Checkbox("Use multiple threads",
                                         &Settings::values.enable_dsp_lle_multithread);
+                        ImGui::Unindent();
                     }
 
                     ImGui::TextUnformatted("Volume:");
