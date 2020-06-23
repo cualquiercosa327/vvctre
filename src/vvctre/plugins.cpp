@@ -51,7 +51,7 @@ bool has_suffix(const std::string& str, const std::string& suffix) {
 
 PluginManager::PluginManager(Core::System& core, SDL_Window* window) : window(window) {
     FileUtil::FSTEntry parent;
-    FileUtil::ScanDirectoryTree(std::string(*asl::Process::myDir()), parent);
+    FileUtil::ScanDirectoryTree(*asl::Process::myDir(), parent);
     for (const auto& entry : parent.children) {
         if (!entry.isDirectory &&
 #ifdef _WIN32

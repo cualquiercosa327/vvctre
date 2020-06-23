@@ -256,7 +256,7 @@ void EmuWindow_SDL2::SwapBuffers() {
             if (ImGui::BeginMenu("File")) {
                 if (ImGui::MenuItem("Load File")) {
                     const std::vector<std::string> result =
-                        pfd::open_file("Browse", std::string(*asl::Process::myDir()),
+                        pfd::open_file("Browse", *asl::Process::myDir(),
                                        {"All supported files",
                                         "*.cci *.CCI *.3ds *.3DS *.cxi *.CXI *.3dsx *.3DSX "
                                         "*.app *.APP *.elf *.ELF *.axf *.AXF",
@@ -277,7 +277,7 @@ void EmuWindow_SDL2::SwapBuffers() {
 
                 if (ImGui::MenuItem("Install CIA")) {
                     const std::vector<std::string> files =
-                        pfd::open_file("Install CIA", std::string(*asl::Process::myDir()),
+                        pfd::open_file("Install CIA", *asl::Process::myDir(),
                                        {"CTR Importable Archive", "*.cia *.CIA"},
                                        pfd::opt::multiselect)
                             .result();
@@ -361,7 +361,7 @@ void EmuWindow_SDL2::SwapBuffers() {
                 if (ImGui::BeginMenu("Amiibo")) {
                     if (ImGui::MenuItem("Load")) {
                         const std::vector<std::string> result =
-                            pfd::open_file("Load Amiibo", std::string(*asl::Process::myDir()),
+                            pfd::open_file("Load Amiibo", *asl::Process::myDir(),
                                            {"Amiibo Files", "*.bin *.BIN", "Anything", "*"})
                                 .result();
 
@@ -2350,10 +2350,9 @@ void EmuWindow_SDL2::SwapBuffers() {
 
                     if (ImGui::MenuItem("Play", nullptr, nullptr,
                                         !movie.IsPlayingInput() && !movie.IsRecordingInput())) {
-                        const auto filename =
-                            pfd::open_file("Play Movie", std::string(*asl::Process::myDir()),
-                                           {"VvCtre Movie", "*.vcm"})
-                                .result();
+                        const auto filename = pfd::open_file("Play Movie", *asl::Process::myDir(),
+                                                             {"VvCtre Movie", "*.vcm"})
+                                                  .result();
                         if (!filename.empty()) {
                             const auto movie_result = movie.ValidateMovie(filename[0]);
                             switch (movie_result) {

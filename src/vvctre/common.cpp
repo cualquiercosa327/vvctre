@@ -131,7 +131,7 @@ bool GUI_CameraAddBrowse(const char* label, std::size_t index) {
 
     if (ImGui::Button(label)) {
         const std::vector<std::string> result =
-            pfd::open_file("Browse", std::string(*asl::Process::myDir()),
+            pfd::open_file("Browse", *asl::Process::myDir(),
                            {"All supported files",
                             "*.jpg *.JPG *.jpeg *.JPEG *.jfif *.JFIF *.png *.PNG "
                             "*.bmp "
