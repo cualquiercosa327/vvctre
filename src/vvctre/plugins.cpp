@@ -504,6 +504,10 @@ void vvctre_set_cheat_enabled(void* core, int index, bool enabled) {
     static_cast<Core::System*>(core)->CheatEngine().GetCheats()[index]->SetEnabled(enabled);
 }
 
+bool vvctre_get_cheat_enabled(void* core, int index) {
+    return static_cast<Core::System*>(core)->CheatEngine().GetCheats()[index]->IsEnabled();
+}
+
 void vvctre_add_gateway_cheat(void* core, const char* name, const char* code,
                               const char* comments) {
     static_cast<Core::System*>(core)->CheatEngine().AddCheat(std::make_shared<Cheats::GatewayCheat>(
@@ -2013,6 +2017,7 @@ std::unordered_map<std::string, void*> PluginManager::function_map = {
     {"vvctre_get_cheat_type", (void*)&vvctre_get_cheat_type},
     {"vvctre_get_cheat_code", (void*)&vvctre_get_cheat_code},
     {"vvctre_set_cheat_enabled", (void*)&vvctre_set_cheat_enabled},
+    {"vvctre_get_cheat_enabled", (void*)&vvctre_get_cheat_enabled},
     {"vvctre_add_gateway_cheat", (void*)&vvctre_add_gateway_cheat},
     {"vvctre_remove_cheat", (void*)&vvctre_remove_cheat},
     {"vvctre_update_gateway_cheat", (void*)&vvctre_update_gateway_cheat},
