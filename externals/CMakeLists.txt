@@ -106,14 +106,10 @@ add_subdirectory(mbedtls EXCLUDE_FROM_ALL)
 add_library(asl STATIC
 	asl/src/String.cpp
 	asl/src/Socket.cpp
-	asl/src/SocketServer.cpp
 	asl/src/MulticastSocket.cpp
-	asl/src/HttpServer.cpp
 	asl/src/Http.cpp
-	asl/src/WebSocket.cpp
 	asl/src/Xdl.cpp
 	asl/src/Var.cpp
-	asl/src/Xml.cpp
 	asl/src/IniFile.cpp
 	asl/src/File.cpp
 	asl/src/TextFile.cpp
@@ -121,17 +117,8 @@ add_library(asl STATIC
 	asl/src/Path.cpp
 	asl/src/Date.cpp
 	asl/src/Process.cpp
-	# asl/src/Matrix4.cpp
-	asl/src/Console.cpp
-	asl/src/Log.cpp
-	asl/src/TabularDataFile.cpp
-	asl/src/CmdArgs.cpp
-	asl/src/SerialPort.cpp
-	asl/src/SharedMem.cpp
 	asl/src/unicodedata.cpp
 	asl/src/util.cpp
-	asl/src/SHA1.cpp
-    asl/src/Uuid.cpp
     asl/src/TlsSocket.cpp
 	asl/include/asl/defs.h
 	asl/include/asl/String.h
@@ -143,10 +130,6 @@ add_library(asl STATIC
 	asl/include/asl/Vec2.h
 	asl/include/asl/Vec3.h
 	asl/include/asl/Vec4.h
-	asl/include/asl/Quaternion.h
-	asl/include/asl/Matrix3.h
-	asl/include/asl/Matrix4.h
-	asl/include/asl/Pose.h
 	asl/include/asl/File.h
 	asl/include/asl/IniFile.h
 	asl/include/asl/Date.h
@@ -154,29 +137,15 @@ add_library(asl STATIC
 	asl/include/asl/TextFile.h
 	asl/include/asl/Directory.h
 	asl/include/asl/Path.h
-	asl/include/asl/Library.h
-	asl/include/asl/Thread.h
 	asl/include/asl/Mutex.h
 	asl/include/asl/Process.h
 	asl/include/asl/Var.h
 	asl/include/asl/Xdl.h
-	asl/include/asl/Xml.h
 	asl/include/asl/Socket.h
-	asl/include/asl/SocketServer.h
-	asl/include/asl/HttpServer.h
 	asl/include/asl/Http.h
-	asl/include/asl/WebSocket.h
-	asl/include/asl/Console.h
-	asl/include/asl/Singleton.h
-	asl/include/asl/Factory.h
-	asl/include/asl/Log.h
 	asl/include/asl/Pointer.h
-	asl/include/asl/TabularDataFile.h
-	asl/include/asl/CmdArgs.h
-	asl/include/asl/SerialPort.h
 	asl/include/asl/util.h
 	asl/include/asl/TlsSocket.h
-	asl/include/asl/SHA1.h
 )
 target_compile_definitions(asl PUBLIC ASL_IPV6 ASL_TLS ASL_STATIC)
 target_include_directories(asl PRIVATE ./asl/include ./mbedtls/include)
