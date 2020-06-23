@@ -17,6 +17,7 @@
 #include "audio_core/cubeb_input.h"
 #endif
 #include <asl/JSON.h>
+#include <asl/Process.h>
 #include "audio_core/sink.h"
 #include "audio_core/sink_details.h"
 #include "common/file_util.h"
@@ -75,7 +76,7 @@ InitialSettings::InitialSettings(PluginManager& plugin_manager, SDL_Window* wind
                     ImGui::SameLine();
                     if (ImGui::Button("Browse...##file")) {
                         const std::vector<std::string> result =
-                            pfd::open_file("Browse", ".",
+                            pfd::open_file("Browse", std::string(*asl::Process::myDir()),
                                            {"All supported files",
                                             "*.cci *.CCI *.3ds *.3DS *.cxi *.CXI *.3dsx *.3DSX "
                                             "*.app *.APP *.elf *.ELF *.axf *.AXF",
@@ -91,7 +92,7 @@ InitialSettings::InitialSettings(PluginManager& plugin_manager, SDL_Window* wind
                     ImGui::SameLine();
                     if (ImGui::Button("Install CIA")) {
                         const std::vector<std::string> files =
-                            pfd::open_file("Install CIA", ".",
+                            pfd::open_file("Install CIA", std::string(*asl::Process::myDir()),
                                            {"CTR Importable Archive", "*.cia *.CIA"},
                                            pfd::opt::multiselect)
                                 .result();
@@ -196,7 +197,8 @@ InitialSettings::InitialSettings(PluginManager& plugin_manager, SDL_Window* wind
                         ImGui::SameLine();
                         if (ImGui::Button("Browse...##playmovie")) {
                             const std::vector<std::string> result =
-                                pfd::open_file("Play Movie", ".", {"VvCtre Movie", "*.vcm"})
+                                pfd::open_file("Play Movie", std::string(*asl::Process::myDir()),
+                                               {"VvCtre Movie", "*.vcm"})
                                     .result();
                             if (!result.empty()) {
                                 Settings::values.play_movie = result[0];
@@ -1801,7 +1803,9 @@ InitialSettings::InitialSettings(PluginManager& plugin_manager, SDL_Window* wind
                 if (ImGui::BeginTabItem("Controls")) {
                     if (ImGui::Button("Load File")) {
                         const std::vector<std::string> path =
-                            pfd::open_file("Load File", ".", {"JSON Files", "*.json"}).result();
+                            pfd::open_file("Load File", std::string(*asl::Process::myDir()),
+                                           {"JSON Files", "*.json"})
+                                .result();
                         if (!path.empty()) {
                             asl::Var json = asl::Json::read(path[0].c_str());
                             asl::Array buttons = json["buttons"].array();

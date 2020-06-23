@@ -7,6 +7,7 @@
 #define SDL_MAIN_HANDLED
 #include <SDL.h>
 #include <asl/JSON.h>
+#include <asl/Process.h>
 #include <fmt/format.h>
 #include <imgui.h>
 #include "common/common_funcs.h"
@@ -50,14 +51,7 @@ bool has_suffix(const std::string& str, const std::string& suffix) {
 
 PluginManager::PluginManager(Core::System& core, SDL_Window* window) : window(window) {
     FileUtil::FSTEntry parent;
-    FileUtil::ScanDirectoryTree(
-#ifdef _WIN32
-        FileUtil::GetExeDirectory()
-#else
-        "."
-#endif
-            ,
-        parent);
+    FileUtil::ScanDirectoryTree(std::string(*asl::Process::myDir()), parent);
     for (const auto& entry : parent.children) {
         if (!entry.isDirectory &&
 #ifdef _WIN32

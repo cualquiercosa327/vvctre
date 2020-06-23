@@ -7,6 +7,7 @@
 #include <memory>
 #include <sstream>
 #include <unordered_map>
+#include <asl/Process.h>
 #include "common/assert.h"
 #include "common/common_funcs.h"
 #include "common/file_util.h"
@@ -572,11 +573,7 @@ std::unordered_map<UserPath, std::string> g_paths;
 static void InitUserPaths() {
     std::string& user_path = g_paths[UserPath::UserDir];
 
-#ifdef _WIN32
-    user_path = GetExeDirectory() + "/user/";
-#else
-    user_path = "./user/";
-#endif
+    user_path = *(asl::Process::myDir() + "/user/");
 
     g_paths[UserPath::SDMCDir] = user_path + "sdmc/";
     g_paths[UserPath::NANDDir] = user_path + "nand/";

@@ -56,7 +56,7 @@ if(ARCHITECTURE_x86_64)
     )
 endif()
 
-target_link_libraries(common PUBLIC fmt ${PLATFORM_LIBRARIES})
+target_link_libraries(common PUBLIC fmt ${PLATFORM_LIBRARIES} PRIVATE asl)
 
 if (ARCHITECTURE_x86_64)
     target_link_libraries(common PRIVATE xbyak)
