@@ -43,6 +43,8 @@ InitialSettings::InitialSettings(PluginManager& plugin_manager, SDL_Window* wind
     CitraRoomList public_rooms;
     bool first_time_in_multiplayer = true;
     std::string public_rooms_query;
+    u16 play_coins = 0xDEAD;
+    bool play_coins_changed = false;
 
     for (;;) {
         // Poll events
@@ -1630,10 +1632,13 @@ InitialSettings::InitialSettings(PluginManager& plugin_manager, SDL_Window* wind
                     const u16 min = 0;
                     const u16 max = 300;
 
-                    u16 play_coins = Service::PTM::Module::GetPlayCoins();
+                    if (play_coins == 0xDEAD) {
+                        play_coins = Service::PTM::Module::GetPlayCoins();
+                    }
+
                     if (ImGui::SliderScalar("##playcoins", ImGuiDataType_U16, &play_coins, &min,
                                             &max)) {
-                        Service::PTM::Module::SetPlayCoins(play_coins);
+                        play_coins_changed = true;
                     }
 
                     if (ImGui::Button("Regenerate Console ID")) {
@@ -2792,6 +2797,9 @@ InitialSettings::InitialSettings(PluginManager& plugin_manager, SDL_Window* wind
                     Settings::Apply();
                     if (update_config_savegame) {
                         cfg.UpdateConfigNANDSavegame();
+                    }
+                    if (play_coins_changed) {
+                        Service::PTM::Module::SetPlayCoins(play_coins);
                     }
                     return;
                 }
