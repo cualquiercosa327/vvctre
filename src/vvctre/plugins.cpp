@@ -63,7 +63,8 @@ PluginManager::PluginManager(Core::System& core, SDL_Window* window) : window(wi
 #ifdef _WIN32
             HMODULE handle = LoadLibraryA(entry.virtualName.c_str());
 #else
-            void* handle = dlopen(fmt::format("./{}", entry.virtualName).c_str(), RTLD_LAZY);
+            void* handle = dlopen(
+                fmt::format("{}/{}", *asl::Process::myDir(), entry.virtualName).c_str(), RTLD_LAZY);
 #endif
             if (handle == NULL) {
                 fmt::print("Plugin {} failed to load: {}\n", entry.virtualName,
