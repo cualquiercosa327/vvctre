@@ -244,10 +244,8 @@ void EmuWindow_SDL2::SwapBuffers() {
 
     if (ImGui::Begin("FPS and Menu", nullptr,
                      ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoSavedSettings |
-                         ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_AlwaysAutoResize)) {
-        if (ImGui::IsWindowAppearing()) {
-            ImGui::SetWindowFocus(nullptr);
-        }
+                         ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_AlwaysAutoResize |
+                         ImGuiWindowFlags_NoFocusOnAppearing)) {
         ImGui::SetWindowPos(ImVec2(), ImGuiCond_Once);
         ImGui::TextColored(fps_color, "%d FPS", static_cast<int>(io.Framerate));
         if (ImGui::BeginPopupContextItem("##menu", ImGuiMouseButton_Right)) {
