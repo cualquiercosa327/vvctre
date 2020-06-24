@@ -48,7 +48,7 @@ void Init(Frontend::EmuWindow& emu_window, Memory::MemorySystem& memory);
 void Shutdown();
 
 /// Request a screenshot of the next frame
-/// Returns: another screenshot pending
+/// Returns whether another screenshot is pending
 bool RequestScreenshot(void* data, std::function<void()> callback,
                        const Layout::FramebufferLayout& layout);
 
