@@ -209,6 +209,8 @@ void RoomMember::RoomMemberImpl::MemberLoop() {
                     SetState(State::Idle);
                     SetError(Error::HostBanned);
                     break;
+                default:
+                    break;
                 }
                 enet_packet_destroy(event.packet);
                 break;
