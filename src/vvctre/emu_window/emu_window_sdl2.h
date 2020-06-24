@@ -85,22 +85,29 @@ private:
 
     void ConnectToCitraRoom();
 
-    /// Window
+    // Window
     bool is_open = true;
     SDL_Window* window = nullptr;
 
+    // System
     Core::System& system;
+
+    // FPS color
     ImVec4 fps_color{0.0f, 1.0f, 0.0f, 1.0f}; // Green
 
+    // IPC recordder
     IPCDebugger::CallbackHandle ipc_recorder_callback;
     std::map<int, IPCDebugger::RequestRecord> ipc_records;
 
+    // Installed
     std::string installed_query;
     std::vector<std::tuple<std::string, std::string>> installed;
 
+    // Windows
     bool show_cheats_window = false;
     bool show_ipc_recorder_window = false;
 
+    // Play coins
     u16 play_coins = 0;
     bool play_coins_changed = false;
 

@@ -23,8 +23,10 @@ public:
                              Service::CFG::Module& cfg);
 
 private:
+    // System
     bool update_config_savegame = false;
 
+    // Installed
     std::vector<std::tuple<std::string, std::string>> installed;
     std::string installed_query;
 };
