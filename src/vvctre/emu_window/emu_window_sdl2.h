@@ -93,7 +93,8 @@ private:
     Core::System& system;
 
     // FPS color
-    ImVec4 fps_color{0.0f, 1.0f, 0.0f, 1.0f}; // Green
+    // Default: Green
+    ImVec4 fps_color{0.0f, 1.0f, 0.0f, 1.0f};
 
     // IPC recorder
     IPCDebugger::CallbackHandle ipc_recorder_callback;
@@ -104,7 +105,7 @@ private:
     std::string installed_query;
     std::vector<std::tuple<std::string, std::string>> installed;
 
-    // Windows
+    // Cheats
     bool show_cheats_window = false;
 
     // Play coins
@@ -122,5 +123,6 @@ private:
     Network::RoomMember::CallbackHandle<Network::StatusMessageEntry> multiplayer_on_status_message;
     std::unordered_set<std::string> multiplayer_blocked_nicknames;
 
+    // Plugins
     PluginManager& plugin_manager;
 };
