@@ -95,9 +95,10 @@ private:
     // FPS color
     ImVec4 fps_color{0.0f, 1.0f, 0.0f, 1.0f}; // Green
 
-    // IPC recordder
+    // IPC recorder
     IPCDebugger::CallbackHandle ipc_recorder_callback;
     std::map<int, IPCDebugger::RequestRecord> ipc_records;
+    bool show_ipc_recorder_window = false;
 
     // Installed
     std::string installed_query;
@@ -105,7 +106,6 @@ private:
 
     // Windows
     bool show_cheats_window = false;
-    bool show_ipc_recorder_window = false;
 
     // Play coins
     u16 play_coins = 0;
