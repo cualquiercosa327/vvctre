@@ -2083,14 +2083,14 @@ void EmuWindow_SDL2::SwapBuffers() {
 
                     ImGui::TextUnformatted("Play Coins (may need to restart emulation):");
                     ImGui::SameLine();
-
                     const u16 min = 0;
                     const u16 max = 300;
-
-                    u16 play_coins = Service::PTM::Module::GetPlayCoins();
+                    if (ImGui::IsWindowAppearing()) {
+                        play_coins = Service::PTM::Module::GetPlayCoins();
+                    }
                     if (ImGui::SliderScalar("##playcoins", ImGuiDataType_U16, &play_coins, &min,
                                             &max)) {
-                        Service::PTM::Module::SetPlayCoins(play_coins);
+                        play_coins_changed = true;
                     }
 
                     ImGui::EndMenu();
@@ -2419,6 +2419,10 @@ void EmuWindow_SDL2::SwapBuffers() {
 
             ImGui::EndPopup();
         } else {
+            if (play_coins_changed) {
+                Service::PTM::Module::SetPlayCoins(play_coins);
+                play_coins_changed = false;
+            }
             paused = false;
         }
     }

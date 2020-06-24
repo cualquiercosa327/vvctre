@@ -101,6 +101,9 @@ private:
     bool show_cheats_window = false;
     bool show_ipc_recorder_window = false;
 
+    u16 play_coins = 0;
+    bool play_coins_changed = false;
+
     // Multiplayer
     bool show_connect_to_citra_room = false;
     CitraRoomList public_rooms;
