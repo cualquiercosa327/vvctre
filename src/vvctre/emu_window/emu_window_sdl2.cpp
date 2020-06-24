@@ -2974,62 +2974,42 @@ void EmuWindow_SDL2::PollEvents() {
             break;
         case SDL_KEYDOWN:
         case SDL_KEYUP:
-            // Ignore it if a Dear ImGui window is focused
-            if (ImGui::IsWindowFocused(ImGuiFocusedFlags_AnyWindow)) {
-                return;
+            if (!ImGui::GetIO().WantCaptureKeyboard) {
+                OnKeyEvent(static_cast<int>(event.key.keysym.scancode), event.key.state);
             }
 
-            OnKeyEvent(static_cast<int>(event.key.keysym.scancode), event.key.state);
             break;
         case SDL_MOUSEMOTION:
-            // Ignore it if a Dear ImGui window is focused
-            if (ImGui::IsWindowFocused(ImGuiFocusedFlags_AnyWindow)) {
-                return;
-            }
-
-            // Ignore if it came from touch
-            if (event.button.which != SDL_TOUCH_MOUSEID) {
+            if (!ImGui::GetIO().WantCaptureMouse && event.button.which != SDL_TOUCH_MOUSEID) {
                 OnMouseMotion(event.motion.x, event.motion.y);
             }
 
             break;
         case SDL_MOUSEBUTTONDOWN:
         case SDL_MOUSEBUTTONUP:
-            // Ignore it if a Dear ImGui window is focused
-            if (ImGui::IsWindowFocused(ImGuiFocusedFlags_AnyWindow)) {
-                return;
-            }
-
-            // Ignore if it came from touch
-            if (event.button.which != SDL_TOUCH_MOUSEID) {
+            if (!ImGui::GetIO().WantCaptureMouse && event.button.which != SDL_TOUCH_MOUSEID) {
                 OnMouseButton(event.button.button, event.button.state, event.button.x,
                               event.button.y);
             }
 
             break;
         case SDL_FINGERDOWN:
-            // Ignore it if a Dear ImGui window is focused
-            if (ImGui::IsWindowFocused(ImGuiFocusedFlags_AnyWindow)) {
-                return;
+            if (!ImGui::GetIO().WantCaptureMouse) {
+                OnFingerDown(event.tfinger.x, event.tfinger.y);
             }
 
-            OnFingerDown(event.tfinger.x, event.tfinger.y);
             break;
         case SDL_FINGERMOTION:
-            // Ignore it if a Dear ImGui window is focused
-            if (ImGui::IsWindowFocused(ImGuiFocusedFlags_AnyWindow)) {
-                return;
+            if (!ImGui::GetIO().WantCaptureMouse) {
+                OnFingerMotion(event.tfinger.x, event.tfinger.y);
             }
 
-            OnFingerMotion(event.tfinger.x, event.tfinger.y);
             break;
         case SDL_FINGERUP:
-            // Ignore it if a Dear ImGui window is focused
-            if (ImGui::IsWindowFocused(ImGuiFocusedFlags_AnyWindow)) {
-                return;
+            if (!ImGui::GetIO().WantCaptureMouse) {
+                OnFingerUp();
             }
 
-            OnFingerUp();
             break;
         case SDL_QUIT:
             is_open = false;
